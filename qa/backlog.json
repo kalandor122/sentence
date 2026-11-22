@@ -1111,8 +1111,9 @@
       "hint": "Repro: In a project open View > Git history, click 'Continue with GitHub', wait for the dialog, then inspect document.activeElement. (Probe: githubDialog.)\nActual: A [role=dialog][aria-modal=true] is present (count 1) but document.activeElement remains the 'Continue with GitHub' button behind the backdrop; document.activeElement.closest('[role=dialog]') is false. The trap only engages on the next Tab.",
       "source": "explore:keyboard:github auth dialog opens without moving focus into it",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:54:02Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:54:02Z",
+      "lastAttemptAt": "2026-11-22T23:54:02Z"
     },
     {
       "id": "qa-076",
