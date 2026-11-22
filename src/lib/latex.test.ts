@@ -500,6 +500,38 @@ describe("LaTeX generation", () => {
     expect(parsed.settings.primaryCategory).toBe("cs.SE");
     expect(parsed.settings.crossListCategories).toBe("cs.DL");
   });
+
+  it("writes image asset paths instead of base64 data URIs", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "image",
+          attrs: {
+            src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==",
+            alt: "qa test.png",
+          },
+        },
+        {
+          type: "image",
+          attrs: {
+            src: "data:image/jpeg;base64,/9j/4AAQSkZJRg==",
+            path: "assets/images/imported-qa-test.png",
+            alt: "qa-test.png",
+          },
+        },
+        {
+          type: "image",
+          attrs: { src: "data:image/png;base64,iVBORw0KGgo==", alt: "" },
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("{assets/images/qa-test.png}");
+    expect(latex).toContain("{assets/images/imported-qa-test.png}");
+    expect(latex).toContain("{assets/images/image.png}");
+    expect(latex).not.toContain("data:");
+  });
 });
 
 describe("document statistics", () => {

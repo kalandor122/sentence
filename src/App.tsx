@@ -39,6 +39,7 @@ import {
   documentPlainText,
   documentToLatex,
   hasCitations,
+  imageAssetPath,
   latexToDocument,
 } from "./lib/latex";
 import {
@@ -748,7 +749,10 @@ export default function App() {
         setToast(error instanceof Error ? error.message : String(error));
       }
     }
-    editor?.chain().focus().setImage({ src: dataUrl, alt: file.name }).run();
+    editor?.chain().focus().insertContent({
+      type: "image",
+      attrs: { src: dataUrl, alt: file.name, path: imageAssetPath(file.name) },
+    }).run();
   };
 
   const refreshGit = async () => {

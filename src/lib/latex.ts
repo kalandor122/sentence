@@ -31,6 +31,22 @@ export function escapeLatex(value: string): string {
   return value.replace(/[\\&%$#_{}~^]/g, (character) => SPECIAL_CHARACTERS[character]);
 }
 
+export function imageAssetPath(fileName: string): string {
+  const safeName = fileName
+    .replace(/^.*[\\/]/, "")
+    .replace(/[^a-zA-Z0-9._-]/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `assets/images/${safeName || "image.png"}`;
+}
+
+function imageSourcePath(src: string, alt: string): string {
+  if (!/^data:/i.test(src)) return src;
+  const mime = /^data:image\/(png|jpe?g);/i.exec(src)?.[1]?.toLowerCase() ?? "png";
+  const extension = mime === "jpeg" ? "jpg" : mime;
+  const name = alt.trim() || "image";
+  return imageAssetPath(/\.[a-z0-9]+$/i.test(name) ? name : `${name}.${extension}`);
+}
+
 function nodesContainCitations(nodes: DocumentNode[] | undefined): boolean {
   return (nodes ?? []).some(
     (node) => node.type === "citation" || nodesContainCitations(node.content),
@@ -266,12 +282,13 @@ function listItemToLatex(node: DocumentNode): string {
 function imageToLatex(node: DocumentNode): string {
   const src = attribute(node, "path") ?? attribute(node, "src") ?? "";
   const alt = attribute(node, "alt") ?? "";
+  const filename = imageSourcePath(src, alt);
   const width = Number(node.attrs?.width ?? 0);
   const widthArgument = width > 0 ? `width=${(width / 100).toFixed(2)}\\linewidth` : "width=0.8\\linewidth";
   return [
     "\\begin{figure}[htbp]",
     "\\centering",
-    `\\includegraphics[${widthArgument}]{${escapeLatex(src)}}`,
+    `\\includegraphics[${widthArgument}]{${escapeLatex(filename)}}`,
     alt ? `\\caption{${escapeLatex(alt)}}` : "",
     "\\end{figure}",
   ]
