@@ -65,7 +65,9 @@
         "src/styles.css"
       ],
       "hint": "App.tsx already has setMode(nextMode) and an EditorMode of visual|source|split. Make the status-bar mode segment a segmented control (Visual / Source / Split) and add a matching View-tab group in the ribbon. Keyboard: Ctrl+Alt+1/2/3.",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:09:03Z"
     },
     {
       "id": "qa-005",
@@ -1134,10 +1136,11 @@
       ],
       "hint": "Repro: Insert a 3x3 table, click the top-left cell, type `first line`, press Enter, type `second line`, then switch View > LaTeX.\nActual: The visual cell shows two paragraphs (`first line` and `second line`), but the exported tabular row contains only `first line &  &  \\\\`; `second line` is absent from the source.",
       "source": "explore:tables:text in a second paragraph of a table cell is dropped from latex",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:06:01Z",
-      "lastAttemptAt": "2026-11-22T23:06:01Z"
+      "lastAttemptAt": "2026-11-22T23:06:01Z",
+      "doneAt": "2026-11-22T23:08:29Z"
     },
     {
       "id": "qa-087",
