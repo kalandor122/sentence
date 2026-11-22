@@ -187,10 +187,11 @@
       ],
       "hint": "Repro: Reload, Create a project, click 'Drafting with constraints' in Outline, type ' omega psi'\nActual: Editor scrolls (scrollTop 0 -> 365) but document.activeElement stays BODY; the typed text is discarded and word count stays 92",
       "source": "explore:chrome:outline navigation does not focus the editor on first use; typing is silently dropped",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:24:14Z",
-      "lastAttemptAt": "2026-11-22T23:24:14Z"
+      "lastAttemptAt": "2026-11-22T23:24:14Z",
+      "doneAt": "2026-11-22T23:24:49Z"
     },
     {
       "id": "qa-013",
@@ -202,7 +203,9 @@
       ],
       "hint": "Repro: Select text, Home > Add link, type 'not a url', Insert\nActual: Dialog closes and creates <a href=\"not a url\">; no error, no normalisation",
       "source": "explore:chrome:link dialog writes invalid hrefs without validation",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:25:23Z"
     },
     {
       "id": "qa-014",
