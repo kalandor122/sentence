@@ -388,8 +388,9 @@
       "hint": "Repro: Cursor after 'Good tool' in 'Good tools stay close to the work.' -> Insert > Image -> pick a file\nActual: paragraph becomes 'Good tool' / [image] / 's stay close to the work.' in the visual doc, and the same split appears in LaTeX | evidence: blocks: P 'Good tool', IMG, P 's stay close to the work. ...'",
       "source": "explore:insert:image inserted mid-paragraph splits the paragraph at the cursor, breaking the sentence in two",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:32:15Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:32:15Z",
+      "lastAttemptAt": "2026-11-22T23:32:15Z"
     },
     {
       "id": "qa-027",
