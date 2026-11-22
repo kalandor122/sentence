@@ -103,3 +103,4 @@ Aborting
 2026-11-22T23:08:29Z DONE qa-086 (tsc -b, npm test, smoke all green)
 2026-11-22T23:14:02Z DONE qa-004 (tsc -b, npm test, smoke all green)
 2026-11-22T23:14:36Z START qa-005 on qa/qa-005-browser-demo-workspace-does-not-survive: Browser demo workspace does not survive a reload (everything is lost)
+2026-11-22T23:21:22Z DONE qa-005 (tsc -b, npm test, smoke all green)

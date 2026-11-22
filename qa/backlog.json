@@ -81,10 +81,11 @@
         "src/lib/tauri.ts"
       ],
       "hint": "When !isDesktop, persist the workspace to localStorage on the existing autosave debounce and restore it on boot (recent documents list too). Keep the desktop path unchanged. Do not fake file-system success.",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:14:36Z",
-      "lastAttemptAt": "2026-11-22T23:14:36Z"
+      "lastAttemptAt": "2026-11-22T23:14:36Z",
+      "doneAt": "2026-11-22T23:21:22Z"
     },
     {
       "id": "qa-006",
@@ -97,7 +98,9 @@
         "src/editor/EditorSurface.tsx"
       ],
       "hint": "Ctrl/Cmd+wheel over the page area changes zoom in the existing 70-150 range; Ctrl+0 resets to 100%; add a small fit-width button next to the zoom percentage. Do not let browser page zoom interfere (preventDefault on the wheel handler).",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:21:56Z"
     },
     {
       "id": "qa-007",
