@@ -99,8 +99,9 @@
       ],
       "hint": "Ctrl/Cmd+wheel over the page area changes zoom in the existing 70-150 range; Ctrl+0 resets to 100%; add a small fit-width button next to the zoom percentage. Do not let browser page zoom interfere (preventDefault on the wheel handler).",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:21:56Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:21:56Z",
+      "lastAttemptAt": "2026-11-22T23:21:56Z"
     },
     {
       "id": "qa-007",
