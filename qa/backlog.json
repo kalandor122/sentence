@@ -1095,8 +1095,9 @@
       "hint": "Repro: In a project open Insert > Inline equation (focus lands in the LaTeX textarea), then press Escape to close the dialog and read document.activeElement. (Probe: escape.mathDialog.)\nActual: The dialog closes (count 1 -> 0) but document.activeElement becomes BODY; all focus context is lost. The same shared Modal backs the citation, footnote, link, comment, arXiv and GitHub dialogs.",
       "source": "explore:keyboard:closing a modal dialog with escape drops keyboard focus to <body>",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:52:53Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:52:53Z",
+      "lastAttemptAt": "2026-11-22T23:52:53Z"
     },
     {
       "id": "qa-075",
