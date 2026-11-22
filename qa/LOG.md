@@ -57,3 +57,4 @@ Aborting
 2026-11-22T21:39:04Z START qa-052 on qa/qa-052-applying-latex-containing-texttt-wipes-t: Applying LaTeX containing \texttt wipes the entire visual document
 2026-11-22T21:40:27Z DONE qa-052 (tsc -b, npm test, smoke all green)
 2026-11-22T21:40:57Z START qa-024 on qa/qa-024-inserted-image-produces-uncompilable-lat: Inserted image produces uncompilable LaTeX: base64 data URI is used as the \includegraphics filename
+2026-11-22T21:45:02Z DONE qa-024 (tsc -b, npm test, smoke all green)
