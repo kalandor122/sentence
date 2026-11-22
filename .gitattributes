@@ -1,0 +1,26 @@
+* text=auto
+
+# Source files: LF in the repository, platform-native on checkout
+*.ts text eol=lf
+*.tsx text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.rs text eol=lf
+*.toml text eol=lf
+
+# Windows-only build scripts
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binaries
+*.exe binary
+*.png binary
+*.ico binary
+*.icns binary
+*.zip binary
+
+# Lockfiles: merge conflicts are not resolvable by hand
+package-lock.json -diff
+src-tauri/Cargo.lock -diff
