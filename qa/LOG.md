@@ -155,3 +155,4 @@ Aborting
 2026-11-22T23:46:00Z START qa-059 on qa/qa-059-paragraph-style-labels-are-off-by-one-le: Paragraph style labels are off by one level
 2026-11-22T23:46:35Z DONE qa-059 (tsc -b, npm test, smoke all green)
 2026-11-22T23:47:09Z START qa-060 on qa/qa-060-page-setup-paper-size-margins-text-size: Page setup (paper size, margins, text size, class) never changes the visible page
+2026-11-22T23:47:43Z DONE qa-060 (tsc -b, npm test, smoke all green)
