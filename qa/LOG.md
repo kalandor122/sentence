@@ -164,3 +164,4 @@ Aborting
 2026-11-22T23:50:35Z START qa-072 on qa/qa-072-no-discoverable-control-to-switch-to-lat: no discoverable control to switch to LaTeX source view from the editor chrome
 2026-11-22T23:51:10Z DONE qa-072 (tsc -b, npm test, smoke all green)
 2026-11-22T23:51:44Z START qa-073 on qa/qa-073-escape-does-not-dismiss-the-colour-palet: Escape does not dismiss the colour-palette popover
+2026-11-22T23:52:19Z DONE qa-073 (tsc -b, npm test, smoke all green)

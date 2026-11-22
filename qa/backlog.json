@@ -1078,10 +1078,11 @@
       ],
       "hint": "Repro: In a project, stay on the Home ribbon tab and activate the icon-only 'Text color' button (aria-label='Text color') so the .color-popover [role=menu] opens. Press Escape. (Probe: qa/probes/keyboard.mjs, escape.colorPopover.)\nActual: The .color-popover stays open: element count is 1 before and 1 after Escape. Only clicking .color-backdrop or picking a swatch closes it, and a .color-backdrop intercepts pointer events on the trigger so re-activating the trigger cannot close it either. A keyboard-only user cannot dismiss the menu without applying a colour.",
       "source": "explore:keyboard:escape does not dismiss the colour-palette popover",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:51:44Z",
-      "lastAttemptAt": "2026-11-22T23:51:44Z"
+      "lastAttemptAt": "2026-11-22T23:51:44Z",
+      "doneAt": "2026-11-22T23:52:19Z"
     },
     {
       "id": "qa-074",
@@ -1093,7 +1094,9 @@
       ],
       "hint": "Repro: In a project open Insert > Inline equation (focus lands in the LaTeX textarea), then press Escape to close the dialog and read document.activeElement. (Probe: escape.mathDialog.)\nActual: The dialog closes (count 1 -> 0) but document.activeElement becomes BODY; all focus context is lost. The same shared Modal backs the citation, footnote, link, comment, arXiv and GitHub dialogs.",
       "source": "explore:keyboard:closing a modal dialog with escape drops keyboard focus to <body>",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:52:53Z"
     },
     {
       "id": "qa-075",
