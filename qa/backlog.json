@@ -527,10 +527,11 @@
       ],
       "hint": "Repro: Create a project. Type `Docs`, select it, Home > Add link, enter `https://combined.example.org`, Insert. View > LaTeX: source contains `\\href{https://combined.example.org}{Docs}`. Click Apply source, View > Visual, then View > LaTeX. For an isolated check, in View > LaTeX replace the document body with `Before \\href{https://hand.example.org}{hand link} and \\ref{sec:handwritten} After` and click Apply source.\nActual: No `<a>` node exists after Apply source. The visual paragraph shows literal `\\href{https://hand.example.org}{hand link}` text, and re-exported source contains `\\textbackslash{}href\\{https://hand.example.org\\}\\{hand link\\}`.",
       "source": "explore:links-cites-footnotes:\\href from latex source is not parsed and links are destroyed on round-trip",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T22:18:13Z",
-      "lastAttemptAt": "2026-11-22T22:18:13Z"
+      "lastAttemptAt": "2026-11-22T22:18:13Z",
+      "doneAt": "2026-11-22T22:19:47Z"
     },
     {
       "id": "qa-041",
@@ -542,7 +543,9 @@
       ],
       "hint": "Repro: Create a project. References > Cross-reference, label `fig:architecture`, Insert. View > LaTeX: source contains `\\ref{fig:architecture}`. Click Apply source, View > Visual, then View > LaTeX. In the isolated source-import check, the body `Before \\href{https://hand.example.org}{hand link} and \\ref{sec:handwritten} After` was applied.\nActual: No `[data-cross-reference]` node survives Apply source. The visual paragraph shows literal `\\ref{sec:handwritten}` and re-export writes `\\textbackslash{}ref\\{sec:handwritten\\}`. In the combined check, both `\\ref{fig:architecture}` and `\\ref{sec:results}` were lost.",
       "source": "explore:links-cites-footnotes:\\ref from latex source is not parsed and cross-references are destroyed on round-trip",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T22:20:21Z"
     },
     {
       "id": "qa-042",
@@ -1037,6 +1040,18 @@
       ],
       "hint": "Repro: In the demo document (which has H1 'Introduction' and H2 'Drafting with constraints'), click References > Table of contents and inspect the inserted block on the visual page.\nActual: The inserted [data-toc] block is a 608x59px dashed box whose entire text is the literal label 'Table of contents'; no headings or compile-time hint appear, even though the LaTeX correctly contains \\tableofcontents. Probe step 4: out.toc.dom.tocs[0] and out.toc.latex.toc=1.",
       "source": "explore:insert-media:visual table of contents shows no entries for the document's headings",
+      "status": "open"
+    },
+    {
+      "id": "qa-082",
+      "title": "Numbered equations lose their numbering when copied or pasted",
+      "why": "Exploratory pass on math-nodeview (functional): expected The rendered block carries data-numbered=\"true\", which is what parseHTML reads back on paste.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Switch to LaTeX, insert '\\begin{equation}E = mc^2\\end{equation}' before \\end{document}, switch to Visual. Inspect the rendered math block element ([data-math-block]) and read its data-numbered attribute.\nActual: getAttribute('data-numbered') is null because the KaTeX node view renders its own DOM instead of the renderHTML output, so copying and pasting the equation re-imports it as an unnumbered equation*. LaTeX serialisation is correct (equation survives a source round trip).",
+      "source": "explore:math-nodeview:numbered equations lose their numbering when copied or pasted",
       "status": "open"
     }
   ]
