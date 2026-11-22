@@ -173,3 +173,4 @@ Aborting
 2026-11-22T23:55:11Z START qa-078 on qa/qa-078-inserting-contents-immediately-after-a-p: Inserting Contents immediately after a page break replaces the new page break
 2026-11-22T23:55:45Z DONE qa-078 (tsc -b, npm test, smoke all green)
 2026-11-22T23:56:20Z START qa-079 on qa/qa-079-image-inserted-at-a-cursor-inside-a-para: Image inserted at a cursor inside a paragraph splits the sentence and exports a block figure
+2026-11-22T23:56:54Z DONE qa-079 (tsc -b, npm test, smoke all green)

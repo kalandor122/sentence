@@ -1170,10 +1170,11 @@
       ],
       "hint": "Repro: Place the caret inside the last paragraph of the demo document, between 'compactly:' and ' meaning = structure + language.'; click Insert > Image and supply a PNG to the hidden file input (the browser picker is stubbed); read the visual DOM and View > LaTeX.\nActual: Visual HTML becomes <p>The central model can be expressed compactly:</p><img src=\"data:image/png;base64,...\" alt=\"qa image #1.png\" data-path=\"assets/images/qa-image--1.png\"><p> <code>meaning = structure + language</code>.</p>. The LaTeX places a \\begin{figure}...\\includegraphics[width=0.8\\linewidth]{assets/images/qa-image--1.png}...\\end{figure} block between the two halves of the sentence. Probe step 2: out.image.dom.html and out.image.latex.body.",
       "source": "explore:insert-media:image inserted at a cursor inside a paragraph splits the sentence and exports a block figure",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:56:20Z",
-      "lastAttemptAt": "2026-11-22T23:56:20Z"
+      "lastAttemptAt": "2026-11-22T23:56:20Z",
+      "doneAt": "2026-11-22T23:56:54Z"
     },
     {
       "id": "qa-080",
@@ -1221,7 +1222,9 @@
       ],
       "hint": "Repro: Create a new document. Click Home > Bulleted list, type 'select one', press Enter, type 'select two'. Press Ctrl+A to select the whole document, then click Home > Bulleted list again. Open View > LaTeX and read the source textarea. Repeat the same steps with Numbered list to get the same result.\nActual: Both items stay in the list and a third empty item is appended: the editor DOM is <ul><li>select one</li><li>select two</li><li><p></p></li></ul>, and the generated LaTeX is '\\begin{itemize}\\n\\item select one\\n\\item select two\\n\\item \\n\\end{itemize}'. With Numbered list the same happens with '\\begin{enumerate}' and an extra '\\item '. Selecting only the two list items (click first item, Home, Shift+ArrowDown, Shift+End) and toggling does work, which isolates the failure to the Ctrl+A case. No console errors were emitted.",
       "source": "explore:lists:select-all + list toggle does not convert a list to paragraphs; it appends an empty item",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:57:28Z"
     },
     {
       "id": "qa-084",
