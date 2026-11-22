@@ -720,10 +720,11 @@
       ],
       "hint": "Repro: Create a project. View > LaTeX, replace `\\texttt{meaning = structure + language}` with plain text, append `\\section{Unbalanced section}`, `\\begin{table}[htbp]` and `SENTINEL UNBALANCED` before `\\end{document}` (no `\\end{table}`), click Apply source, then View > Visual and View > LaTeX.\nActual: Apply source succeeds with the success toast and no error message. The visual editor shows the raw lines `\\section{Unbalanced section}`, `\\begin{table}[htbp]` and `SENTINEL UNBALANCED` as plain text, and the re-exported source escapes them as `\\textbackslash{}section\\{Unbalanced section\\}` and `\\textbackslash{}begin\\{table\\}[htbp]`, corrupting the LaTeX.",
       "source": "explore:source-editor:unbalanced table environment is stored as escaped text with no error",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T22:36:46Z",
-      "lastAttemptAt": "2026-11-22T22:36:46Z"
+      "lastAttemptAt": "2026-11-22T22:36:46Z",
+      "doneAt": "2026-11-22T22:39:12Z"
     },
     {
       "id": "qa-055",
@@ -771,7 +772,9 @@
       ],
       "hint": "Repro: Home tab, click Text color (or Highlight). The menu opens with 10 swatches in the DOM, but elementFromPoint at a swatch centre returns div.color-backdrop; a real mouse click on a swatch just closes the menu.\nActual: The popover is rendered below .color-backdrop (popover y=125..213 while the ribbon ends at y=149) and the page canvas covers the swatch grid; only the 'No color' row is exposed. Both colour controls are unusable with a mouse; injecting .click() shows the LaTeX side is fine ({\\colorbox{yellow}{...}}, {\\color{magenta}{...}}).",
       "source": "explore:ribbon-full:colour and highlight palettes are painted under their own backdrop, so no swatch is clickable",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T22:45:19Z"
     },
     {
       "id": "qa-059",
@@ -1081,6 +1084,54 @@
       ],
       "hint": "Repro: Create a new document. Click Home > Bulleted list, type 'select one', press Enter, type 'select two'. Press Ctrl+A to select the whole document, then click Home > Bulleted list again. Open View > LaTeX and read the source textarea. Repeat the same steps with Numbered list to get the same result.\nActual: Both items stay in the list and a third empty item is appended: the editor DOM is <ul><li>select one</li><li>select two</li><li><p></p></li></ul>, and the generated LaTeX is '\\begin{itemize}\\n\\item select one\\n\\item select two\\n\\item \\n\\end{itemize}'. With Numbered list the same happens with '\\begin{enumerate}' and an extra '\\item '. Selecting only the two list items (click first item, Home, Shift+ArrowDown, Shift+End) and toggling does work, which isolates the failure to the Ctrl+A case. No console errors were emitted.",
       "source": "explore:lists:select-all + list toggle does not convert a list to paragraphs; it appends an empty item",
+      "status": "open"
+    },
+    {
+      "id": "qa-084",
+      "title": "Deleted table is resurrected on source/visual switch",
+      "why": "Exploratory pass on tables (functional): expected Deleting the table removes it from the document; the LaTeX no longer contains the tabular and the table stays deleted after switching views.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new project, Insert tab > Insert table, click the centre cell and type `victim`. Switch View > LaTeX (the source contains a tabular with `victim`), switch back to View > Visual, click the centre cell again, then Insert tab > Delete table. The table disappears. Now switch View > LaTeX and then View > Visual again.\nActual: Immediately after the click the editor shows only an empty paragraph, but View > LaTeX still shows `\\begin{tabular}{lll}` with `victim`, and switching back to View > Visual restores the full 3x3 table with `victim`. The Delete table button then becomes disabled again even though the table is visible, and typing after the round trip leaves the restored table in the document.",
+      "source": "explore:tables:deleted table is resurrected on source/visual switch",
+      "status": "open"
+    },
+    {
+      "id": "qa-085",
+      "title": "Single-column LaTeX tabular becomes escaped plain text instead of a table",
+      "why": "Exploratory pass on tables (functional): expected An editable one-column table with the three rows, and re-exported LaTeX keeps the table environment.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert a 3x3 table, switch View > LaTeX, replace the table block with `\\begin{table}[htbp]`, `\\centering`, `\\begin{tabular}{l}`, `\\hline`, rows `Only \\\\`, `a \\\\`, `b \\\\`, `\\hline`, `\\end{tabular}`, `\\end{table}`, click Apply source, then View > Visual.\nActual: No table exists. The body shows the raw LaTeX as one paragraph (`\\begin{table}[htbp] \\centering \\begin{tabular}{l} ...`). The next LaTeX export escapes it as `\\textbackslash{}begin\\{table\\}[htbp]` etc., corrupting the document source.",
+      "source": "explore:tables:single-column latex tabular becomes escaped plain text instead of a table",
+      "status": "open"
+    },
+    {
+      "id": "qa-086",
+      "title": "Text in a second paragraph of a table cell is dropped from LaTeX",
+      "why": "Exploratory pass on tables (functional): expected Both lines from the cell appear in the tabular row (for example `first line\\par second line` or `first line second line &  &  \\\\`).",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert a 3x3 table, click the top-left cell, type `first line`, press Enter, type `second line`, then switch View > LaTeX.\nActual: The visual cell shows two paragraphs (`first line` and `second line`), but the exported tabular row contains only `first line &  &  \\\\`; `second line` is absent from the source.",
+      "source": "explore:tables:text in a second paragraph of a table cell is dropped from latex",
+      "status": "open"
+    },
+    {
+      "id": "qa-087",
+      "title": "No visual controls to add or remove table rows or columns",
+      "why": "Exploratory pass on tables (functional): expected The visual editor offers a way to insert and delete a row or column near the cursor.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert a 3x3 table with a header row, click the centre body cell, inspect the buttons on every ribbon tab (Home, Insert, Layout, References, Review, Paper, View, Git), right-click the cell, and try Alt+Enter, Alt+Insert, Ctrl+Enter, Ctrl+Shift+Equal and Ctrl+Shift+Backspace.\nActual: The only table controls anywhere are Insert table and Delete table. Right-clicking a cell opens no menu, none of the tried shortcuts changes the table, and Tab at the end of the last row only appends a row (3x3 becomes 4x3). Rows/columns can only be changed by hand-editing LaTeX source; there is no way to remove a single row or column visually.",
+      "source": "explore:tables:no visual controls to add or remove table rows or columns",
       "status": "open"
     }
   ]
