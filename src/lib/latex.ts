@@ -791,6 +791,62 @@ function splitTableRow(row: string): string[] {
   return cells;
 }
 
+function precedingBackslashes(source: string, index: number): number {
+  let count = 0;
+  for (let cursor = index - 1; cursor >= 0 && source[cursor] === "\\"; cursor -= 1) {
+    count += 1;
+  }
+  return count;
+}
+
+function stripLatexComment(line: string): string {
+  for (let index = 0; index < line.length; index += 1) {
+    if (line[index] === "%" && precedingBackslashes(line, index) % 2 === 0) {
+      return line.slice(0, index);
+    }
+  }
+  return line;
+}
+
+function assertBalancedEnvironments(source: string): void {
+  const stack: string[] = [];
+  const pattern = /\\(begin|end)\{([a-zA-Z*]+)\}/g;
+  let verbatim: string | null = null;
+
+  for (const rawLine of source.split(/\r?\n/)) {
+    let line: string = verbatim ? rawLine : stripLatexComment(rawLine);
+    if (verbatim) {
+      const close = line.indexOf(`\\end{${verbatim}}`);
+      if (close < 0) continue;
+      line = line.slice(close + verbatim.length + 6);
+      verbatim = null;
+    }
+    for (const match of line.matchAll(pattern)) {
+      const index = match.index ?? 0;
+      if (precedingBackslashes(line, index) % 2 === 1) continue;
+      const command = match[1];
+      const name = match[2];
+      if (command === "begin") {
+        stack.push(name);
+        if (
+          name === "verbatim" &&
+          !line.includes(`\\end{verbatim}`, index + match[0].length)
+        ) {
+          verbatim = name;
+          break;
+        }
+      } else if (stack.pop() !== name) {
+        throw new Error(`Invalid LaTeX: unbalanced environment "${name}".`);
+      }
+    }
+  }
+  if (stack.length > 0) {
+    throw new Error(
+      `Invalid LaTeX: unbalanced environment "${stack[stack.length - 1]}".`,
+    );
+  }
+}
+
 function documentBody(latex: string): string {
   const begin = "\\begin{document}";
   const end = "\\end{document}";
@@ -891,7 +947,9 @@ export function latexToDocument(
   }
   settings.paragraphSpacing = packages.includes("parskip") ? "gap" : "indent";
 
-  const source = documentBody(latex)
+  const body = documentBody(latex);
+  assertBalancedEnvironments(body);
+  const source = body
     .replace(/\\begin\{abstract\}[\s\S]*?\\end\{abstract\}/g, "")
     .replace(/\\keywords\{[^}]*\}/g, "")
     .replace(/\\maketitle/g, "")
