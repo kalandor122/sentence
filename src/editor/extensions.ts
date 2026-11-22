@@ -73,6 +73,7 @@ export const MathBlock = Node.create({
   addAttributes() {
     return {
       latex: { default: "" },
+      numbered: { default: false },
     };
   },
 
@@ -86,6 +87,7 @@ export const MathBlock = Node.create({
         tag: "div[data-math-block]",
         getAttrs: (element) => ({
           latex: element.getAttribute("data-latex") ?? element.textContent ?? "",
+          numbered: element.getAttribute("data-numbered") === "true",
         }),
       },
     ];
@@ -98,6 +100,7 @@ export const MathBlock = Node.create({
       mergeAttributes(HTMLAttributes, {
         "data-math-block": "",
         "data-latex": latex,
+        "data-numbered": HTMLAttributes.numbered ? "true" : "false",
         class: "math-block",
       }),
       latex,

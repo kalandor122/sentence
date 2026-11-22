@@ -488,8 +488,9 @@
       "hint": "Repro: Create a project with inline math `E=mc^2` and an equation block `a^2+b^2=c^2` via the Insert tab. View > LaTeX, change `\\begin{equation*}` / `\\end{equation*}` to `\\begin{equation}` / `\\end{equation}`, click Apply source, then View > Visual and View > LaTeX again.\nActual: The display math node disappears and the visual document shows the raw lines `\\begin{equation}`, `a^2+b^2=c^2`, `\\end{equation}` as text. Re-exported source contains `\\textbackslash{}begin\\{equation\\}` and `a\\textasciicircum{}2+b\\textasciicircum{}2=c\\textasciicircum{}2`, destroying the equation.",
       "source": "explore:math:numbered equation environment from latex source is not recognized and is escaped as text",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T22:16:05Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T22:16:05Z",
+      "lastAttemptAt": "2026-11-22T22:16:06Z"
     },
     {
       "id": "qa-038",
