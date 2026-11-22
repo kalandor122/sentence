@@ -817,8 +817,9 @@
       "hint": "Repro: Create a project. View > Split. In the LaTeX pane replace `\\texttt{meaning = structure + language}` with plain text and insert `ZXSPLIT paragraph` before `\\end{document}` without clicking Apply source. Click View > Visual, then View > Split.\nActual: `ZXSPLIT paragraph` is absent from the visual document after switching to Visual. Returning to Split still shows it in the textarea, so the source and visual surfaces disagree until the user manually clicks Apply source.",
       "source": "explore:source-editor:source edits in split mode are not applied when switching to visual",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:42:34Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:42:34Z",
+      "lastAttemptAt": "2026-11-22T23:42:34Z"
     },
     {
       "id": "qa-056",

@@ -145,3 +145,4 @@ Aborting
 2026-11-22T23:41:11Z EXPLORE persistence: 0 new items, agent exit 1
 2026-11-22T23:41:25Z START qa-051 on qa/qa-051-no-ui-to-reply-to-a-comment-thread: No UI to reply to a comment thread
 2026-11-22T23:42:00Z DONE qa-051 (tsc -b, npm test, smoke all green)
+2026-11-22T23:42:34Z START qa-055 on qa/qa-055-source-edits-in-split-mode-are-not-appli: Source edits in Split mode are not applied when switching to Visual
