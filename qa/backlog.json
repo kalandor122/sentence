@@ -105,6 +105,18 @@
       ],
       "hint": "Ctrl+P calls window.print(). Add an @media print block that hides ribbon, sidebar and status bar, removes page shadows and background chrome, and prints the page sheet at its true width. Verify with a headless PDF print in the smoke script (page.pdf()) that the ribbon does not appear.",
       "status": "open"
+    },
+    {
+      "id": "qa-009",
+      "title": "Nested lists are destroyed when LaTeX source is applied",
+      "why": "Exploratory pass on lists (functional): expected The edited source re-imports as a two-level nested list: 'renamed parent' with an indented 'keep child' item, and the LaTeX stays a nested itemize environment.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In a new document, clear the editor (Ctrl+A, Backspace). Click Home > Bulleted list, type 'keep parent', press Enter, press Tab, type 'keep child'. Click View > LaTeX, change 'keep parent' to 'renamed parent' in the LaTeX source textarea, click 'Apply source', then click View > Visual. (The same happens if you apply hand-authored LaTeX containing a nested \\begin{enumerate} inside a \\begin{itemize}.)\nActual: The visual editor shows a flat two-item bulleted list whose item texts literally contain '\\begin{itemize}' and '\\end{itemize}' ('renamed parent \\begin{itemize}' / 'keep child \\end{itemize}'). Switching back to LaTeX shows the environment commands escaped as '\\textbackslash{}begin\\{itemize\\}' and '\\textbackslash{}end\\{itemize\\}' instead of a nested environment. Applying hand-authored mixed itemize/enumerate likewise flattens all items into the outer list type and leaves '\\begin{enumerate}' / '\\end{enumerate}' as visible text. No console errors were emitted.",
+      "source": "explore:lists:nested lists are destroyed when latex source is applied",
+      "status": "open"
     }
   ]
 }

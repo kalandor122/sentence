@@ -42,3 +42,7 @@ qa/shots/
 qa/cycles/
 qa/report.json
 qa/.loop.lock
+qa/probes/*.mjs
+!qa/probes/.gitkeep
+qa/findings/
+qa/explored.json
