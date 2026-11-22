@@ -156,7 +156,7 @@ try {
     const bar = page.locator(".find-bar input").first();
     hard("Ctrl+F opens the find bar", (await bar.count()) > 0);
     if (await bar.count()) {
-      await bar.fill("smoke marker");
+      await bar.fill("the");
       await page.waitForTimeout(500);
       const barText = (await page.locator(".find-bar").first().innerText()).replace(/\s+/g, " ");
       hard("find reports a match count", /\d+\s*\/\s*\d+/.test(barText), barText.slice(0, 120));
@@ -179,6 +179,10 @@ try {
     await page.waitForTimeout(300);
 
     // Nested list LaTeX round trip (visual -> source -> visual)
+    const wordsBefore = await page.evaluate(() => {
+      const m = /([\d,]+)\s+words/.exec(document.querySelector(".status-bar")?.innerText ?? "");
+      return m ? Number(m[1].replace(/,/g, "")) : 0;
+    });
     await viewTab.click();
     await page.waitForTimeout(200);
     const latexBtn = page.getByRole("button", { name: "LaTeX", exact: true }).first();
@@ -190,7 +194,11 @@ try {
       hard("source view shows the LaTeX textarea", (await area.count()) > 0);
       if (await area.count()) {
         const before = await area.inputValue();
-        await area.fill(before + "\n\\begin{itemize}\n\\item parent item\n\\begin{enumerate}\n\\item child item\n\\end{enumerate}\n\\end{itemize}\n");
+        const marker = "\\end{document}";
+        const at = before.lastIndexOf(marker);
+        const list = "\n\\begin{itemize}\n\\item parent item\n\\begin{enumerate}\n\\item child item\n\\end{enumerate}\n\\end{itemize}\n";
+        const injected = at >= 0 ? before.slice(0, at) + list + before.slice(at) : before + list;
+        await area.fill(injected);
         await page.waitForTimeout(900);
         await page.getByRole("button", { name: "Visual", exact: true }).first().click();
         await page.waitForTimeout(700);
@@ -202,6 +210,13 @@ try {
         });
         hard("nested lists survive the source round trip", Boolean(roundTrip && roundTrip.nested > 0 && !roundTrip.leaked),
           JSON.stringify(roundTrip));
+        const wordsAfter = await page.evaluate(() => {
+          const m = /([\d,]+)\s+words/.exec(document.querySelector(".status-bar")?.innerText ?? "");
+          return m ? Number(m[1].replace(/,/g, "")) : 0;
+        });
+        // The editor used to emit an empty document on remount and wipe everything.
+        hard("editing the LaTeX source keeps the document", wordsAfter >= wordsBefore && wordsAfter > 0,
+          `words ${wordsBefore} -> ${wordsAfter}`);
         await shot("07-roundtrip");
       }
     }

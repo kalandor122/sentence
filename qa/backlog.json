@@ -851,9 +851,10 @@
       ],
       "hint": "Detail: No matches",
       "source": "smoke-fail:find reports a match count",
-      "status": "in_progress",
+      "status": "superseded",
       "attempts": 0,
-      "startedAt": "2026-11-22T21:52:55Z"
+      "startedAt": "2026-11-22T21:52:55Z",
+      "note": "the smoke check itself was wrong (query absent from the demo doc); fixed as part of the source-wipe commit"
     },
     {
       "id": "qa-068",

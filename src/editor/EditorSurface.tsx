@@ -188,6 +188,14 @@ export default function EditorSurface({
     },
     onUpdate: ({ editor: current }) => {
       const json = current.getJSON() as SentenceDocument;
+      const empty = (json.content ?? []).every(
+        (node) => node.type === "paragraph" && !(node.content ?? []).length,
+      );
+      // React StrictMode double-mounts in dev: the discarded instance syncs the
+      // real document, the live one starts empty and emits that empty doc, which
+      // used to overwrite the workspace on every switch out of LaTeX source.
+      // An unfocused editor is not the user — a real select-all-delete is focused.
+      if (empty && !current.isFocused) return;
       lastEmitted.current = JSON.stringify(json);
       onUpdate(json);
     },
