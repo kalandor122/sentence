@@ -487,10 +487,11 @@
       ],
       "hint": "Repro: Create a project with inline math `E=mc^2` and an equation block `a^2+b^2=c^2` via the Insert tab. View > LaTeX, change `\\begin{equation*}` / `\\end{equation*}` to `\\begin{equation}` / `\\end{equation}`, click Apply source, then View > Visual and View > LaTeX again.\nActual: The display math node disappears and the visual document shows the raw lines `\\begin{equation}`, `a^2+b^2=c^2`, `\\end{equation}` as text. Re-exported source contains `\\textbackslash{}begin\\{equation\\}` and `a\\textasciicircum{}2+b\\textasciicircum{}2=c\\textasciicircum{}2`, destroying the equation.",
       "source": "explore:math:numbered equation environment from latex source is not recognized and is escaped as text",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T22:16:05Z",
-      "lastAttemptAt": "2026-11-22T22:16:06Z"
+      "lastAttemptAt": "2026-11-22T22:16:06Z",
+      "doneAt": "2026-11-22T22:17:40Z"
     },
     {
       "id": "qa-038",
@@ -526,7 +527,9 @@
       ],
       "hint": "Repro: Create a project. Type `Docs`, select it, Home > Add link, enter `https://combined.example.org`, Insert. View > LaTeX: source contains `\\href{https://combined.example.org}{Docs}`. Click Apply source, View > Visual, then View > LaTeX. For an isolated check, in View > LaTeX replace the document body with `Before \\href{https://hand.example.org}{hand link} and \\ref{sec:handwritten} After` and click Apply source.\nActual: No `<a>` node exists after Apply source. The visual paragraph shows literal `\\href{https://hand.example.org}{hand link}` text, and re-exported source contains `\\textbackslash{}href\\{https://hand.example.org\\}\\{hand link\\}`.",
       "source": "explore:links-cites-footnotes:\\href from latex source is not parsed and links are destroyed on round-trip",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T22:18:13Z"
     },
     {
       "id": "qa-041",
