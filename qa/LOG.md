@@ -148,3 +148,4 @@ Aborting
 2026-11-22T23:42:34Z START qa-055 on qa/qa-055-source-edits-in-split-mode-are-not-appli: Source edits in Split mode are not applied when switching to Visual
 2026-11-22T23:43:08Z DONE qa-055 (tsc -b, npm test, smoke all green)
 2026-11-22T23:43:43Z START qa-056 on qa/qa-056-clicking-the-active-latex-mode-button-di: Clicking the active LaTeX mode button discards unapplied source edits
+2026-11-22T23:44:17Z DONE qa-056 (tsc -b, npm test, smoke all green)
