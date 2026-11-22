@@ -48,3 +48,4 @@ qa/findings/
 qa/explored.json
 qa/requeue.json
 qa/STOP
+qa/probes/

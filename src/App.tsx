@@ -535,7 +535,7 @@ export default function App() {
 
   const handleModeChange = (nextMode: EditorMode) => {
     const current = workspaceRef.current;
-    if (current && nextMode !== "source" && mode === "source" && sourceDirtyRef.current) {
+    if (current && nextMode !== "source" && mode !== "visual" && sourceDirtyRef.current) {
       applySource();
     }
     if (nextMode === "source" && current) {
