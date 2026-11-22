@@ -1063,8 +1063,9 @@
       "hint": "",
       "source": "no discoverable control to switch to latex source view from the editor chrome",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:50:35Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:50:35Z",
+      "lastAttemptAt": "2026-11-22T23:50:35Z"
     },
     {
       "id": "qa-073",
