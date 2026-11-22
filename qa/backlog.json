@@ -416,8 +416,9 @@
       "hint": "Repro: Create a new project, Insert tab > Insert table, switch View > LaTeX. Replace the table block with a 4-column, 4-row tabular whose first row is `H1 & H2 & H3 & H4 \\\\`, followed by rows `a1 & a2 & a3 & a4 \\\\`, `b1 & b2 & b3 & b4 \\\\`, `c1 & c2 & c3 & c4 \\\\`. Click Apply source, then View > Visual.\nActual: The visual table has only 3 rows; the first row is `a1 a2 a3 a4` and H1-H4 are gone. The re-exported LaTeX starts with `a1 & a2 & a3 & a4 \\\\`.",
       "source": "explore:tables:applying table latex drops the first/header row",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T21:45:32Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T21:45:32Z",
+      "lastAttemptAt": "2026-11-22T21:45:32Z"
     },
     {
       "id": "qa-033",

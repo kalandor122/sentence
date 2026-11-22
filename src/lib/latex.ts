@@ -903,11 +903,14 @@ export function latexToDocument(
       content.push({ type: "horizontalRule" });
       continue;
     }
-    if (/^\\begin\{table\}/.test(block)) {
-      const rows = block
+    if (/^\\begin\{(?:table|tabular)\}/.test(block)) {
+      const tabularBody = block.match(
+        /\\begin\{tabular\}(?:\s*\{[^{}]*\})?\s*([\s\S]*?)\\end\{tabular\}/,
+      )?.[1] ?? block;
+      const rows = tabularBody
         .split(/\\\\\s*(?:\n|$)/)
-        .map((row) => row.trim())
-        .filter((row) => row.includes("&") && !row.startsWith("\\begin") && !row.startsWith("\\end") && !row.startsWith("\\hline"));
+        .map((row) => row.replace(/^\s*\\hline\s*/, "").trim())
+        .filter((row) => row.includes("&"));
       if (rows.length > 0) {
         content.push({
           type: "table",
