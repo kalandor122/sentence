@@ -660,9 +660,9 @@
       ],
       "hint": "Repro: Create a project and switch View > LaTeX. Append the line `Code: \\texttt{CODE MARKER}` before `\\end{document}`, click Apply source, then View > Visual. Switch back to View > LaTeX to read the generated source.\nActual: The visual editor is empty (innerHTML 122 chars, placeholder only): both headings, all paragraphs and the quote disappear, the toast says 'Visual document synchronized from LaTeX.', and the re-exported source contains only front matter through `\\keywords{...}` with no body. The app's unmodified exported source triggers the same wipe because it contains `\\texttt{meaning = structure + language}`; an in-page check of /src/lib/latex.ts shows that command is parsed into a text node with mark type `inlineCode`.",
       "source": "explore:source-editor:applying latex containing \\texttt wipes the entire visual document",
-      "status": "open",
+      "status": "in_progress",
       "attempts": 0,
-      "startedAt": "2026-11-22T21:30:06Z"
+      "startedAt": "2026-11-22T21:39:04Z"
     },
     {
       "id": "qa-053",
@@ -710,6 +710,18 @@
       ],
       "hint": "Repro: Create a project. View > LaTeX. Type `ZXRECLICK` at the end of the source textarea without clicking Apply source, then click View > LaTeX again while LaTeX mode is already active and read the textarea.\nActual: The textarea is regenerated from the visual document, the typed `ZXRECLICK` disappears, and no warning is shown.",
       "source": "explore:source-editor:clicking the active latex mode button discards unapplied source edits",
+      "status": "open"
+    },
+    {
+      "id": "qa-057",
+      "title": "Status bar page count ignores page breaks and visual document length",
+      "why": "Exploratory pass on long-document (functional): expected The status bar page count should reflect the visible document length and increase when explicit page breaks are added (the two breaks grow the sheet by ~2,567px).",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs`. After it builds 50 headings and ~6,050 words the status bar reads '13 pages' while the `.paper-sheet` is 17,440px tall (scrollHeight 17,550px). Then, in the same document, place the caret at the end and click Insert > Page break twice, typing text between and after the breaks; the sheet grows to 20,007px, the LaTeX gains two `\\newpage` commands, but the status bar still reads '13 pages'.\nActual: With 6,050 words the status bar reads 13 pages for a 17,440px sheet; after two explicit page breaks (verified as two `\\newpage` lines in the LaTeX source) the sheet is 20,007px tall and the status bar still reads 13 pages. Word count itself stays correct (6,050 -> 6,072 after the added text).",
+      "source": "explore:long-document:status bar page count ignores page breaks and visual document length",
       "status": "open"
     }
   ]

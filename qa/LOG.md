@@ -53,3 +53,4 @@ Aborting
 Please commit your changes or stash them before you switch branches.
 Aborting
 
+2026-11-22T21:38:55Z EXPLORE long-document: 1 new items, agent exit 0
