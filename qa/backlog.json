@@ -953,8 +953,9 @@
       "hint": "Repro: Open Document properties, switch Paragraph spacing between 'Indented paragraphs' and 'Spaced paragraphs', then read the computed styles and the .tex.\nActual: Nothing changes: computed text-indent stays 0px, margin-bottom 17.6px, and no \\parindent or \\parskip is emitted in either state. (Line spacing, by contrast, works correctly: setspace + \\doublespacing, line-height 27.5px -> 41.6px.)",
       "source": "explore:ribbon-full:paragraph spacing (indented vs spaced) setting is inert",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:49:26Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:49:26Z",
+      "lastAttemptAt": "2026-11-22T23:49:26Z"
     },
     {
       "id": "qa-065",
