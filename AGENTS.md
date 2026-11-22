@@ -54,6 +54,25 @@ cargo test --manifest-path src-tauri/Cargo.toml
 - Projects are plain folders: `document.tex` (readable outside the app), `sentence.json` (visual model + settings), `references.bib`, `.sentence/` (review state, build, cache), `.git/`. Visual-only state (comments, tracked edits) must never leak into exported LaTeX.
 - WebView2 dev/test overrides read in `lib.rs`: `SENTENCE_WEBVIEW_DATA_DIR` (isolated profile dir) and `SENTENCE_WEBVIEW_BROWSER_ARGS`. The `.tools/*runtime*` and `.tools/webview-data` dirs are past smoke-test profiles.
 
+## QA loop (autonomous)
+
+`qa/loop.sh` runs forever under the systemd user unit `sentence-qa-loop`
+(`systemctl --user status sentence-qa-loop`). Each cycle: ensure Vite on :1420 →
+run `qa/smoke.mjs` (Playwright gate) → take the highest-severity open item from
+`qa/backlog.json` → branch `qa/<id>-<slug>` → `opencode run` fixes it → verify
+`npx tsc -b` + `npm test` + smoke → commit and merge to `main` only if green.
+Every fourth cycle runs `qa/explore.py`, where an agent writes a Playwright probe
+for an untested area (`qa/areas.json`) and files findings into the backlog.
+When the backlog empties, `qa/roadmap.json` is promoted into it.
+
+- Stop: `touch qa/STOP` (loop exits between cycles; systemd keeps it stopped).
+- Watch: `tail -f qa/LOG.md`, per-cycle agent output in `qa/cycles/<id>.log`.
+- Supervisor overrides: write `qa/requeue.json` (`[{"id":"qa-002","status":"open"}]`);
+  `cycle.py` applies it under its lock so it cannot race the loop.
+- Browser build only: Tauri commands are stubbed, so desktop-only paths must
+  degrade with a message. Never weaken `qa/smoke.mjs` or the tests to pass a gate;
+  fix the app instead. Blocked items keep their branch with a `wip` commit.
+
 ## Conventions
 
 - Version is triple-tracked — `package.json`, `src-tauri/Cargo.toml`, `src-tauri/tauri.conf.json` — bump all three together.
