@@ -1155,8 +1155,9 @@
       "hint": "Repro: With the caret at the end of a paragraph, click Insert > Page break and then, without clicking back into the editor, click References > Table of contents.\nActual: Right after the page-break click the editor has 2 [data-page-break] and 0 [data-toc] nodes; after the Contents click it has 1 [data-page-break] and 1 [data-toc], and the exported LaTeX has \\newpage count 1 instead of 2. The still-selected page break atom is overwritten by the TOC. Probe step 7: out.repeated.afterSecondBreak={breaks:2,tocs:0} vs out.repeated.dom.breaks=1, out.repeated.dom.tocs=1, out.repeated.latex.newpage=1.",
       "source": "explore:insert-media:inserting contents immediately after a page break replaces the new page break",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:55:11Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:55:11Z",
+      "lastAttemptAt": "2026-11-22T23:55:11Z"
     },
     {
       "id": "qa-079",
