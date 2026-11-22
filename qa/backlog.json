@@ -912,10 +912,11 @@
       ],
       "hint": "Repro: Place a collapsed cursor, press Ctrl+K (or Links > Add link), type https://example.net, press Insert.\nActual: The dialog closes and nothing is inserted \u2014 no link, no message. With a selection it works correctly (href set, \\href{...} escaped properly, survives round trip).",
       "source": "explore:ribbon-full:add link with no selection silently inserts nothing",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:48:18Z",
-      "lastAttemptAt": "2026-11-22T23:48:18Z"
+      "lastAttemptAt": "2026-11-22T23:48:18Z",
+      "doneAt": "2026-11-22T23:48:52Z"
     },
     {
       "id": "qa-062",
@@ -951,7 +952,9 @@
       ],
       "hint": "Repro: Open Document properties, switch Paragraph spacing between 'Indented paragraphs' and 'Spaced paragraphs', then read the computed styles and the .tex.\nActual: Nothing changes: computed text-indent stays 0px, margin-bottom 17.6px, and no \\parindent or \\parskip is emitted in either state. (Line spacing, by contrast, works correctly: setspace + \\doublespacing, line-height 27.5px -> 41.6px.)",
       "source": "explore:ribbon-full:paragraph spacing (indented vs spaced) setting is inert",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:49:26Z"
     },
     {
       "id": "qa-065",
