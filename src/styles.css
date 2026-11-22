@@ -1267,6 +1267,83 @@ button:disabled {
   cursor: pointer;
 }
 
+/* Find and replace */
+
+.find-bar {
+  position: absolute;
+  z-index: 12;
+  top: 12px;
+  right: 16px;
+  display: grid;
+  gap: 6px;
+  width: min(400px, calc(100% - 32px));
+  padding: 8px;
+  color: var(--ink);
+  background: var(--chrome);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgba(30, 34, 28, 0.18);
+}
+
+.find-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.find-bar-icon {
+  flex: none;
+  color: var(--muted);
+}
+
+.find-bar input {
+  flex: 1;
+  min-width: 0;
+  height: 27px;
+  padding: 0 8px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.find-bar input::placeholder {
+  color: var(--faint);
+}
+
+.find-count {
+  flex: none;
+  min-width: 54px;
+  color: var(--muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.find-bar .icon-button {
+  flex: none;
+  width: 26px;
+  height: 26px;
+}
+
+.find-bar .secondary-button.small {
+  white-space: nowrap;
+}
+
+.sentence-find-match {
+  background: #f4dfa1;
+  border-radius: 2px;
+}
+
+.sentence-find-current {
+  color: #1f1b14;
+  background: #e9a94f;
+  border-radius: 2px;
+  outline: 1px solid #b5712d;
+}
+
 .restore-sidebar {
   position: absolute;
   z-index: 5;
@@ -1287,6 +1364,7 @@ button:disabled {
 /* Source */
 
 .source-column {
+  position: relative;
   display: grid;
   grid-template-rows: 37px minmax(0, 1fr);
   min-width: 0;

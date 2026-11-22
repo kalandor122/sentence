@@ -17,6 +17,7 @@ import {
   ProjectImage,
   TableOfContents,
 } from "./extensions";
+import { FindHighlight } from "./find";
 import {
   ColorMark,
   FontFamilyMark,
@@ -130,6 +131,7 @@ export default function EditorSurface({
       PageBreak,
       TableOfContents,
       CommentMark,
+      FindHighlight,
     ],
     content: document,
     editable,

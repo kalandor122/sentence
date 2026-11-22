@@ -210,6 +210,20 @@ def cycle(dry_run: bool = False) -> str:
     except Exception as exc:  # never let intake break the loop
         log(f"IMPORT FAIL {exc}")
 
+    # Supervisor overrides queued as a file so they never race the loop's writes.
+    requeue = QA / "requeue.json"
+    if requeue.exists():
+        try:
+            for fix in json.loads(requeue.read_text()):
+                for i in data["items"]:
+                    if i["id"] == fix["id"]:
+                        i.update({k: v for k, v in fix.items() if k != "id"})
+                        log(f"REQUEUE {i['id']} -> {i['status']} ({fix.get('note', '')})")
+            requeue.unlink()
+            save_backlog(data)
+        except Exception as exc:
+            log(f"REQUEUE FAIL {exc}")
+
     item = pick(data)
     if not item:
         item = promote_from_roadmap(data)
@@ -284,8 +298,13 @@ def cycle(dry_run: bool = False) -> str:
     item["status"] = "blocked"
     item["lastFailure"] = (failures or "")[-1500:]
     save_backlog(data)
+    # Keep the failed work: a WIP commit on the branch is what a reviewer (or the
+    # next attempt) needs — reverting it threw away two attempts of work.
+    git("add", "-A")
+    wip_code, wip_out = git("commit", "-m", f"wip {item['id']}: {item['title']} (unverified)")
     git("checkout", "main")
-    log(f"BLOCKED {item['id']} after {item['attempts']} attempts — branch {branch} kept for review")
+    log(f"BLOCKED {item['id']} after {item['attempts']} attempts — branch {branch} kept"
+        + ("" if wip_code == 0 else f" (could not commit WIP: {wip_out[-200:]})"))
     return "blocked"
 
 
