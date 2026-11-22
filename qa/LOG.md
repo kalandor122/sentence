@@ -86,3 +86,4 @@ Aborting
 2026-11-22T22:29:46Z START qa-047 on qa/qa-047-font-family-control-emits-unbraced-latex: Font family control emits unbraced LaTeX command
 2026-11-22T22:31:57Z DONE qa-047 (tsc -b, npm test, smoke all green)
 2026-11-22T22:32:30Z START qa-053 on qa/qa-053-malformed-latex-with-a-missing-end-docum: Malformed LaTeX with a missing \end{document} is applied silently and clears the document
+2026-11-22T22:36:12Z DONE qa-053 (tsc -b, npm test, smoke all green)

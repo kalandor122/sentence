@@ -704,10 +704,11 @@
       ],
       "hint": "Repro: Create a project. View > LaTeX: replace `\\texttt{meaning = structure + language}` with plain text and add `SENTINEL BEFORE BREAK` before `\\end{document}`, click Apply source, then View > Visual and confirm the sentinel is visible. Return to View > LaTeX, delete only the `\\end{document}` line, click Apply source, then View > Visual.\nActual: Apply source is enabled, the toast says 'Visual document synchronized from LaTeX.', and no alert or error text appears. The visual editor is empty (innerHTML 122 chars), the status bar reads 0 words, and re-exported LaTeX has only front matter - the sentinel and all body content are gone.",
       "source": "explore:source-editor:malformed latex with a missing \\end{document} is applied silently and clears the document",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T22:32:30Z",
-      "lastAttemptAt": "2026-11-22T22:32:30Z"
+      "lastAttemptAt": "2026-11-22T22:32:30Z",
+      "doneAt": "2026-11-22T22:36:12Z"
     },
     {
       "id": "qa-054",
@@ -719,7 +720,9 @@
       ],
       "hint": "Repro: Create a project. View > LaTeX, replace `\\texttt{meaning = structure + language}` with plain text, append `\\section{Unbalanced section}`, `\\begin{table}[htbp]` and `SENTINEL UNBALANCED` before `\\end{document}` (no `\\end{table}`), click Apply source, then View > Visual and View > LaTeX.\nActual: Apply source succeeds with the success toast and no error message. The visual editor shows the raw lines `\\section{Unbalanced section}`, `\\begin{table}[htbp]` and `SENTINEL UNBALANCED` as plain text, and the re-exported source escapes them as `\\textbackslash{}section\\{Unbalanced section\\}` and `\\textbackslash{}begin\\{table\\}[htbp]`, corrupting the LaTeX.",
       "source": "explore:source-editor:unbalanced table environment is stored as escaped text with no error",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T22:36:46Z"
     },
     {
       "id": "qa-055",
