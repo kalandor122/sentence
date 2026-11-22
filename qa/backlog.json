@@ -833,8 +833,9 @@
       "hint": "Repro: Create a project. View > LaTeX. Type `ZXRECLICK` at the end of the source textarea without clicking Apply source, then click View > LaTeX again while LaTeX mode is already active and read the textarea.\nActual: The textarea is regenerated from the visual document, the typed `ZXRECLICK` disappears, and no warning is shown.",
       "source": "explore:source-editor:clicking the active latex mode button discards unapplied source edits",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:43:43Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:43:43Z",
+      "lastAttemptAt": "2026-11-22T23:43:43Z"
     },
     {
       "id": "qa-057",
