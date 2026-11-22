@@ -140,3 +140,4 @@ Aborting
 2026-11-22T23:38:33Z DONE qa-039 (tsc -b, npm test, smoke all green)
 2026-11-22T23:39:08Z START qa-043 on qa/qa-043-no-way-to-remove-a-link-without-deleting: No way to remove a link without deleting its text
 2026-11-22T23:39:42Z DONE qa-043 (tsc -b, npm test, smoke all green)
+2026-11-22T23:40:16Z START qa-044 on qa/qa-044-footnote-text-citation-keys-and-cross-re: Footnote text, citation keys and cross-reference labels have no visual edit flow
