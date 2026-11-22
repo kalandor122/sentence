@@ -81,3 +81,4 @@ Aborting
 2026-11-22T22:20:21Z START qa-041 on qa/qa-041-ref-from-latex-source-is-not-parsed-and: \ref from LaTeX source is not parsed and cross-references are destroyed on round-trip
 2026-11-22T22:21:44Z DONE qa-041 (tsc -b, npm test, smoke all green)
 2026-11-22T22:27:46Z EXPLORE lists: 1 new items, agent exit 0
+2026-11-22T22:27:59Z START qa-042 on qa/qa-042-citation-bibliography-directives-turn-in: Citation bibliography directives turn into escaped text and are duplicated when source is applied
