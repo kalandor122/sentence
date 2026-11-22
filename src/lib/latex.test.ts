@@ -118,6 +118,85 @@ describe("LaTeX generation", () => {
     expect(parsed.document.content[2]?.type).toBe("bulletList");
   });
 
+  it("round-trips nested lists through LaTeX source", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "bulletList",
+          content: [
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [{ type: "text", text: "renamed parent" }],
+                },
+                {
+                  type: "bulletList",
+                  content: [
+                    {
+                      type: "listItem",
+                      content: [
+                        {
+                          type: "paragraph",
+                          content: [{ type: "text", text: "keep child" }],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const nestedLatex =
+      "\\begin{itemize}\n\\item renamed parent\n\\begin{itemize}\n\\item keep child\n\\end{itemize}\n\\end{itemize}";
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain(nestedLatex);
+
+    const parsed = latexToDocument(latex, settings).document;
+    const list = parsed.content[0];
+    expect(list?.type).toBe("bulletList");
+    expect(list?.content?.[0]?.content?.[0]?.content?.[0]?.text).toBe("renamed parent");
+    const nested = list?.content?.[0]?.content?.[1];
+    expect(nested?.type).toBe("bulletList");
+    expect(nested?.content?.[0]?.content?.[0]?.content?.[0]?.text).toBe("keep child");
+    expect(documentToLatex(parsed, settings)).toContain(nestedLatex);
+  });
+
+  it("imports hand-authored mixed nested lists without flattening them", () => {
+    const latex = [
+      "\\begin{document}",
+      "\\begin{itemize}",
+      "\\item outer bullet",
+      "",
+      "\\begin{enumerate}",
+      "\\item inner number one",
+      "\\item inner number two",
+      "\\end{enumerate}",
+      "",
+      "\\end{itemize}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(latex, DEFAULT_SETTINGS).document;
+    const list = parsed.content[0];
+    expect(list?.type).toBe("bulletList");
+    expect(list?.content).toHaveLength(1);
+    expect(list?.content?.[0]?.content?.[0]?.content?.[0]?.text).toBe("outer bullet");
+    const nested = list?.content?.[0]?.content?.[1];
+    expect(nested?.type).toBe("orderedList");
+    expect(nested?.content?.map((item) => item.content?.[0]?.content?.[0]?.text)).toEqual([
+      "inner number one",
+      "inner number two",
+    ]);
+    expect(documentToLatex(parsed, settings)).toContain(
+      "\\begin{itemize}\n\\item outer bullet\n\\begin{enumerate}\n\\item inner number one\n\\item inner number two\n\\end{enumerate}\n\\end{itemize}",
+    );
+  });
+
   it("keeps paragraph and heading alignment in LaTeX", () => {
     const document: SentenceDocument = {
       type: "doc",

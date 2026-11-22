@@ -46,3 +46,5 @@ qa/probes/*.mjs
 !qa/probes/.gitkeep
 qa/findings/
 qa/explored.json
+qa/requeue.json
+qa/STOP
