@@ -28,11 +28,13 @@
         "src/editor/EditorSurface.tsx"
       ],
       "hint": "App.tsx has a keydown effect that only handles Ctrl+S and Ctrl+Enter \u2014 extend that pattern. Ctrl+K should open the existing link dialog, Ctrl+Shift+7/8 toggle ordered/bullet lists through Tiptap commands, Ctrl+1/2/5 apply the existing line-spacing styles, Tab/Shift+Tab indent or outdent the current list/paragraph instead of leaving the editor. Every shortcut must keep working inside the LaTeX source textarea without hijacking it.",
-      "status": "blocked",
-      "attempts": 2,
-      "startedAt": "2026-11-22T20:44:21Z",
-      "lastAttemptAt": "2026-11-22T20:49:51Z",
-      "lastFailure": "== tsc -b EXIT 0\n\n== npm test EXIT 0\n\n> sentence@0.2.0 test\n> vitest run\n\n\n RUN  v4.1.12 /home/magor/Projects/sentence\n\n\n Test Files  1 passed | 1 skipped (2)\n      Tests  9 passed | 1 skipped (10)\n   Start at  21:52:30\n   Duration  173ms (transform 74ms, setup 0ms, import 96ms, tests 38ms, environment 0ms)\n\n\n== smoke EXIT 1\nFAIL failures=1 observations=5 consoleErrors=0\n  FAIL harness: TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /^compile$/i }).first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"compile-button\">\u2026</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 \u00d7 waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div role=\"p\n"
+      "status": "in_progress",
+      "attempts": 1,
+      "startedAt": "2026-11-22T21:04:41Z",
+      "lastAttemptAt": "2026-11-22T21:04:41Z",
+      "lastFailure": "== tsc -b EXIT 0\n\n== npm test EXIT 0\n\n> sentence@0.2.0 test\n> vitest run\n\n\n RUN  v4.1.12 /home/magor/Projects/sentence\n\n\n Test Files  1 passed | 1 skipped (2)\n      Tests  9 passed | 1 skipped (10)\n   Start at  21:52:30\n   Duration  173ms (transform 74ms, setup 0ms, import 96ms, tests 38ms, environment 0ms)\n\n\n== smoke EXIT 1\nFAIL failures=1 observations=5 consoleErrors=0\n  FAIL harness: TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /^compile$/i }).first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"compile-button\">\u2026</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 \u00d7 waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div role=\"p\n",
+      "max_attempts": 3,
+      "note": "retry: the earlier block was a harness bug (the Ctrl+K probe left the link dialog open and the compile click timed out); smoke now closes overlays between shortcut probes"
     },
     {
       "id": "qa-003",
@@ -124,10 +126,11 @@
       ],
       "hint": "Repro: In a new document, clear the editor (Ctrl+A, Backspace). Click Home > Bulleted list, type 'keep parent', press Enter, press Tab, type 'keep child'. Click View > LaTeX, change 'keep parent' to 'renamed parent' in the LaTeX source textarea, click 'Apply source', then click View > Visual. (The same happens if you apply hand-authored LaTeX containing a nested \\begin{enumerate} inside a \\begin{itemize}.)\nActual: The visual editor shows a flat two-item bulleted list whose item texts literally contain '\\begin{itemize}' and '\\end{itemize}' ('renamed parent \\begin{itemize}' / 'keep child \\end{itemize}'). Switching back to LaTeX shows the environment commands escaped as '\\textbackslash{}begin\\{itemize\\}' and '\\textbackslash{}end\\{itemize\\}' instead of a nested environment. Applying hand-authored mixed itemize/enumerate likewise flattens all items into the outer list type and leaves '\\begin{enumerate}' / '\\end{enumerate}' as visible text. No console errors were emitted.",
       "source": "explore:lists:nested lists are destroyed when latex source is applied",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T21:01:55Z",
-      "lastAttemptAt": "2026-11-22T21:01:55Z"
+      "lastAttemptAt": "2026-11-22T21:01:55Z",
+      "doneAt": "2026-11-22T21:04:16Z"
     },
     {
       "id": "qa-010",
