@@ -101,3 +101,4 @@ Aborting
 2026-11-22T23:05:47Z EXPLORE math: 2 new items, agent exit 0
 2026-11-22T23:06:01Z START qa-086 on qa/qa-086-text-in-a-second-paragraph-of-a-table-ce: Text in a second paragraph of a table cell is dropped from LaTeX
 2026-11-22T23:08:29Z DONE qa-086 (tsc -b, npm test, smoke all green)
+2026-11-22T23:14:02Z DONE qa-004 (tsc -b, npm test, smoke all green)
