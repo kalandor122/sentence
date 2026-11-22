@@ -111,3 +111,4 @@ Aborting
 2026-11-22T23:23:40Z DONE qa-011 (tsc -b, npm test, smoke all green)
 2026-11-22T23:24:14Z START qa-012 on qa/qa-012-outline-navigation-does-not-focus-the-ed: Outline navigation does not focus the editor on first use; typing is silently dropped
 2026-11-22T23:24:49Z DONE qa-012 (tsc -b, npm test, smoke all green)
+2026-11-22T23:25:23Z START qa-013 on qa/qa-013-link-dialog-writes-invalid-hrefs-without: Link dialog writes invalid hrefs without validation
