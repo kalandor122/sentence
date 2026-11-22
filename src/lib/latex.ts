@@ -188,6 +188,14 @@ function inlineContent(nodes: DocumentNode[] | undefined): string {
     .join("");
 }
 
+function tableCellToLatex(cell: DocumentNode): string {
+  const children = cell.content ?? [];
+  if (children.every((child) => child.type === "paragraph")) {
+    return children.map((child) => inlineContent(child.content)).join("\\par ");
+  }
+  return inlineContent(children);
+}
+
 function tableToLatex(node: DocumentNode): string {
   const rows = (node.content ?? []).filter((row) => row.type === "tableRow");
   const columnCount = Math.max(
@@ -198,7 +206,7 @@ function tableToLatex(node: DocumentNode): string {
     .map((row) => {
       const cells = (row.content ?? [])
         .filter((cell) => cell.type === "tableCell" || cell.type === "tableHeader")
-        .map((cell) => inlineContent(cell.content?.[0]?.content ?? cell.content));
+        .map(tableCellToLatex);
       return `${cells.join(" & ")} \\\\`;
     })
     .join("\n");
@@ -1067,7 +1075,10 @@ export function latexToDocument(
             type: "tableRow",
             content: splitTableRow(row).map((cell) => ({
               type: rowIndex === 0 ? "tableHeader" : "tableCell",
-              content: [{ type: "paragraph", content: parseInline(cell.trim()).content }],
+              content: cell.trim().split(/(?<!\\)\\par\b/).map((paragraph) => ({
+                type: "paragraph",
+                content: parseInline(paragraph.trim()).content,
+              })),
             })),
           })),
         });

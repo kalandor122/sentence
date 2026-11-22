@@ -573,6 +573,50 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("\\textbackslash{}begin");
   });
 
+  it("exports every paragraph of a table cell and restores them on import", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableHeader",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "H" }] }],
+                },
+              ],
+            },
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [
+                    { type: "paragraph", content: [{ type: "text", text: "first line" }] },
+                    { type: "paragraph", content: [{ type: "text", text: "second line" }] },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("H \\\\\nfirst line\\par second line \\\\");
+    const parsed = latexToDocument(latex, settings).document;
+    const cell = parsed.content[0]?.content?.[1]?.content?.[0];
+    expect(cell?.content?.map((node) => node.type)).toEqual(["paragraph", "paragraph"]);
+    expect(cell?.content?.map((node) => node.content?.[0]?.text)).toEqual([
+      "first line",
+      "second line",
+    ]);
+    expect(documentToLatex(parsed, settings)).toContain("first line\\par second line \\\\");
+  });
+
   it("round-trips page breaks", () => {
     const document: SentenceDocument = {
       type: "doc",
