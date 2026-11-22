@@ -25,3 +25,6 @@
 2026-11-22T21:04:16Z DONE qa-009 (tsc -b, npm test, smoke all green)
 2026-11-22T21:04:41Z REQUEUE qa-002 -> open (retry: the earlier block was a harness bug (the Ctrl+K probe left the link dialog open and the compile click timed out); smoke now closes overlays between shortcut probes)
 2026-11-22T21:04:41Z START qa-002 on qa/qa-002-word-standard-editing-shortcuts-missing: Word-standard editing shortcuts missing (Ctrl+K link, Ctrl+Shift+7/8 lists, Ctrl+1/2/5 spacing, Tab indent)
+2026-11-22T21:13:04Z DONE qa-002 (tsc -b, npm test, smoke all green)
+2026-11-22T21:17:01Z EXPLORE review: 1 new items, agent exit 0
+2026-11-22T21:17:10Z START qa-010 on qa/qa-010-modals-do-not-trap-focus: Modals do not trap focus
