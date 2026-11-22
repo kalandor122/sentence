@@ -127,3 +127,4 @@ Aborting
 2026-11-22T23:32:01Z EXPLORE source-editor: 0 new items, agent exit 1
 2026-11-22T23:32:15Z START qa-026 on qa/qa-026-image-inserted-mid-paragraph-splits-the: Image inserted mid-paragraph splits the paragraph at the cursor, breaking the sentence in two
 2026-11-22T23:32:50Z DONE qa-026 (tsc -b, npm test, smoke all green)
+2026-11-22T23:33:24Z START qa-027 on qa/qa-027-table-header-row-is-lost-in-latex-no-cap: Table header row is lost in LaTeX; no caption/label emitted

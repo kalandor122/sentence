@@ -404,8 +404,9 @@
       "hint": "Repro: Insert > Insert table -> fill Alpha/Beta/Gamma -> View/LaTeX\nActual: plain 'Alpha & Beta & Gamma \\\\' row inside \\hline...\\hline; the visual <th> shading/bold (font-weight 650) has no LaTeX counterpart; no caption or label, so the table cannot be cross-referenced | evidence: tabular lll shown above; booktabs is already in the preamble but unused for tables",
       "source": "explore:insert:table header row is lost in latex; no caption/label emitted",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:33:24Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:33:24Z",
+      "lastAttemptAt": "2026-11-22T23:33:24Z"
     },
     {
       "id": "qa-028",
