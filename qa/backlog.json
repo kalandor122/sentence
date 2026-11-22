@@ -543,10 +543,11 @@
       ],
       "hint": "Repro: Create a project. References > Cross-reference, label `fig:architecture`, Insert. View > LaTeX: source contains `\\ref{fig:architecture}`. Click Apply source, View > Visual, then View > LaTeX. In the isolated source-import check, the body `Before \\href{https://hand.example.org}{hand link} and \\ref{sec:handwritten} After` was applied.\nActual: No `[data-cross-reference]` node survives Apply source. The visual paragraph shows literal `\\ref{sec:handwritten}` and re-export writes `\\textbackslash{}ref\\{sec:handwritten\\}`. In the combined check, both `\\ref{fig:architecture}` and `\\ref{sec:results}` were lost.",
       "source": "explore:links-cites-footnotes:\\ref from latex source is not parsed and cross-references are destroyed on round-trip",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T22:20:21Z",
-      "lastAttemptAt": "2026-11-22T22:20:21Z"
+      "lastAttemptAt": "2026-11-22T22:20:21Z",
+      "doneAt": "2026-11-22T22:21:44Z"
     },
     {
       "id": "qa-042",
@@ -558,7 +559,9 @@
       ],
       "hint": "Repro: Create a project. References > Insert citation with key `sentence2026`, Insert. View > LaTeX: the document body ends with `\\bibliographystyle{plain}` and `\\bibliography{references}`. Click Apply source, View > Visual, then View > LaTeX again.\nActual: The visual document gains a paragraph with literal `\\textbackslash{}bibliographystyle\\{plain\\}` and `\\textbackslash{}bibliography\\{references\\}`. Re-exported source contains those escaped lines plus a second, real `\\bibliographystyle{plain}` / `\\bibliography{references}` pair.",
       "source": "explore:links-cites-footnotes:citation bibliography directives turn into escaped text and are duplicated when source is applied",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T22:27:59Z"
     },
     {
       "id": "qa-043",
@@ -1053,6 +1056,18 @@
       ],
       "hint": "Repro: Switch to LaTeX, insert '\\begin{equation}E = mc^2\\end{equation}' before \\end{document}, switch to Visual. Inspect the rendered math block element ([data-math-block]) and read its data-numbered attribute.\nActual: getAttribute('data-numbered') is null because the KaTeX node view renders its own DOM instead of the renderHTML output, so copying and pasting the equation re-imports it as an unnumbered equation*. LaTeX serialisation is correct (equation survives a source round trip).",
       "source": "explore:math-nodeview:numbered equations lose their numbering when copied or pasted",
+      "status": "open"
+    },
+    {
+      "id": "qa-083",
+      "title": "Select-all + list toggle does not convert a list to paragraphs; it appends an empty item",
+      "why": "Exploratory pass on lists (functional): expected Toggling the list button off with the whole document selected converts both list items into ordinary paragraphs, so the source contains 'select one' and 'select two' with no itemize/environment markers.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Click Home > Bulleted list, type 'select one', press Enter, type 'select two'. Press Ctrl+A to select the whole document, then click Home > Bulleted list again. Open View > LaTeX and read the source textarea. Repeat the same steps with Numbered list to get the same result.\nActual: Both items stay in the list and a third empty item is appended: the editor DOM is <ul><li>select one</li><li>select two</li><li><p></p></li></ul>, and the generated LaTeX is '\\begin{itemize}\\n\\item select one\\n\\item select two\\n\\item \\n\\end{itemize}'. With Numbered list the same happens with '\\begin{enumerate}' and an extra '\\item '. Selecting only the two list items (click first item, Home, Shift+ArrowDown, Shift+End) and toggling does work, which isolates the failure to the Ctrl+A case. No console errors were emitted.",
+      "source": "explore:lists:select-all + list toggle does not convert a list to paragraphs; it appends an empty item",
       "status": "open"
     }
   ]

@@ -79,3 +79,5 @@ Aborting
 2026-11-22T22:19:47Z DONE qa-040 (tsc -b, npm test, smoke all green)
 2026-11-22T22:20:21Z IMPORTED 1 tester findings into the backlog
 2026-11-22T22:20:21Z START qa-041 on qa/qa-041-ref-from-latex-source-is-not-parsed-and: \ref from LaTeX source is not parsed and cross-references are destroyed on round-trip
+2026-11-22T22:21:44Z DONE qa-041 (tsc -b, npm test, smoke all green)
+2026-11-22T22:27:46Z EXPLORE lists: 1 new items, agent exit 0
