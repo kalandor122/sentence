@@ -721,8 +721,9 @@
       "hint": "Repro: Create a project. View > LaTeX, replace `\\texttt{meaning = structure + language}` with plain text, append `\\section{Unbalanced section}`, `\\begin{table}[htbp]` and `SENTINEL UNBALANCED` before `\\end{document}` (no `\\end{table}`), click Apply source, then View > Visual and View > LaTeX.\nActual: Apply source succeeds with the success toast and no error message. The visual editor shows the raw lines `\\section{Unbalanced section}`, `\\begin{table}[htbp]` and `SENTINEL UNBALANCED` as plain text, and the re-exported source escapes them as `\\textbackslash{}section\\{Unbalanced section\\}` and `\\textbackslash{}begin\\{table\\}[htbp]`, corrupting the LaTeX.",
       "source": "explore:source-editor:unbalanced table environment is stored as escaped text with no error",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T22:36:46Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T22:36:46Z",
+      "lastAttemptAt": "2026-11-22T22:36:46Z"
     },
     {
       "id": "qa-055",

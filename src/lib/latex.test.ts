@@ -183,6 +183,19 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("rejects an unbalanced table environment instead of storing it as text", () => {
+    const source = [
+      "\\begin{document}",
+      "\\section{Unbalanced section}",
+      "\\begin{table}[htbp]",
+      "SENTINEL UNBALANCED",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(source, DEFAULT_SETTINGS)).toThrow(
+      'Invalid LaTeX: unbalanced environment "table".',
+    );
+  });
+
   it("imports hand-authored \\href as an editable link and re-exports it", () => {
     const source = [
       "\\begin{document}",
