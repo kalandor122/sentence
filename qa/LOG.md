@@ -68,4 +68,5 @@ Aborting
 2026-11-22T21:52:55Z SMOKE RED — queueing the failure as critical work: FAIL failures=2 observations=4 consoleErrors=0
   FAIL find reports a match count: No matches
   FAIL nested lists survive the source round trip: {"nested":0,"leaked":false}
-2026-11-22T22:03:05Z STASHED as 'qa-loop-autostash-2026-11-22T22:03:05Z' (recover with git stash list)
+2026-11-22T22:02:51Z EXPLORE keyboard: 4 new items, agent exit 0
+2026-11-22T22:03:05Z DIRTY TREE before qa-068 — stashing so the loop can continue

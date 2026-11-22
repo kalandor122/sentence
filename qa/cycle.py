@@ -138,6 +138,7 @@ RULES
 - Smallest change that fully does the task. Match the existing code style (no formatter, no lint).
 - TypeScript strict: `npx tsc -b` must exit 0. `npm test` must stay green.
 - Do not edit qa/smoke.mjs or qa/cycle.py and do not weaken existing tests to make them pass.
+- Never change UI copy, markup or behaviour for the sole purpose of satisfying a string the smoke script looks for. Fix the cause.
 - No new npm dependencies unless it is impossible without one.
 - Accessibility and keyboard behaviour are part of "done" for UI work.
 - Do not commit, do not create branches, do not run git.
@@ -201,6 +202,18 @@ def cycle(dry_run: bool = False) -> str:
         subprocess.run([sys.executable, str(QA / "triage.py")], cwd=ROOT)
 
     data = load_backlog()
+    # A green gate invalidates any "fix failing smoke check" item queued while it
+    # was red — the loop used to spend a whole cycle re-fixing a passing check.
+    if gate_ok:
+        stale = [i for i in data["items"]
+                 if i["status"] == "open" and str(i.get("source", "")).startswith("smoke-fail:")]
+        for i in stale:
+            i["status"] = "superseded"
+            i["note"] = "gate is green again; this item was queued while it was red"
+            log(f"SUPERSEDED stale gate item {i['id']}")
+        if stale:
+            save_backlog(data)
+
     try:
         import explore  # sibling module; cycle.py always runs as qa/cycle.py
         added = explore.merge_pending()

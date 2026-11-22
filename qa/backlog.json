@@ -869,9 +869,10 @@
       ],
       "hint": "Detail: {\"nested\":0,\"leaked\":false}",
       "source": "smoke-fail:nested lists survive the source round trip",
-      "status": "in_progress",
+      "status": "superseded",
       "attempts": 0,
-      "startedAt": "2026-11-22T22:03:05Z"
+      "startedAt": "2026-11-22T22:03:05Z",
+      "note": "the check it was fixing now passes; the fixer was mutating FindBar copy to satisfy the check"
     },
     {
       "id": "qa-069",
