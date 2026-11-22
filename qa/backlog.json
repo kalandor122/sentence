@@ -1222,10 +1222,11 @@
       ],
       "hint": "Repro: Create a new document. Click Home > Bulleted list, type 'select one', press Enter, type 'select two'. Press Ctrl+A to select the whole document, then click Home > Bulleted list again. Open View > LaTeX and read the source textarea. Repeat the same steps with Numbered list to get the same result.\nActual: Both items stay in the list and a third empty item is appended: the editor DOM is <ul><li>select one</li><li>select two</li><li><p></p></li></ul>, and the generated LaTeX is '\\begin{itemize}\\n\\item select one\\n\\item select two\\n\\item \\n\\end{itemize}'. With Numbered list the same happens with '\\begin{enumerate}' and an extra '\\item '. Selecting only the two list items (click first item, Home, Shift+ArrowDown, Shift+End) and toggling does work, which isolates the failure to the Ctrl+A case. No console errors were emitted.",
       "source": "explore:lists:select-all + list toggle does not convert a list to paragraphs; it appends an empty item",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:57:28Z",
-      "lastAttemptAt": "2026-11-22T23:57:28Z"
+      "lastAttemptAt": "2026-11-22T23:57:28Z",
+      "doneAt": "2026-11-22T23:58:03Z"
     },
     {
       "id": "qa-084",
@@ -1285,7 +1286,9 @@
       ],
       "hint": "Repro: Insert a 3x3 table with a header row, click the centre body cell, inspect the buttons on every ribbon tab (Home, Insert, Layout, References, Review, Paper, View, Git), right-click the cell, and try Alt+Enter, Alt+Insert, Ctrl+Enter, Ctrl+Shift+Equal and Ctrl+Shift+Backspace.\nActual: The only table controls anywhere are Insert table and Delete table. Right-clicking a cell opens no menu, none of the tried shortcuts changes the table, and Tab at the end of the last row only appends a row (3x3 becomes 4x3). Rows/columns can only be changed by hand-editing LaTeX source; there is no way to remove a single row or column visually.",
       "source": "explore:tables:no visual controls to add or remove table rows or columns",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:58:37Z"
     },
     {
       "id": "qa-088",

@@ -175,3 +175,4 @@ Aborting
 2026-11-22T23:56:20Z START qa-079 on qa/qa-079-image-inserted-at-a-cursor-inside-a-para: Image inserted at a cursor inside a paragraph splits the sentence and exports a block figure
 2026-11-22T23:56:54Z DONE qa-079 (tsc -b, npm test, smoke all green)
 2026-11-22T23:57:28Z START qa-083 on qa/qa-083-select-all-list-toggle-does-not-convert: Select-all + list toggle does not convert a list to paragraphs; it appends an empty item
+2026-11-22T23:58:03Z DONE qa-083 (tsc -b, npm test, smoke all green)
