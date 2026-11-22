@@ -1015,8 +1015,9 @@
       "hint": "Repro: In the demo document click References > Table of contents, then View > LaTeX. Press Ctrl+End, type a space and Backspace so the source text is unchanged but Apply source becomes enabled; click Apply source, then View > Visual, then View > LaTeX again.\nActual: After Apply source the toast says 'Visual document synchronized from LaTeX.' and the textarea still shows \\tableofcontents (count 1), but the visual document has 0 [data-toc] nodes. Re-entering LaTeX mode regenerates the source and \\tableofcontents is now count 0. Probe qa/probes/insert-media.mjs step 6: out.applySource.latexImmediatelyAfterApply.toc=1, out.applySource.dom.tocs.length=0, out.applySource.latexAfterReturnToSource.toc=0, while figureBlocks=1 and newpage=1 throughout.",
       "source": "explore:insert-media:apply source silently deletes the inserted table of contents",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T22:48:16Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T22:48:16Z",
+      "lastAttemptAt": "2026-11-22T22:48:16Z"
     },
     {
       "id": "qa-078",

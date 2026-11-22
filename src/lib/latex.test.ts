@@ -560,6 +560,43 @@ describe("LaTeX generation", () => {
     expect(parsed.document.content[2]?.content?.[0]?.text).toBe("Second page.");
   });
 
+  it("round-trips inserted tables of contents without duplicating the generated one", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Before." }] },
+        { type: "toc" },
+        { type: "paragraph", content: [{ type: "text", text: "After." }] },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("Before.\n\n\\tableofcontents\n\nAfter.");
+    const parsed = latexToDocument(latex, settings);
+    expect(parsed.document.content.map((node) => node.type)).toEqual([
+      "paragraph",
+      "toc",
+      "paragraph",
+    ]);
+    expect(documentToLatex(parsed.document, parsed.settings)).toBe(latex);
+
+    const withGeneratedToc = documentToLatex(document, {
+      ...settings,
+      includeToc: true,
+    });
+    const generatedParsed = latexToDocument(withGeneratedToc, {
+      ...settings,
+      includeToc: true,
+    });
+    expect(generatedParsed.document.content.map((node) => node.type)).toEqual([
+      "paragraph",
+      "toc",
+      "paragraph",
+    ]);
+    expect(documentToLatex(generatedParsed.document, generatedParsed.settings)).toBe(
+      withGeneratedToc,
+    );
+  });
+
   it("emits and round-trips typography settings", () => {
     const mainFontSpec =
       "Extension=.otf, UprightFont=*-regular, BoldFont=*-bold, ItalicFont=*-italic, BoldItalicFont=*-bolditalic";
