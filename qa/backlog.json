@@ -431,10 +431,11 @@
       ],
       "hint": "Repro: Insert a 3x3 table. Type `Header` in the top-left cell and `R&D` in the first body cell. Switch View > LaTeX; the source contains `R\\&D &  &  \\\\`. Change `Header` to `Header!` in the textarea, click Apply source, then View > Visual.\nActual: The table has 4 columns: the former body cell becomes two cells containing `R\\` and `D`. Re-exported LaTeX has `\\begin{tabular}{llll}` and `R\\textbackslash{} & D &  &  \\\\`.",
       "source": "explore:tables:escaped ampersand in a cell corrupts the table on source round-trip",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T21:47:25Z",
-      "lastAttemptAt": "2026-11-22T21:47:25Z"
+      "lastAttemptAt": "2026-11-22T21:47:25Z",
+      "doneAt": "2026-11-22T21:48:21Z"
     },
     {
       "id": "qa-034",
@@ -813,6 +814,106 @@
       ],
       "hint": "Repro: Open Document properties, switch Paragraph spacing between 'Indented paragraphs' and 'Spaced paragraphs', then read the computed styles and the .tex.\nActual: Nothing changes: computed text-indent stays 0px, margin-bottom 17.6px, and no \\parindent or \\parskip is emitted in either state. (Line spacing, by contrast, works correctly: setspace + \\doublespacing, line-height 27.5px -> 41.6px.)",
       "source": "explore:ribbon-full:paragraph spacing (indented vs spaced) setting is inert",
+      "status": "open"
+    },
+    {
+      "id": "qa-065",
+      "title": "Browser document is lost on reload while the UI reports it as saved",
+      "why": "Exploratory pass on persistence (functional): expected Once the indicator reads 'Saved locally' (and especially after a Save click reports 'Saved to disk.'), reloading should restore the edited document. If nothing is persisted, the indicator and toast should not claim a successful save.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: On http://localhost:1420 click 'Create a project'. Type ` PERSIST-RELOAD-MARKER-7Q` at the end of the document and wait ~1.6s until the top-bar sublabel under the project name reads 'Saved locally' (View > LaTeX shows the marker in the exported source). Click the Save button and note the toast. Reload the page, then click 'Create a project' again on the Start screen and inspect the visual editor and View > LaTeX source. Run the same reload immediately after typing, before the autosave debounce fires.\nActual: The Save click shows the toast 'Saved to disk.' and the sublabel becomes 'Saved locally', but reload returns to the Start screen with no recent documents. After creating a project again the marker is absent from both the visual editor and the exported LaTeX; the original demo body is back. localStorage before reload contains only `sentence.gitAuthor` - no document snapshot is written. Reloading immediately after typing (sublabel 'Editing') also loses the text and shows no beforeunload confirmation (0 dialogs observed).",
+      "source": "explore:persistence:browser document is lost on reload while the ui reports it as saved",
+      "status": "open"
+    },
+    {
+      "id": "qa-066",
+      "title": "Opening or returning to Visual view flips an unchanged document to 'Editing'",
+      "why": "Exploratory pass on persistence (ux): expected A no-op mode switch should leave the save state at 'Saved locally'.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project and wait ~1.6s until the top-bar sublabel reads 'Saved locally'. Click View > LaTeX, then View > Visual without editing anything, and read the sublabel immediately. The same is visible right after 'Create a project' before the first autosave.\nActual: The sublabel changes to 'Editing' even though the editor's innerText is unchanged (probe comparison true); it returns to 'Saved locally' only after another ~1.1s autosave. Immediately after project creation the sublabel also reads 'Editing'.",
+      "source": "explore:persistence:opening or returning to visual view flips an unchanged document to 'editing'",
+      "status": "open"
+    },
+    {
+      "id": "qa-067",
+      "title": "Fix failing smoke check: find reports a match count",
+      "why": "The automated gate is red; nothing else can be trusted until it is green.",
+      "severity": "critical",
+      "files": [
+        "qa/smoke.mjs",
+        "src"
+      ],
+      "hint": "Detail: No matches",
+      "source": "smoke-fail:find reports a match count",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T21:52:55Z"
+    },
+    {
+      "id": "qa-068",
+      "title": "Fix failing smoke check: nested lists survive the source round trip",
+      "why": "The automated gate is red; nothing else can be trusted until it is green.",
+      "severity": "critical",
+      "files": [
+        "qa/smoke.mjs",
+        "src"
+      ],
+      "hint": "Detail: {\"nested\":0,\"leaked\":false}",
+      "source": "smoke-fail:nested lists survive the source round trip",
+      "status": "open"
+    },
+    {
+      "id": "qa-069",
+      "title": "start screen footer shows version 0.1 while package.json is 0.2.0 \u2014 hardcoded version?",
+      "why": "Found by the automated pass (low/content).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Sentence 0.1 in footer",
+      "source": "start screen footer shows version 0.1 while package.json is 0.2.0 \u2014 hardcoded version?",
+      "status": "open"
+    },
+    {
+      "id": "qa-070",
+      "title": "keyboard shortcut \"Ctrl+K link\" has no visible effect on the document",
+      "why": "Found by the automated pass (low/ux).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "innerHTML unchanged",
+      "source": "keyboard shortcut \"ctrl+k link\" has no visible effect on the document",
+      "status": "open"
+    },
+    {
+      "id": "qa-071",
+      "title": "keyboard shortcut \"Ctrl+5 line spacing\" has no visible effect on the document",
+      "why": "Found by the automated pass (low/ux).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "innerHTML unchanged",
+      "source": "keyboard shortcut \"ctrl+5 line spacing\" has no visible effect on the document",
+      "status": "open"
+    },
+    {
+      "id": "qa-072",
+      "title": "no discoverable control to switch to LaTeX source view from the editor chrome",
+      "why": "Found by the automated pass (medium/ux).",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "",
+      "source": "no discoverable control to switch to latex source view from the editor chrome",
       "status": "open"
     }
   ]

@@ -63,3 +63,8 @@ Aborting
 2026-11-22T21:47:25Z IMPORTED 7 tester findings into the backlog
 2026-11-22T21:47:25Z REQUEUE qa-048 -> superseded (line spacing actually works (setspace, 27.5->41.6px line-height); only paragraph spacing is inert, now queued separately)
 2026-11-22T21:47:25Z START qa-033 on qa/qa-033-escaped-ampersand-in-a-cell-corrupts-the: Escaped ampersand in a cell corrupts the table on source round-trip
+2026-11-22T21:48:21Z DONE qa-033 (tsc -b, npm test, smoke all green)
+2026-11-22T21:52:42Z EXPLORE persistence: 2 new items, agent exit 0
+2026-11-22T21:52:55Z SMOKE RED — queueing the failure as critical work: FAIL failures=2 observations=4 consoleErrors=0
+  FAIL find reports a match count: No matches
+  FAIL nested lists survive the source round trip: {"nested":0,"leaked":false}

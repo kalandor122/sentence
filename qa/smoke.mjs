@@ -147,7 +147,69 @@ try {
     await shot("06-compile");
   } else observe("functional", "high", "no Compile control found in the ribbon", null);
 
-  // 7. Console gate
+  // 7. Regressions that shipped once and must not come back
+  const viewTab = page.getByRole("button", { name: "View", exact: true }).first();
+  if (await viewTab.count()) {
+    // Ctrl+F find bar
+    await page.keyboard.press("ControlOrMeta+f");
+    await page.waitForTimeout(400);
+    const bar = page.locator(".find-bar input").first();
+    hard("Ctrl+F opens the find bar", (await bar.count()) > 0);
+    if (await bar.count()) {
+      await bar.fill("smoke marker");
+      await page.waitForTimeout(500);
+      const barText = (await page.locator(".find-bar").first().innerText()).replace(/\s+/g, " ");
+      hard("find reports a match count", /\d+\s*\/\s*\d+/.test(barText), barText.slice(0, 120));
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(250);
+      hard("Escape closes the find bar", (await page.locator(".find-bar").count()) === 0);
+    }
+
+    // Ctrl+K link dialog, and it must not keep the page blocked after Escape
+    const surfaceNow = surface;
+    if (await surfaceNow.count()) { await surfaceNow.click(); await page.keyboard.press("ControlOrMeta+End"); }
+    await page.keyboard.press("ControlOrMeta+k");
+    await page.waitForTimeout(400);
+    const dialog = await page.evaluate(() => {
+      const d = document.querySelector('[role="dialog"], .modal, .dialog');
+      return d ? d.innerText.replace(/\s+/g, " ").slice(0, 80) : null;
+    });
+    hard("Ctrl+K opens the link dialog", Boolean(dialog), String(dialog));
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(300);
+
+    // Nested list LaTeX round trip (visual -> source -> visual)
+    await viewTab.click();
+    await page.waitForTimeout(200);
+    const latexBtn = page.getByRole("button", { name: "LaTeX", exact: true }).first();
+    hard("View tab exposes a LaTeX button", (await latexBtn.count()) > 0);
+    if (await latexBtn.count()) {
+      await latexBtn.click();
+      await page.waitForTimeout(500);
+      const area = page.locator('textarea[aria-label="LaTeX source"]').first();
+      hard("source view shows the LaTeX textarea", (await area.count()) > 0);
+      if (await area.count()) {
+        const before = await area.inputValue();
+        await area.fill(before + "\n\\begin{itemize}\n\\item parent item\n\\begin{enumerate}\n\\item child item\n\\end{enumerate}\n\\end{itemize}\n");
+        await page.waitForTimeout(900);
+        await page.getByRole("button", { name: "Visual", exact: true }).first().click();
+        await page.waitForTimeout(700);
+        const roundTrip = await page.evaluate(() => {
+          const ed = document.querySelector(".tiptap, .ProseMirror");
+          if (!ed) return null;
+          const nested = [...ed.querySelectorAll("ul ol, ol ul, ul ul, ol ol")].length;
+          return { nested, leaked: /\\begin\{itemize\}|\\end\{itemize\}/.test(ed.innerText) };
+        });
+        hard("nested lists survive the source round trip", Boolean(roundTrip && roundTrip.nested > 0 && !roundTrip.leaked),
+          JSON.stringify(roundTrip));
+        await shot("07-roundtrip");
+      }
+    }
+  } else {
+    observe("ux", "medium", "no View ribbon tab found, cannot check source-view round trips", null);
+  }
+
+  // 8. Console gate
   hard("no console errors", report.consoleErrors.length === 0, report.consoleErrors.slice(0, 5).join(" | "));
 } catch (e) {
   report.failures.push({ check: "harness", detail: String(e).slice(0, 500) });
