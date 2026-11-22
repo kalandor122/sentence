@@ -75,3 +75,4 @@ Aborting
 2026-11-22T22:15:32Z DONE qa-036 (tsc -b, npm test, smoke all green)
 2026-11-22T22:16:06Z START qa-037 on qa/qa-037-numbered-equation-environment-from-latex: Numbered equation environment from LaTeX source is not recognized and is escaped as text
 2026-11-22T22:17:40Z DONE qa-037 (tsc -b, npm test, smoke all green)
+2026-11-22T22:18:13Z START qa-040 on qa/qa-040-href-from-latex-source-is-not-parsed-an: \href from LaTeX source is not parsed and links are destroyed on round-trip

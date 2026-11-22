@@ -528,8 +528,9 @@
       "hint": "Repro: Create a project. Type `Docs`, select it, Home > Add link, enter `https://combined.example.org`, Insert. View > LaTeX: source contains `\\href{https://combined.example.org}{Docs}`. Click Apply source, View > Visual, then View > LaTeX. For an isolated check, in View > LaTeX replace the document body with `Before \\href{https://hand.example.org}{hand link} and \\ref{sec:handwritten} After` and click Apply source.\nActual: No `<a>` node exists after Apply source. The visual paragraph shows literal `\\href{https://hand.example.org}{hand link}` text, and re-exported source contains `\\textbackslash{}href\\{https://hand.example.org\\}\\{hand link\\}`.",
       "source": "explore:links-cites-footnotes:\\href from latex source is not parsed and links are destroyed on round-trip",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T22:18:13Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T22:18:13Z",
+      "lastAttemptAt": "2026-11-22T22:18:13Z"
     },
     {
       "id": "qa-041",
