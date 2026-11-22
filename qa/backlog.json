@@ -236,8 +236,9 @@
       "hint": "Repro: Git ribbon tab > Pull, Push; then panel > Fetch, Pull, Push\nActual: No toast, no dialog, no state change, no error; nothing indicates the action is desktop-only",
       "source": "explore:chrome:fetch / pull / push are silent no-ops (ribbon git tab and panel)",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:27:41Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:27:41Z",
+      "lastAttemptAt": "2026-11-22T23:27:41Z"
     },
     {
       "id": "qa-016",
