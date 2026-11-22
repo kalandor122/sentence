@@ -268,8 +268,9 @@
       "hint": "Repro: Git panel > Continue with GitHub\nActual: document.activeElement remains behind the backdrop; the equation/comment/citation dialogs do focus correctly, so behaviour is inconsistent",
       "source": "explore:chrome:github dialog does not move focus into the dialog",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:29:58Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:29:58Z",
+      "lastAttemptAt": "2026-11-22T23:29:58Z"
     },
     {
       "id": "qa-018",
