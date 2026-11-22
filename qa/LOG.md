@@ -131,3 +131,4 @@ Aborting
 2026-11-22T23:33:58Z DONE qa-027 (tsc -b, npm test, smoke all green)
 2026-11-22T23:34:33Z START qa-034 on qa/qa-034-single-column-latex-table-is-not-restore: Single-column LaTeX table is not restored as a table
 2026-11-22T23:35:07Z DONE qa-034 (tsc -b, npm test, smoke all green)
+2026-11-22T23:35:41Z START qa-035 on qa/qa-035-no-ui-controls-to-add-or-remove-table-ro: No UI controls to add or remove table rows or columns
