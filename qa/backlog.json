@@ -251,10 +251,11 @@
       ],
       "hint": "Repro: Type ' alpha beta' in the body (92 -> 94 words), open Git panel\nActual: Panel still shows CHANGES 0 / 'Working tree clean' and hides the commit-message field, so there is nothing to commit",
       "source": "explore:chrome:change tracking reports 'working tree clean' after real edits",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:28:49Z",
-      "lastAttemptAt": "2026-11-22T23:28:49Z"
+      "lastAttemptAt": "2026-11-22T23:28:49Z",
+      "doneAt": "2026-11-22T23:29:24Z"
     },
     {
       "id": "qa-017",
@@ -266,7 +267,9 @@
       ],
       "hint": "Repro: Git panel > Continue with GitHub\nActual: document.activeElement remains behind the backdrop; the equation/comment/citation dialogs do focus correctly, so behaviour is inconsistent",
       "source": "explore:chrome:github dialog does not move focus into the dialog",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:29:58Z"
     },
     {
       "id": "qa-018",
