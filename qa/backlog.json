@@ -172,8 +172,9 @@
       "hint": "Repro: Click button[aria-label=Settings] in top bar (programmatic click and real CDP mouse click at 1254,19)\nActual: No dialog, no menu, no DOM change, no toast, no console error; button only takes focus",
       "source": "explore:chrome:avatar/settings button is dead",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:23:06Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:23:06Z",
+      "lastAttemptAt": "2026-11-22T23:23:06Z"
     },
     {
       "id": "qa-012",
