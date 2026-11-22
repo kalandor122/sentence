@@ -139,6 +139,7 @@ RULES
 - TypeScript strict: `npx tsc -b` must exit 0. `npm test` must stay green.
 - Do not edit qa/smoke.mjs or qa/cycle.py and do not weaken existing tests to make them pass.
 - Never change UI copy, markup or behaviour for the sole purpose of satisfying a string the smoke script looks for. Fix the cause.
+- Touch nothing under qa/ except reading it — qa/STOP, qa/backlog.json, qa/cycle.py and qa/smoke.mjs are the operator's.
 - No new npm dependencies unless it is impossible without one.
 - Accessibility and keyboard behaviour are part of "done" for UI work.
 - Do not commit, do not create branches, do not run git.
