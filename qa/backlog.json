@@ -1014,10 +1014,11 @@
       ],
       "hint": "Repro: In the demo document click References > Table of contents, then View > LaTeX. Press Ctrl+End, type a space and Backspace so the source text is unchanged but Apply source becomes enabled; click Apply source, then View > Visual, then View > LaTeX again.\nActual: After Apply source the toast says 'Visual document synchronized from LaTeX.' and the textarea still shows \\tableofcontents (count 1), but the visual document has 0 [data-toc] nodes. Re-entering LaTeX mode regenerates the source and \\tableofcontents is now count 0. Probe qa/probes/insert-media.mjs step 6: out.applySource.latexImmediatelyAfterApply.toc=1, out.applySource.dom.tocs.length=0, out.applySource.latexAfterReturnToSource.toc=0, while figureBlocks=1 and newpage=1 throughout.",
       "source": "explore:insert-media:apply source silently deletes the inserted table of contents",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T22:48:16Z",
-      "lastAttemptAt": "2026-11-22T22:48:16Z"
+      "lastAttemptAt": "2026-11-22T22:48:16Z",
+      "doneAt": "2026-11-22T22:51:01Z"
     },
     {
       "id": "qa-078",
@@ -1101,7 +1102,9 @@
       ],
       "hint": "Repro: Create a new project, Insert tab > Insert table, click the centre cell and type `victim`. Switch View > LaTeX (the source contains a tabular with `victim`), switch back to View > Visual, click the centre cell again, then Insert tab > Delete table. The table disappears. Now switch View > LaTeX and then View > Visual again.\nActual: Immediately after the click the editor shows only an empty paragraph, but View > LaTeX still shows `\\begin{tabular}{lll}` with `victim`, and switching back to View > Visual restores the full 3x3 table with `victim`. The Delete table button then becomes disabled again even though the table is visible, and typing after the round trip leaves the restored table in the document.",
       "source": "explore:tables:deleted table is resurrected on source/visual switch",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T22:51:35Z"
     },
     {
       "id": "qa-085",
