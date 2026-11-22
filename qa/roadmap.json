@@ -1,0 +1,53 @@
+{
+  "notes": "Word-parity work for when the defect backlog runs dry. cycle.py promotes the first item that is not already in the backlog, then works it like any other item. One at a time, in order: each of these is a real feature someone has to design, not a checklist entry.",
+  "items": [
+    {
+      "title": "Table editing: a contextual table toolbar",
+      "why": "Word users edit tables constantly. Tiptap ships table commands; the app exposes only 'insert 3x3', so a table cannot be reshaped after creation.",
+      "severity": "high",
+      "hint": "When the cursor is inside a table, show a small toolbar above it (or in the ribbon) with: add row above/below, delete row, add column left/right, delete column, toggle header row, merge/split cells, cell alignment, delete table. Use the existing Tiptap table extension commands through the editor. Add a caption field that emits \\caption{...} in LaTeX."
+    },
+    {
+      "title": "Spell check that respects the LaTeX source",
+      "why": "Every word processor has it. A manuscript editor without spell check sends people to another app to proofread.",
+      "severity": "high",
+      "hint": "Use the WebView's native spellchecker on the ProseMirror surface (spellcheck attribute + lang) rather than shipping a dictionary; verify it does not underline LaTeX commands in source mode (turn spellcheck off in the .tex textarea). Add a Review-tab 'Spelling' toggle that persists in settings."
+    },
+    {
+      "title": "Real pagination in the visual editor",
+      "why": "The visual page is a single long sheet and the status bar guesses page count. Without page breaks WYSIWYG means nothing for a print-first tool.",
+      "severity": "high",
+      "hint": "Measure the rendered block positions against the configured page height and draw page-break rules (a repeating background or absolutely positioned separators) so the user sees where pages split; derive the page count from the same measurement instead of word count. Use the settings' paperSize/margins/fontSize to compute the content height. Keep it CSS/measurement only — no full layout engine."
+    },
+    {
+      "title": "Bibliography manager",
+      "why": "Citations exist but the .bib file can only be edited by hand. Word's citation manager is a core reason people stay.",
+      "severity": "high",
+      "hint": "A References-tab panel listing entries parsed from references.bib (key, author, year, title) with search, add, edit and delete; inserting a citation opens this list. Keep the .bib text the source of truth and parse/write it in src/lib (add round-trip tests next to latex.test.ts)."
+    },
+    {
+      "title": "Track changes UI",
+      "why": "Revision data exists in the model but a reviewer cannot see, accept or reject individual changes.",
+      "severity": "high",
+      "hint": "Show insertions and deletions inline in the visual editor (marks with author colours), a Review-tab toggle for tracking, and per-change accept/reject plus accept-all/reject-all in the History panel. Review state must never leak into the exported LaTeX."
+    },
+    {
+      "title": "Document themes and style gallery",
+      "why": "Word's style gallery is how normal people get a consistent document without knowing LaTeX.",
+      "severity": "medium",
+      "hint": "A small gallery of named themes (e.g. Classic, Modern, Compact) that set documentClass/fontFamily/fontSize/lineSpacing/paragraphSpacing/margins at once, previewed as a styled thumbnail. Apply through the existing settings object so the LaTeX preamble follows."
+    },
+    {
+      "title": "Multi-document workspace tabs",
+      "why": "One document per window forces people to juggle windows for a paper plus its notes.",
+      "severity": "medium",
+      "hint": "Tabs above the page area holding multiple open projects, with dirty indicators and per-tab close. Keep one editor instance and swap the workspace snapshot to avoid memory blowup. Desktop only for real projects; browser mode keeps the single demo workspace."
+    },
+    {
+      "title": "Export to HTML and Markdown alongside LaTeX",
+      "why": "People need to publish the same text as a blog post or a web page, and currently the only portable output is .tex.",
+      "severity": "medium",
+      "hint": "Add exporters next to documentToLatex in src/lib, driven by the same document model, with round-trip tests for the supported subset. Wire them into a File/Export menu that is honest about which subset is supported."
+    }
+  ]
+}

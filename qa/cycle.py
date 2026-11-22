@@ -151,6 +151,36 @@ def append_log(entry: dict) -> None:
         f.write(json.dumps(entry, indent=2) + "\n")
 
 
+def promote_from_roadmap(data: dict) -> dict | None:
+    """Backlog dry? Pull the next roadmap feature in as a normal item, so the
+    loop keeps moving toward Word parity instead of idling."""
+    path = QA / "roadmap.json"
+    if not path.exists():
+        return None
+    roadmap = json.loads(path.read_text())["items"]
+    titles = {i["title"].strip().lower() for i in data["items"]}
+    ids = [int(i["id"].split("-")[1]) for i in data["items"] if i["id"].startswith("qa-")]
+    next_id = max(ids, default=0) + 1
+    for feat in roadmap:
+        if feat["title"].strip().lower() in titles:
+            continue
+        item = {
+            "id": f"qa-{next_id:03d}",
+            "title": feat["title"],
+            "why": feat.get("why", ""),
+            "severity": feat.get("severity", "medium"),
+            "files": ["src"],
+            "hint": feat.get("hint", ""),
+            "source": f"roadmap:{feat['title'].lower()}",
+            "status": "open",
+        }
+        data["items"].append(item)
+        save_backlog(data)
+        log(f"PROMOTED from roadmap: {item['id']} {item['title']}")
+        return item
+    return None
+
+
 def cycle(dry_run: bool = False) -> str:
     ok, msg = ensure_server()
     if not ok:
@@ -173,6 +203,8 @@ def cycle(dry_run: bool = False) -> str:
         log(f"IMPORT FAIL {exc}")
 
     item = pick(data)
+    if not item:
+        item = promote_from_roadmap(data)
     if not item:
         log("BACKLOG EMPTY — nothing open, idle")
         return "idle"
