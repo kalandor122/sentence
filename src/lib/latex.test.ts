@@ -118,6 +118,35 @@ describe("LaTeX generation", () => {
     expect(parsed.document.content[2]?.type).toBe("bulletList");
   });
 
+  it("round-trips \\texttt as inline code without dropping the body", () => {
+    const latex = [
+      "\\begin{document}",
+      "\\section{Title}",
+      "",
+      "Existing body.",
+      "",
+      "Code: \\texttt{CODE MARKER}",
+      "",
+      "\\begin{quote}",
+      "Quoted text.",
+      "\\end{quote}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(latex, DEFAULT_SETTINGS).document;
+    expect(parsed.content.map((node) => node.type)).toEqual([
+      "heading",
+      "paragraph",
+      "paragraph",
+      "blockquote",
+    ]);
+    expect(parsed.content[2]?.content?.[1]?.text).toBe("CODE MARKER");
+    expect(parsed.content[2]?.content?.[1]?.marks).toEqual([{ type: "code" }]);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("Existing body.");
+    expect(exported).toContain("Code: \\texttt{CODE MARKER}");
+    expect(exported).toContain("\\begin{quote}");
+  });
+
   it("round-trips nested lists through LaTeX source", () => {
     const document: SentenceDocument = {
       type: "doc",
