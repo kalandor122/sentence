@@ -288,6 +288,40 @@ describe("LaTeX generation", () => {
     expect(centeredHeading?.attrs?.level).toBe(2);
   });
 
+  it("parses $...$ source as editable inline math and keeps it on export", () => {
+    const source = [
+      "\\begin{document}",
+      "Inline $E=mc^2$ tail",
+      "",
+      "\\begin{equation*}",
+      "a^2+b^2=c^2",
+      "\\end{equation*}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const paragraph = parsed.content[0];
+    expect(paragraph?.content?.map((node) => node.type)).toEqual([
+      "text",
+      "mathInline",
+      "text",
+    ]);
+    expect(paragraph?.content?.[0]?.text).toBe("Inline ");
+    expect(paragraph?.content?.[1]?.attrs?.latex).toBe("E=mc^2");
+    expect(paragraph?.content?.[2]?.text).toBe(" tail");
+    expect(parsed.content[1]?.type).toBe("mathBlock");
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("Inline \\(E=mc^2\\) tail");
+    expect(exported).toContain("\\begin{equation*}\na^2+b^2=c^2\n\\end{equation*}");
+  });
+
+  it("keeps escaped dollar signs as literal text", () => {
+    const source = "\\begin{document}\nCosts \\$5 and \\$10.\n\\end{document}";
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    expect(parsed.content[0]?.content?.map((node) => node.type)).toEqual(["text"]);
+    expect(parsed.content[0]?.content?.[0]?.text).toBe("Costs $5 and $10.");
+    expect(documentToLatex(parsed, settings)).toContain("Costs \\$5 and \\$10.");
+  });
+
   it("keeps the header row when importing table LaTeX", () => {
     const cells = [
       ["H1", "H2", "H3", "H4"],

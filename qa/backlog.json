@@ -472,8 +472,9 @@
       "hint": "Repro: Create a project. Type `Inline `, Insert tab > Inline equation with `E=mc^2`, type ` tail`, Insert tab > Equation block with `a^2+b^2=c^2`. View > LaTeX: the source has `Inline \\(E=mc^2\\) tail` and an `equation*` block. Change only that inline expression to `Inline $E=mc^2$ tail`, click Apply source, then View > Visual, then View > LaTeX again.\nActual: No inline math node remains: the visual paragraph reads `Inline $E=mc^2$ tail` as literal text (the display equation survives). Re-exporting writes `Inline \\$E=mc\\textasciicircum{}2\\$ tail`, so the math is corrupted on round-trip.",
       "source": "explore:math:$...$ inline math from latex source is silently turned into escaped plain text",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T22:14:14Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T22:14:14Z",
+      "lastAttemptAt": "2026-11-22T22:14:14Z"
     },
     {
       "id": "qa-037",
