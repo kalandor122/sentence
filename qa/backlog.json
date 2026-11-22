@@ -661,8 +661,9 @@
       "hint": "Repro: Create a project and switch View > LaTeX. Append the line `Code: \\texttt{CODE MARKER}` before `\\end{document}`, click Apply source, then View > Visual. Switch back to View > LaTeX to read the generated source.\nActual: The visual editor is empty (innerHTML 122 chars, placeholder only): both headings, all paragraphs and the quote disappear, the toast says 'Visual document synchronized from LaTeX.', and the re-exported source contains only front matter through `\\keywords{...}` with no body. The app's unmodified exported source triggers the same wipe because it contains `\\texttt{meaning = structure + language}`; an in-page check of /src/lib/latex.ts shows that command is parsed into a text node with mark type `inlineCode`.",
       "source": "explore:source-editor:applying latex containing \\texttt wipes the entire visual document",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T21:39:04Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T21:39:04Z",
+      "lastAttemptAt": "2026-11-22T21:39:04Z"
     },
     {
       "id": "qa-053",

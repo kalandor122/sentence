@@ -557,7 +557,7 @@ function parseInline(source: string): InlineParseResult {
         textit: "italic",
         underline: "underline",
         sout: "strike",
-        texttt: "inlineCode",
+        texttt: "code",
         textsuperscript: "superscript",
         textsubscript: "subscript",
       };
