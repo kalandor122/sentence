@@ -73,3 +73,4 @@ Aborting
 2026-11-22T22:14:00Z EXPLORE insert-media: 5 new items, agent exit 0
 2026-11-22T22:14:14Z START qa-036 on qa/qa-036-inline-math-from-latex-source-is-silent: $...$ inline math from LaTeX source is silently turned into escaped plain text
 2026-11-22T22:15:32Z DONE qa-036 (tsc -b, npm test, smoke all green)
+2026-11-22T22:16:06Z START qa-037 on qa/qa-037-numbered-equation-environment-from-latex: Numbered equation environment from LaTeX source is not recognized and is escaped as text

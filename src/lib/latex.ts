@@ -258,8 +258,10 @@ function blockToLatex(node: DocumentNode): string {
       return imageToLatex(node);
     case "table":
       return tableToLatex(node);
-    case "mathBlock":
-      return `\\begin{equation*}\n${attribute(node, "latex") ?? ""}\n\\end{equation*}`;
+    case "mathBlock": {
+      const environment = node.attrs?.numbered === true ? "equation" : "equation*";
+      return `\\begin{${environment}}\n${attribute(node, "latex") ?? ""}\n\\end{${environment}}`;
+    }
     case "pageBreak":
       return "\\newpage";
     case "toc":
@@ -905,9 +907,12 @@ export function latexToDocument(
       });
       continue;
     }
-    const equation = block.match(/^\\begin\{equation\*\}[\s\S]*?\n([\s\S]*)\n\\end\{equation\*\}$/);
+    const equation = block.match(/^\\begin\{equation(\*?)\}[\s\S]*?\n([\s\S]*)\n\\end\{equation\1\}$/);
     if (equation) {
-      content.push({ type: "mathBlock", attrs: { latex: equation[1].trim() } });
+      content.push({
+        type: "mathBlock",
+        attrs: { latex: equation[2].trim(), numbered: equation[1] !== "*" },
+      });
       continue;
     }
     const verbatim = block.match(/^\\begin\{verbatim\}\n([\s\S]*)\n\\end\{verbatim\}$/);
