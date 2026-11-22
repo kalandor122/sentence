@@ -147,6 +147,64 @@ describe("LaTeX generation", () => {
     expect(exported).toContain("\\begin{quote}");
   });
 
+  it("imports hand-authored \\href as an editable link and re-exports it", () => {
+    const source = [
+      "\\begin{document}",
+      "Before \\href{https://hand.example.org}{hand link} After",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const paragraph = parsed.content[0];
+    expect(paragraph?.content?.map((node) => node.type)).toEqual([
+      "text",
+      "text",
+      "text",
+    ]);
+    expect(paragraph?.content?.[0]?.text).toBe("Before ");
+    expect(paragraph?.content?.[1]?.text).toBe("hand link");
+    expect(paragraph?.content?.[1]?.marks).toEqual([
+      { type: "link", attrs: { href: "https://hand.example.org" } },
+    ]);
+    expect(paragraph?.content?.[2]?.text).toBe(" After");
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain(
+      "Before \\href{https://hand.example.org}{hand link} After",
+    );
+    expect(exported).not.toContain("\\textbackslash{}href");
+  });
+
+  it("keeps escaped link URLs and nested marks through a LaTeX round trip", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: "Docs",
+              marks: [
+                { type: "bold" },
+                { type: "link", attrs: { href: "https://example.org/a_b?x=1&y=2" } },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const expected = "\\href{https://example.org/a\\_b?x=1\\&y=2}{\\textbf{Docs}}";
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain(expected);
+    const parsed = latexToDocument(latex, DEFAULT_SETTINGS).document;
+    const marks = parsed.content[0]?.content?.[0]?.marks;
+    expect(marks).toContainEqual({
+      type: "link",
+      attrs: { href: "https://example.org/a_b?x=1&y=2" },
+    });
+    expect(marks).toContainEqual({ type: "bold" });
+    expect(documentToLatex(parsed, settings)).toContain(expected);
+  });
+
   it("round-trips nested lists through LaTeX source", () => {
     const document: SentenceDocument = {
       type: "doc",

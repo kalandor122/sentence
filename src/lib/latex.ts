@@ -588,6 +588,31 @@ function parseInline(source: string): InlineParseResult {
       continue;
     }
 
+    const hrefMatch = remainder.match(/^\\href\s*\{/);
+    if (hrefMatch) {
+      const urlOpen = index + hrefMatch[0].length - 1;
+      const urlClose = findMatchingBrace(source, urlOpen);
+      const textOpen = urlClose > 0 ? source.indexOf("{", urlClose + 1) : -1;
+      const textClose = textOpen > 0 ? findMatchingBrace(source, textOpen) : -1;
+      if (
+        urlClose > 0 &&
+        textClose > 0 &&
+        !source.slice(urlClose + 1, textOpen).trim()
+      ) {
+        flush();
+        const linkMark: DocumentMark = {
+          type: "link",
+          attrs: { href: decodeLatexText(source.slice(urlOpen + 1, urlClose)) },
+        };
+        for (const node of parseInline(source.slice(textOpen + 1, textClose)).content) {
+          node.marks = [...(node.marks ?? []), linkMark];
+          content.push(node);
+        }
+        index = textClose + 1;
+        continue;
+      }
+    }
+
     if (source[index] === "\\" && source[index + 1] === "$") {
       buffer += "\\$";
       index += 2;
