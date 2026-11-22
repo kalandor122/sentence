@@ -561,6 +561,11 @@ button:disabled {
   scrollbar-width: thin;
 }
 
+/* Colour palettes must escape the ribbon's horizontal scroller to be clickable. */
+.ribbon-content:has(.color-popover) {
+  overflow: visible;
+}
+
 .ribbon-group {
   display: grid;
   grid-template-rows: minmax(0, 1fr) 13px;
