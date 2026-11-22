@@ -150,3 +150,5 @@ Aborting
 2026-11-22T23:43:43Z START qa-056 on qa/qa-056-clicking-the-active-latex-mode-button-di: Clicking the active LaTeX mode button discards unapplied source edits
 2026-11-22T23:44:17Z DONE qa-056 (tsc -b, npm test, smoke all green)
 2026-11-22T23:44:51Z START qa-057 on qa/qa-057-status-bar-page-count-ignores-page-break: Status bar page count ignores page breaks and visual document length
+2026-11-22T23:45:26Z DONE qa-057 (tsc -b, npm test, smoke all green)
+2026-11-22T23:45:46Z EXPLORE keyboard: 0 new items, agent exit 1
