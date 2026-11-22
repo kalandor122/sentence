@@ -385,6 +385,9 @@ button:disabled {
 
 .app-shell {
   display: grid;
+  /* explicit minmax(0,1fr): without it the implicit column sizes to the widest
+     child (the ribbon) and the whole shell overflows the window */
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: 40px auto minmax(0, 1fr) 24px;
   width: 100%;
   height: 100%;

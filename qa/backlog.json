@@ -11,12 +11,12 @@
         "src/components/Ribbon.tsx"
       ],
       "hint": "Reproduce with `node qa/smoke.mjs` (it records ribbon overflow observations and qa/shots/03-ribbon-*.png). Fix in CSS first: the ribbon should not overflow the window \u2014 allow groups to shrink the wide labels to icons or scroll horizontally inside .ribbon-content. Do not reorder or remove commands.",
-      "status": "done",
+      "status": "superseded",
       "attempts": 1,
       "startedAt": "2026-11-22T19:47:59Z",
       "lastAttemptAt": "2026-11-22T19:47:59Z",
       "doneAt": "2026-11-22T20:10:00Z",
-      "note": "min-width:0 on .ribbon + narrower selects under 1360px; smoke now hard-fails on ribbon overflow"
+      "note": "first fix was insufficient; real fix: .app-shell explicit minmax(0,1fr) column"
     },
     {
       "id": "qa-002",
@@ -380,6 +380,102 @@
       ],
       "hint": "Repro: Insert > Contents\nActual: dashed box reading 'TABLE OF CONTENTS' only, no entries, even though the doc has H1/H2 headings; LaTeX gets \\tableofcontents correctly",
       "source": "explore:insert:toc block is an empty placeholder in the visual editor",
+      "status": "open"
+    },
+    {
+      "id": "qa-032",
+      "title": "Applying table LaTeX drops the first/header row",
+      "why": "Exploratory pass on tables (functional): expected An editable 4-row table with header H1-H4 plus the three body rows, and the re-exported LaTeX contains all four rows.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new project, Insert tab > Insert table, switch View > LaTeX. Replace the table block with a 4-column, 4-row tabular whose first row is `H1 & H2 & H3 & H4 \\\\`, followed by rows `a1 & a2 & a3 & a4 \\\\`, `b1 & b2 & b3 & b4 \\\\`, `c1 & c2 & c3 & c4 \\\\`. Click Apply source, then View > Visual.\nActual: The visual table has only 3 rows; the first row is `a1 a2 a3 a4` and H1-H4 are gone. The re-exported LaTeX starts with `a1 & a2 & a3 & a4 \\\\`.",
+      "source": "explore:tables:applying table latex drops the first/header row",
+      "status": "open"
+    },
+    {
+      "id": "qa-033",
+      "title": "Escaped ampersand in a cell corrupts the table on source round-trip",
+      "why": "Exploratory pass on tables (functional): expected A 3-column table with `Header!` in the first header cell and `R&D` preserved in the first body cell.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert a 3x3 table. Type `Header` in the top-left cell and `R&D` in the first body cell. Switch View > LaTeX; the source contains `R\\&D &  &  \\\\`. Change `Header` to `Header!` in the textarea, click Apply source, then View > Visual.\nActual: The table has 4 columns: the former body cell becomes two cells containing `R\\` and `D`. Re-exported LaTeX has `\\begin{tabular}{llll}` and `R\\textbackslash{} & D &  &  \\\\`.",
+      "source": "explore:tables:escaped ampersand in a cell corrupts the table on source round-trip",
+      "status": "open"
+    },
+    {
+      "id": "qa-034",
+      "title": "Single-column LaTeX table is not restored as a table",
+      "why": "Exploratory pass on tables (functional): expected An editable one-column table with three rows.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert a 3x3 table, switch View > LaTeX, replace the table block with a `tabular}{l}` table containing the rows `Only \\\\`, `a \\\\`, and `b \\\\`, click Apply source, then View > Visual.\nActual: No table is present. The body shows the raw LaTeX as text, and re-export escapes it as `\\textbackslash{}begin\\{table\\}...`.",
+      "source": "explore:tables:single-column latex table is not restored as a table",
+      "status": "open"
+    },
+    {
+      "id": "qa-035",
+      "title": "No UI controls to add or remove table rows or columns",
+      "why": "Exploratory pass on tables (functional): expected Commands to add and remove rows and columns while editing the table.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert a 3x3 table, click a body cell, inspect every ribbon tab, then right-click the cell.\nActual: The Insert ribbon offers only `Insert table` and `Delete table`; all other ribbon tabs have no row/column table commands and right-clicking a cell opens no menu. Tab on the last cell adds a row, but there is no UI action to delete a row or add/remove a column.",
+      "source": "explore:tables:no ui controls to add or remove table rows or columns",
+      "status": "open"
+    },
+    {
+      "id": "qa-036",
+      "title": "$...$ inline math from LaTeX source is silently turned into escaped plain text",
+      "why": "Exploratory pass on math (functional): expected `$E=mc^2$` is parsed as an editable inline math node, and the re-exported source still contains the math expression.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Type `Inline `, Insert tab > Inline equation with `E=mc^2`, type ` tail`, Insert tab > Equation block with `a^2+b^2=c^2`. View > LaTeX: the source has `Inline \\(E=mc^2\\) tail` and an `equation*` block. Change only that inline expression to `Inline $E=mc^2$ tail`, click Apply source, then View > Visual, then View > LaTeX again.\nActual: No inline math node remains: the visual paragraph reads `Inline $E=mc^2$ tail` as literal text (the display equation survives). Re-exporting writes `Inline \\$E=mc\\textasciicircum{}2\\$ tail`, so the math is corrupted on round-trip.",
+      "source": "explore:math:$...$ inline math from latex source is silently turned into escaped plain text",
+      "status": "open"
+    },
+    {
+      "id": "qa-037",
+      "title": "Numbered equation environment from LaTeX source is not recognized and is escaped as text",
+      "why": "Exploratory pass on math (functional): expected The numbered equation is imported as an editable display math node and re-exported as an equation environment.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project with inline math `E=mc^2` and an equation block `a^2+b^2=c^2` via the Insert tab. View > LaTeX, change `\\begin{equation*}` / `\\end{equation*}` to `\\begin{equation}` / `\\end{equation}`, click Apply source, then View > Visual and View > LaTeX again.\nActual: The display math node disappears and the visual document shows the raw lines `\\begin{equation}`, `a^2+b^2=c^2`, `\\end{equation}` as text. Re-exported source contains `\\textbackslash{}begin\\{equation\\}` and `a\\textasciicircum{}2+b\\textasciicircum{}2=c\\textasciicircum{}2`, destroying the equation.",
+      "source": "explore:math:numbered equation environment from latex source is not recognized and is escaped as text",
+      "status": "open"
+    },
+    {
+      "id": "qa-038",
+      "title": "Undefined control sequence in math is accepted: no error flag and Insert stays enabled",
+      "why": "Exploratory pass on math (functional): expected An undefined command is flagged as invalid (as `\\frac{` is), the Insert button is disabled, and an error message is shown instead of writing uncompilable LaTeX into the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert tab > Inline equation, type `\\badcommand{x}` in the LaTeX source field, inspect the preview and the Insert button, then click Insert and switch View > LaTeX.\nActual: KaTeX renders the command in red (`mstyle mathcolor=\"#cc0000\"`), but the preview has no `.math-preview-invalid`/`.katex-error` class and Insert is enabled. After insertion the document contains `\\(\\badcommand{x}\\)` in the generated source with no error reported to the user. By contrast `\\frac{`, `x^{` and `\\begin{` correctly show `.katex-error` and disable Insert.",
+      "source": "explore:math:undefined control sequence in math is accepted: no error flag and insert stays enabled",
+      "status": "open"
+    },
+    {
+      "id": "qa-039",
+      "title": "Clicking a math node, cancelling the edit dialog, then pressing Backspace does not delete it",
+      "why": "Exploratory pass on math (ux): expected Focus returns to the editor with the math node still selected, so Backspace deletes the math node.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project, type `before `, Insert tab > Inline equation with `y=2`, click Insert, View > Visual. Click the rendered math node to edit it, click Cancel in the dialog, then press Backspace.\nActual: The click opens the edit dialog instead of selecting the node; after Cancel, `document.activeElement` is `BODY`, the DOM selection is outside the editor, and Backspace leaves the node and the source `before \\(y=2\\)` unchanged. Keyboard deletion does work if the user clicks the editor, presses End, Left, then Delete.",
+      "source": "explore:math:clicking a math node, cancelling the edit dialog, then pressing backspace does not delete it",
       "status": "open"
     }
   ]
