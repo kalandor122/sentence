@@ -59,3 +59,6 @@ Aborting
 2026-11-22T21:40:57Z START qa-024 on qa/qa-024-inserted-image-produces-uncompilable-lat: Inserted image produces uncompilable LaTeX: base64 data URI is used as the \includegraphics filename
 2026-11-22T21:45:02Z DONE qa-024 (tsc -b, npm test, smoke all green)
 2026-11-22T21:45:32Z START qa-032 on qa/qa-032-applying-table-latex-drops-the-first-hea: Applying table LaTeX drops the first/header row
+2026-11-22T21:46:56Z DONE qa-032 (tsc -b, npm test, smoke all green)
+2026-11-22T21:47:25Z IMPORTED 7 tester findings into the backlog
+2026-11-22T21:47:25Z REQUEUE qa-048 -> superseded (line spacing actually works (setspace, 27.5->41.6px line-height); only paragraph spacing is inert, now queued separately)

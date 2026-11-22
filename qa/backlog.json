@@ -415,10 +415,11 @@
       ],
       "hint": "Repro: Create a new project, Insert tab > Insert table, switch View > LaTeX. Replace the table block with a 4-column, 4-row tabular whose first row is `H1 & H2 & H3 & H4 \\\\`, followed by rows `a1 & a2 & a3 & a4 \\\\`, `b1 & b2 & b3 & b4 \\\\`, `c1 & c2 & c3 & c4 \\\\`. Click Apply source, then View > Visual.\nActual: The visual table has only 3 rows; the first row is `a1 a2 a3 a4` and H1-H4 are gone. The re-exported LaTeX starts with `a1 & a2 & a3 & a4 \\\\`.",
       "source": "explore:tables:applying table latex drops the first/header row",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T21:45:32Z",
-      "lastAttemptAt": "2026-11-22T21:45:32Z"
+      "lastAttemptAt": "2026-11-22T21:45:32Z",
+      "doneAt": "2026-11-22T21:46:56Z"
     },
     {
       "id": "qa-033",
@@ -430,9 +431,9 @@
       ],
       "hint": "Repro: Insert a 3x3 table. Type `Header` in the top-left cell and `R&D` in the first body cell. Switch View > LaTeX; the source contains `R\\&D &  &  \\\\`. Change `Header` to `Header!` in the textarea, click Apply source, then View > Visual.\nActual: The table has 4 columns: the former body cell becomes two cells containing `R\\` and `D`. Re-exported LaTeX has `\\begin{tabular}{llll}` and `R\\textbackslash{} & D &  &  \\\\`.",
       "source": "explore:tables:escaped ampersand in a cell corrupts the table on source round-trip",
-      "status": "open",
+      "status": "in_progress",
       "attempts": 0,
-      "startedAt": "2026-11-22T21:32:04Z"
+      "startedAt": "2026-11-22T21:47:25Z"
     },
     {
       "id": "qa-034",
@@ -614,7 +615,8 @@
       ],
       "hint": "Repro: Layout tab, change line spacing (single/onehalf/double) and paragraph spacing (indent/gap), then read the computed styles and the .tex.\nActual: Computed text-indent stays 0px and margin-bottom 17.6px regardless of the setting, and no \\parindent or \\parskip appears in the .tex. The controls are enabled but inert.",
       "source": "explore:ribbon:line spacing and paragraph spacing controls do nothing",
-      "status": "open"
+      "status": "superseded",
+      "note": "line spacing actually works (setspace, 27.5->41.6px line-height); only paragraph spacing is inert, now queued separately"
     },
     {
       "id": "qa-049",
@@ -726,6 +728,90 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs`. After it builds 50 headings and ~6,050 words the status bar reads '13 pages' while the `.paper-sheet` is 17,440px tall (scrollHeight 17,550px). Then, in the same document, place the caret at the end and click Insert > Page break twice, typing text between and after the breaks; the sheet grows to 20,007px, the LaTeX gains two `\\newpage` commands, but the status bar still reads '13 pages'.\nActual: With 6,050 words the status bar reads 13 pages for a 17,440px sheet; after two explicit page breaks (verified as two `\\newpage` lines in the LaTeX source) the sheet is 20,007px tall and the status bar still reads 13 pages. Word count itself stays correct (6,050 -> 6,072 after the added text).",
       "source": "explore:long-document:status bar page count ignores page breaks and visual document length",
+      "status": "open"
+    },
+    {
+      "id": "qa-058",
+      "title": "Colour and highlight palettes are painted under their own backdrop, so no swatch is clickable",
+      "why": "Exploratory pass on ribbon-full (functional): expected Clicking a swatch applies the colour/highlight to the selection.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Home tab, click Text color (or Highlight). The menu opens with 10 swatches in the DOM, but elementFromPoint at a swatch centre returns div.color-backdrop; a real mouse click on a swatch just closes the menu.\nActual: The popover is rendered below .color-backdrop (popover y=125..213 while the ribbon ends at y=149) and the page canvas covers the swatch grid; only the 'No color' row is exposed. Both colour controls are unusable with a mouse; injecting .click() shows the LaTeX side is fine ({\\colorbox{yellow}{...}}, {\\color{magenta}{...}}).",
+      "source": "explore:ribbon-full:colour and highlight palettes are painted under their own backdrop, so no swatch is clickable",
+      "status": "open"
+    },
+    {
+      "id": "qa-059",
+      "title": "Paragraph style labels are off by one level",
+      "why": "Exploratory pass on ribbon-full (ux): expected Labels match the markup: the outline badges show H1/H2/H3, so 'Heading 1' should be a top-level heading.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Home tab, Paragraph style select. Pick 'Title', then 'Heading 1', and read the emitted LaTeX.\nActual: The select maps paragraph->p, heading-1->h1->\\section, heading-2->h2->\\subsection, heading-3->h3->\\subsubsection, but the options read 'Normal text / Title / Heading 1 / Heading 2'. Picking 'Title' yields \\section and 'Heading 1' yields \\subsection \u2014 one level below what the label claims.",
+      "source": "explore:ribbon-full:paragraph style labels are off by one level",
+      "status": "open"
+    },
+    {
+      "id": "qa-060",
+      "title": "Page setup (paper size, margins, text size, class) never changes the visible page",
+      "why": "Exploratory pass on ribbon-full (visual): expected The on-screen sheet resizes and re-paginates so the visual page matches what will compile.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Layout tab, switch paper size to Letter, margins to narrow, text size to 12 pt. Watch the page and read the computed styles.\nActual: Only the .tex changes (letterpaper, geometry margin, 10-12pt, documentclass). .paper-sheet stays 794px wide and .tiptap stays 792px with padding 84px 92px 110px and font-size 16px for every combination \u2014 no visual feedback at all.",
+      "source": "explore:ribbon-full:page setup (paper size, margins, text size, class) never changes the visible page",
+      "status": "open"
+    },
+    {
+      "id": "qa-061",
+      "title": "Add link with no selection silently inserts nothing",
+      "why": "Exploratory pass on ribbon-full (ux): expected Either insert the URL as a link at the caret, or explain that text must be selected.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Place a collapsed cursor, press Ctrl+K (or Links > Add link), type https://example.net, press Insert.\nActual: The dialog closes and nothing is inserted \u2014 no link, no message. With a selection it works correctly (href set, \\href{...} escaped properly, survives round trip).",
+      "source": "explore:ribbon-full:add link with no selection silently inserts nothing",
+      "status": "open"
+    },
+    {
+      "id": "qa-062",
+      "title": "Layout tab selects are unnamed for screen readers",
+      "why": "Exploratory pass on ribbon-full (ux): expected Each combobox has an accessible name, like the Home tab selects which carry aria-label (Font, Font size, Paragraph style).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Inspect the four selects on the Layout tab (paper size, margins, text size, document class).\nActual: No aria-label/name/id on any of the four; their visible headings are unlinked sibling divs, so assistive tech announces unnamed comboboxes.",
+      "source": "explore:ribbon-full:layout tab selects are unnamed for screen readers",
+      "status": "open"
+    },
+    {
+      "id": "qa-063",
+      "title": "Inactive ribbon toggles omit aria-pressed instead of reporting false",
+      "why": "Exploratory pass on ribbon-full (ux): expected aria-pressed=\"false\" so the toggle's state is announced; ribbon tab buttons expose role=tab/aria-selected.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Inspect a formatting toggle (Bold, Italic, alignment) with the cursor in plain text.\nActual: aria-pressed is only present when active ('true'); inactive buttons omit the attribute entirely and the ribbon tabs are plain buttons inside a nav with no tablist semantics.",
+      "source": "explore:ribbon-full:inactive ribbon toggles omit aria-pressed instead of reporting false",
+      "status": "open"
+    },
+    {
+      "id": "qa-064",
+      "title": "Paragraph spacing (indented vs spaced) setting is inert",
+      "why": "Exploratory pass on ribbon-full (functional): expected Indented emits \\parindent with \\parskip 0; spaced emits \\parskip with \\parindent 0 \u2014 and the visual page reflects it.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open Document properties, switch Paragraph spacing between 'Indented paragraphs' and 'Spaced paragraphs', then read the computed styles and the .tex.\nActual: Nothing changes: computed text-indent stays 0px, margin-bottom 17.6px, and no \\parindent or \\parskip is emitted in either state. (Line spacing, by contrast, works correctly: setspace + \\doublespacing, line-height 27.5px -> 41.6px.)",
+      "source": "explore:ribbon-full:paragraph spacing (indented vs spaced) setting is inert",
       "status": "open"
     }
   ]
