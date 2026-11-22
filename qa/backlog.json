@@ -117,6 +117,270 @@
       "hint": "Repro: In a new document, clear the editor (Ctrl+A, Backspace). Click Home > Bulleted list, type 'keep parent', press Enter, press Tab, type 'keep child'. Click View > LaTeX, change 'keep parent' to 'renamed parent' in the LaTeX source textarea, click 'Apply source', then click View > Visual. (The same happens if you apply hand-authored LaTeX containing a nested \\begin{enumerate} inside a \\begin{itemize}.)\nActual: The visual editor shows a flat two-item bulleted list whose item texts literally contain '\\begin{itemize}' and '\\end{itemize}' ('renamed parent \\begin{itemize}' / 'keep child \\end{itemize}'). Switching back to LaTeX shows the environment commands escaped as '\\textbackslash{}begin\\{itemize\\}' and '\\textbackslash{}end\\{itemize\\}' instead of a nested environment. Applying hand-authored mixed itemize/enumerate likewise flattens all items into the outer list type and leaves '\\begin{enumerate}' / '\\end{enumerate}' as visible text. No console errors were emitted.",
       "source": "explore:lists:nested lists are destroyed when latex source is applied",
       "status": "open"
+    },
+    {
+      "id": "qa-010",
+      "title": "Modals do not trap focus",
+      "why": "Exploratory pass on chrome (ux): expected Focus cycles inside the dialog while it is open",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert > Inline equation, focus lands on textarea, press Tab repeatedly\nActual: Tab order: textarea -> Cancel -> BODY -> Save -> draft/opening -> Settings -> Home/Insert/Layout... while the dialog is still open and aria-modal=\"true\"",
+      "source": "explore:chrome:modals do not trap focus",
+      "status": "open"
+    },
+    {
+      "id": "qa-011",
+      "title": "Avatar/settings button is dead",
+      "why": "Exploratory pass on chrome (functional): expected Opens a settings dialog or is removed/disabled with a reason",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Click button[aria-label=Settings] in top bar (programmatic click and real CDP mouse click at 1254,19)\nActual: No dialog, no menu, no DOM change, no toast, no console error; button only takes focus",
+      "source": "explore:chrome:avatar/settings button is dead",
+      "status": "open"
+    },
+    {
+      "id": "qa-012",
+      "title": "Outline navigation does not focus the editor on first use; typing is silently dropped",
+      "why": "Exploratory pass on chrome (functional): expected Caret placed in the target heading and editor focused; works only after the editor has been clicked once",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Reload, Create a project, click 'Drafting with constraints' in Outline, type ' omega psi'\nActual: Editor scrolls (scrollTop 0 -> 365) but document.activeElement stays BODY; the typed text is discarded and word count stays 92",
+      "source": "explore:chrome:outline navigation does not focus the editor on first use; typing is silently dropped",
+      "status": "open"
+    },
+    {
+      "id": "qa-013",
+      "title": "Link dialog writes invalid hrefs without validation",
+      "why": "Exploratory pass on chrome (ux): expected Reject/normalise non-URL input (e.g. require scheme or add https://)",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Select text, Home > Add link, type 'not a url', Insert\nActual: Dialog closes and creates <a href=\"not a url\">; no error, no normalisation",
+      "source": "explore:chrome:link dialog writes invalid hrefs without validation",
+      "status": "open"
+    },
+    {
+      "id": "qa-014",
+      "title": "Desktop-only Git actions throw a raw TypeError into the UI",
+      "why": "Exploratory pass on chrome (functional): expected Friendly 'Available in the desktop application' message like Compile shows",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: View tab > Git history panel > click 'View diff', then 'Set', then 'Manage'\nActual: UI shows 'TypeError: Cannot read properties of undefined (reading 'invoke')' and keeps it on screen",
+      "source": "explore:chrome:desktop-only git actions throw a raw typeerror into the ui",
+      "status": "open"
+    },
+    {
+      "id": "qa-015",
+      "title": "Fetch / Pull / Push are silent no-ops (ribbon Git tab and panel)",
+      "why": "Exploratory pass on chrome (functional): expected Same desktop-only message Compile uses",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Git ribbon tab > Pull, Push; then panel > Fetch, Pull, Push\nActual: No toast, no dialog, no state change, no error; nothing indicates the action is desktop-only",
+      "source": "explore:chrome:fetch / pull / push are silent no-ops (ribbon git tab and panel)",
+      "status": "open"
+    },
+    {
+      "id": "qa-016",
+      "title": "Change tracking reports 'Working tree clean' after real edits",
+      "why": "Exploratory pass on chrome (functional): expected Change count/commit box reflect edited document",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Type ' alpha beta' in the body (92 -> 94 words), open Git panel\nActual: Panel still shows CHANGES 0 / 'Working tree clean' and hides the commit-message field, so there is nothing to commit",
+      "source": "explore:chrome:change tracking reports 'working tree clean' after real edits",
+      "status": "open"
+    },
+    {
+      "id": "qa-017",
+      "title": "GitHub dialog does not move focus into the dialog",
+      "why": "Exploratory pass on chrome (ux): expected Focus moves to the dialog (first field or heading) on open",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Git panel > Continue with GitHub\nActual: document.activeElement remains behind the backdrop; the equation/comment/citation dialogs do focus correctly, so behaviour is inconsistent",
+      "source": "explore:chrome:github dialog does not move focus into the dialog",
+      "status": "open"
+    },
+    {
+      "id": "qa-018",
+      "title": "Inline validation error not announced",
+      "why": "Exploratory pass on chrome (ux): expected role=alert or aria-live=polite so screen readers announce it",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: GitHub dialog > Continue in browser with empty client ID\nActual: Validation message renders as <p class=\"auth-message\"> with no role=alert and no aria-live",
+      "source": "explore:chrome:inline validation error not announced",
+      "status": "open"
+    },
+    {
+      "id": "qa-019",
+      "title": "Ribbon tabs lack tablist semantics",
+      "why": "Exploratory pass on chrome (ux): expected Tablist pattern or at least aria-current on the active tab",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Inspect nav.ribbon-tabs\nActual: nav[aria-label='Ribbon tabs'] containing plain <button>s; no role=tablist/tab, no aria-selected, active state only via class",
+      "source": "explore:chrome:ribbon tabs lack tablist semantics",
+      "status": "open"
+    },
+    {
+      "id": "qa-020",
+      "title": "Word count excludes the paper title/front matter",
+      "why": "Exploratory pass on chrome (ux): expected Either count the whole manuscript or label the counter (e.g. 'body words')",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Word count 94; in Inspector prepend 'two extra ' to the title\nActual: Page title updates to 'two extra The quiet architecture of a sentence' but the count stays 94",
+      "source": "explore:chrome:word count excludes the paper title/front matter",
+      "status": "open"
+    },
+    {
+      "id": "qa-021",
+      "title": "'Submission check' opens the arXiv package dialog and performs no check",
+      "why": "Exploratory pass on chrome (ux): expected A submission-readiness result or a distinct, correctly-labelled dialog",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Paper > Submission check\nActual: Same dialog as 'Create arXiv ZIP' titled 'arXiv submission package'; no validation results shown",
+      "source": "explore:chrome:'submission check' opens the arxiv package dialog and performs no check",
+      "status": "open"
+    },
+    {
+      "id": "qa-022",
+      "title": "Track-changes state is not surfaced outside the button",
+      "why": "Exploratory pass on chrome (ux): expected Persistent indicator of tracking state",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Review > 'Tracking on' toggles to 'Track changes'\nActual: Toggle works but nothing in the status bar or sidebar shows whether tracking is active",
+      "source": "explore:chrome:track-changes state is not surfaced outside the button",
+      "status": "open"
+    },
+    {
+      "id": "qa-023",
+      "title": "Backdrop click does not dismiss modals",
+      "why": "Exploratory pass on chrome (ux): expected Consistent with Escape behaviour (nitpick, may be intentional)",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open equation dialog, click the backdrop\nActual: Dialog stays; Escape and Close work",
+      "source": "explore:chrome:backdrop click does not dismiss modals",
+      "status": "open"
+    },
+    {
+      "id": "qa-024",
+      "title": "Inserted image produces uncompilable LaTeX: base64 data URI is used as the \\includegraphics filename",
+      "why": "Exploratory pass on insert (functional): expected \\includegraphics{assets/qa-test.png} (a real path) after the asset is written",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert tab -> Image -> choose any PNG (browser build stubs the picker; feeding a File to the hidden input exercises the same path) -> View/LaTeX\nActual: \\includegraphics[width=0.8\\linewidth]{data:image/png;base64,iVBORw0KG...} - a ~4KB data URI as the file name. graphicx/Tectonic cannot open it, so document.tex fails to compile. Visual editor shows the image fine. | evidence: source excerpt above; src/lib/latex.ts:266-279 emits src verbatim; App.tsx:717-732 only writes a relative asset path when isDesktop && project.path, otherwise keeps the data URL",
+      "source": "explore:insert:inserted image produces uncompilable latex: base64 data uri is used as the \\includegraphics filename",
+      "status": "open"
+    },
+    {
+      "id": "qa-025",
+      "title": "Switching Visual->LaTeX->Visual resets the cursor to the start of the document, so the next insert lands in the wrong pl",
+      "why": "Exploratory pass on insert (functional): expected cursor stays where the user left it; next insert goes there",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Click into the Introduction paragraph (offset 25) -> View > LaTeX -> View > Visual -> Insert > Image\nActual: after the round trip the DOM selection is at offset 0 of the title text; the next image insert went to body position 0 (before \\section{Introduction}) instead of the cursor position | evidence: before: {text:'A sentence is not merely ', offset:25, blockIndex:2}; after: {text:'The quiet architecture of a se', offset:0}; resulting source has \\begin{figure} immediately after \\keywords",
+      "source": "explore:insert:switching visual->latex->visual resets the cursor to the start of the document, so the next insert lands in the wrong pl",
+      "status": "open"
+    },
+    {
+      "id": "qa-026",
+      "title": "Image inserted mid-paragraph splits the paragraph at the cursor, breaking the sentence in two",
+      "why": "Exploratory pass on insert (functional): expected image inserted on its own line/paragraph without cutting the sentence, or inserted inline",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Cursor after 'Good tool' in 'Good tools stay close to the work.' -> Insert > Image -> pick a file\nActual: paragraph becomes 'Good tool' / [image] / 's stay close to the work.' in the visual doc, and the same split appears in LaTeX | evidence: blocks: P 'Good tool', IMG, P 's stay close to the work. ...'",
+      "source": "explore:insert:image inserted mid-paragraph splits the paragraph at the cursor, breaking the sentence in two",
+      "status": "open"
+    },
+    {
+      "id": "qa-027",
+      "title": "Table header row is lost in LaTeX; no caption/label emitted",
+      "why": "Exploratory pass on insert (functional): expected header styling/semantics preserved (\\toprule + \\textbf, or booktabs header) and a \\caption/\\label for referencing",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert > Insert table -> fill Alpha/Beta/Gamma -> View/LaTeX\nActual: plain 'Alpha & Beta & Gamma \\\\' row inside \\hline...\\hline; the visual <th> shading/bold (font-weight 650) has no LaTeX counterpart; no caption or label, so the table cannot be cross-referenced | evidence: tabular lll shown above; booktabs is already in the preamble but unused for tables",
+      "source": "explore:insert:table header row is lost in latex; no caption/label emitted",
+      "status": "open"
+    },
+    {
+      "id": "qa-028",
+      "title": "Adjacent inline atoms are emitted glued together",
+      "why": "Exploratory pass on insert (functional): expected \\cite{knuth1984}, \\cite{lamport1994}\\footnote{...} (separated)",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert two citations and a footnote consecutively -> View/LaTeX\nActual: \\cite{knuth1984}\\cite{lamport1994}\\footnote{A note about the analytical engine.} with no separator; renders as [1][2]^1 | evidence: source excerpt above",
+      "source": "explore:insert:adjacent inline atoms are emitted glued together",
+      "status": "open"
+    },
+    {
+      "id": "qa-029",
+      "title": "All images forced to 0.8\\linewidth; caption is the raw filename",
+      "why": "Exploratory pass on insert (functional): expected natural size or a width control; caption should be user text or omitted",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert a 120x60 px image -> View/LaTeX\nActual: \\includegraphics[width=0.8\\linewidth]{...} with \\caption{qa-test.png}; a 120px image is stretched to 80% of the text block and the filename becomes the caption | evidence: src/lib/latex.ts:269-276 (width defaults to 0.8 when attrs.width is 0)",
+      "source": "explore:insert:all images forced to 0.8\\linewidth; caption is the raw filename",
+      "status": "open"
+    },
+    {
+      "id": "qa-030",
+      "title": "Status bar page count ignores page breaks",
+      "why": "Exploratory pass on insert (functional): expected at least 2 pages",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert > Page break -> read the status bar\nActual: '1 page' with a page break present",
+      "source": "explore:insert:status bar page count ignores page breaks",
+      "status": "open"
+    },
+    {
+      "id": "qa-031",
+      "title": "TOC block is an empty placeholder in the visual editor",
+      "why": "Exploratory pass on insert (functional): expected the visual page shows the heading entries the TOC will produce (or clearly says it is generated at compile time)",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert > Contents\nActual: dashed box reading 'TABLE OF CONTENTS' only, no entries, even though the doc has H1/H2 headings; LaTeX gets \\tableofcontents correctly",
+      "source": "explore:insert:toc block is an empty placeholder in the visual editor",
+      "status": "open"
     }
   ]
 }

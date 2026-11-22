@@ -163,6 +163,15 @@ def cycle(dry_run: bool = False) -> str:
         return "smoke-red"
 
     data = load_backlog()
+    try:
+        import explore  # sibling module; cycle.py always runs as qa/cycle.py
+        added = explore.merge_pending()
+        if added:
+            log(f"IMPORTED {added} tester findings into the backlog")
+            data = load_backlog()
+    except Exception as exc:  # never let intake break the loop
+        log(f"IMPORT FAIL {exc}")
+
     item = pick(data)
     if not item:
         log("BACKLOG EMPTY — nothing open, idle")

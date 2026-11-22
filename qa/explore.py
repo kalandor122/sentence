@@ -107,6 +107,19 @@ def merge(area_id: str, path: Path) -> int:
     return added
 
 
+def merge_pending() -> int:
+    """Merge every qa/findings/*.json that came from a tester (explore.py's own
+    merge is idempotent, so double-merging is harmless). Files are kept as the
+    evidence trail, never deleted."""
+    added = 0
+    for path in sorted(FINDINGS.glob("*.json")):
+        try:
+            added += merge(path.stem, path)
+        except (json.JSONDecodeError, KeyError) as exc:
+            print(f"skip {path}: {exc}")
+    return added
+
+
 def main() -> None:
     PROBES.mkdir(exist_ok=True)
     FINDINGS.mkdir(exist_ok=True)
