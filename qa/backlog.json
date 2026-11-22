@@ -98,10 +98,11 @@
         "src/editor/EditorSurface.tsx"
       ],
       "hint": "Ctrl/Cmd+wheel over the page area changes zoom in the existing 70-150 range; Ctrl+0 resets to 100%; add a small fit-width button next to the zoom percentage. Do not let browser page zoom interfere (preventDefault on the wheel handler).",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:21:56Z",
-      "lastAttemptAt": "2026-11-22T23:21:56Z"
+      "lastAttemptAt": "2026-11-22T23:21:56Z",
+      "doneAt": "2026-11-22T23:22:31Z"
     },
     {
       "id": "qa-007",
@@ -170,7 +171,9 @@
       ],
       "hint": "Repro: Click button[aria-label=Settings] in top bar (programmatic click and real CDP mouse click at 1254,19)\nActual: No dialog, no menu, no DOM change, no toast, no console error; button only takes focus",
       "source": "explore:chrome:avatar/settings button is dead",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:23:06Z"
     },
     {
       "id": "qa-012",
