@@ -82,8 +82,9 @@
       ],
       "hint": "When !isDesktop, persist the workspace to localStorage on the existing autosave debounce and restore it on boot (recent documents list too). Keep the desktop path unchanged. Do not fake file-system success.",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:14:36Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:14:36Z",
+      "lastAttemptAt": "2026-11-22T23:14:36Z"
     },
     {
       "id": "qa-006",

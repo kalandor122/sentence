@@ -128,6 +128,39 @@ function loadRecent(): RecentProject[] {
   }
 }
 
+const BROWSER_WORKSPACE_KEY = "sentence.workspace";
+const BROWSER_WORKSPACE_PATH = "browser://workspace";
+
+function loadBrowserWorkspace(): Workspace | null {
+  if (isDesktop) return null;
+  try {
+    const raw = localStorage.getItem(BROWSER_WORKSPACE_KEY);
+    if (!raw) return null;
+    const saved = JSON.parse(raw) as Partial<Workspace>;
+    if (!saved.document || !saved.settings) return null;
+    return {
+      path: "",
+      name: saved.name ?? "Quiet architecture",
+      document: saved.document,
+      bibliography: saved.bibliography ?? "",
+      settings: { ...DEFAULT_SETTINGS, ...saved.settings },
+      comments: Array.isArray(saved.comments) ? saved.comments : [],
+      revisions: Array.isArray(saved.revisions) ? saved.revisions : [],
+      git: {
+        ...EMPTY_GIT_STATE,
+        ...saved.git,
+        status: { ...EMPTY_GIT_STATE.status, ...saved.git?.status },
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveBrowserWorkspace(project: Workspace): void {
+  localStorage.setItem(BROWSER_WORKSPACE_KEY, JSON.stringify({ ...project, path: "" }));
+}
+
 function hydrate(snapshot: ProjectSnapshot): Workspace {
   return {
     path: snapshot.path,
@@ -212,10 +245,11 @@ function documentSource(document: SentenceDocument, settings: ProjectSettings): 
 }
 
 export default function App() {
-  const [workspace, setWorkspace] = useState<Workspace | null>(null);
-  const workspaceRef = useRef<Workspace | null>(null);
-  const [source, setSource] = useState("");
-  const sourceRef = useRef("");
+  const [workspace, setWorkspace] = useState<Workspace | null>(loadBrowserWorkspace);
+  const workspaceRef = useRef<Workspace | null>(workspace);
+  const [source, setSource] = useState(() =>
+    workspace ? documentSource(workspace.document, workspace.settings) : "");
+  const sourceRef = useRef(source);
   const [sourceFile, setSourceFile] = useState<"document.tex" | "references.bib">("document.tex");
   const [sourceDirty, setSourceDirty] = useState(false);
   const sourceDirtyRef = useRef(false);
@@ -322,15 +356,30 @@ export default function App() {
   };
 
   const rememberProject = (project: Workspace) => {
-    if (!project.path) return;
+    const path = project.path || (isDesktop ? "" : BROWSER_WORKSPACE_PATH);
+    if (!path) return;
     setRecent((current) => {
       const next = [
-        { path: project.path, name: project.name, openedAt: new Date().toISOString() },
-        ...current.filter((item) => item.path !== project.path),
+        { path, name: project.name, openedAt: new Date().toISOString() },
+        ...current.filter((item) => item.path !== path),
       ].slice(0, 8);
       localStorage.setItem("sentence.recent", JSON.stringify(next));
       return next;
     });
+  };
+
+  const persistBrowser = (project: Workspace): boolean => {
+    try {
+      saveBrowserWorkspace(project);
+      setSaveError(null);
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setSaveError(message);
+      setSaveState("error");
+      setToast(message);
+      return false;
+    }
   };
 
   const adoptWorkspace = (project: Workspace) => {
@@ -345,6 +394,7 @@ export default function App() {
     setDirty(false);
     setSaveState("saved");
     setCompileResult(null);
+    if (!isDesktop) persistBrowser(project);
     rememberProject(project);
   };
 
@@ -372,7 +422,14 @@ export default function App() {
     const latex = sourceDirtyRef.current
       ? sourceRef.current
       : documentSource(current.document, current.settings);
-    if (!isDesktop || !current.path) {
+    if (!isDesktop) {
+      if (!persistBrowser(current)) return null;
+      rememberProject(current);
+      setDirty(false);
+      setSaveState("saved");
+      return current;
+    }
+    if (!current.path) {
       setDirty(false);
       setSaveState("saved");
       return current;
@@ -422,6 +479,10 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (workspace) rememberProject(workspace);
+  }, []);
+
+  useEffect(() => {
     if (!dirty || !workspace) return;
     const timer = window.setTimeout(() => {
       void persist();
@@ -447,7 +508,7 @@ export default function App() {
 
   const handleOpenRecent = async (path: string) => {
     if (!isDesktop) {
-      adoptWorkspace(demoWorkspace());
+      adoptWorkspace(loadBrowserWorkspace() ?? demoWorkspace());
       return;
     }
     try {
@@ -460,7 +521,7 @@ export default function App() {
 
   const handleOpen = async () => {
     if (!isDesktop) {
-      adoptWorkspace(demoWorkspace());
+      adoptWorkspace(loadBrowserWorkspace() ?? demoWorkspace());
       return;
     }
     const path = await chooseProject();
@@ -482,6 +543,7 @@ export default function App() {
 
   const handleDocumentUpdate = (document: SentenceDocument) => {
     const before = workspaceRef.current?.document;
+    if (!isDesktop && before && JSON.stringify(before) === JSON.stringify(document)) return;
     const currentSettings = workspaceRef.current?.settings;
     setWorkspace((current) => current ? { ...current, document } : current);
     if (!sourceDirtyRef.current && currentSettings) {
@@ -804,7 +866,7 @@ export default function App() {
     const saved = await persist();
     if (saved) {
       await refreshGit();
-      setToast("Saved to disk.");
+      setToast(isDesktop ? "Saved to disk." : "Saved in this browser.");
     }
   };
 
