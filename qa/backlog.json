@@ -204,8 +204,9 @@
       "hint": "Repro: Select text, Home > Add link, type 'not a url', Insert\nActual: Dialog closes and creates <a href=\"not a url\">; no error, no normalisation",
       "source": "explore:chrome:link dialog writes invalid hrefs without validation",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:25:23Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:25:23Z",
+      "lastAttemptAt": "2026-11-22T23:25:23Z"
     },
     {
       "id": "qa-014",
