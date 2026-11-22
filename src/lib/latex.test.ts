@@ -118,6 +118,31 @@ describe("LaTeX generation", () => {
     expect(parsed.document.content[2]?.type).toBe("bulletList");
   });
 
+  it("keeps generated bibliography directives intact through a source round trip", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "See " },
+            { type: "citation", attrs: { key: "sentence2026" } },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex.match(/\\bibliographystyle\{plain\}/g)).toHaveLength(1);
+    expect(latex.match(/\\bibliography\{references\}/g)).toHaveLength(1);
+
+    const parsed = latexToDocument(latex, settings).document;
+    expect(parsed.content.map((node) => node.type)).toEqual(["paragraph"]);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toBe(latex);
+    expect(exported).not.toContain("\\textbackslash{}bibliographystyle");
+    expect(exported).not.toContain("\\textbackslash{}bibliography");
+  });
+
   it("round-trips \\texttt as inline code without dropping the body", () => {
     const latex = [
       "\\begin{document}",

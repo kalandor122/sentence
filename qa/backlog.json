@@ -560,8 +560,9 @@
       "hint": "Repro: Create a project. References > Insert citation with key `sentence2026`, Insert. View > LaTeX: the document body ends with `\\bibliographystyle{plain}` and `\\bibliography{references}`. Click Apply source, View > Visual, then View > LaTeX again.\nActual: The visual document gains a paragraph with literal `\\textbackslash{}bibliographystyle\\{plain\\}` and `\\textbackslash{}bibliography\\{references\\}`. Re-exported source contains those escaped lines plus a second, real `\\bibliographystyle{plain}` / `\\bibliography{references}` pair.",
       "source": "explore:links-cites-footnotes:citation bibliography directives turn into escaped text and are duplicated when source is applied",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T22:27:59Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T22:27:59Z",
+      "lastAttemptAt": "2026-11-22T22:27:59Z"
     },
     {
       "id": "qa-043",

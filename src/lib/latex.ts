@@ -882,6 +882,8 @@ export function latexToDocument(
     .replace(/\\begin\{abstract\}[\s\S]*?\\end\{abstract\}/g, "")
     .replace(/\\keywords\{[^}]*\}/g, "")
     .replace(/\\maketitle/g, "")
+    .replace(/\\bibliographystyle\{[^}]*\}\s*/g, "")
+    .replace(/\\bibliography\{[^}]*\}\s*/g, "")
     .replace(/\\tableofcontents\\newpage/g, "\\tableofcontents")
     .replace(/\\tableofcontents/g, "")
     .trim();
