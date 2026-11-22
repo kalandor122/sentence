@@ -849,8 +849,9 @@
       "hint": "Repro: Run `node qa/probes/long-document.mjs`. After it builds 50 headings and ~6,050 words the status bar reads '13 pages' while the `.paper-sheet` is 17,440px tall (scrollHeight 17,550px). Then, in the same document, place the caret at the end and click Insert > Page break twice, typing text between and after the breaks; the sheet grows to 20,007px, the LaTeX gains two `\\newpage` commands, but the status bar still reads '13 pages'.\nActual: With 6,050 words the status bar reads 13 pages for a 17,440px sheet; after two explicit page breaks (verified as two `\\newpage` lines in the LaTeX source) the sheet is 20,007px tall and the status bar still reads 13 pages. Word count itself stays correct (6,050 -> 6,072 after the added text).",
       "source": "explore:long-document:status bar page count ignores page breaks and visual document length",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:44:51Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:44:51Z",
+      "lastAttemptAt": "2026-11-22T23:44:51Z"
     },
     {
       "id": "qa-058",
