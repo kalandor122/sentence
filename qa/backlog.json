@@ -1223,8 +1223,9 @@
       "hint": "Repro: Create a new document. Click Home > Bulleted list, type 'select one', press Enter, type 'select two'. Press Ctrl+A to select the whole document, then click Home > Bulleted list again. Open View > LaTeX and read the source textarea. Repeat the same steps with Numbered list to get the same result.\nActual: Both items stay in the list and a third empty item is appended: the editor DOM is <ul><li>select one</li><li>select two</li><li><p></p></li></ul>, and the generated LaTeX is '\\begin{itemize}\\n\\item select one\\n\\item select two\\n\\item \\n\\end{itemize}'. With Numbered list the same happens with '\\begin{enumerate}' and an extra '\\item '. Selecting only the two list items (click first item, Home, Shift+ArrowDown, Shift+End) and toggling does work, which isolates the failure to the Ctrl+A case. No console errors were emitted.",
       "source": "explore:lists:select-all + list toggle does not convert a list to paragraphs; it appends an empty item",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:57:28Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:57:28Z",
+      "lastAttemptAt": "2026-11-22T23:57:28Z"
     },
     {
       "id": "qa-084",
