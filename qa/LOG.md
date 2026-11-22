@@ -28,3 +28,5 @@
 2026-11-22T21:13:04Z DONE qa-002 (tsc -b, npm test, smoke all green)
 2026-11-22T21:17:01Z EXPLORE review: 1 new items, agent exit 0
 2026-11-22T21:17:10Z START qa-010 on qa/qa-010-modals-do-not-trap-focus: Modals do not trap focus
+2026-11-22T21:19:45Z DONE qa-010 (tsc -b, npm test, smoke all green)
+2026-11-22T21:20:09Z START qa-024 on qa/qa-024-inserted-image-produces-uncompilable-lat: Inserted image produces uncompilable LaTeX: base64 data URI is used as the \includegraphics filename

@@ -143,10 +143,11 @@
       ],
       "hint": "Repro: Insert > Inline equation, focus lands on textarea, press Tab repeatedly\nActual: Tab order: textarea -> Cancel -> BODY -> Save -> draft/opening -> Settings -> Home/Insert/Layout... while the dialog is still open and aria-modal=\"true\"",
       "source": "explore:chrome:modals do not trap focus",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T21:17:10Z",
-      "lastAttemptAt": "2026-11-22T21:17:10Z"
+      "lastAttemptAt": "2026-11-22T21:17:10Z",
+      "doneAt": "2026-11-22T21:19:45Z"
     },
     {
       "id": "qa-011",
@@ -314,7 +315,10 @@
       ],
       "hint": "Repro: Insert tab -> Image -> choose any PNG (browser build stubs the picker; feeding a File to the hidden input exercises the same path) -> View/LaTeX\nActual: \\includegraphics[width=0.8\\linewidth]{data:image/png;base64,iVBORw0KG...} - a ~4KB data URI as the file name. graphicx/Tectonic cannot open it, so document.tex fails to compile. Visual editor shows the image fine. | evidence: source excerpt above; src/lib/latex.ts:266-279 emits src verbatim; App.tsx:717-732 only writes a relative asset path when isDesktop && project.path, otherwise keeps the data URL",
       "source": "explore:insert:inserted image produces uncompilable latex: base64 data uri is used as the \\includegraphics filename",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 1,
+      "startedAt": "2026-11-22T21:20:09Z",
+      "lastAttemptAt": "2026-11-22T21:20:09Z"
     },
     {
       "id": "qa-025",
