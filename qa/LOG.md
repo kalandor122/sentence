@@ -97,3 +97,5 @@ Aborting
 2026-11-22T22:51:35Z START qa-084 on qa/qa-084-deleted-table-is-resurrected-on-source-v: Deleted table is resurrected on source/visual switch
 2026-11-22T22:55:02Z DONE qa-084 (tsc -b, npm test, smoke all green)
 2026-11-22T22:55:35Z START qa-085 on qa/qa-085-single-column-latex-tabular-becomes-esca: Single-column LaTeX tabular becomes escaped plain text instead of a table
+2026-11-22T22:57:41Z DONE qa-085 (tsc -b, npm test, smoke all green)
+2026-11-22T23:05:47Z EXPLORE math: 2 new items, agent exit 0

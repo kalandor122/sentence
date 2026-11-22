@@ -1118,10 +1118,11 @@
       ],
       "hint": "Repro: Insert a 3x3 table, switch View > LaTeX, replace the table block with `\\begin{table}[htbp]`, `\\centering`, `\\begin{tabular}{l}`, `\\hline`, rows `Only \\\\`, `a \\\\`, `b \\\\`, `\\hline`, `\\end{tabular}`, `\\end{table}`, click Apply source, then View > Visual.\nActual: No table exists. The body shows the raw LaTeX as one paragraph (`\\begin{table}[htbp] \\centering \\begin{tabular}{l} ...`). The next LaTeX export escapes it as `\\textbackslash{}begin\\{table\\}[htbp]` etc., corrupting the document source.",
       "source": "explore:tables:single-column latex tabular becomes escaped plain text instead of a table",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T22:55:35Z",
-      "lastAttemptAt": "2026-11-22T22:55:35Z"
+      "lastAttemptAt": "2026-11-22T22:55:35Z",
+      "doneAt": "2026-11-22T22:57:41Z"
     },
     {
       "id": "qa-086",
@@ -1133,7 +1134,9 @@
       ],
       "hint": "Repro: Insert a 3x3 table, click the top-left cell, type `first line`, press Enter, type `second line`, then switch View > LaTeX.\nActual: The visual cell shows two paragraphs (`first line` and `second line`), but the exported tabular row contains only `first line &  &  \\\\`; `second line` is absent from the source.",
       "source": "explore:tables:text in a second paragraph of a table cell is dropped from latex",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:06:01Z"
     },
     {
       "id": "qa-087",
@@ -1145,6 +1148,30 @@
       ],
       "hint": "Repro: Insert a 3x3 table with a header row, click the centre body cell, inspect the buttons on every ribbon tab (Home, Insert, Layout, References, Review, Paper, View, Git), right-click the cell, and try Alt+Enter, Alt+Insert, Ctrl+Enter, Ctrl+Shift+Equal and Ctrl+Shift+Backspace.\nActual: The only table controls anywhere are Insert table and Delete table. Right-clicking a cell opens no menu, none of the tried shortcuts changes the table, and Tab at the end of the last row only appends a row (3x3 becomes 4x3). Rows/columns can only be changed by hand-editing LaTeX source; there is no way to remove a single row or column visually.",
       "source": "explore:tables:no visual controls to add or remove table rows or columns",
+      "status": "open"
+    },
+    {
+      "id": "qa-088",
+      "title": "Math dialog accepts unknown LaTeX commands that KaTeX renders as errors",
+      "why": "Exploratory pass on math (functional): expected Invalid/unknown LaTeX should be flagged as an error and the Insert button should be disabled, as it is for malformed input like `\\frac{`.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open the app and create a new project.\n2. On the Insert tab, click 'Inline equation'.\n3. In the LaTeX source textarea, enter `\\badcommand{x}`.\n4. Observe the preview and the Insert button state.\nActual: The preview renders the command in red error styling but the dialog reports no katex-error/invalid state (`hasKatexError: false`, no `math-preview-invalid` class) and the Insert button remains enabled. The same input can be inserted into the document.",
+      "source": "explore:math:math dialog accepts unknown latex commands that katex renders as errors",
+      "status": "open"
+    },
+    {
+      "id": "qa-089",
+      "title": "Math node cannot be removed with Backspace/Delete after closing its edit dialog",
+      "why": "Exploratory pass on math (ux): expected After dismissing the edit dialog, the math node should be selectable/removable by keyboard, or there should be an obvious delete affordance.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a new project.\n2. Insert an inline equation with value `x+1` (Insert > Inline equation, type `x+1`, click Insert).\n3. Click the inserted math node in the editor; the edit dialog opens.\n4. Press Escape to close the dialog.\n5. Press Backspace (or Delete).\nActual: After Escape closes the dialog, pressing Backspace or Delete does not remove the math node; the node remains in the document. The probe observed the node still present after both Backspace and Delete following dialog dismissal.",
+      "source": "explore:math:math node cannot be removed with backspace/delete after closing its edit dialog",
       "status": "open"
     }
   ]
