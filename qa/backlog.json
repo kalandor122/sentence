@@ -1287,8 +1287,9 @@
       "hint": "Repro: Insert a 3x3 table with a header row, click the centre body cell, inspect the buttons on every ribbon tab (Home, Insert, Layout, References, Review, Paper, View, Git), right-click the cell, and try Alt+Enter, Alt+Insert, Ctrl+Enter, Ctrl+Shift+Equal and Ctrl+Shift+Backspace.\nActual: The only table controls anywhere are Insert table and Delete table. Right-clicking a cell opens no menu, none of the tried shortcuts changes the table, and Tab at the end of the last row only appends a row (3x3 becomes 4x3). Rows/columns can only be changed by hand-editing LaTeX source; there is no way to remove a single row or column visually.",
       "source": "explore:tables:no visual controls to add or remove table rows or columns",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:58:37Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:58:37Z",
+      "lastAttemptAt": "2026-11-22T23:58:37Z"
     },
     {
       "id": "qa-088",
