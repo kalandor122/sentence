@@ -288,6 +288,46 @@ describe("LaTeX generation", () => {
     expect(centeredHeading?.attrs?.level).toBe(2);
   });
 
+  it("keeps the header row when importing table LaTeX", () => {
+    const cells = [
+      ["H1", "H2", "H3", "H4"],
+      ["a1", "a2", "a3", "a4"],
+      ["b1", "b2", "b3", "b4"],
+      ["c1", "c2", "c3", "c4"],
+    ];
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\begin{tabular}{llll}",
+      "\\hline",
+      ...cells.map((row) => `${row.join(" & ")} \\\\`),
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(table?.content).toHaveLength(4);
+    expect(table?.content?.[0]?.content?.map((cell) => cell.type)).toEqual([
+      "tableHeader",
+      "tableHeader",
+      "tableHeader",
+      "tableHeader",
+    ]);
+    expect(
+      table?.content?.[0]?.content?.map(
+        (cell) => cell.content?.[0]?.content?.[0]?.text,
+      ),
+    ).toEqual(["H1", "H2", "H3", "H4"]);
+    const exported = documentToLatex(parsed, settings);
+    for (const row of cells) {
+      expect(exported).toContain(`${row.join(" & ")} \\\\`);
+    }
+  });
+
   it("round-trips page breaks", () => {
     const document: SentenceDocument = {
       type: "doc",
