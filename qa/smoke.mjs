@@ -67,19 +67,20 @@ try {
     if ((await tab.count()) === 0) { hard(`ribbon tab ${t}`, false, "tab missing"); continue; }
     await tab.click();
     await page.waitForTimeout(250);
-    const overflow = await page.evaluate(() => {
-      const r = document.querySelector(".ribbon, .ribbon-groups, .ribbon-body");
-      if (!r) return null;
-      const clipped = [...document.querySelectorAll(".ribbon button")].filter((b) => {
-        const bb = b.getBoundingClientRect();
-        const rb = r.getBoundingClientRect();
-        return bb.width > 0 && (bb.right > rb.right + 1 || bb.left < rb.left - 1);
-      }).map((b) => b.innerText.trim() || b.getAttribute("aria-label"));
-      return { scrollWidth: r.scrollWidth, clientWidth: r.clientWidth, clipped };
-    });
     hard(`ribbon tab ${t} opens`, (await text()).length > 0);
-    if (overflow && (overflow.scrollWidth > overflow.clientWidth + 1 || overflow.clipped.length))
-      observe("visual", "high", `ribbon overflows on ${t} tab at 1280px: clipped buttons [${overflow.clipped.join(", ")}]`, `scrollWidth ${overflow.scrollWidth} > clientWidth ${overflow.clientWidth}`);
+    const overflow = await page.evaluate(() => {
+      const btns = [...document.querySelectorAll("section.ribbon button")];
+      const offscreen = btns.filter((b) => {
+        const r = b.getBoundingClientRect();
+        return r.width > 0 && (r.right > window.innerWidth + 0.5 || r.left < -0.5);
+      }).map((b) => (b.innerText || b.getAttribute("aria-label") || "").trim());
+      const content = document.querySelector(".ribbon-content");
+      const scrolls = content ? content.scrollWidth - content.clientWidth : 0;
+      const docScroll = document.documentElement.scrollWidth - window.innerWidth;
+      return { offscreen, scrolls, docScroll };
+    });
+    hard(`ribbon fits at 1280px on ${t}`, overflow.offscreen.length === 0 && overflow.scrolls <= 1 && overflow.docScroll <= 1,
+      `offscreen=[${overflow.offscreen.join(", ")}] contentOverflow=${overflow.scrolls}px docOverflow=${overflow.docScroll}px`);
     await shot(`03-ribbon-${t.toLowerCase()}`);
   }
 

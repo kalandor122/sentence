@@ -105,11 +105,14 @@ def verify() -> tuple[bool, str]:
 
 
 def git(*args: str, timeout: int = 120) -> tuple[int, str]:
-    return sh("git " + " ".join(args), timeout=timeout)
+    # list form: commit messages contain parentheses and quotes
+    p = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, timeout=timeout)
+    return p.returncode, (p.stdout + p.stderr)
 
 
 def clean_tree() -> bool:
-    code, out = git("status", "--porcelain")
+    # qa/ is the loop's own bookkeeping — it must not count as "the user is editing".
+    code, out = git("status", "--porcelain", "--", ".", ":(exclude)qa")
     return code == 0 and out.strip() == ""
 
 
@@ -171,7 +174,10 @@ def cycle(dry_run: bool = False) -> str:
 
     if not clean_tree():
         log(f"DIRTY TREE before {item['id']} — stashing so the loop can continue")
-        git("stash", "push", "-u", "-m", f"qa-loop-autostash-{now()}")
+        stash_msg = f"qa-loop-autostash-{now()}"
+        code, out = git("stash", "push", "-u", "-m", stash_msg)
+        if code == 0:
+            log(f"STASHED as '{stash_msg}' (recover with git stash list)")
 
     branch = f"qa/{item['id']}-{re.sub(r'[^a-z0-9]+', '-', item['title'].lower())[:40].strip('-')}"
     item["status"] = "in_progress"
@@ -199,8 +205,13 @@ def cycle(dry_run: bool = False) -> str:
         green, detail = verify()
         if green:
             git("add", "-A")
-            git("commit", "-m", f"{item['id']}: {item['title']}")
-            merge_code, merge_out = git("checkout", "main")
+            commit_code, commit_out = git("commit", "-m", f"{item['id']}: {item['title']}")
+            if commit_code != 0:
+                append_log({"id": item["id"], "attempt": attempt, "commit_error": commit_out})
+                log(f"COMMIT FAIL {item['id']}: {commit_out[-300:]}")
+                git("checkout", "main")
+                continue
+            git("checkout", "main")
             merge_code, merge_out = git("merge", "--no-ff", branch, "-m", f"merge {item['id']}: {item['title']}")
             if merge_code != 0:
                 git("merge", "--abort")
