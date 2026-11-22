@@ -168,3 +168,5 @@ Aborting
 2026-11-22T23:52:53Z START qa-074 on qa/qa-074-closing-a-modal-dialog-with-escape-drops: Closing a modal dialog with Escape drops keyboard focus to <body>
 2026-11-22T23:53:28Z DONE qa-074 (tsc -b, npm test, smoke all green)
 2026-11-22T23:54:02Z START qa-075 on qa/qa-075-github-auth-dialog-opens-without-moving: GitHub auth dialog opens without moving focus into it
+2026-11-22T23:54:37Z DONE qa-075 (tsc -b, npm test, smoke all green)
+2026-11-22T23:54:57Z EXPLORE lists: 0 new items, agent exit 1
