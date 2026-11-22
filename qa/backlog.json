@@ -219,10 +219,11 @@
       ],
       "hint": "Repro: View tab > Git history panel > click 'View diff', then 'Set', then 'Manage'\nActual: UI shows 'TypeError: Cannot read properties of undefined (reading 'invoke')' and keeps it on screen",
       "source": "explore:chrome:desktop-only git actions throw a raw typeerror into the ui",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:26:32Z",
-      "lastAttemptAt": "2026-11-22T23:26:32Z"
+      "lastAttemptAt": "2026-11-22T23:26:32Z",
+      "doneAt": "2026-11-22T23:27:06Z"
     },
     {
       "id": "qa-015",
@@ -234,7 +235,9 @@
       ],
       "hint": "Repro: Git ribbon tab > Pull, Push; then panel > Fetch, Pull, Push\nActual: No toast, no dialog, no state change, no error; nothing indicates the action is desktop-only",
       "source": "explore:chrome:fetch / pull / push are silent no-ops (ribbon git tab and panel)",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:27:41Z"
     },
     {
       "id": "qa-016",
