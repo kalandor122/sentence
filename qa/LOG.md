@@ -28,5 +28,28 @@
 2026-11-22T21:13:04Z DONE qa-002 (tsc -b, npm test, smoke all green)
 2026-11-22T21:17:01Z EXPLORE review: 1 new items, agent exit 0
 2026-11-22T21:17:10Z START qa-010 on qa/qa-010-modals-do-not-trap-focus: Modals do not trap focus
-2026-11-22T21:19:45Z DONE qa-010 (tsc -b, npm test, smoke all green)
-2026-11-22T21:20:09Z START qa-024 on qa/qa-024-inserted-image-produces-uncompilable-lat: Inserted image produces uncompilable LaTeX: base64 data URI is used as the \includegraphics filename
+2026-11-22T21:30:06Z STASHED as 'qa-loop-autostash-2026-11-22T21:30:06Z' (recover with git stash list)
+2026-11-22T21:30:06Z BRANCH FAIL qa/qa-052-applying-latex-containing-texttt-wipes-t: error: Your local changes to the following files would be overwritten by checkout:
+	qa/LOG.md
+	qa/backlog.json
+Please commit your changes or stash them before you switch branches.
+Aborting
+
+2026-11-22T21:31:05Z BRANCH FAIL qa/qa-032-applying-table-latex-drops-the-first-hea: error: Your local changes to the following files would be overwritten by checkout:
+	qa/LOG.md
+	qa/backlog.json
+Please commit your changes or stash them before you switch branches.
+Aborting
+
+2026-11-22T21:32:04Z BRANCH FAIL qa/qa-033-escaped-ampersand-in-a-cell-corrupts-the: error: Your local changes to the following files would be overwritten by checkout:
+	qa/LOG.md
+	qa/backlog.json
+Please commit your changes or stash them before you switch branches.
+Aborting
+
+2026-11-22T21:33:03Z BRANCH FAIL qa/qa-036-inline-math-from-latex-source-is-silent: error: Your local changes to the following files would be overwritten by checkout:
+	qa/LOG.md
+	qa/backlog.json
+Please commit your changes or stash them before you switch branches.
+Aborting
+

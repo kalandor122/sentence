@@ -248,9 +248,16 @@ def cycle(dry_run: bool = False) -> str:
     item["startedAt"] = now()
     save_backlog(data)
 
+    # Checkout refuses to run over uncommitted bookkeeping, so park qa/ in a
+    # commit on the current branch first — this used to abort every branch switch.
+    git("add", "-A", "--", "qa")
+    git("commit", "-m", f"qa: bookkeeping before {item['id']}")
+
     code, out = git("checkout", "-B", branch, "main")
     if code != 0:
         log(f"BRANCH FAIL {branch}: {out[-400:]}")
+        item["status"] = "open"  # never leave an item stuck in_progress
+        save_backlog(data)
         return "branch-fail"
     log(f"START {item['id']} on {branch}: {item['title']}")
 

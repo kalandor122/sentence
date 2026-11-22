@@ -315,7 +315,7 @@
       ],
       "hint": "Repro: Insert tab -> Image -> choose any PNG (browser build stubs the picker; feeding a File to the hidden input exercises the same path) -> View/LaTeX\nActual: \\includegraphics[width=0.8\\linewidth]{data:image/png;base64,iVBORw0KG...} - a ~4KB data URI as the file name. graphicx/Tectonic cannot open it, so document.tex fails to compile. Visual editor shows the image fine. | evidence: source excerpt above; src/lib/latex.ts:266-279 emits src verbatim; App.tsx:717-732 only writes a relative asset path when isDesktop && project.path, otherwise keeps the data URL",
       "source": "explore:insert:inserted image produces uncompilable latex: base64 data uri is used as the \\includegraphics filename",
-      "status": "in_progress",
+      "status": "open",
       "attempts": 1,
       "startedAt": "2026-11-22T21:20:09Z",
       "lastAttemptAt": "2026-11-22T21:20:09Z"
@@ -414,7 +414,9 @@
       ],
       "hint": "Repro: Create a new project, Insert tab > Insert table, switch View > LaTeX. Replace the table block with a 4-column, 4-row tabular whose first row is `H1 & H2 & H3 & H4 \\\\`, followed by rows `a1 & a2 & a3 & a4 \\\\`, `b1 & b2 & b3 & b4 \\\\`, `c1 & c2 & c3 & c4 \\\\`. Click Apply source, then View > Visual.\nActual: The visual table has only 3 rows; the first row is `a1 a2 a3 a4` and H1-H4 are gone. The re-exported LaTeX starts with `a1 & a2 & a3 & a4 \\\\`.",
       "source": "explore:tables:applying table latex drops the first/header row",
-      "status": "open"
+      "status": "open",
+      "attempts": 0,
+      "startedAt": "2026-11-22T21:31:05Z"
     },
     {
       "id": "qa-033",
@@ -426,7 +428,9 @@
       ],
       "hint": "Repro: Insert a 3x3 table. Type `Header` in the top-left cell and `R&D` in the first body cell. Switch View > LaTeX; the source contains `R\\&D &  &  \\\\`. Change `Header` to `Header!` in the textarea, click Apply source, then View > Visual.\nActual: The table has 4 columns: the former body cell becomes two cells containing `R\\` and `D`. Re-exported LaTeX has `\\begin{tabular}{llll}` and `R\\textbackslash{} & D &  &  \\\\`.",
       "source": "explore:tables:escaped ampersand in a cell corrupts the table on source round-trip",
-      "status": "open"
+      "status": "open",
+      "attempts": 0,
+      "startedAt": "2026-11-22T21:32:04Z"
     },
     {
       "id": "qa-034",
@@ -462,7 +466,9 @@
       ],
       "hint": "Repro: Create a project. Type `Inline `, Insert tab > Inline equation with `E=mc^2`, type ` tail`, Insert tab > Equation block with `a^2+b^2=c^2`. View > LaTeX: the source has `Inline \\(E=mc^2\\) tail` and an `equation*` block. Change only that inline expression to `Inline $E=mc^2$ tail`, click Apply source, then View > Visual, then View > LaTeX again.\nActual: No inline math node remains: the visual paragraph reads `Inline $E=mc^2$ tail` as literal text (the display equation survives). Re-exporting writes `Inline \\$E=mc\\textasciicircum{}2\\$ tail`, so the math is corrupted on round-trip.",
       "source": "explore:math:$...$ inline math from latex source is silently turned into escaped plain text",
-      "status": "open"
+      "status": "open",
+      "attempts": 0,
+      "startedAt": "2026-11-22T21:33:03Z"
     },
     {
       "id": "qa-037",
@@ -642,6 +648,68 @@
       ],
       "hint": "Repro: 1. Create/open a project in the editor. 2. Type text, select it, and open Review > New comment. 3. Enter a comment and click Comment. 4. In the Review sidebar, inspect the created comment thread for reply controls (buttons, inputs, or reply text).\nActual: The comment thread shows only Resolve/Reopen and Delete icon buttons; there are no reply inputs or reply buttons. Probe observed thread buttons=[Resolve comment, Delete comment], inputs=[], hasReplyText=false.",
       "source": "explore:review:no ui to reply to a comment thread",
+      "status": "open"
+    },
+    {
+      "id": "qa-052",
+      "title": "Applying LaTeX containing \\texttt wipes the entire visual document",
+      "why": "Exploratory pass on source-editor (functional): expected The new paragraph renders in the visual editor and stays in the exported LaTeX alongside the existing body.",
+      "severity": "critical",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project and switch View > LaTeX. Append the line `Code: \\texttt{CODE MARKER}` before `\\end{document}`, click Apply source, then View > Visual. Switch back to View > LaTeX to read the generated source.\nActual: The visual editor is empty (innerHTML 122 chars, placeholder only): both headings, all paragraphs and the quote disappear, the toast says 'Visual document synchronized from LaTeX.', and the re-exported source contains only front matter through `\\keywords{...}` with no body. The app's unmodified exported source triggers the same wipe because it contains `\\texttt{meaning = structure + language}`; an in-page check of /src/lib/latex.ts shows that command is parsed into a text node with mark type `inlineCode`.",
+      "source": "explore:source-editor:applying latex containing \\texttt wipes the entire visual document",
+      "status": "open",
+      "attempts": 0,
+      "startedAt": "2026-11-22T21:30:06Z"
+    },
+    {
+      "id": "qa-053",
+      "title": "Malformed LaTeX with a missing \\end{document} is applied silently and clears the document",
+      "why": "Exploratory pass on source-editor (functional): expected The app reports the invalid LaTeX and keeps the previous document; the sentinel and original body remain.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. View > LaTeX: replace `\\texttt{meaning = structure + language}` with plain text and add `SENTINEL BEFORE BREAK` before `\\end{document}`, click Apply source, then View > Visual and confirm the sentinel is visible. Return to View > LaTeX, delete only the `\\end{document}` line, click Apply source, then View > Visual.\nActual: Apply source is enabled, the toast says 'Visual document synchronized from LaTeX.', and no alert or error text appears. The visual editor is empty (innerHTML 122 chars), the status bar reads 0 words, and re-exported LaTeX has only front matter - the sentinel and all body content are gone.",
+      "source": "explore:source-editor:malformed latex with a missing \\end{document} is applied silently and clears the document",
+      "status": "open"
+    },
+    {
+      "id": "qa-054",
+      "title": "Unbalanced table environment is stored as escaped text with no error",
+      "why": "Exploratory pass on source-editor (functional): expected The unbalanced environment is reported as invalid LaTeX and the previous document is preserved.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. View > LaTeX, replace `\\texttt{meaning = structure + language}` with plain text, append `\\section{Unbalanced section}`, `\\begin{table}[htbp]` and `SENTINEL UNBALANCED` before `\\end{document}` (no `\\end{table}`), click Apply source, then View > Visual and View > LaTeX.\nActual: Apply source succeeds with the success toast and no error message. The visual editor shows the raw lines `\\section{Unbalanced section}`, `\\begin{table}[htbp]` and `SENTINEL UNBALANCED` as plain text, and the re-exported source escapes them as `\\textbackslash{}section\\{Unbalanced section\\}` and `\\textbackslash{}begin\\{table\\}[htbp]`, corrupting the LaTeX.",
+      "source": "explore:source-editor:unbalanced table environment is stored as escaped text with no error",
+      "status": "open"
+    },
+    {
+      "id": "qa-055",
+      "title": "Source edits in Split mode are not applied when switching to Visual",
+      "why": "Exploratory pass on source-editor (functional): expected Switching to Visual applies pending source edits the same way switching from LaTeX mode does, so `ZXSPLIT paragraph` appears in the visual document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. View > Split. In the LaTeX pane replace `\\texttt{meaning = structure + language}` with plain text and insert `ZXSPLIT paragraph` before `\\end{document}` without clicking Apply source. Click View > Visual, then View > Split.\nActual: `ZXSPLIT paragraph` is absent from the visual document after switching to Visual. Returning to Split still shows it in the textarea, so the source and visual surfaces disagree until the user manually clicks Apply source.",
+      "source": "explore:source-editor:source edits in split mode are not applied when switching to visual",
+      "status": "open"
+    },
+    {
+      "id": "qa-056",
+      "title": "Clicking the active LaTeX mode button discards unapplied source edits",
+      "why": "Exploratory pass on source-editor (functional): expected Re-selecting the already active mode is a no-op and the typed text remains in the textarea.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. View > LaTeX. Type `ZXRECLICK` at the end of the source textarea without clicking Apply source, then click View > LaTeX again while LaTeX mode is already active and read the textarea.\nActual: The textarea is regenerated from the visual document, the typed `ZXRECLICK` disappears, and no warning is shown.",
+      "source": "explore:source-editor:clicking the active latex mode button discards unapplied source edits",
       "status": "open"
     }
   ]
