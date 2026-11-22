@@ -913,8 +913,9 @@
       "hint": "Repro: Place a collapsed cursor, press Ctrl+K (or Links > Add link), type https://example.net, press Insert.\nActual: The dialog closes and nothing is inserted \u2014 no link, no message. With a selection it works correctly (href set, \\href{...} escaped properly, survives round trip).",
       "source": "explore:ribbon-full:add link with no selection silently inserts nothing",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:48:18Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:48:18Z",
+      "lastAttemptAt": "2026-11-22T23:48:18Z"
     },
     {
       "id": "qa-062",
