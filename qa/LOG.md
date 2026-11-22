@@ -162,3 +162,4 @@ Aborting
 2026-11-22T23:50:01Z DONE qa-064 (tsc -b, npm test, smoke all green)
 2026-11-22T23:50:21Z EXPLORE insert-media: 0 new items, agent exit 1
 2026-11-22T23:50:35Z START qa-072 on qa/qa-072-no-discoverable-control-to-switch-to-lat: no discoverable control to switch to LaTeX source view from the editor chrome
+2026-11-22T23:51:10Z DONE qa-072 (tsc -b, npm test, smoke all green)

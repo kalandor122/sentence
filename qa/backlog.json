@@ -1062,10 +1062,11 @@
       ],
       "hint": "",
       "source": "no discoverable control to switch to latex source view from the editor chrome",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:50:35Z",
-      "lastAttemptAt": "2026-11-22T23:50:35Z"
+      "lastAttemptAt": "2026-11-22T23:50:35Z",
+      "doneAt": "2026-11-22T23:51:10Z"
     },
     {
       "id": "qa-073",
@@ -1077,7 +1078,9 @@
       ],
       "hint": "Repro: In a project, stay on the Home ribbon tab and activate the icon-only 'Text color' button (aria-label='Text color') so the .color-popover [role=menu] opens. Press Escape. (Probe: qa/probes/keyboard.mjs, escape.colorPopover.)\nActual: The .color-popover stays open: element count is 1 before and 1 after Escape. Only clicking .color-backdrop or picking a swatch closes it, and a .color-backdrop intercepts pointer events on the trigger so re-activating the trigger cannot close it either. A keyboard-only user cannot dismiss the menu without applying a colour.",
       "source": "explore:keyboard:escape does not dismiss the colour-palette popover",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:51:44Z"
     },
     {
       "id": "qa-074",
