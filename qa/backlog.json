@@ -471,9 +471,9 @@
       ],
       "hint": "Repro: Create a project. Type `Inline `, Insert tab > Inline equation with `E=mc^2`, type ` tail`, Insert tab > Equation block with `a^2+b^2=c^2`. View > LaTeX: the source has `Inline \\(E=mc^2\\) tail` and an `equation*` block. Change only that inline expression to `Inline $E=mc^2$ tail`, click Apply source, then View > Visual, then View > LaTeX again.\nActual: No inline math node remains: the visual paragraph reads `Inline $E=mc^2$ tail` as literal text (the display equation survives). Re-exporting writes `Inline \\$E=mc\\textasciicircum{}2\\$ tail`, so the math is corrupted on round-trip.",
       "source": "explore:math:$...$ inline math from latex source is silently turned into escaped plain text",
-      "status": "open",
+      "status": "in_progress",
       "attempts": 0,
-      "startedAt": "2026-11-22T21:33:03Z"
+      "startedAt": "2026-11-22T22:14:14Z"
     },
     {
       "id": "qa-037",
@@ -968,6 +968,66 @@
       ],
       "hint": "Repro: In a project inspect nav.ribbon-tabs, then focus the 'Home' tab and press ArrowRight. (Probe: ribbonTabs.)\nActual: The nav has role=null; all 8 tab buttons have role=null and aria-selected=null (active state is only a CSS class). Focus starts on 'Home', stays on 'Home' after ArrowRight, and the active tab remains 'Home'. All tabs are still reachable one-by-one with Tab.",
       "source": "explore:keyboard:ribbon tabs lack tab semantics and arrow-key navigation",
+      "status": "open"
+    },
+    {
+      "id": "qa-077",
+      "title": "Apply source silently deletes the inserted table of contents",
+      "why": "Exploratory pass on insert-media (functional): expected Applying an unchanged source is a no-op: the visual TOC block and the \\tableofcontents command should both survive, as the image figure and \\newpage do.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the demo document click References > Table of contents, then View > LaTeX. Press Ctrl+End, type a space and Backspace so the source text is unchanged but Apply source becomes enabled; click Apply source, then View > Visual, then View > LaTeX again.\nActual: After Apply source the toast says 'Visual document synchronized from LaTeX.' and the textarea still shows \\tableofcontents (count 1), but the visual document has 0 [data-toc] nodes. Re-entering LaTeX mode regenerates the source and \\tableofcontents is now count 0. Probe qa/probes/insert-media.mjs step 6: out.applySource.latexImmediatelyAfterApply.toc=1, out.applySource.dom.tocs.length=0, out.applySource.latexAfterReturnToSource.toc=0, while figureBlocks=1 and newpage=1 throughout.",
+      "source": "explore:insert-media:apply source silently deletes the inserted table of contents",
+      "status": "open"
+    },
+    {
+      "id": "qa-078",
+      "title": "Inserting Contents immediately after a page break replaces the new page break",
+      "why": "Exploratory pass on insert-media (functional): expected Both commands insert independently: a second page-break band plus a TOC block, with two \\newpage commands in the LaTeX.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: With the caret at the end of a paragraph, click Insert > Page break and then, without clicking back into the editor, click References > Table of contents.\nActual: Right after the page-break click the editor has 2 [data-page-break] and 0 [data-toc] nodes; after the Contents click it has 1 [data-page-break] and 1 [data-toc], and the exported LaTeX has \\newpage count 1 instead of 2. The still-selected page break atom is overwritten by the TOC. Probe step 7: out.repeated.afterSecondBreak={breaks:2,tocs:0} vs out.repeated.dom.breaks=1, out.repeated.dom.tocs=1, out.repeated.latex.newpage=1.",
+      "source": "explore:insert-media:inserting contents immediately after a page break replaces the new page break",
+      "status": "open"
+    },
+    {
+      "id": "qa-079",
+      "title": "Image inserted at a cursor inside a paragraph splits the sentence and exports a block figure",
+      "why": "Exploratory pass on insert-media (functional): expected The image is inserted inline, or as a separate block without cutting the existing sentence into two paragraphs.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Place the caret inside the last paragraph of the demo document, between 'compactly:' and ' meaning = structure + language.'; click Insert > Image and supply a PNG to the hidden file input (the browser picker is stubbed); read the visual DOM and View > LaTeX.\nActual: Visual HTML becomes <p>The central model can be expressed compactly:</p><img src=\"data:image/png;base64,...\" alt=\"qa image #1.png\" data-path=\"assets/images/qa-image--1.png\"><p> <code>meaning = structure + language</code>.</p>. The LaTeX places a \\begin{figure}...\\includegraphics[width=0.8\\linewidth]{assets/images/qa-image--1.png}...\\end{figure} block between the two halves of the sentence. Probe step 2: out.image.dom.html and out.image.latex.body.",
+      "source": "explore:insert-media:image inserted at a cursor inside a paragraph splits the sentence and exports a block figure",
+      "status": "open"
+    },
+    {
+      "id": "qa-080",
+      "title": "Status bar page count ignores inserted page breaks",
+      "why": "Exploratory pass on insert-media (functional): expected The status bar reports 2 pages, matching the two-page sheet layout produced by the break.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Click Insert > Page break once in the demo document, then read the status bar and the --sentence-sheet-min-height CSS variable on .visual-editor-scroll.\nActual: The status bar still reads '1 page' while the 64px page-break band renders and --sentence-sheet-min-height is 2106px (2 x 1053px). Probe step 3: out.pageBreak.domImmediately={sheetMinHeight:'2106px',status:['1 page']} and the same values remain in out.pageBreak.dom.",
+      "source": "explore:insert-media:status bar page count ignores inserted page breaks",
+      "status": "open"
+    },
+    {
+      "id": "qa-081",
+      "title": "Visual table of contents shows no entries for the document's headings",
+      "why": "Exploratory pass on insert-media (content): expected The visual TOC lists the heading entries it will generate, or at least states that it is generated when the PDF is compiled.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the demo document (which has H1 'Introduction' and H2 'Drafting with constraints'), click References > Table of contents and inspect the inserted block on the visual page.\nActual: The inserted [data-toc] block is a 608x59px dashed box whose entire text is the literal label 'Table of contents'; no headings or compile-time hint appear, even though the LaTeX correctly contains \\tableofcontents. Probe step 4: out.toc.dom.tocs[0] and out.toc.latex.toc=1.",
+      "source": "explore:insert-media:visual table of contents shows no entries for the document's headings",
       "status": "open"
     }
   ]
