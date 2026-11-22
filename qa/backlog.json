@@ -220,8 +220,9 @@
       "hint": "Repro: View tab > Git history panel > click 'View diff', then 'Set', then 'Manage'\nActual: UI shows 'TypeError: Cannot read properties of undefined (reading 'invoke')' and keeps it on screen",
       "source": "explore:chrome:desktop-only git actions throw a raw typeerror into the ui",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:26:32Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:26:32Z",
+      "lastAttemptAt": "2026-11-22T23:26:32Z"
     },
     {
       "id": "qa-015",
