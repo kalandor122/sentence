@@ -71,3 +71,4 @@ Aborting
 2026-11-22T22:02:51Z EXPLORE keyboard: 4 new items, agent exit 0
 2026-11-22T22:03:05Z DIRTY TREE before qa-068 — stashing so the loop can continue
 2026-11-22T22:14:00Z EXPLORE insert-media: 5 new items, agent exit 0
+2026-11-22T22:14:14Z START qa-036 on qa/qa-036-inline-math-from-latex-source-is-silent: $...$ inline math from LaTeX source is silently turned into escaped plain text

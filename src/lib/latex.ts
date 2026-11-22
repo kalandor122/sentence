@@ -586,11 +586,25 @@ function parseInline(source: string): InlineParseResult {
       continue;
     }
 
+    if (source[index] === "\\" && source[index + 1] === "$") {
+      buffer += "\\$";
+      index += 2;
+      continue;
+    }
+
     const mathMatch = remainder.match(/^\\\((.+?)\\\)/s);
     if (mathMatch) {
       flush();
       content.push({ type: "mathInline", attrs: { latex: mathMatch[1] } });
       index += mathMatch[0].length;
+      continue;
+    }
+
+    const dollarMathMatch = remainder.match(/^\$([^$\n]+)\$(?!\$)/);
+    if (dollarMathMatch) {
+      flush();
+      content.push({ type: "mathInline", attrs: { latex: dollarMathMatch[1] } });
+      index += dollarMathMatch[0].length;
       continue;
     }
 
