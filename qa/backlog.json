@@ -1171,8 +1171,9 @@
       "hint": "Repro: Place the caret inside the last paragraph of the demo document, between 'compactly:' and ' meaning = structure + language.'; click Insert > Image and supply a PNG to the hidden file input (the browser picker is stubbed); read the visual DOM and View > LaTeX.\nActual: Visual HTML becomes <p>The central model can be expressed compactly:</p><img src=\"data:image/png;base64,...\" alt=\"qa image #1.png\" data-path=\"assets/images/qa-image--1.png\"><p> <code>meaning = structure + language</code>.</p>. The LaTeX places a \\begin{figure}...\\includegraphics[width=0.8\\linewidth]{assets/images/qa-image--1.png}...\\end{figure} block between the two halves of the sentence. Probe step 2: out.image.dom.html and out.image.latex.body.",
       "source": "explore:insert-media:image inserted at a cursor inside a paragraph splits the sentence and exports a block figure",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:56:20Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:56:20Z",
+      "lastAttemptAt": "2026-11-22T23:56:20Z"
     },
     {
       "id": "qa-080",
