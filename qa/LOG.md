@@ -125,3 +125,4 @@ Aborting
 2026-11-22T23:31:07Z START qa-025 on qa/qa-025-switching-visual-latex-visual-resets-the: Switching Visual->LaTeX->Visual resets the cursor to the start of the document, so the next insert lands in the wrong pl
 2026-11-22T23:31:41Z DONE qa-025 (tsc -b, npm test, smoke all green)
 2026-11-22T23:32:01Z EXPLORE source-editor: 0 new items, agent exit 1
+2026-11-22T23:32:15Z START qa-026 on qa/qa-026-image-inserted-mid-paragraph-splits-the: Image inserted mid-paragraph splits the paragraph at the cursor, breaking the sentence in two
