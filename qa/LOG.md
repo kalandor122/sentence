@@ -55,3 +55,4 @@ Aborting
 
 2026-11-22T21:38:55Z EXPLORE long-document: 1 new items, agent exit 0
 2026-11-22T21:39:04Z START qa-052 on qa/qa-052-applying-latex-containing-texttt-wipes-t: Applying LaTeX containing \texttt wipes the entire visual document
+2026-11-22T21:40:27Z DONE qa-052 (tsc -b, npm test, smoke all green)
