@@ -22,6 +22,8 @@ import socket
 import subprocess
 import sys
 import time
+import urllib.error
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -70,9 +72,13 @@ def pick(data: dict) -> dict | None:
 
 
 def port_open() -> bool:
-    with socket.socket() as s:
-        s.settimeout(0.5)
-        return s.connect_ex(("127.0.0.1", PORT)) == 0
+    # Ask the server over HTTP: a raw 127.0.0.1 socket misses Vite's [::1] bind,
+    # and this also proves the app actually answers, not just that something listens.
+    try:
+        with urllib.request.urlopen(f"http://localhost:{PORT}/", timeout=2) as r:
+            return r.status == 200
+    except (OSError, urllib.error.URLError):
+        return False
 
 
 def ensure_server() -> tuple[bool, str]:
