@@ -624,8 +624,9 @@
       "hint": "Repro: Home tab, select text, set Font family to Times New Roman, switch to View -> LaTeX, inspect the emitted command.\nActual: Emitted as '{\\\\sentenceTimes MARKER one two three.}' \u2014 one brace group with no argument braces, so the switch applies to the first character only and the command is undefined in the preamble; the document will not compile.",
       "source": "explore:ribbon:font family control emits unbraced latex command",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T22:29:45Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T22:29:45Z",
+      "lastAttemptAt": "2026-11-22T22:29:46Z"
     },
     {
       "id": "qa-048",
