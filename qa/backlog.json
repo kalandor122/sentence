@@ -45,10 +45,11 @@
         "src/styles.css"
       ],
       "hint": "Add a small non-modal find bar anchored top-right of the editor column (not a modal). Ctrl+F opens it and prefills with the current selection, Enter/Shift+Enter walk matches, Escape closes and returns focus to the page. Ctrl+H reveals the replace field with Replace / Replace all. Use the Tiptap editor's own document search (ProseMirror positions) so matches highlight in the visual editor; in source mode search the textarea. Keep the LaTeX round trip untouched.",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T20:54:02Z",
-      "lastAttemptAt": "2026-11-22T20:54:02Z"
+      "lastAttemptAt": "2026-11-22T20:54:02Z",
+      "doneAt": "2026-11-22T21:01:31Z"
     },
     {
       "id": "qa-004",
@@ -123,7 +124,10 @@
       ],
       "hint": "Repro: In a new document, clear the editor (Ctrl+A, Backspace). Click Home > Bulleted list, type 'keep parent', press Enter, press Tab, type 'keep child'. Click View > LaTeX, change 'keep parent' to 'renamed parent' in the LaTeX source textarea, click 'Apply source', then click View > Visual. (The same happens if you apply hand-authored LaTeX containing a nested \\begin{enumerate} inside a \\begin{itemize}.)\nActual: The visual editor shows a flat two-item bulleted list whose item texts literally contain '\\begin{itemize}' and '\\end{itemize}' ('renamed parent \\begin{itemize}' / 'keep child \\end{itemize}'). Switching back to LaTeX shows the environment commands escaped as '\\textbackslash{}begin\\{itemize\\}' and '\\textbackslash{}end\\{itemize\\}' instead of a nested environment. Applying hand-authored mixed itemize/enumerate likewise flattens all items into the outer list type and leaves '\\begin{enumerate}' / '\\end{enumerate}' as visible text. No console errors were emitted.",
       "source": "explore:lists:nested lists are destroyed when latex source is applied",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 1,
+      "startedAt": "2026-11-22T21:01:55Z",
+      "lastAttemptAt": "2026-11-22T21:01:55Z"
     },
     {
       "id": "qa-010",

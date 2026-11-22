@@ -607,17 +607,102 @@ function parseInline(source: string): InlineParseResult {
   return { content };
 }
 
+const LIST_ENVIRONMENTS: Record<string, "bulletList" | "orderedList"> = {
+  itemize: "bulletList",
+  enumerate: "orderedList",
+};
+
+function nestedListSpans(
+  body: string,
+): Array<{ start: number; end: number; type: "bulletList" | "orderedList" }> {
+  const spans: Array<{ start: number; end: number; type: "bulletList" | "orderedList" }> = [];
+  let depth = 0;
+  let start = 0;
+  let type: "bulletList" | "orderedList" = "bulletList";
+  for (const match of body.matchAll(/\\(begin|end)\{(itemize|enumerate)\}/g)) {
+    const index = match.index ?? 0;
+    if (match[1] === "begin") {
+      if (depth === 0) {
+        start = index;
+        type = LIST_ENVIRONMENTS[match[2]];
+      }
+      depth += 1;
+    } else if (depth > 0) {
+      depth -= 1;
+      if (depth === 0) spans.push({ start, end: index + match[0].length, type });
+    }
+  }
+  return spans;
+}
+
+function parseListItemContent(body: string): DocumentNode[] {
+  const content: DocumentNode[] = [];
+  let cursor = 0;
+  const pushParagraph = (text: string) => {
+    const trimmed = text.trim();
+    if (trimmed) content.push({ type: "paragraph", content: parseInline(trimmed).content });
+  };
+  for (const span of nestedListSpans(body)) {
+    pushParagraph(body.slice(cursor, span.start));
+    if (!content.some((node) => node.type === "paragraph")) {
+      content.push({ type: "paragraph" });
+    }
+    content.push(parseList(body.slice(span.start, span.end), span.type));
+    cursor = span.end;
+  }
+  pushParagraph(body.slice(cursor));
+  if (content.length === 0) content.push({ type: "paragraph" });
+  return content;
+}
+
+function splitLatexBlocks(source: string): string[] {
+  const blocks: string[] = [];
+  let current: string[] = [];
+  let depth = 0;
+  const flush = () => {
+    const block = current.join("\n").trim();
+    if (block) blocks.push(block);
+    current = [];
+  };
+  for (const line of source.split(/\r?\n/)) {
+    if (!line.trim() && depth === 0) {
+      flush();
+      continue;
+    }
+    current.push(line);
+    for (const match of line.matchAll(/\\(begin|end)\{[a-zA-Z*]+\}/g)) {
+      depth += match[1] === "begin" ? 1 : -1;
+    }
+  }
+  flush();
+  return blocks;
+}
+
 function parseList(source: string, type: "bulletList" | "orderedList"): DocumentNode {
   const environment = type === "bulletList" ? "itemize" : "enumerate";
   const inner = source
     .replace(new RegExp(`^\\\\begin\\{${environment}\\}\\s*`), "")
     .replace(new RegExp(`\\s*\\\\end\\{${environment}\\}$`), "");
-  const parts = inner.split(/\\item\s+/).filter(Boolean);
+  const starts: Array<{ start: number; bodyStart: number }> = [];
+  let depth = 0;
+  for (const match of inner.matchAll(/\\item\b|\\(?:begin|end)\{(?:itemize|enumerate)\}/g)) {
+    const index = match.index ?? 0;
+    if (match[0] === "\\item") {
+      if (depth === 0) starts.push({ start: index, bodyStart: index + match[0].length });
+    } else if (match[0].startsWith("\\begin")) {
+      depth += 1;
+    } else {
+      depth -= 1;
+    }
+  }
+  if (starts.length === 0) starts.push({ start: 0, bodyStart: 0 });
   return {
     type,
-    content: parts.map((part) => ({
+    content: starts.map((item, index) => ({
       type: "listItem",
-      content: [{ type: "paragraph", content: parseInline(part.trim()).content }],
+      content: parseListItemContent(
+        inner.slice(item.bodyStart, starts[index + 1]?.start ?? inner.length),
+      ),
     })),
   };
 }
@@ -716,10 +801,7 @@ export function latexToDocument(
     .replace(/\\tableofcontents\\newpage/g, "\\tableofcontents")
     .replace(/\\tableofcontents/g, "")
     .trim();
-  const blocks = source
-    .split(/\n{2,}/)
-    .map((part) => part.trim())
-    .filter(Boolean);
+  const blocks = splitLatexBlocks(source);
   const content: DocumentNode[] = [];
 
   for (const block of blocks) {
