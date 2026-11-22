@@ -911,15 +911,25 @@ export default function App() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+      const mod = event.ctrlKey || event.metaKey;
+      const target = event.target;
+      const inEditor = target instanceof HTMLElement && Boolean(target.closest(".sentence-editor"));
+      const inTextField = target instanceof HTMLElement && (
+        target.matches("input, textarea, select") ||
+        (target.isContentEditable && !inEditor)
+      );
+      const editingDocument = mode !== "source" && !inTextField && !dialog && !mathEditor;
+      const pressedDigit = (digit: string) =>
+        event.key === digit || event.code === `Digit${digit}` || event.code === `Numpad${digit}`;
+      if (mod && event.key.toLowerCase() === "s") {
         event.preventDefault();
         void handleSave();
       }
-      if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+      if (mod && event.key === "Enter") {
         event.preventDefault();
         void handleCompile();
       }
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "f") {
+      if (mod && event.key.toLowerCase() === "f") {
         event.preventDefault();
         if (findInput.current?.closest(".find-bar")?.contains(document.activeElement)) {
           findInput.current.select();
@@ -927,10 +937,32 @@ export default function App() {
           openFind(find.showReplace);
         }
       }
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "h") {
+      if (mod && event.key.toLowerCase() === "h") {
         event.preventDefault();
         if (find.open) setFind((current) => ({ ...current, showReplace: true }));
         else openFind(true);
+      }
+      if (editingDocument && mod && !event.altKey && !event.shiftKey && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setDialog({ kind: "link" });
+      }
+      // Inside the page Tiptap already owns these list shortcuts; outside it,
+      // route them to the same commands against the current selection.
+      if (editingDocument && !inEditor && mod && event.shiftKey && !event.altKey && editor) {
+        if (pressedDigit("7")) {
+          event.preventDefault();
+          editor.chain().focus().toggleOrderedList().run();
+        } else if (pressedDigit("8")) {
+          event.preventDefault();
+          editor.chain().focus().toggleBulletList().run();
+        }
+      }
+      if (editingDocument && mod && !event.shiftKey && !event.altKey) {
+        const spacing: ProjectSettings["lineSpacing"] | null = pressedDigit("1") ? "single" : pressedDigit("2") ? "double" : pressedDigit("5") ? "onehalf" : null;
+        if (spacing) {
+          event.preventDefault();
+          handleSettingsChange({ lineSpacing: spacing });
+        }
       }
       if (event.key === "Escape" && find.open) {
         event.preventDefault();

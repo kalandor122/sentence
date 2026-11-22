@@ -1,4 +1,4 @@
-import { EditorContent, useEditor, type Editor } from "@tiptap/react";
+import { EditorContent, Extension, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Subscript from "@tiptap/extension-subscript";
@@ -53,6 +53,33 @@ const LINE_HEIGHTS: Record<ProjectSettings["lineSpacing"], string> = {
   onehalf: "2.15",
   double: "2.6",
 };
+
+// Tab keeps keyboard focus in the page: it nests list items or indents a block,
+// and Shift+Tab reverses the last step. Tables keep their own cell navigation.
+const TabIndent = Extension.create({
+  name: "sentenceTabIndent",
+  priority: 200,
+  addKeyboardShortcuts() {
+    const indent = (outdent: boolean) => {
+      const { editor } = this;
+      if (!editor.isEditable || editor.isActive("table") || editor.isActive("codeBlock")) return false;
+      const chain = editor.chain().focus();
+      if (editor.isActive("listItem")) {
+        if (outdent) chain.liftListItem("listItem").run();
+        else chain.sinkListItem("listItem").run();
+      } else if (outdent) {
+        chain.lift("blockquote").run();
+      } else {
+        chain.wrapIn("blockquote").run();
+      }
+      return true;
+    };
+    return {
+      Tab: () => indent(false),
+      "Shift-Tab": () => indent(true),
+    };
+  },
+});
 
 // Visual pagination constants (layout px, unscaled by the editor zoom).
 const PAGE_HEIGHT = 1053;
@@ -132,6 +159,7 @@ export default function EditorSurface({
       TableOfContents,
       CommentMark,
       FindHighlight,
+      TabIndent,
     ],
     content: document,
     editable,
