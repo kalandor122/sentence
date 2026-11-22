@@ -826,7 +826,8 @@
       ],
       "hint": "Repro: On http://localhost:1420 click 'Create a project'. Type ` PERSIST-RELOAD-MARKER-7Q` at the end of the document and wait ~1.6s until the top-bar sublabel under the project name reads 'Saved locally' (View > LaTeX shows the marker in the exported source). Click the Save button and note the toast. Reload the page, then click 'Create a project' again on the Start screen and inspect the visual editor and View > LaTeX source. Run the same reload immediately after typing, before the autosave debounce fires.\nActual: The Save click shows the toast 'Saved to disk.' and the sublabel becomes 'Saved locally', but reload returns to the Start screen with no recent documents. After creating a project again the marker is absent from both the visual editor and the exported LaTeX; the original demo body is back. localStorage before reload contains only `sentence.gitAuthor` - no document snapshot is written. Reloading immediately after typing (sublabel 'Editing') also loses the text and shows no beforeunload confirmation (0 dialogs observed).",
       "source": "explore:persistence:browser document is lost on reload while the ui reports it as saved",
-      "status": "open"
+      "status": "superseded",
+      "note": "duplicate of qa-005 (browser workspace does not survive reload)"
     },
     {
       "id": "qa-066",
@@ -838,7 +839,8 @@
       ],
       "hint": "Repro: Create a project and wait ~1.6s until the top-bar sublabel reads 'Saved locally'. Click View > LaTeX, then View > Visual without editing anything, and read the sublabel immediately. The same is visible right after 'Create a project' before the first autosave.\nActual: The sublabel changes to 'Editing' even though the editor's innerText is unchanged (probe comparison true); it returns to 'Saved locally' only after another ~1.1s autosave. Immediately after project creation the sublabel also reads 'Editing'.",
       "source": "explore:persistence:opening or returning to visual view flips an unchanged document to 'editing'",
-      "status": "open"
+      "status": "superseded",
+      "note": "verified fixed by bf241b6: Visual -> LaTeX -> Visual with no edit leaves the top bar at 'Saved locally' and the document at 92 words (was flipping to 'Editing')"
     },
     {
       "id": "qa-067",
@@ -867,7 +869,9 @@
       ],
       "hint": "Detail: {\"nested\":0,\"leaked\":false}",
       "source": "smoke-fail:nested lists survive the source round trip",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T22:03:05Z"
     },
     {
       "id": "qa-069",
@@ -915,6 +919,54 @@
       ],
       "hint": "",
       "source": "no discoverable control to switch to latex source view from the editor chrome",
+      "status": "open"
+    },
+    {
+      "id": "qa-073",
+      "title": "Escape does not dismiss the colour-palette popover",
+      "why": "Exploratory pass on keyboard (functional): expected Escape closes the popover overlay and returns focus to the Text color button, matching how Escape closes the find bar and modal dialogs.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In a project, stay on the Home ribbon tab and activate the icon-only 'Text color' button (aria-label='Text color') so the .color-popover [role=menu] opens. Press Escape. (Probe: qa/probes/keyboard.mjs, escape.colorPopover.)\nActual: The .color-popover stays open: element count is 1 before and 1 after Escape. Only clicking .color-backdrop or picking a swatch closes it, and a .color-backdrop intercepts pointer events on the trigger so re-activating the trigger cannot close it either. A keyboard-only user cannot dismiss the menu without applying a colour.",
+      "source": "explore:keyboard:escape does not dismiss the colour-palette popover",
+      "status": "open"
+    },
+    {
+      "id": "qa-074",
+      "title": "Closing a modal dialog with Escape drops keyboard focus to <body>",
+      "why": "Exploratory pass on keyboard (ux): expected Focus returns to the control that opened the dialog (the Inline equation ribbon button) so keyboard and screen-reader users resume from the same place.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In a project open Insert > Inline equation (focus lands in the LaTeX textarea), then press Escape to close the dialog and read document.activeElement. (Probe: escape.mathDialog.)\nActual: The dialog closes (count 1 -> 0) but document.activeElement becomes BODY; all focus context is lost. The same shared Modal backs the citation, footnote, link, comment, arXiv and GitHub dialogs.",
+      "source": "explore:keyboard:closing a modal dialog with escape drops keyboard focus to <body>",
+      "status": "open"
+    },
+    {
+      "id": "qa-075",
+      "title": "GitHub auth dialog opens without moving focus into it",
+      "why": "Exploratory pass on keyboard (ux): expected Focus moves into the dialog (first field or heading), as it does for the inline-equation and citation dialogs which autoFocus their field.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In a project open View > Git history, click 'Continue with GitHub', wait for the dialog, then inspect document.activeElement. (Probe: githubDialog.)\nActual: A [role=dialog][aria-modal=true] is present (count 1) but document.activeElement remains the 'Continue with GitHub' button behind the backdrop; document.activeElement.closest('[role=dialog]') is false. The trap only engages on the next Tab.",
+      "source": "explore:keyboard:github auth dialog opens without moving focus into it",
+      "status": "open"
+    },
+    {
+      "id": "qa-076",
+      "title": "Ribbon tabs lack tab semantics and arrow-key navigation",
+      "why": "Exploratory pass on keyboard (ux): expected Tabs expose role=tablist/role=tab with aria-selected on the current tab, and Left/Right arrows move between tabs per the ARIA tabs pattern.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In a project inspect nav.ribbon-tabs, then focus the 'Home' tab and press ArrowRight. (Probe: ribbonTabs.)\nActual: The nav has role=null; all 8 tab buttons have role=null and aria-selected=null (active state is only a CSS class). Focus starts on 'Home', stays on 'Home' after ArrowRight, and the active tab remains 'Home'. All tabs are still reachable one-by-one with Tab.",
+      "source": "explore:keyboard:ribbon tabs lack tab semantics and arrow-key navigation",
       "status": "open"
     }
   ]
