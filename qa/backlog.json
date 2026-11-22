@@ -752,10 +752,11 @@
       ],
       "hint": "Repro: 1. Create/open a project in the editor. 2. Type text, select it, and open Review > New comment. 3. Enter a comment and click Comment. 4. In the Review sidebar, inspect the created comment thread for reply controls (buttons, inputs, or reply text).\nActual: The comment thread shows only Resolve/Reopen and Delete icon buttons; there are no reply inputs or reply buttons. Probe observed thread buttons=[Resolve comment, Delete comment], inputs=[], hasReplyText=false.",
       "source": "explore:review:no ui to reply to a comment thread",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:41:25Z",
-      "lastAttemptAt": "2026-11-22T23:41:25Z"
+      "lastAttemptAt": "2026-11-22T23:41:25Z",
+      "doneAt": "2026-11-22T23:42:00Z"
     },
     {
       "id": "qa-052",
@@ -815,7 +816,9 @@
       ],
       "hint": "Repro: Create a project. View > Split. In the LaTeX pane replace `\\texttt{meaning = structure + language}` with plain text and insert `ZXSPLIT paragraph` before `\\end{document}` without clicking Apply source. Click View > Visual, then View > Split.\nActual: `ZXSPLIT paragraph` is absent from the visual document after switching to Visual. Returning to Split still shows it in the textarea, so the source and visual surfaces disagree until the user manually clicks Apply source.",
       "source": "explore:source-editor:source edits in split mode are not applied when switching to visual",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:42:34Z"
     },
     {
       "id": "qa-056",
