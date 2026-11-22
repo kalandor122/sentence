@@ -203,10 +203,11 @@
       ],
       "hint": "Repro: Select text, Home > Add link, type 'not a url', Insert\nActual: Dialog closes and creates <a href=\"not a url\">; no error, no normalisation",
       "source": "explore:chrome:link dialog writes invalid hrefs without validation",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:25:23Z",
-      "lastAttemptAt": "2026-11-22T23:25:23Z"
+      "lastAttemptAt": "2026-11-22T23:25:23Z",
+      "doneAt": "2026-11-22T23:25:57Z"
     },
     {
       "id": "qa-014",
@@ -218,7 +219,9 @@
       ],
       "hint": "Repro: View tab > Git history panel > click 'View diff', then 'Set', then 'Manage'\nActual: UI shows 'TypeError: Cannot read properties of undefined (reading 'invoke')' and keeps it on screen",
       "source": "explore:chrome:desktop-only git actions throw a raw typeerror into the ui",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:26:32Z"
     },
     {
       "id": "qa-015",
