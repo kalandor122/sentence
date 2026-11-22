@@ -659,10 +659,11 @@
       ],
       "hint": "Repro: Create a project. Insert > Footnote with note `A useful note`, References > Insert citation with key `sentence2026`, and References > Cross-reference with label `fig:architecture`. Click each inserted object in the visual editor, then double-click each one.\nActual: Neither click nor double-click opens a dialog for any of the three objects. Each only gains the `ProseMirror-selectednode` class; `data-text=\"A useful note\"`, `data-key=\"sentence2026\"` and `data-label=\"fig:architecture\"` remain unchanged.",
       "source": "explore:links-cites-footnotes:footnote text, citation keys and cross-reference labels have no visual edit flow",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:40:16Z",
-      "lastAttemptAt": "2026-11-22T23:40:16Z"
+      "lastAttemptAt": "2026-11-22T23:40:16Z",
+      "doneAt": "2026-11-22T23:40:51Z"
     },
     {
       "id": "qa-045",
@@ -751,7 +752,9 @@
       ],
       "hint": "Repro: 1. Create/open a project in the editor. 2. Type text, select it, and open Review > New comment. 3. Enter a comment and click Comment. 4. In the Review sidebar, inspect the created comment thread for reply controls (buttons, inputs, or reply text).\nActual: The comment thread shows only Resolve/Reopen and Delete icon buttons; there are no reply inputs or reply buttons. Probe observed thread buttons=[Resolve comment, Delete comment], inputs=[], hasReplyText=false.",
       "source": "explore:review:no ui to reply to a comment thread",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:41:25Z"
     },
     {
       "id": "qa-052",
