@@ -897,8 +897,9 @@
       "hint": "Repro: Layout tab, switch paper size to Letter, margins to narrow, text size to 12 pt. Watch the page and read the computed styles.\nActual: Only the .tex changes (letterpaper, geometry margin, 10-12pt, documentclass). .paper-sheet stays 794px wide and .tiptap stays 792px with padding 84px 92px 110px and font-size 16px for every combination \u2014 no visual feedback at all.",
       "source": "explore:ribbon-full:page setup (paper size, margins, text size, class) never changes the visible page",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:47:09Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:47:09Z",
+      "lastAttemptAt": "2026-11-22T23:47:09Z"
     },
     {
       "id": "qa-061",
