@@ -143,3 +143,4 @@ Aborting
 2026-11-22T23:40:16Z START qa-044 on qa/qa-044-footnote-text-citation-keys-and-cross-re: Footnote text, citation keys and cross-reference labels have no visual edit flow
 2026-11-22T23:40:51Z DONE qa-044 (tsc -b, npm test, smoke all green)
 2026-11-22T23:41:11Z EXPLORE persistence: 0 new items, agent exit 1
+2026-11-22T23:41:25Z START qa-051 on qa/qa-051-no-ui-to-reply-to-a-comment-thread: No UI to reply to a comment thread
