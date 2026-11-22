@@ -123,3 +123,5 @@ Aborting
 2026-11-22T23:29:58Z START qa-017 on qa/qa-017-github-dialog-does-not-move-focus-into-t: GitHub dialog does not move focus into the dialog
 2026-11-22T23:30:32Z DONE qa-017 (tsc -b, npm test, smoke all green)
 2026-11-22T23:31:07Z START qa-025 on qa/qa-025-switching-visual-latex-visual-resets-the: Switching Visual->LaTeX->Visual resets the cursor to the start of the document, so the next insert lands in the wrong pl
+2026-11-22T23:31:41Z DONE qa-025 (tsc -b, npm test, smoke all green)
+2026-11-22T23:32:01Z EXPLORE source-editor: 0 new items, agent exit 1
