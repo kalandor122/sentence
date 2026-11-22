@@ -152,3 +152,4 @@ Aborting
 2026-11-22T23:44:51Z START qa-057 on qa/qa-057-status-bar-page-count-ignores-page-break: Status bar page count ignores page breaks and visual document length
 2026-11-22T23:45:26Z DONE qa-057 (tsc -b, npm test, smoke all green)
 2026-11-22T23:45:46Z EXPLORE keyboard: 0 new items, agent exit 1
+2026-11-22T23:46:00Z START qa-059 on qa/qa-059-paragraph-style-labels-are-off-by-one-le: Paragraph style labels are off by one level

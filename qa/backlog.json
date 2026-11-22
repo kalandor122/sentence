@@ -881,8 +881,9 @@
       "hint": "Repro: Home tab, Paragraph style select. Pick 'Title', then 'Heading 1', and read the emitted LaTeX.\nActual: The select maps paragraph->p, heading-1->h1->\\section, heading-2->h2->\\subsection, heading-3->h3->\\subsubsection, but the options read 'Normal text / Title / Heading 1 / Heading 2'. Picking 'Title' yields \\section and 'Heading 1' yields \\subsection \u2014 one level below what the label claims.",
       "source": "explore:ribbon-full:paragraph style labels are off by one level",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:46:00Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:46:00Z",
+      "lastAttemptAt": "2026-11-22T23:46:00Z"
     },
     {
       "id": "qa-060",
