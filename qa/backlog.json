@@ -28,13 +28,14 @@
         "src/editor/EditorSurface.tsx"
       ],
       "hint": "App.tsx has a keydown effect that only handles Ctrl+S and Ctrl+Enter \u2014 extend that pattern. Ctrl+K should open the existing link dialog, Ctrl+Shift+7/8 toggle ordered/bullet lists through Tiptap commands, Ctrl+1/2/5 apply the existing line-spacing styles, Tab/Shift+Tab indent or outdent the current list/paragraph instead of leaving the editor. Every shortcut must keep working inside the LaTeX source textarea without hijacking it.",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T21:04:41Z",
       "lastAttemptAt": "2026-11-22T21:04:41Z",
       "lastFailure": "== tsc -b EXIT 0\n\n== npm test EXIT 0\n\n> sentence@0.2.0 test\n> vitest run\n\n\n RUN  v4.1.12 /home/magor/Projects/sentence\n\n\n Test Files  1 passed | 1 skipped (2)\n      Tests  9 passed | 1 skipped (10)\n   Start at  21:52:30\n   Duration  173ms (transform 74ms, setup 0ms, import 96ms, tests 38ms, environment 0ms)\n\n\n== smoke EXIT 1\nFAIL failures=1 observations=5 consoleErrors=0\n  FAIL harness: TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /^compile$/i }).first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"compile-button\">\u2026</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 \u00d7 waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div role=\"p\n",
       "max_attempts": 3,
-      "note": "retry: the earlier block was a harness bug (the Ctrl+K probe left the link dialog open and the compile click timed out); smoke now closes overlays between shortcut probes"
+      "note": "retry: the earlier block was a harness bug (the Ctrl+K probe left the link dialog open and the compile click timed out); smoke now closes overlays between shortcut probes",
+      "doneAt": "2026-11-22T21:13:04Z"
     },
     {
       "id": "qa-003",
@@ -142,7 +143,10 @@
       ],
       "hint": "Repro: Insert > Inline equation, focus lands on textarea, press Tab repeatedly\nActual: Tab order: textarea -> Cancel -> BODY -> Save -> draft/opening -> Settings -> Home/Insert/Layout... while the dialog is still open and aria-modal=\"true\"",
       "source": "explore:chrome:modals do not trap focus",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 1,
+      "startedAt": "2026-11-22T21:17:10Z",
+      "lastAttemptAt": "2026-11-22T21:17:10Z"
     },
     {
       "id": "qa-011",
@@ -622,6 +626,18 @@
       ],
       "hint": "Repro: Place the cursor in a plain left-aligned paragraph and read the pressed state of the four alignment buttons.\nActual: None of the four buttons is active until Align left is clicked explicitly; centre/right/justify then light up correctly.",
       "source": "explore:ribbon:align left button is not active by default",
+      "status": "open"
+    },
+    {
+      "id": "qa-051",
+      "title": "No UI to reply to a comment thread",
+      "why": "Exploratory pass on review (functional): expected A comment thread exposes a way to add a reply, as implied by the review comment workflow.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create/open a project in the editor. 2. Type text, select it, and open Review > New comment. 3. Enter a comment and click Comment. 4. In the Review sidebar, inspect the created comment thread for reply controls (buttons, inputs, or reply text).\nActual: The comment thread shows only Resolve/Reopen and Delete icon buttons; there are no reply inputs or reply buttons. Probe observed thread buttons=[Resolve comment, Delete comment], inputs=[], hasReplyText=false.",
+      "source": "explore:review:no ui to reply to a comment thread",
       "status": "open"
     }
   ]
