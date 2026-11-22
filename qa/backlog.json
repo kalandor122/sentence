@@ -580,8 +580,9 @@
       "hint": "Repro: Create a project, type `before `, Insert tab > Inline equation with `y=2`, click Insert, View > Visual. Click the rendered math node to edit it, click Cancel in the dialog, then press Backspace.\nActual: The click opens the edit dialog instead of selecting the node; after Cancel, `document.activeElement` is `BODY`, the DOM selection is outside the editor, and Backspace leaves the node and the source `before \\(y=2\\)` unchanged. Keyboard deletion does work if the user clicks the editor, presses End, Left, then Delete.",
       "source": "explore:math:clicking a math node, cancelling the edit dialog, then pressing backspace does not delete it",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:37:59Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:37:59Z",
+      "lastAttemptAt": "2026-11-22T23:37:59Z"
     },
     {
       "id": "qa-040",
