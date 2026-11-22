@@ -166,3 +166,4 @@ Aborting
 2026-11-22T23:51:44Z START qa-073 on qa/qa-073-escape-does-not-dismiss-the-colour-palet: Escape does not dismiss the colour-palette popover
 2026-11-22T23:52:19Z DONE qa-073 (tsc -b, npm test, smoke all green)
 2026-11-22T23:52:53Z START qa-074 on qa/qa-074-closing-a-modal-dialog-with-escape-drops: Closing a modal dialog with Escape drops keyboard focus to <body>
+2026-11-22T23:53:28Z DONE qa-074 (tsc -b, npm test, smoke all green)

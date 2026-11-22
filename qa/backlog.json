@@ -1094,10 +1094,11 @@
       ],
       "hint": "Repro: In a project open Insert > Inline equation (focus lands in the LaTeX textarea), then press Escape to close the dialog and read document.activeElement. (Probe: escape.mathDialog.)\nActual: The dialog closes (count 1 -> 0) but document.activeElement becomes BODY; all focus context is lost. The same shared Modal backs the citation, footnote, link, comment, arXiv and GitHub dialogs.",
       "source": "explore:keyboard:closing a modal dialog with escape drops keyboard focus to <body>",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:52:53Z",
-      "lastAttemptAt": "2026-11-22T23:52:53Z"
+      "lastAttemptAt": "2026-11-22T23:52:53Z",
+      "doneAt": "2026-11-22T23:53:28Z"
     },
     {
       "id": "qa-075",
@@ -1109,7 +1110,9 @@
       ],
       "hint": "Repro: In a project open View > Git history, click 'Continue with GitHub', wait for the dialog, then inspect document.activeElement. (Probe: githubDialog.)\nActual: A [role=dialog][aria-modal=true] is present (count 1) but document.activeElement remains the 'Continue with GitHub' button behind the backdrop; document.activeElement.closest('[role=dialog]') is false. The trap only engages on the next Tab.",
       "source": "explore:keyboard:github auth dialog opens without moving focus into it",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:54:02Z"
     },
     {
       "id": "qa-076",
