@@ -499,10 +499,11 @@
       ],
       "hint": "Repro: Insert a 3x3 table, switch View > LaTeX, replace the table block with a `tabular}{l}` table containing the rows `Only \\\\`, `a \\\\`, and `b \\\\`, click Apply source, then View > Visual.\nActual: No table is present. The body shows the raw LaTeX as text, and re-export escapes it as `\\textbackslash{}begin\\{table\\}...`.",
       "source": "explore:tables:single-column latex table is not restored as a table",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:34:33Z",
-      "lastAttemptAt": "2026-11-22T23:34:33Z"
+      "lastAttemptAt": "2026-11-22T23:34:33Z",
+      "doneAt": "2026-11-22T23:35:07Z"
     },
     {
       "id": "qa-035",
@@ -514,7 +515,9 @@
       ],
       "hint": "Repro: Insert a 3x3 table, click a body cell, inspect every ribbon tab, then right-click the cell.\nActual: The Insert ribbon offers only `Insert table` and `Delete table`; all other ribbon tabs have no row/column table commands and right-clicking a cell opens no menu. Tab on the last cell adds a row, but there is no UI action to delete a row or add/remove a column.",
       "source": "explore:tables:no ui controls to add or remove table rows or columns",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:35:41Z"
     },
     {
       "id": "qa-036",
