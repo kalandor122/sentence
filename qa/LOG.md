@@ -176,3 +176,4 @@ Aborting
 2026-11-22T23:56:54Z DONE qa-079 (tsc -b, npm test, smoke all green)
 2026-11-22T23:57:28Z START qa-083 on qa/qa-083-select-all-list-toggle-does-not-convert: Select-all + list toggle does not convert a list to paragraphs; it appends an empty item
 2026-11-22T23:58:03Z DONE qa-083 (tsc -b, npm test, smoke all green)
+2026-11-22T23:58:37Z START qa-087 on qa/qa-087-no-visual-controls-to-add-or-remove-tabl: No visual controls to add or remove table rows or columns
