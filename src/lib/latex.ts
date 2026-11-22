@@ -955,8 +955,7 @@ export function latexToDocument(
     .replace(/\\maketitle/g, "")
     .replace(/\\bibliographystyle\{[^}]*\}\s*/g, "")
     .replace(/\\bibliography\{[^}]*\}\s*/g, "")
-    .replace(/\\tableofcontents\\newpage/g, "\\tableofcontents")
-    .replace(/\\tableofcontents/g, "")
+    .replace(/\\tableofcontents\\newpage/g, "")
     .trim();
   const blocks = splitLatexBlocks(source);
   const content: DocumentNode[] = [];
@@ -1040,6 +1039,10 @@ export function latexToDocument(
     }
     if (/^\\newpage$/.test(block)) {
       content.push({ type: "pageBreak" });
+      continue;
+    }
+    if (/^\\tableofcontents$/.test(block)) {
+      content.push({ type: "toc" });
       continue;
     }
     if (/^\\noindent\\rule/.test(block)) {
