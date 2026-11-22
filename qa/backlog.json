@@ -267,10 +267,11 @@
       ],
       "hint": "Repro: Git panel > Continue with GitHub\nActual: document.activeElement remains behind the backdrop; the equation/comment/citation dialogs do focus correctly, so behaviour is inconsistent",
       "source": "explore:chrome:github dialog does not move focus into the dialog",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:29:58Z",
-      "lastAttemptAt": "2026-11-22T23:29:58Z"
+      "lastAttemptAt": "2026-11-22T23:29:58Z",
+      "doneAt": "2026-11-22T23:30:32Z"
     },
     {
       "id": "qa-018",
@@ -370,7 +371,9 @@
       ],
       "hint": "Repro: Click into the Introduction paragraph (offset 25) -> View > LaTeX -> View > Visual -> Insert > Image\nActual: after the round trip the DOM selection is at offset 0 of the title text; the next image insert went to body position 0 (before \\section{Introduction}) instead of the cursor position | evidence: before: {text:'A sentence is not merely ', offset:25, blockIndex:2}; after: {text:'The quiet architecture of a se', offset:0}; resulting source has \\begin{figure} immediately after \\keywords",
       "source": "explore:insert:switching visual->latex->visual resets the cursor to the start of the document, so the next insert lands in the wrong pl",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:31:06Z"
     },
     {
       "id": "qa-026",

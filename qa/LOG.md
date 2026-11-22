@@ -121,3 +121,4 @@ Aborting
 2026-11-22T23:28:49Z START qa-016 on qa/qa-016-change-tracking-reports-working-tree-cle: Change tracking reports 'Working tree clean' after real edits
 2026-11-22T23:29:24Z DONE qa-016 (tsc -b, npm test, smoke all green)
 2026-11-22T23:29:58Z START qa-017 on qa/qa-017-github-dialog-does-not-move-focus-into-t: GitHub dialog does not move focus into the dialog
+2026-11-22T23:30:32Z DONE qa-017 (tsc -b, npm test, smoke all green)
