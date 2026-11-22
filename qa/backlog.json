@@ -1102,10 +1102,11 @@
       ],
       "hint": "Repro: Create a new project, Insert tab > Insert table, click the centre cell and type `victim`. Switch View > LaTeX (the source contains a tabular with `victim`), switch back to View > Visual, click the centre cell again, then Insert tab > Delete table. The table disappears. Now switch View > LaTeX and then View > Visual again.\nActual: Immediately after the click the editor shows only an empty paragraph, but View > LaTeX still shows `\\begin{tabular}{lll}` with `victim`, and switching back to View > Visual restores the full 3x3 table with `victim`. The Delete table button then becomes disabled again even though the table is visible, and typing after the round trip leaves the restored table in the document.",
       "source": "explore:tables:deleted table is resurrected on source/visual switch",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T22:51:35Z",
-      "lastAttemptAt": "2026-11-22T22:51:35Z"
+      "lastAttemptAt": "2026-11-22T22:51:35Z",
+      "doneAt": "2026-11-22T22:55:02Z"
     },
     {
       "id": "qa-085",
@@ -1117,7 +1118,9 @@
       ],
       "hint": "Repro: Insert a 3x3 table, switch View > LaTeX, replace the table block with `\\begin{table}[htbp]`, `\\centering`, `\\begin{tabular}{l}`, `\\hline`, rows `Only \\\\`, `a \\\\`, `b \\\\`, `\\hline`, `\\end{tabular}`, `\\end{table}`, click Apply source, then View > Visual.\nActual: No table exists. The body shows the raw LaTeX as one paragraph (`\\begin{table}[htbp] \\centering \\begin{tabular}{l} ...`). The next LaTeX export escapes it as `\\textbackslash{}begin\\{table\\}[htbp]` etc., corrupting the document source.",
       "source": "explore:tables:single-column latex tabular becomes escaped plain text instead of a table",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T22:55:35Z"
     },
     {
       "id": "qa-086",

@@ -95,3 +95,4 @@ Aborting
 2026-11-22T22:48:16Z START qa-077 on qa/qa-077-apply-source-silently-deletes-the-insert: Apply source silently deletes the inserted table of contents
 2026-11-22T22:51:01Z DONE qa-077 (tsc -b, npm test, smoke all green)
 2026-11-22T22:51:35Z START qa-084 on qa/qa-084-deleted-table-is-resurrected-on-source-v: Deleted table is resurrected on source/visual switch
+2026-11-22T22:55:02Z DONE qa-084 (tsc -b, npm test, smoke all green)
