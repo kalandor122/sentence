@@ -158,3 +158,4 @@ Aborting
 2026-11-22T23:47:43Z DONE qa-060 (tsc -b, npm test, smoke all green)
 2026-11-22T23:48:18Z START qa-061 on qa/qa-061-add-link-with-no-selection-silently-inse: Add link with no selection silently inserts nothing
 2026-11-22T23:48:52Z DONE qa-061 (tsc -b, npm test, smoke all green)
+2026-11-22T23:49:26Z START qa-064 on qa/qa-064-paragraph-spacing-indented-vs-spaced-set: Paragraph spacing (indented vs spaced) setting is inert
