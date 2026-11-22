@@ -515,10 +515,11 @@
       ],
       "hint": "Repro: Insert a 3x3 table, click a body cell, inspect every ribbon tab, then right-click the cell.\nActual: The Insert ribbon offers only `Insert table` and `Delete table`; all other ribbon tabs have no row/column table commands and right-clicking a cell opens no menu. Tab on the last cell adds a row, but there is no UI action to delete a row or add/remove a column.",
       "source": "explore:tables:no ui controls to add or remove table rows or columns",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:35:41Z",
-      "lastAttemptAt": "2026-11-22T23:35:41Z"
+      "lastAttemptAt": "2026-11-22T23:35:41Z",
+      "doneAt": "2026-11-22T23:36:15Z"
     },
     {
       "id": "qa-036",
@@ -562,7 +563,9 @@
       ],
       "hint": "Repro: Insert tab > Inline equation, type `\\badcommand{x}` in the LaTeX source field, inspect the preview and the Insert button, then click Insert and switch View > LaTeX.\nActual: KaTeX renders the command in red (`mstyle mathcolor=\"#cc0000\"`), but the preview has no `.math-preview-invalid`/`.katex-error` class and Insert is enabled. After insertion the document contains `\\(\\badcommand{x}\\)` in the generated source with no error reported to the user. By contrast `\\frac{`, `x^{` and `\\begin{` correctly show `.katex-error` and disable Insert.",
       "source": "explore:math:undefined control sequence in math is accepted: no error flag and insert stays enabled",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:36:50Z"
     },
     {
       "id": "qa-039",
