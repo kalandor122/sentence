@@ -113,3 +113,4 @@ Aborting
 2026-11-22T23:24:49Z DONE qa-012 (tsc -b, npm test, smoke all green)
 2026-11-22T23:25:23Z START qa-013 on qa/qa-013-link-dialog-writes-invalid-hrefs-without: Link dialog writes invalid hrefs without validation
 2026-11-22T23:25:57Z DONE qa-013 (tsc -b, npm test, smoke all green)
+2026-11-22T23:26:32Z START qa-014 on qa/qa-014-desktop-only-git-actions-throw-a-raw-typ: Desktop-only Git actions throw a raw TypeError into the UI
