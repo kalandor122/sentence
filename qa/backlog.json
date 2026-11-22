@@ -772,10 +772,11 @@
       ],
       "hint": "Repro: Home tab, click Text color (or Highlight). The menu opens with 10 swatches in the DOM, but elementFromPoint at a swatch centre returns div.color-backdrop; a real mouse click on a swatch just closes the menu.\nActual: The popover is rendered below .color-backdrop (popover y=125..213 while the ribbon ends at y=149) and the page canvas covers the swatch grid; only the 'No color' row is exposed. Both colour controls are unusable with a mouse; injecting .click() shows the LaTeX side is fine ({\\colorbox{yellow}{...}}, {\\color{magenta}{...}}).",
       "source": "explore:ribbon-full:colour and highlight palettes are painted under their own backdrop, so no swatch is clickable",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T22:45:19Z",
-      "lastAttemptAt": "2026-11-22T22:45:19Z"
+      "lastAttemptAt": "2026-11-22T22:45:19Z",
+      "doneAt": "2026-11-22T22:47:43Z"
     },
     {
       "id": "qa-059",
@@ -1013,7 +1014,9 @@
       ],
       "hint": "Repro: In the demo document click References > Table of contents, then View > LaTeX. Press Ctrl+End, type a space and Backspace so the source text is unchanged but Apply source becomes enabled; click Apply source, then View > Visual, then View > LaTeX again.\nActual: After Apply source the toast says 'Visual document synchronized from LaTeX.' and the textarea still shows \\tableofcontents (count 1), but the visual document has 0 [data-toc] nodes. Re-entering LaTeX mode regenerates the source and \\tableofcontents is now count 0. Probe qa/probes/insert-media.mjs step 6: out.applySource.latexImmediatelyAfterApply.toc=1, out.applySource.dom.tocs.length=0, out.applySource.latexAfterReturnToSource.toc=0, while figureBlocks=1 and newpage=1 throughout.",
       "source": "explore:insert-media:apply source silently deletes the inserted table of contents",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T22:48:16Z"
     },
     {
       "id": "qa-078",

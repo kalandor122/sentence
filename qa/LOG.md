@@ -91,3 +91,4 @@ Aborting
 2026-11-22T22:39:12Z DONE qa-054 (tsc -b, npm test, smoke all green)
 2026-11-22T22:45:05Z EXPLORE tables: 4 new items, agent exit 0
 2026-11-22T22:45:19Z START qa-058 on qa/qa-058-colour-and-highlight-palettes-are-painte: Colour and highlight palettes are painted under their own backdrop, so no swatch is clickable
+2026-11-22T22:47:43Z DONE qa-058 (tsc -b, npm test, smoke all green)
