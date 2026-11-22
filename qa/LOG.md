@@ -134,3 +134,4 @@ Aborting
 2026-11-22T23:35:41Z START qa-035 on qa/qa-035-no-ui-controls-to-add-or-remove-table-ro: No UI controls to add or remove table rows or columns
 2026-11-22T23:36:15Z DONE qa-035 (tsc -b, npm test, smoke all green)
 2026-11-22T23:36:36Z EXPLORE long-document: 0 new items, agent exit 1
+2026-11-22T23:36:50Z START qa-038 on qa/qa-038-undefined-control-sequence-in-math-is-ac: Undefined control sequence in math is accepted: no error flag and Insert stays enabled

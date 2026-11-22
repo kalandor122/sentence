@@ -564,8 +564,9 @@
       "hint": "Repro: Insert tab > Inline equation, type `\\badcommand{x}` in the LaTeX source field, inspect the preview and the Insert button, then click Insert and switch View > LaTeX.\nActual: KaTeX renders the command in red (`mstyle mathcolor=\"#cc0000\"`), but the preview has no `.math-preview-invalid`/`.katex-error` class and Insert is enabled. After insertion the document contains `\\(\\badcommand{x}\\)` in the generated source with no error reported to the user. By contrast `\\frac{`, `x^{` and `\\begin{` correctly show `.katex-error` and disable Insert.",
       "source": "explore:math:undefined control sequence in math is accepted: no error flag and insert stays enabled",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:36:50Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:36:50Z",
+      "lastAttemptAt": "2026-11-22T23:36:50Z"
     },
     {
       "id": "qa-039",
