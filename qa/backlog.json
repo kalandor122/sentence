@@ -623,10 +623,11 @@
       ],
       "hint": "Repro: Home tab, select text, set Font family to Times New Roman, switch to View -> LaTeX, inspect the emitted command.\nActual: Emitted as '{\\\\sentenceTimes MARKER one two three.}' \u2014 one brace group with no argument braces, so the switch applies to the first character only and the command is undefined in the preamble; the document will not compile.",
       "source": "explore:ribbon:font family control emits unbraced latex command",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T22:29:45Z",
-      "lastAttemptAt": "2026-11-22T22:29:46Z"
+      "lastAttemptAt": "2026-11-22T22:29:46Z",
+      "doneAt": "2026-11-22T22:31:57Z"
     },
     {
       "id": "qa-048",
@@ -703,7 +704,9 @@
       ],
       "hint": "Repro: Create a project. View > LaTeX: replace `\\texttt{meaning = structure + language}` with plain text and add `SENTINEL BEFORE BREAK` before `\\end{document}`, click Apply source, then View > Visual and confirm the sentinel is visible. Return to View > LaTeX, delete only the `\\end{document}` line, click Apply source, then View > Visual.\nActual: Apply source is enabled, the toast says 'Visual document synchronized from LaTeX.', and no alert or error text appears. The visual editor is empty (innerHTML 122 chars), the status bar reads 0 words, and re-exported LaTeX has only front matter - the sentinel and all body content are gone.",
       "source": "explore:source-editor:malformed latex with a missing \\end{document} is applied silently and clears the document",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T22:32:30Z"
     },
     {
       "id": "qa-054",

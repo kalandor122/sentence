@@ -84,3 +84,4 @@ Aborting
 2026-11-22T22:27:59Z START qa-042 on qa/qa-042-citation-bibliography-directives-turn-in: Citation bibliography directives turn into escaped text and are duplicated when source is applied
 2026-11-22T22:29:12Z DONE qa-042 (tsc -b, npm test, smoke all green)
 2026-11-22T22:29:46Z START qa-047 on qa/qa-047-font-family-control-emits-unbraced-latex: Font family control emits unbraced LaTeX command
+2026-11-22T22:31:57Z DONE qa-047 (tsc -b, npm test, smoke all green)
