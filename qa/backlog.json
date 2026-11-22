@@ -66,8 +66,9 @@
       ],
       "hint": "App.tsx already has setMode(nextMode) and an EditorMode of visual|source|split. Make the status-bar mode segment a segmented control (Visual / Source / Split) and add a matching View-tab group in the ribbon. Keyboard: Ctrl+Alt+1/2/3.",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:09:03Z"
+      "attempts": 2,
+      "startedAt": "2026-11-22T23:09:03Z",
+      "lastAttemptAt": "2026-11-22T23:11:06Z"
     },
     {
       "id": "qa-005",

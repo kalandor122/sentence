@@ -939,6 +939,13 @@ export default function App() {
       const editingDocument = mode !== "source" && !inTextField && !dialog && !mathEditor;
       const pressedDigit = (digit: string) =>
         event.key === digit || event.code === `Digit${digit}` || event.code === `Numpad${digit}`;
+      if (mod && event.altKey && !event.shiftKey) {
+        const nextMode: EditorMode | null = pressedDigit("1") ? "visual" : pressedDigit("2") ? "source" : pressedDigit("3") ? "split" : null;
+        if (nextMode) {
+          event.preventDefault();
+          handleModeChange(nextMode);
+        }
+      }
       if (mod && event.key.toLowerCase() === "s") {
         event.preventDefault();
         void handleSave();
@@ -1256,11 +1263,12 @@ export default function App() {
       <StatusBar
         words={words}
         pages={pages}
-        mode={mode === "visual" ? "Visual" : mode === "source" ? "LaTeX" : "Split"}
+        mode={mode}
         branch={branch}
         zoom={zoom}
         compileState={compiling ? "compiling" : compileResult?.success ? "success" : compileResult ? "error" : "idle"}
         onZoomChange={setZoom}
+        onModeChange={handleModeChange}
       />
       {saveError ? <button className="save-error" type="button" onClick={() => void handleSave()}><Save size={14} /> Retry save</button> : null}
       {toast ? <div className="toast" role="alert">{toast}</div> : null}
