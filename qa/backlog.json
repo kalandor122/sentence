@@ -471,10 +471,11 @@
       ],
       "hint": "Repro: Create a project. Type `Inline `, Insert tab > Inline equation with `E=mc^2`, type ` tail`, Insert tab > Equation block with `a^2+b^2=c^2`. View > LaTeX: the source has `Inline \\(E=mc^2\\) tail` and an `equation*` block. Change only that inline expression to `Inline $E=mc^2$ tail`, click Apply source, then View > Visual, then View > LaTeX again.\nActual: No inline math node remains: the visual paragraph reads `Inline $E=mc^2$ tail` as literal text (the display equation survives). Re-exporting writes `Inline \\$E=mc\\textasciicircum{}2\\$ tail`, so the math is corrupted on round-trip.",
       "source": "explore:math:$...$ inline math from latex source is silently turned into escaped plain text",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T22:14:14Z",
-      "lastAttemptAt": "2026-11-22T22:14:14Z"
+      "lastAttemptAt": "2026-11-22T22:14:14Z",
+      "doneAt": "2026-11-22T22:15:32Z"
     },
     {
       "id": "qa-037",
@@ -486,7 +487,9 @@
       ],
       "hint": "Repro: Create a project with inline math `E=mc^2` and an equation block `a^2+b^2=c^2` via the Insert tab. View > LaTeX, change `\\begin{equation*}` / `\\end{equation*}` to `\\begin{equation}` / `\\end{equation}`, click Apply source, then View > Visual and View > LaTeX again.\nActual: The display math node disappears and the visual document shows the raw lines `\\begin{equation}`, `a^2+b^2=c^2`, `\\end{equation}` as text. Re-exported source contains `\\textbackslash{}begin\\{equation\\}` and `a\\textasciicircum{}2+b\\textasciicircum{}2=c\\textasciicircum{}2`, destroying the equation.",
       "source": "explore:math:numbered equation environment from latex source is not recognized and is escaped as text",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T22:16:05Z"
     },
     {
       "id": "qa-038",
