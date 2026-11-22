@@ -372,8 +372,9 @@
       "hint": "Repro: Click into the Introduction paragraph (offset 25) -> View > LaTeX -> View > Visual -> Insert > Image\nActual: after the round trip the DOM selection is at offset 0 of the title text; the next image insert went to body position 0 (before \\section{Introduction}) instead of the cursor position | evidence: before: {text:'A sentence is not merely ', offset:25, blockIndex:2}; after: {text:'The quiet architecture of a se', offset:0}; resulting source has \\begin{figure} immediately after \\keywords",
       "source": "explore:insert:switching visual->latex->visual resets the cursor to the start of the document, so the next insert lands in the wrong pl",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:31:06Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:31:06Z",
+      "lastAttemptAt": "2026-11-22T23:31:07Z"
     },
     {
       "id": "qa-026",
