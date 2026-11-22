@@ -773,8 +773,9 @@
       "hint": "Repro: Home tab, click Text color (or Highlight). The menu opens with 10 swatches in the DOM, but elementFromPoint at a swatch centre returns div.color-backdrop; a real mouse click on a swatch just closes the menu.\nActual: The popover is rendered below .color-backdrop (popover y=125..213 while the ribbon ends at y=149) and the page canvas covers the swatch grid; only the 'No color' row is exposed. Both colour controls are unusable with a mouse; injecting .click() shows the LaTeX side is fine ({\\colorbox{yellow}{...}}, {\\color{magenta}{...}}).",
       "source": "explore:ribbon-full:colour and highlight palettes are painted under their own backdrop, so no swatch is clickable",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T22:45:19Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T22:45:19Z",
+      "lastAttemptAt": "2026-11-22T22:45:19Z"
     },
     {
       "id": "qa-059",
