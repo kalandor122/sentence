@@ -171,10 +171,11 @@
       ],
       "hint": "Repro: Click button[aria-label=Settings] in top bar (programmatic click and real CDP mouse click at 1254,19)\nActual: No dialog, no menu, no DOM change, no toast, no console error; button only takes focus",
       "source": "explore:chrome:avatar/settings button is dead",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:23:06Z",
-      "lastAttemptAt": "2026-11-22T23:23:06Z"
+      "lastAttemptAt": "2026-11-22T23:23:06Z",
+      "doneAt": "2026-11-22T23:23:40Z"
     },
     {
       "id": "qa-012",
@@ -186,7 +187,9 @@
       ],
       "hint": "Repro: Reload, Create a project, click 'Drafting with constraints' in Outline, type ' omega psi'\nActual: Editor scrolls (scrollTop 0 -> 365) but document.activeElement stays BODY; the typed text is discarded and word count stays 92",
       "source": "explore:chrome:outline navigation does not focus the editor on first use; typing is silently dropped",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:24:14Z"
     },
     {
       "id": "qa-013",

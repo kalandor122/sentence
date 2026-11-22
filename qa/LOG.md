@@ -108,3 +108,4 @@ Aborting
 2026-11-22T23:22:31Z DONE qa-006 (tsc -b, npm test, smoke all green)
 2026-11-22T23:22:51Z EXPLORE links-cites-footnotes: 0 new items, agent exit 1
 2026-11-22T23:23:06Z START qa-011 on qa/qa-011-avatar-settings-button-is-dead: Avatar/settings button is dead
+2026-11-22T23:23:40Z DONE qa-011 (tsc -b, npm test, smoke all green)
