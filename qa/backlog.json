@@ -432,8 +432,9 @@
       "hint": "Repro: Insert a 3x3 table. Type `Header` in the top-left cell and `R&D` in the first body cell. Switch View > LaTeX; the source contains `R\\&D &  &  \\\\`. Change `Header` to `Header!` in the textarea, click Apply source, then View > Visual.\nActual: The table has 4 columns: the former body cell becomes two cells containing `R\\` and `D`. Re-exported LaTeX has `\\begin{tabular}{llll}` and `R\\textbackslash{} & D &  &  \\\\`.",
       "source": "explore:tables:escaped ampersand in a cell corrupts the table on source round-trip",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T21:47:25Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T21:47:25Z",
+      "lastAttemptAt": "2026-11-22T21:47:25Z"
     },
     {
       "id": "qa-034",

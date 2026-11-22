@@ -62,3 +62,4 @@ Aborting
 2026-11-22T21:46:56Z DONE qa-032 (tsc -b, npm test, smoke all green)
 2026-11-22T21:47:25Z IMPORTED 7 tester findings into the backlog
 2026-11-22T21:47:25Z REQUEUE qa-048 -> superseded (line spacing actually works (setspace, 27.5->41.6px line-height); only paragraph spacing is inert, now queued separately)
+2026-11-22T21:47:25Z START qa-033 on qa/qa-033-escaped-ampersand-in-a-cell-corrupts-the: Escaped ampersand in a cell corrupts the table on source round-trip

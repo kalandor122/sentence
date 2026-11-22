@@ -328,6 +328,33 @@ describe("LaTeX generation", () => {
     }
   });
 
+  it("keeps escaped ampersands inside table cells on import", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\begin{tabular}{lll}",
+      "\\hline",
+      "Header! &  &  \\\\",
+      "R\\&D &  &  \\\\",
+      " &  &  \\\\",
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(table?.content).toHaveLength(3);
+    expect(table?.content?.map((row) => row.content?.length)).toEqual([3, 3, 3]);
+    expect(table?.content?.[0]?.content?.[0]?.content?.[0]?.content?.[0]?.text).toBe("Header!");
+    expect(table?.content?.[1]?.content?.[0]?.content?.[0]?.content?.[0]?.text).toBe("R&D");
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\begin{tabular}{lll}");
+    expect(exported).toContain("R\\&D &  &  \\\\");
+  });
+
   it("round-trips page breaks", () => {
     const document: SentenceDocument = {
       type: "doc",
