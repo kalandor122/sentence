@@ -129,3 +129,4 @@ Aborting
 2026-11-22T23:32:50Z DONE qa-026 (tsc -b, npm test, smoke all green)
 2026-11-22T23:33:24Z START qa-027 on qa/qa-027-table-header-row-is-lost-in-latex-no-cap: Table header row is lost in LaTeX; no caption/label emitted
 2026-11-22T23:33:58Z DONE qa-027 (tsc -b, npm test, smoke all green)
+2026-11-22T23:34:33Z START qa-034 on qa/qa-034-single-column-latex-table-is-not-restore: Single-column LaTeX table is not restored as a table

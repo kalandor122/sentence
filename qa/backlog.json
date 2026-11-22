@@ -500,8 +500,9 @@
       "hint": "Repro: Insert a 3x3 table, switch View > LaTeX, replace the table block with a `tabular}{l}` table containing the rows `Only \\\\`, `a \\\\`, and `b \\\\`, click Apply source, then View > Visual.\nActual: No table is present. The body shows the raw LaTeX as text, and re-export escapes it as `\\textbackslash{}begin\\{table\\}...`.",
       "source": "explore:tables:single-column latex table is not restored as a table",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:34:33Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:34:33Z",
+      "lastAttemptAt": "2026-11-22T23:34:33Z"
     },
     {
       "id": "qa-035",
