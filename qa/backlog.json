@@ -516,8 +516,9 @@
       "hint": "Repro: Insert a 3x3 table, click a body cell, inspect every ribbon tab, then right-click the cell.\nActual: The Insert ribbon offers only `Insert table` and `Delete table`; all other ribbon tabs have no row/column table commands and right-clicking a cell opens no menu. Tab on the last cell adds a row, but there is no UI action to delete a row or add/remove a column.",
       "source": "explore:tables:no ui controls to add or remove table rows or columns",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:35:41Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:35:41Z",
+      "lastAttemptAt": "2026-11-22T23:35:41Z"
     },
     {
       "id": "qa-036",
