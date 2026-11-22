@@ -173,6 +173,36 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("\\textbackslash{}href");
   });
 
+  it("imports hand-authored \\ref as an editable cross-reference and re-exports it", () => {
+    const source = [
+      "\\begin{document}",
+      "Before \\href{https://hand.example.org}{hand link} and \\ref{sec:handwritten} then \\ref{fig:architecture} After",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const paragraph = parsed.content[0];
+    expect(paragraph?.content?.map((node) => node.type)).toEqual([
+      "text",
+      "text",
+      "text",
+      "crossReference",
+      "text",
+      "crossReference",
+      "text",
+    ]);
+    expect(paragraph?.content?.[1]?.marks).toEqual([
+      { type: "link", attrs: { href: "https://hand.example.org" } },
+    ]);
+    expect(paragraph?.content?.[3]?.attrs).toEqual({ label: "sec:handwritten" });
+    expect(paragraph?.content?.[5]?.attrs).toEqual({ label: "fig:architecture" });
+    expect(paragraph?.content?.[6]?.text).toBe(" After");
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain(
+      "Before \\href{https://hand.example.org}{hand link} and \\ref{sec:handwritten} then \\ref{fig:architecture} After",
+    );
+    expect(exported).not.toContain("\\textbackslash{}ref");
+  });
+
   it("keeps escaped link URLs and nested marks through a LaTeX round trip", () => {
     const document: SentenceDocument = {
       type: "doc",
