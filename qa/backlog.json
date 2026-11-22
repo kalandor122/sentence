@@ -1,0 +1,77 @@
+{
+  "notes": "Queue for the QA loop. Statuses: open | in_progress | done | blocked | regressed. cycle.py takes the highest severity open item; triage.py appends what the automated pass found.",
+  "items": [
+    {
+      "id": "qa-001",
+      "title": "Ribbon clips its primary action at 1280px (Compile cut off)",
+      "why": "At a 1280x800 window the Build group's Compile button is clipped by the viewport edge, so the most important action is half-invisible. Word keeps every group reachable at narrow widths.",
+      "severity": "high",
+      "files": ["src/styles.css", "src/components/Ribbon.tsx"],
+      "hint": "Reproduce with `node qa/smoke.mjs` (it records ribbon overflow observations and qa/shots/03-ribbon-*.png). Fix in CSS first: the ribbon should not overflow the window — allow groups to shrink the wide labels to icons or scroll horizontally inside .ribbon-content. Do not reorder or remove commands.",
+      "status": "open"
+    },
+    {
+      "id": "qa-002",
+      "title": "Word-standard editing shortcuts missing (Ctrl+K link, Ctrl+Shift+7/8 lists, Ctrl+1/2/5 spacing, Tab indent)",
+      "why": "The smoke pass confirmed these keys do nothing. Anyone coming from Word hits them in the first minute.",
+      "severity": "high",
+      "files": ["src/App.tsx", "src/editor/EditorSurface.tsx"],
+      "hint": "App.tsx has a keydown effect that only handles Ctrl+S and Ctrl+Enter — extend that pattern. Ctrl+K should open the existing link dialog, Ctrl+Shift+7/8 toggle ordered/bullet lists through Tiptap commands, Ctrl+1/2/5 apply the existing line-spacing styles, Tab/Shift+Tab indent or outdent the current list/paragraph instead of leaving the editor. Every shortcut must keep working inside the LaTeX source textarea without hijacking it.",
+      "status": "open"
+    },
+    {
+      "id": "qa-003",
+      "title": "No Find & Replace (Ctrl+F / Ctrl+H)",
+      "why": "Searching a manuscript is table stakes; there is no find UI anywhere in the app.",
+      "severity": "high",
+      "files": ["src/App.tsx", "src/editor/EditorSurface.tsx", "src/styles.css"],
+      "hint": "Add a small non-modal find bar anchored top-right of the editor column (not a modal). Ctrl+F opens it and prefills with the current selection, Enter/Shift+Enter walk matches, Escape closes and returns focus to the page. Ctrl+H reveals the replace field with Replace / Replace all. Use the Tiptap editor's own document search (ProseMirror positions) so matches highlight in the visual editor; in source mode search the textarea. Keep the LaTeX round trip untouched.",
+      "status": "open"
+    },
+    {
+      "id": "qa-004",
+      "title": "No discoverable Visual / Source / Split switcher in the editor chrome",
+      "why": "The status bar prints the current mode as static text and nothing in the ribbon switches modes, so the split view is effectively hidden.",
+      "severity": "medium",
+      "files": ["src/components/StatusBar.tsx", "src/App.tsx", "src/styles.css"],
+      "hint": "App.tsx already has setMode(nextMode) and an EditorMode of visual|source|split. Make the status-bar mode segment a segmented control (Visual / Source / Split) and add a matching View-tab group in the ribbon. Keyboard: Ctrl+Alt+1/2/3.",
+      "status": "open"
+    },
+    {
+      "id": "qa-005",
+      "title": "Browser demo workspace does not survive a reload (everything is lost)",
+      "why": "In browser mode the app adopts demoWorkspace() and the top bar still says 'Saved locally', but nothing is persisted. Reloading loses the document — the label is a lie and it blocks multi-turn testing.",
+      "severity": "medium",
+      "files": ["src/App.tsx", "src/lib/tauri.ts"],
+      "hint": "When !isDesktop, persist the workspace to localStorage on the existing autosave debounce and restore it on boot (recent documents list too). Keep the desktop path unchanged. Do not fake file-system success.",
+      "status": "open"
+    },
+    {
+      "id": "qa-006",
+      "title": "Zoom has no keyboard or gesture path and no fit-width",
+      "why": "Status bar zoom buttons are the only way to zoom; Word users expect Ctrl+wheel and a fit-width option.",
+      "severity": "medium",
+      "files": ["src/App.tsx", "src/components/StatusBar.tsx", "src/editor/EditorSurface.tsx"],
+      "hint": "Ctrl/Cmd+wheel over the page area changes zoom in the existing 70-150 range; Ctrl+0 resets to 100%; add a small fit-width button next to the zoom percentage. Do not let browser page zoom interfere (preventDefault on the wheel handler).",
+      "status": "open"
+    },
+    {
+      "id": "qa-007",
+      "title": "Start screen footer is hardcoded 'Sentence 0.1' while the app is 0.2.0",
+      "why": "Version is triple-tracked in package.json, Cargo.toml and tauri.conf.json; the UI shows a fourth, stale number.",
+      "severity": "low",
+      "files": ["src/components/StartScreen.tsx", "vite.config.ts", "src/vite-env.d.ts"],
+      "hint": "Inject the version at build time (define in vite.config.ts from package.json) and render it, so bumping package.json cannot drift.",
+      "status": "open"
+    },
+    {
+      "id": "qa-008",
+      "title": "No print path (Ctrl+P) with paper-accurate styles",
+      "why": "Word's most-used output besides save is print; the app can only export through the desktop Tectonic build.",
+      "severity": "low",
+      "files": ["src/App.tsx", "src/styles.css"],
+      "hint": "Ctrl+P calls window.print(). Add an @media print block that hides ribbon, sidebar and status bar, removes page shadows and background chrome, and prints the page sheet at its true width. Verify with a headless PDF print in the smoke script (page.pdf()) that the ribbon does not appear.",
+      "status": "open"
+    }
+  ]
+}
