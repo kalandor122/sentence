@@ -501,6 +501,7 @@ button:disabled {
 
 .ribbon {
   z-index: 3;
+  min-width: 0;
   background: var(--chrome);
   border-bottom: 1px solid #cbc7be;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
@@ -2763,6 +2764,20 @@ button:disabled {
   color: #4b524a;
   font-family: "Cascadia Mono", monospace;
   font-size: 9px;
+}
+
+@media (max-width: 1360px) {
+  .font-select {
+    width: 108px;
+  }
+
+  .size-select {
+    width: 70px;
+  }
+
+  .style-select {
+    width: 104px;
+  }
 }
 
 @media (max-width: 1180px) {
