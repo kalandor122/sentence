@@ -1119,8 +1119,9 @@
       "hint": "Repro: Insert a 3x3 table, switch View > LaTeX, replace the table block with `\\begin{table}[htbp]`, `\\centering`, `\\begin{tabular}{l}`, `\\hline`, rows `Only \\\\`, `a \\\\`, `b \\\\`, `\\hline`, `\\end{tabular}`, `\\end{table}`, click Apply source, then View > Visual.\nActual: No table exists. The body shows the raw LaTeX as one paragraph (`\\begin{table}[htbp] \\centering \\begin{tabular}{l} ...`). The next LaTeX export escapes it as `\\textbackslash{}begin\\{table\\}[htbp]` etc., corrupting the document source.",
       "source": "explore:tables:single-column latex tabular becomes escaped plain text instead of a table",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T22:55:35Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T22:55:35Z",
+      "lastAttemptAt": "2026-11-22T22:55:35Z"
     },
     {
       "id": "qa-086",

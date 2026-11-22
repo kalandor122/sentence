@@ -1053,10 +1053,13 @@ export function latexToDocument(
       const tabularBody = block.match(
         /\\begin\{tabular\}(?:\s*\{[^{}]*\})?\s*([\s\S]*?)\\end\{tabular\}/,
       )?.[1] ?? block;
-      const rows = tabularBody
-        .split(/\\\\\s*(?:\n|$)/)
-        .map((row) => row.replace(/^\s*\\hline\s*/, "").trim())
-        .filter((row) => row.includes("&"));
+      const parts = tabularBody.split(/\\\\\s*(?:\n|$)/);
+      const rows =
+        parts.length > 1
+          ? parts
+              .map((row) => row.replace(/^\s*\\hline\s*/, "").trim())
+              .filter(Boolean)
+          : [];
       if (rows.length > 0) {
         content.push({
           type: "table",
