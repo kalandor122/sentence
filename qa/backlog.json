@@ -403,10 +403,11 @@
       ],
       "hint": "Repro: Insert > Insert table -> fill Alpha/Beta/Gamma -> View/LaTeX\nActual: plain 'Alpha & Beta & Gamma \\\\' row inside \\hline...\\hline; the visual <th> shading/bold (font-weight 650) has no LaTeX counterpart; no caption or label, so the table cannot be cross-referenced | evidence: tabular lll shown above; booktabs is already in the preamble but unused for tables",
       "source": "explore:insert:table header row is lost in latex; no caption/label emitted",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:33:24Z",
-      "lastAttemptAt": "2026-11-22T23:33:24Z"
+      "lastAttemptAt": "2026-11-22T23:33:24Z",
+      "doneAt": "2026-11-22T23:33:58Z"
     },
     {
       "id": "qa-028",
@@ -498,7 +499,9 @@
       ],
       "hint": "Repro: Insert a 3x3 table, switch View > LaTeX, replace the table block with a `tabular}{l}` table containing the rows `Only \\\\`, `a \\\\`, and `b \\\\`, click Apply source, then View > Visual.\nActual: No table is present. The body shows the raw LaTeX as text, and re-export escapes it as `\\textbackslash{}begin\\{table\\}...`.",
       "source": "explore:tables:single-column latex table is not restored as a table",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:34:33Z"
     },
     {
       "id": "qa-035",
