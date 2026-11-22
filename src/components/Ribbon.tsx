@@ -528,15 +528,15 @@ export default function Ribbon({
         {activeTab === "View" ? (
           <>
             <RibbonGroup label="Editor mode">
-              <button type="button" className={`ribbon-command wide ${mode === "visual" ? "active" : ""}`} onClick={() => onModeChange("visual")}>
+              <button type="button" className={`ribbon-command wide ${mode === "visual" ? "active" : ""}`} aria-pressed={mode === "visual"} aria-keyshortcuts="Control+Alt+1" title="Visual (Ctrl+Alt+1)" onClick={() => onModeChange("visual")}>
                 <Monitor size={18} />
                 <span>Visual</span>
               </button>
-              <button type="button" className={`ribbon-command wide ${mode === "source" ? "active" : ""}`} onClick={() => onModeChange("source")}>
+              <button type="button" className={`ribbon-command wide ${mode === "source" ? "active" : ""}`} aria-pressed={mode === "source"} aria-keyshortcuts="Control+Alt+2" title="LaTeX (Ctrl+Alt+2)" onClick={() => onModeChange("source")}>
                 <Code2 size={18} />
                 <span>LaTeX</span>
               </button>
-              <button type="button" className={`ribbon-command wide ${mode === "split" ? "active" : ""}`} onClick={() => onModeChange("split")}>
+              <button type="button" className={`ribbon-command wide ${mode === "split" ? "active" : ""}`} aria-pressed={mode === "split"} aria-keyshortcuts="Control+Alt+3" title="Split (Ctrl+Alt+3)" onClick={() => onModeChange("split")}>
                 <Columns2 size={18} />
                 <span>Split</span>
               </button>
