@@ -644,8 +644,9 @@
       "hint": "Repro: Create a project. Type `See example`, select it, Home > Add link, enter `https://changed.example.org/new`, Insert. Click the linked text, inspect the Home ribbon, then Home > Add link, clear Address, press Enter, and click Cancel.\nActual: The ribbon has no unlink control; the only matching button is Add link. The dialog has only Cancel and Insert, Insert stays disabled with an empty Address, Enter does nothing, and after Cancel the anchor still has href `https://changed.example.org/new` with `\\href{https://changed.example.org/new}{See example}` in the source.",
       "source": "explore:links-cites-footnotes:no way to remove a link without deleting its text",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:39:08Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:39:08Z",
+      "lastAttemptAt": "2026-11-22T23:39:08Z"
     },
     {
       "id": "qa-044",

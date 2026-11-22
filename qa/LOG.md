@@ -138,3 +138,4 @@ Aborting
 2026-11-22T23:37:25Z DONE qa-038 (tsc -b, npm test, smoke all green)
 2026-11-22T23:37:59Z START qa-039 on qa/qa-039-clicking-a-math-node-cancelling-the-edit: Clicking a math node, cancelling the edit dialog, then pressing Backspace does not delete it
 2026-11-22T23:38:33Z DONE qa-039 (tsc -b, npm test, smoke all green)
+2026-11-22T23:39:08Z START qa-043 on qa/qa-043-no-way-to-remove-a-link-without-deleting: No way to remove a link without deleting its text
