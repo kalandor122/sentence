@@ -172,6 +172,17 @@ describe("LaTeX generation", () => {
     expect(exported).toContain("\\begin{quote}");
   });
 
+  it("rejects LaTeX with a missing document end instead of clearing the body", () => {
+    const source = [
+      "\\begin{document}",
+      "SENTINEL BEFORE BREAK",
+      "",
+    ].join("\n");
+    expect(() => latexToDocument(source, DEFAULT_SETTINGS)).toThrow(
+      "Invalid LaTeX: missing \\end{document}.",
+    );
+  });
+
   it("imports hand-authored \\href as an editable link and re-exports it", () => {
     const source = [
       "\\begin{document}",

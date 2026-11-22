@@ -705,8 +705,9 @@
       "hint": "Repro: Create a project. View > LaTeX: replace `\\texttt{meaning = structure + language}` with plain text and add `SENTINEL BEFORE BREAK` before `\\end{document}`, click Apply source, then View > Visual and confirm the sentinel is visible. Return to View > LaTeX, delete only the `\\end{document}` line, click Apply source, then View > Visual.\nActual: Apply source is enabled, the toast says 'Visual document synchronized from LaTeX.', and no alert or error text appears. The visual editor is empty (innerHTML 122 chars), the status bar reads 0 words, and re-exported LaTeX has only front matter - the sentinel and all body content are gone.",
       "source": "explore:source-editor:malformed latex with a missing \\end{document} is applied silently and clears the document",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T22:32:30Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T22:32:30Z",
+      "lastAttemptAt": "2026-11-22T22:32:30Z"
     },
     {
       "id": "qa-054",

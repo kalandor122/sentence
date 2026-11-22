@@ -791,6 +791,20 @@ function splitTableRow(row: string): string[] {
   return cells;
 }
 
+function documentBody(latex: string): string {
+  const begin = "\\begin{document}";
+  const end = "\\end{document}";
+  const beginIndex = latex.indexOf(begin);
+  if (beginIndex < 0) {
+    throw new Error("Invalid LaTeX: missing \\begin{document}.");
+  }
+  const endIndex = latex.indexOf(end, beginIndex + begin.length);
+  if (endIndex < 0) {
+    throw new Error("Invalid LaTeX: missing \\end{document}.");
+  }
+  return latex.slice(beginIndex + begin.length, endIndex);
+}
+
 export function latexToDocument(
   latex: string,
   fallbackSettings: ProjectSettings,
@@ -877,8 +891,7 @@ export function latexToDocument(
   }
   settings.paragraphSpacing = packages.includes("parskip") ? "gap" : "indent";
 
-  const documentMatch = latex.match(/\\begin\{document\}([\s\S]*?)\\end\{document\}/);
-  const source = (documentMatch?.[1] ?? "")
+  const source = documentBody(latex)
     .replace(/\\begin\{abstract\}[\s\S]*?\\end\{abstract\}/g, "")
     .replace(/\\keywords\{[^}]*\}/g, "")
     .replace(/\\maketitle/g, "")

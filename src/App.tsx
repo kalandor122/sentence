@@ -352,12 +352,21 @@ export default function App() {
     let current = workspaceRef.current;
     if (!current) return null;
     if (sourceDirtyRef.current && !sourceRef.current.includes("<<<<<<<")) {
-      const parsed = latexToDocument(sourceRef.current, current.settings);
-      current = { ...current, document: parsed.document, settings: parsed.settings };
-      workspaceRef.current = current;
-      setWorkspace(current);
-      setSourceDirty(false);
-      sourceDirtyRef.current = false;
+      try {
+        const parsed = latexToDocument(sourceRef.current, current.settings);
+        current = { ...current, document: parsed.document, settings: parsed.settings };
+        workspaceRef.current = current;
+        setWorkspace(current);
+        setSourceDirty(false);
+        sourceDirtyRef.current = false;
+        setSaveError(null);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        setSaveError(message);
+        setSaveState("error");
+        setToast(message);
+        return null;
+      }
     }
     const versionAtStart = changeVersion.current;
     const latex = sourceDirtyRef.current
@@ -525,12 +534,17 @@ export default function App() {
   const applySource = () => {
     const current = workspaceRef.current;
     if (!current) return;
-    const parsed = latexToDocument(sourceRef.current, current.settings);
-    setWorkspace({ ...current, document: parsed.document, settings: parsed.settings });
-    setSourceDirty(false);
-    sourceDirtyRef.current = false;
-    markDirty();
-    setToast("Visual document synchronized from LaTeX.");
+    try {
+      const parsed = latexToDocument(sourceRef.current, current.settings);
+      setWorkspace({ ...current, document: parsed.document, settings: parsed.settings });
+      setSourceDirty(false);
+      sourceDirtyRef.current = false;
+      setSaveError(null);
+      markDirty();
+      setToast("Visual document synchronized from LaTeX.");
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : String(error));
+    }
   };
 
   const handleModeChange = (nextMode: EditorMode) => {
@@ -1020,7 +1034,7 @@ export default function App() {
           onClose={() => { setCloneOpen(false); setPendingClone(false); }}
           onCloned={(project) => adoptWorkspace(hydrate(project))}
         />
-        {toast ? <div className="toast">{toast}</div> : null}
+        {toast ? <div className="toast" role="alert">{toast}</div> : null}
       </>
     );
   }
@@ -1249,7 +1263,7 @@ export default function App() {
         onZoomChange={setZoom}
       />
       {saveError ? <button className="save-error" type="button" onClick={() => void handleSave()}><Save size={14} /> Retry save</button> : null}
-      {toast ? <div className="toast">{toast}</div> : null}
+      {toast ? <div className="toast" role="alert">{toast}</div> : null}
       <input
         ref={imageInput}
         type="file"
