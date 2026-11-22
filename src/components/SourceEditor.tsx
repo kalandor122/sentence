@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, type RefObject } from "react";
 
 interface SourceEditorProps {
   value: string;
   onChange: (value: string) => void;
   activeLine?: number;
   readOnly?: boolean;
+  textareaRef?: RefObject<HTMLTextAreaElement | null>;
 }
 
 export default function SourceEditor({
@@ -12,8 +13,10 @@ export default function SourceEditor({
   onChange,
   activeLine,
   readOnly = false,
+  textareaRef,
 }: SourceEditorProps) {
-  const textarea = useRef<HTMLTextAreaElement>(null);
+  const localTextarea = useRef<HTMLTextAreaElement>(null);
+  const textarea = textareaRef ?? localTextarea;
   const gutter = useRef<HTMLDivElement>(null);
   const lines = useMemo(() => value.split("\n").length, [value]);
 

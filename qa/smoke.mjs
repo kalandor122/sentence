@@ -110,6 +110,12 @@ try {
       await page.waitForTimeout(250);
       const after = await page.evaluate(() => document.querySelector(".tiptap, .ProseMirror")?.innerHTML.length ?? 0);
       if (before === after) observe("ux", "low", `keyboard shortcut "${label}" has no visible effect on the document`, "innerHTML unchanged");
+      // A shortcut may legitimately open a dialog (link, find). Close it before the
+      // next probe, otherwise the modal swallows the clicks later in this script.
+      await page.keyboard.press("Escape");
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(150);
+      if (await surface.count()) await surface.click({ timeout: 2000 }).catch(() => {});
       await page.keyboard.press("ControlOrMeta+z");
     }
     await shot("04-typed");

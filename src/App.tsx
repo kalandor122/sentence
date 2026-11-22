@@ -1,5 +1,5 @@
 import type { Editor } from "@tiptap/react";
-import { NodeSelection } from "@tiptap/pm/state";
+import { NodeSelection, TextSelection } from "@tiptap/pm/state";
 import { FolderOpen, Save, X } from "lucide-react";
 import {
   lazy,
@@ -13,6 +13,7 @@ import {
 import CloneProjectDialog from "./components/CloneProjectDialog";
 import ArxivExportDialog from "./components/ArxivExportDialog";
 import GitHubAuthDialog from "./components/GitHubAuthDialog";
+import FindBar from "./components/FindBar";
 import GitPanel from "./components/GitPanel";
 import IconButton from "./components/IconButton";
 import InputDialog from "./components/InputDialog";
@@ -26,6 +27,7 @@ import SourceEditor from "./components/SourceEditor";
 import StartScreen, { type RecentProject } from "./components/StartScreen";
 import StatusBar from "./components/StatusBar";
 import TopBar from "./components/TopBar";
+import { findDocumentMatches, findTextRanges, setFindHighlight } from "./editor/find";
 import {
   createWelcomeDocument,
   DEFAULT_SETTINGS,
@@ -106,6 +108,14 @@ interface MathEditorState {
   display: boolean;
   latex: string;
   editing: boolean;
+}
+
+interface FindState {
+  open: boolean;
+  query: string;
+  replacement: string;
+  showReplace: boolean;
+  current: number;
 }
 
 function loadRecent(): RecentProject[] {
@@ -211,6 +221,13 @@ export default function App() {
   const [editor, setEditor] = useState<Editor | null>(null);
   const [editorVersion, setEditorVersion] = useState(0);
   const [mode, setMode] = useState<EditorMode>("visual");
+  const [find, setFind] = useState<FindState>({
+    open: false,
+    query: "",
+    replacement: "",
+    showReplace: false,
+    current: 0,
+  });
   const [ribbonTab, setRibbonTab] = useState<RibbonTab>("Home");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarPanel, setSidebarPanel] = useState<SidebarPanel>("outline");
@@ -249,6 +266,8 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const imageInput = useRef<HTMLInputElement>(null);
+  const findInput = useRef<HTMLInputElement>(null);
+  const sourceTextarea = useRef<HTMLTextAreaElement>(null);
   const changeVersion = useRef(0);
   const revisionBaseline = useRef<SentenceDocument | null>(null);
   const revisionTimer = useRef<number | null>(null);
@@ -795,6 +814,101 @@ export default function App() {
     }
   };
 
+  const findSource = sourceFile === "document.tex" ? source : workspace?.bibliography ?? "";
+  const findRanges = findTextRanges(findSource, find.query);
+  const visualFindMatches = useMemo(
+    () => (editor ? findDocumentMatches(editor.state.doc, find.query) : []),
+    [editor, editorVersion, find.query],
+  );
+  const findMatches = mode === "source" ? findRanges : visualFindMatches;
+  const activeFindIndex = findMatches.length ? Math.min(find.current, findMatches.length - 1) : 0;
+  const findPosition = findMatches.length ? `${activeFindIndex + 1}/${findMatches.length}` : "No matches";
+
+  useEffect(() => {
+    if (!editor || (!find.open && !find.query)) return;
+    setFindHighlight(editor, find.open ? find.query : "", find.open ? activeFindIndex : 0);
+  }, [editor, find.open, find.query, activeFindIndex]);
+
+  const openFind = (withReplace: boolean) => {
+    let selected = "";
+    if (mode === "source") {
+      const textarea = sourceTextarea.current;
+      if (textarea) selected = textarea.value.slice(textarea.selectionStart, textarea.selectionEnd);
+    } else if (editor && !editor.state.selection.empty) {
+      const { from, to } = editor.state.selection;
+      selected = editor.state.doc.textBetween(from, to, " ");
+    }
+    setFind((current) => ({
+      open: true,
+      query: selected || current.query,
+      replacement: current.replacement,
+      showReplace: withReplace || current.showReplace,
+      current: 0,
+    }));
+    window.requestAnimationFrame(() => {
+      findInput.current?.focus();
+      findInput.current?.select();
+    });
+  };
+
+  const closeFind = () => {
+    setFind((current) => ({ ...current, open: false }));
+    window.requestAnimationFrame(() => {
+      if (mode === "source") sourceTextarea.current?.focus();
+      else editor?.commands.focus();
+    });
+  };
+
+  const moveFind = (step: number) => {
+    if (!findMatches.length) return;
+    const next = (activeFindIndex + step + findMatches.length) % findMatches.length;
+    setFind((current) => ({ ...current, current: next }));
+    if (mode === "source") {
+      const range = findRanges[next];
+      const textarea = sourceTextarea.current;
+      if (range && textarea) {
+        textarea.setSelectionRange(range.from, range.to);
+        const line = findSource.slice(0, range.from).split("\n").length - 1;
+        textarea.scrollTop = Math.max(0, (line - 3) * 22);
+      }
+      return;
+    }
+    if (!editor) return;
+    const ranges = visualFindMatches[next]?.ranges;
+    if (!ranges?.length) return;
+    editor.view.dispatch(
+      editor.state.tr
+        .setSelection(TextSelection.create(editor.state.doc, ranges[0].from, ranges[ranges.length - 1].to))
+        .scrollIntoView(),
+    );
+  };
+
+  const replaceFind = (all: boolean) => {
+    if (!find.query) return;
+    if (mode === "source") {
+      if (!findRanges.length) return;
+      const targets = all ? [...findRanges].reverse() : [findRanges[activeFindIndex]];
+      let next = findSource;
+      for (const range of targets) {
+        if (!range) continue;
+        next = next.slice(0, range.from) + find.replacement + next.slice(range.to);
+      }
+      if (sourceFile === "document.tex") handleSourceChange(next);
+      else handleBibliographyChange(next);
+    } else if (editor) {
+      if (!visualFindMatches.length) return;
+      const targets = all ? [...visualFindMatches].reverse() : [visualFindMatches[activeFindIndex]];
+      const tr = editor.state.tr;
+      for (const match of targets) {
+        const ranges = match?.ranges;
+        if (!ranges?.length) continue;
+        tr.insertText(find.replacement, ranges[0].from, ranges[ranges.length - 1].to);
+      }
+      if (tr.docChanged) editor.view.dispatch(tr);
+    }
+    setFind((current) => ({ ...current, current: 0 }));
+  };
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
@@ -805,6 +919,23 @@ export default function App() {
         event.preventDefault();
         void handleCompile();
       }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "f") {
+        event.preventDefault();
+        if (findInput.current?.closest(".find-bar")?.contains(document.activeElement)) {
+          findInput.current.select();
+        } else {
+          openFind(find.showReplace);
+        }
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "h") {
+        event.preventDefault();
+        if (find.open) setFind((current) => ({ ...current, showReplace: true }));
+        else openFind(true);
+      }
+      if (event.key === "Escape" && find.open) {
+        event.preventDefault();
+        closeFind();
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -813,6 +944,24 @@ export default function App() {
   const words = workspace ? countWords(workspace.document) : 0;
   const pages = Math.max(1, Math.ceil(words / 480));
   const branch = workspace?.git.status.branch ?? "main";
+
+  const findBar = find.open ? (
+    <FindBar
+      query={find.query}
+      replacement={find.replacement}
+      showReplace={find.showReplace}
+      position={findPosition}
+      inputRef={findInput}
+      onQueryChange={(query) => setFind((current) => ({ ...current, query, current: 0 }))}
+      onReplacementChange={(replacement) => setFind((current) => ({ ...current, replacement }))}
+      onToggleReplace={() => setFind((current) => ({ ...current, showReplace: !current.showReplace }))}
+      onNext={() => moveFind(1)}
+      onPrevious={() => moveFind(-1)}
+      onReplace={() => replaceFind(false)}
+      onReplaceAll={() => replaceFind(true)}
+      onClose={closeFind}
+    />
+  ) : null;
 
   if (!workspace) {
     return (
@@ -939,6 +1088,7 @@ export default function App() {
           <div className={`editor-workspace layout-${mode} ${previewOpen ? "with-preview" : ""}`}>
             {mode === "visual" || mode === "split" ? (
               <section className="editor-column">
+                {findBar}
                 {sidebarOpen ? null : (
                   <button className="restore-sidebar" type="button" onClick={() => setSidebarOpen(true)} title="Show navigation">
                     <FolderOpen size={15} />
@@ -965,6 +1115,7 @@ export default function App() {
             ) : null}
             {mode === "source" || mode === "split" ? (
               <section className="source-column">
+                {findBar}
                 <header className="source-header">
                   <div className="source-file-tabs">
                     <button type="button" className={sourceFile === "document.tex" ? "active" : ""} onClick={() => setSourceFile("document.tex")}>document.tex</button>
@@ -995,6 +1146,7 @@ export default function App() {
                   value={sourceFile === "document.tex" ? source : workspace.bibliography}
                   onChange={sourceFile === "document.tex" ? handleSourceChange : handleBibliographyChange}
                   activeLine={sourceFile === "document.tex" ? compileResult?.diagnostics.find((item) => item.line)?.line : undefined}
+                  textareaRef={sourceTextarea}
                 />
               </section>
             ) : null}

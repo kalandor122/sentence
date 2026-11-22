@@ -28,7 +28,11 @@
         "src/editor/EditorSurface.tsx"
       ],
       "hint": "App.tsx has a keydown effect that only handles Ctrl+S and Ctrl+Enter \u2014 extend that pattern. Ctrl+K should open the existing link dialog, Ctrl+Shift+7/8 toggle ordered/bullet lists through Tiptap commands, Ctrl+1/2/5 apply the existing line-spacing styles, Tab/Shift+Tab indent or outdent the current list/paragraph instead of leaving the editor. Every shortcut must keep working inside the LaTeX source textarea without hijacking it.",
-      "status": "open"
+      "status": "blocked",
+      "attempts": 2,
+      "startedAt": "2026-11-22T20:44:21Z",
+      "lastAttemptAt": "2026-11-22T20:49:51Z",
+      "lastFailure": "== tsc -b EXIT 0\n\n== npm test EXIT 0\n\n> sentence@0.2.0 test\n> vitest run\n\n\n RUN  v4.1.12 /home/magor/Projects/sentence\n\n\n Test Files  1 passed | 1 skipped (2)\n      Tests  9 passed | 1 skipped (10)\n   Start at  21:52:30\n   Duration  173ms (transform 74ms, setup 0ms, import 96ms, tests 38ms, environment 0ms)\n\n\n== smoke EXIT 1\nFAIL failures=1 observations=5 consoleErrors=0\n  FAIL harness: TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /^compile$/i }).first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"compile-button\">\u2026</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 \u00d7 waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div role=\"p\n"
     },
     {
       "id": "qa-003",
@@ -41,7 +45,10 @@
         "src/styles.css"
       ],
       "hint": "Add a small non-modal find bar anchored top-right of the editor column (not a modal). Ctrl+F opens it and prefills with the current selection, Enter/Shift+Enter walk matches, Escape closes and returns focus to the page. Ctrl+H reveals the replace field with Replace / Replace all. Use the Tiptap editor's own document search (ProseMirror positions) so matches highlight in the visual editor; in source mode search the textarea. Keep the LaTeX round trip untouched.",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 1,
+      "startedAt": "2026-11-22T20:54:02Z",
+      "lastAttemptAt": "2026-11-22T20:54:02Z"
     },
     {
       "id": "qa-004",
@@ -476,6 +483,138 @@
       ],
       "hint": "Repro: Create a project, type `before `, Insert tab > Inline equation with `y=2`, click Insert, View > Visual. Click the rendered math node to edit it, click Cancel in the dialog, then press Backspace.\nActual: The click opens the edit dialog instead of selecting the node; after Cancel, `document.activeElement` is `BODY`, the DOM selection is outside the editor, and Backspace leaves the node and the source `before \\(y=2\\)` unchanged. Keyboard deletion does work if the user clicks the editor, presses End, Left, then Delete.",
       "source": "explore:math:clicking a math node, cancelling the edit dialog, then pressing backspace does not delete it",
+      "status": "open"
+    },
+    {
+      "id": "qa-040",
+      "title": "\\href from LaTeX source is not parsed and links are destroyed on round-trip",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected Imported `\\href{url}{text}` becomes an editable link node with the same href, and re-export writes `\\href{url}{text}`.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Type `Docs`, select it, Home > Add link, enter `https://combined.example.org`, Insert. View > LaTeX: source contains `\\href{https://combined.example.org}{Docs}`. Click Apply source, View > Visual, then View > LaTeX. For an isolated check, in View > LaTeX replace the document body with `Before \\href{https://hand.example.org}{hand link} and \\ref{sec:handwritten} After` and click Apply source.\nActual: No `<a>` node exists after Apply source. The visual paragraph shows literal `\\href{https://hand.example.org}{hand link}` text, and re-exported source contains `\\textbackslash{}href\\{https://hand.example.org\\}\\{hand link\\}`.",
+      "source": "explore:links-cites-footnotes:\\href from latex source is not parsed and links are destroyed on round-trip",
+      "status": "open"
+    },
+    {
+      "id": "qa-041",
+      "title": "\\ref from LaTeX source is not parsed and cross-references are destroyed on round-trip",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected Imported `\\ref{label}` becomes an editable cross-reference node and re-export keeps `\\ref{label}`.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. References > Cross-reference, label `fig:architecture`, Insert. View > LaTeX: source contains `\\ref{fig:architecture}`. Click Apply source, View > Visual, then View > LaTeX. In the isolated source-import check, the body `Before \\href{https://hand.example.org}{hand link} and \\ref{sec:handwritten} After` was applied.\nActual: No `[data-cross-reference]` node survives Apply source. The visual paragraph shows literal `\\ref{sec:handwritten}` and re-export writes `\\textbackslash{}ref\\{sec:handwritten\\}`. In the combined check, both `\\ref{fig:architecture}` and `\\ref{sec:results}` were lost.",
+      "source": "explore:links-cites-footnotes:\\ref from latex source is not parsed and cross-references are destroyed on round-trip",
+      "status": "open"
+    },
+    {
+      "id": "qa-042",
+      "title": "Citation bibliography directives turn into escaped text and are duplicated when source is applied",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected The bibliography commands survive the source round-trip unchanged and are emitted once in the exported LaTeX.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. References > Insert citation with key `sentence2026`, Insert. View > LaTeX: the document body ends with `\\bibliographystyle{plain}` and `\\bibliography{references}`. Click Apply source, View > Visual, then View > LaTeX again.\nActual: The visual document gains a paragraph with literal `\\textbackslash{}bibliographystyle\\{plain\\}` and `\\textbackslash{}bibliography\\{references\\}`. Re-exported source contains those escaped lines plus a second, real `\\bibliographystyle{plain}` / `\\bibliography{references}` pair.",
+      "source": "explore:links-cites-footnotes:citation bibliography directives turn into escaped text and are duplicated when source is applied",
+      "status": "open"
+    },
+    {
+      "id": "qa-043",
+      "title": "No way to remove a link without deleting its text",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected A remove/unlink command clears the link while keeping the text `See example`.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Type `See example`, select it, Home > Add link, enter `https://changed.example.org/new`, Insert. Click the linked text, inspect the Home ribbon, then Home > Add link, clear Address, press Enter, and click Cancel.\nActual: The ribbon has no unlink control; the only matching button is Add link. The dialog has only Cancel and Insert, Insert stays disabled with an empty Address, Enter does nothing, and after Cancel the anchor still has href `https://changed.example.org/new` with `\\href{https://changed.example.org/new}{See example}` in the source.",
+      "source": "explore:links-cites-footnotes:no way to remove a link without deleting its text",
+      "status": "open"
+    },
+    {
+      "id": "qa-044",
+      "title": "Footnote text, citation keys and cross-reference labels have no visual edit flow",
+      "why": "Exploratory pass on links-cites-footnotes (ux): expected Clicking an inserted object offers a way to edit its note text, BibTeX key or label in visual mode, as math nodes do.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Insert > Footnote with note `A useful note`, References > Insert citation with key `sentence2026`, and References > Cross-reference with label `fig:architecture`. Click each inserted object in the visual editor, then double-click each one.\nActual: Neither click nor double-click opens a dialog for any of the three objects. Each only gains the `ProseMirror-selectednode` class; `data-text=\"A useful note\"`, `data-key=\"sentence2026\"` and `data-label=\"fig:architecture\"` remain unchanged.",
+      "source": "explore:links-cites-footnotes:footnote text, citation keys and cross-reference labels have no visual edit flow",
+      "status": "open"
+    },
+    {
+      "id": "qa-045",
+      "title": "Add link dialog does not prefill the existing URL when editing a link",
+      "why": "Exploratory pass on links-cites-footnotes (ux): expected The Address field shows the link's current href so it can be amended.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Type `See example`, select it, Home > Add link, enter `https://example.com/a_b?x=1&y=2`, Insert. Click the linked text and click Home > Add link again.\nActual: The dialog opens with an empty Address field and placeholder `https://example.com`, even though the selected anchor's href is `https://example.com/a_b?x=1&y=2`.",
+      "source": "explore:links-cites-footnotes:add link dialog does not prefill the existing url when editing a link",
+      "status": "open"
+    },
+    {
+      "id": "qa-046",
+      "title": "All footnotes render the marker 1 in the visual editor",
+      "why": "Exploratory pass on links-cites-footnotes (visual): expected Visual footnote markers are numbered sequentially (1, 2).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Insert > Footnote with note `A useful note`, then Insert > Footnote with note `Second note text`, in the same paragraph.\nActual: Both `<sup class=\"footnote\">` elements display `1`; their `data-text` values differ (`A useful note`, `Second note text`) and the source contains two distinct `\\footnote{...}` commands.",
+      "source": "explore:links-cites-footnotes:all footnotes render the marker 1 in the visual editor",
+      "status": "open"
+    },
+    {
+      "id": "qa-047",
+      "title": "Font family control emits unbraced LaTeX command",
+      "why": "Exploratory pass on ribbon (functional): expected {\\sentenceTimes MARKER one two three.} applies to the whole run: a braced argument, and the command defined in the preamble.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Home tab, select text, set Font family to Times New Roman, switch to View -> LaTeX, inspect the emitted command.\nActual: Emitted as '{\\\\sentenceTimes MARKER one two three.}' \u2014 one brace group with no argument braces, so the switch applies to the first character only and the command is undefined in the preamble; the document will not compile.",
+      "source": "explore:ribbon:font family control emits unbraced latex command",
+      "status": "open"
+    },
+    {
+      "id": "qa-048",
+      "title": "Line spacing and paragraph spacing controls do nothing",
+      "why": "Exploratory pass on ribbon (functional): expected Line spacing changes the rendered line height and emits \\linespread / setspace in the preamble; paragraph spacing emits \\parindent and \\parskip.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Layout tab, change line spacing (single/onehalf/double) and paragraph spacing (indent/gap), then read the computed styles and the .tex.\nActual: Computed text-indent stays 0px and margin-bottom 17.6px regardless of the setting, and no \\parindent or \\parskip appears in the .tex. The controls are enabled but inert.",
+      "source": "explore:ribbon:line spacing and paragraph spacing controls do nothing",
+      "status": "open"
+    },
+    {
+      "id": "qa-049",
+      "title": "No indent / outdent controls anywhere in the ribbon",
+      "why": "Exploratory pass on ribbon (ux): expected Word's Home tab has Increase/Decrease Indent; LaTeX equivalent is a quote/itemize nesting or \\hspace.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Inspect every group on the Home and Layout tabs for an indent or outdent button.\nActual: No such controls exist. Paragraph indentation cannot be changed from the UI at all.",
+      "source": "explore:ribbon:no indent / outdent controls anywhere in the ribbon",
+      "status": "open"
+    },
+    {
+      "id": "qa-050",
+      "title": "Align left button is not active by default",
+      "why": "Exploratory pass on ribbon (ux): expected Align left reads as pressed, matching the actual rendering (Word convention).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Place the cursor in a plain left-aligned paragraph and read the pressed state of the four alignment buttons.\nActual: None of the four buttons is active until Align left is clicked explicitly; centre/right/justify then light up correctly.",
+      "source": "explore:ribbon:align left button is not active by default",
       "status": "open"
     }
   ]
