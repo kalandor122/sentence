@@ -135,3 +135,4 @@ Aborting
 2026-11-22T23:36:15Z DONE qa-035 (tsc -b, npm test, smoke all green)
 2026-11-22T23:36:36Z EXPLORE long-document: 0 new items, agent exit 1
 2026-11-22T23:36:50Z START qa-038 on qa/qa-038-undefined-control-sequence-in-math-is-ac: Undefined control sequence in math is accepted: no error flag and Insert stays enabled
+2026-11-22T23:37:25Z DONE qa-038 (tsc -b, npm test, smoke all green)
