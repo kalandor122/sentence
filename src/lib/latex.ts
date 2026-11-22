@@ -651,6 +651,14 @@ function parseInline(source: string): InlineParseResult {
       continue;
     }
 
+    const refMatch = remainder.match(/^\\ref\s*\{([^}]*)\}/);
+    if (refMatch) {
+      flush();
+      content.push({ type: "crossReference", attrs: { label: refMatch[1] } });
+      index += refMatch[0].length;
+      continue;
+    }
+
     if (remainder.startsWith("\\\\")) {
       flush();
       content.push({ type: "hardBreak" });

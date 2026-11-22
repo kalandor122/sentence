@@ -544,8 +544,9 @@
       "hint": "Repro: Create a project. References > Cross-reference, label `fig:architecture`, Insert. View > LaTeX: source contains `\\ref{fig:architecture}`. Click Apply source, View > Visual, then View > LaTeX. In the isolated source-import check, the body `Before \\href{https://hand.example.org}{hand link} and \\ref{sec:handwritten} After` was applied.\nActual: No `[data-cross-reference]` node survives Apply source. The visual paragraph shows literal `\\ref{sec:handwritten}` and re-export writes `\\textbackslash{}ref\\{sec:handwritten\\}`. In the combined check, both `\\ref{fig:architecture}` and `\\ref{sec:results}` were lost.",
       "source": "explore:links-cites-footnotes:\\ref from latex source is not parsed and cross-references are destroyed on round-trip",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T22:20:21Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T22:20:21Z",
+      "lastAttemptAt": "2026-11-22T22:20:21Z"
     },
     {
       "id": "qa-042",
