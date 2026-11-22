@@ -186,7 +186,7 @@ export default function EditorSurface({
         return false;
       },
     },
-    onUpdate: ({ editor: current }) => {
+    onUpdate: ({ editor: current, transaction }) => {
       const json = current.getJSON() as SentenceDocument;
       const empty = (json.content ?? []).every(
         (node) => node.type === "paragraph" && !(node.content ?? []).length,
@@ -194,8 +194,10 @@ export default function EditorSurface({
       // React StrictMode double-mounts in dev: the discarded instance syncs the
       // real document, the live one starts empty and emits that empty doc, which
       // used to overwrite the workspace on every switch out of LaTeX source.
-      // An unfocused editor is not the user — a real select-all-delete is focused.
-      if (empty && !current.isFocused) return;
+      // Those setup transactions carry no edit steps. Focus is unreliable here:
+      // Tiptap defers focus from toolbar commands, so a Delete table click emits
+      // a real one-step edit while the editor is still unfocused.
+      if (empty && transaction.steps.length === 0) return;
       lastEmitted.current = JSON.stringify(json);
       onUpdate(json);
     },
