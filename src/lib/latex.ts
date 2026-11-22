@@ -724,6 +724,24 @@ function parseList(source: string, type: "bulletList" | "orderedList"): Document
   };
 }
 
+function splitTableRow(row: string): string[] {
+  const cells: string[] = [];
+  let cell = "";
+  let backslashes = 0;
+  for (const character of row) {
+    if (character === "&" && backslashes % 2 === 0) {
+      cells.push(cell);
+      cell = "";
+      backslashes = 0;
+      continue;
+    }
+    cell += character;
+    backslashes = character === "\\" ? backslashes + 1 : 0;
+  }
+  cells.push(cell);
+  return cells;
+}
+
 export function latexToDocument(
   latex: string,
   fallbackSettings: ProjectSettings,
@@ -916,7 +934,7 @@ export function latexToDocument(
           type: "table",
           content: rows.map((row, rowIndex) => ({
             type: "tableRow",
-            content: row.split("&").map((cell) => ({
+            content: splitTableRow(row).map((cell) => ({
               type: rowIndex === 0 ? "tableHeader" : "tableCell",
               content: [{ type: "paragraph", content: parseInline(cell.trim()).content }],
             })),
