@@ -99,3 +99,4 @@ Aborting
 2026-11-22T22:55:35Z START qa-085 on qa/qa-085-single-column-latex-tabular-becomes-esca: Single-column LaTeX tabular becomes escaped plain text instead of a table
 2026-11-22T22:57:41Z DONE qa-085 (tsc -b, npm test, smoke all green)
 2026-11-22T23:05:47Z EXPLORE math: 2 new items, agent exit 0
+2026-11-22T23:06:01Z START qa-086 on qa/qa-086-text-in-a-second-paragraph-of-a-table-ce: Text in a second paragraph of a table cell is dropped from LaTeX
