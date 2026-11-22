@@ -137,3 +137,4 @@ Aborting
 2026-11-22T23:36:50Z START qa-038 on qa/qa-038-undefined-control-sequence-in-math-is-ac: Undefined control sequence in math is accepted: no error flag and Insert stays enabled
 2026-11-22T23:37:25Z DONE qa-038 (tsc -b, npm test, smoke all green)
 2026-11-22T23:37:59Z START qa-039 on qa/qa-039-clicking-a-math-node-cancelling-the-edit: Clicking a math node, cancelling the edit dialog, then pressing Backspace does not delete it
+2026-11-22T23:38:33Z DONE qa-039 (tsc -b, npm test, smoke all green)

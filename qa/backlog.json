@@ -579,10 +579,11 @@
       ],
       "hint": "Repro: Create a project, type `before `, Insert tab > Inline equation with `y=2`, click Insert, View > Visual. Click the rendered math node to edit it, click Cancel in the dialog, then press Backspace.\nActual: The click opens the edit dialog instead of selecting the node; after Cancel, `document.activeElement` is `BODY`, the DOM selection is outside the editor, and Backspace leaves the node and the source `before \\(y=2\\)` unchanged. Keyboard deletion does work if the user clicks the editor, presses End, Left, then Delete.",
       "source": "explore:math:clicking a math node, cancelling the edit dialog, then pressing backspace does not delete it",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:37:59Z",
-      "lastAttemptAt": "2026-11-22T23:37:59Z"
+      "lastAttemptAt": "2026-11-22T23:37:59Z",
+      "doneAt": "2026-11-22T23:38:33Z"
     },
     {
       "id": "qa-040",
@@ -642,7 +643,9 @@
       ],
       "hint": "Repro: Create a project. Type `See example`, select it, Home > Add link, enter `https://changed.example.org/new`, Insert. Click the linked text, inspect the Home ribbon, then Home > Add link, clear Address, press Enter, and click Cancel.\nActual: The ribbon has no unlink control; the only matching button is Add link. The dialog has only Cancel and Insert, Insert stays disabled with an empty Address, Enter does nothing, and after Cancel the anchor still has href `https://changed.example.org/new` with `\\href{https://changed.example.org/new}{See example}` in the source.",
       "source": "explore:links-cites-footnotes:no way to remove a link without deleting its text",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-22T23:39:08Z"
     },
     {
       "id": "qa-044",
