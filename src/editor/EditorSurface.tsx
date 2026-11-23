@@ -173,18 +173,15 @@ export default function EditorSurface({
         return false;
       },
     },
-    onUpdate: ({ editor: current, transaction }) => {
+    onUpdate: ({ editor: current, transaction, appendedTransactions }) => {
       const json = current.getJSON() as SentenceDocument;
-      const empty = (json.content ?? []).every(
-        (node) => node.type === "paragraph" && !(node.content ?? []).length,
-      );
-      // React StrictMode double-mounts in dev: the discarded instance syncs the
-      // real document, the live one starts empty and emits that empty doc, which
-      // used to overwrite the workspace on every switch out of LaTeX source.
-      // Those setup transactions carry no edit steps. Focus is unreliable here:
+      // Editor setup (including React StrictMode's discarded instance) emits a
+      // transaction with no edit steps but with Tiptap's default attrs filled
+      // in. Treating that as an edit dirtied a restored document and made an
+      // idle autosave rewrite its stored model. Focus is unreliable here:
       // Tiptap defers focus from toolbar commands, so a Delete table click emits
       // a real one-step edit while the editor is still unfocused.
-      if (empty && transaction.steps.length === 0) return;
+      if (![transaction, ...appendedTransactions].some((tr) => tr.steps.length > 0)) return;
       lastEmitted.current = JSON.stringify(json);
       onUpdate(json);
     },

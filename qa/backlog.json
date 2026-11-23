@@ -1563,8 +1563,9 @@
       "hint": "Repro: In the browser app, type text and wait for 'Saved locally'. Switch View > LaTeX, insert a plain sentence before \\end{document}, wait 1.5 s for autosave, then reload. Observe the heading immediately after reload, wait another 1.5 s without editing, and re-read localStorage sentence.workspace.\nActual: Immediately after reload the heading says 'Editing' and the saved check icon disappears despite no user edit. After another 1.5 s, autosave rewrites the stored document JSON from 1302 to 1471 characters while text, node types, and marks are unchanged, and the heading returns to 'Saved locally'. Opening a fresh document shows the same pattern without input: stored document grows from 1174 to 1316 characters after 1.5 s idle.",
       "source": "explore:persistence:a restored source-edited document is marked dirty and silently rewritten",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T02:55:50Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T02:55:50Z",
+      "lastAttemptAt": "2026-11-23T02:55:50Z"
     },
     {
       "id": "qa-099",
