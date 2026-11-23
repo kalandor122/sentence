@@ -266,3 +266,4 @@ Aborting
 2026-11-23T02:52:28Z DONE qa-103 (tsc -b, npm test, smoke all green)
 2026-11-23T02:52:57Z START qa-097 on qa/qa-097-undo-appears-enabled-but-is-a-no-op-afte: Undo appears enabled but is a no-op after reload
 2026-11-23T02:55:20Z DONE qa-097 (tsc -b, npm test, smoke all green)
+2026-11-23T02:55:50Z START qa-098 on qa/qa-098-a-restored-source-edited-document-is-mar: A restored source-edited document is marked dirty and silently rewritten
