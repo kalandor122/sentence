@@ -800,10 +800,11 @@
       ],
       "hint": "Repro: Place the cursor in a plain left-aligned paragraph and read the pressed state of the four alignment buttons.\nActual: None of the four buttons is active until Align left is clicked explicitly; centre/right/justify then light up correctly.",
       "source": "explore:ribbon:align left button is not active by default",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T01:20:50Z",
-      "lastAttemptAt": "2026-11-23T01:20:50Z"
+      "lastAttemptAt": "2026-11-23T01:20:50Z",
+      "doneAt": "2026-11-23T01:23:25Z"
     },
     {
       "id": "qa-051",
@@ -991,7 +992,9 @@
       ],
       "hint": "Repro: Inspect the four selects on the Layout tab (paper size, margins, text size, document class).\nActual: No aria-label/name/id on any of the four; their visible headings are unlinked sibling divs, so assistive tech announces unnamed comboboxes.",
       "source": "explore:ribbon-full:layout tab selects are unnamed for screen readers",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T01:23:59Z"
     },
     {
       "id": "qa-063",
