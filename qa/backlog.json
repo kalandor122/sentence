@@ -1855,6 +1855,21 @@
       "startedAt": "2026-11-23T05:01:15Z",
       "lastAttemptAt": "2026-11-23T05:01:15Z",
       "doneAt": "2026-11-23T05:01:41Z"
+    },
+    {
+      "id": "qa-117",
+      "title": "Fix failing smoke check: harness",
+      "why": "The automated gate is red; nothing else can be trusted until it is green.",
+      "severity": "critical",
+      "files": [
+        "qa/smoke.mjs",
+        "src"
+      ],
+      "hint": "Detail: Error: page.waitForTimeout: Target page, context or browser has been closed",
+      "source": "smoke-fail:harness",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T13:01:05Z"
     }
   ]
 }
