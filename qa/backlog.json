@@ -1883,8 +1883,9 @@
       "hint": "Repro: 1. In a fresh document type 'Comment on tracked text'. 2. Review tab > Track changes (the button changes to 'Tracking on'). 3. Select the first word 'Comment', Review tab > New comment, enter 'Comment before tracked edit' and click Comment. 4. Put the caret at the end and type ' tail', wait ~2 s for the tracked change to appear, open the History sidebar and click Reject on the pending revision. 5. Open the Review sidebar.\nActual: The editor text returned to 'Comment on tracked text', but zero [data-comment-id] highlight spans remained. The Review panel still listed 'Comment before tracked edit' with badge 1, so the thread survived with no anchor; clicking it cannot locate or highlight any text.",
       "source": "explore:review:rejecting a tracked edit made after a comment removes the comment highlight and leaves the thread unanchored",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T13:16:01Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T13:16:01Z",
+      "lastAttemptAt": "2026-11-23T13:16:01Z"
     },
     {
       "id": "qa-119",

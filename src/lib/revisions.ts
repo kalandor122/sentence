@@ -1,5 +1,5 @@
 import { documentPlainText } from "./latex";
-import type { Revision, SentenceDocument } from "./types";
+import type { DocumentNode, Revision, SentenceDocument } from "./types";
 
 type Path = (string | number)[];
 
@@ -180,6 +180,24 @@ function undoValue(root: unknown, change: ValueChange): void {
     if (change.before === undefined) delete parent[key];
     else parent[key] = change.before;
   }
+}
+
+// Tracked changes record text edits, so a mark-only update (a comment mark, a
+// link, formatting) must not become part of the next revision. Marks also split
+// text nodes, so compare the characters rather than the raw document JSON.
+// This mirrors documentPlainText but keeps trailing whitespace: typing a space
+// is still a real edit that the revision must be able to undo.
+export function trackedText(document: SentenceDocument): string {
+  const visit = (node: DocumentNode): string => {
+    if (typeof node.text === "string") return node.text;
+    if (node.type === "hardBreak") return "\n";
+    if (node.type === "footnote") {
+      const text = node.attrs?.text;
+      return typeof text === "string" ? text : "";
+    }
+    return (node.content ?? []).map(visit).join("");
+  };
+  return (document.content ?? []).map(visit).join("");
 }
 
 export function documentChanges(before: SentenceDocument, after: SentenceDocument): Change[] {

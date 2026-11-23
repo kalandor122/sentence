@@ -66,6 +66,7 @@ import {
   acceptRevisions,
   pendingRevisions,
   rejectRevisions,
+  trackedText,
 } from "./lib/revisions";
 import {
   assetUrl,
@@ -882,30 +883,41 @@ export default function App() {
     }
     markDirty();
     if (tracking && before) {
-      revisionBaseline.current ??= before;
-      if (revisionTimer.current) window.clearTimeout(revisionTimer.current);
-      revisionTimer.current = window.setTimeout(() => {
-        const latest = workspaceRef.current;
-        const baseline = revisionBaseline.current;
-        if (!latest || !baseline) return;
-        const beforeText = documentPlainText(baseline);
-        const afterText = documentPlainText(latest.document);
-        if (beforeText === afterText) return;
-        const revision: Revision = {
-          id: crypto.randomUUID(),
-          author: gitAuthor.name || latest.settings.author || "You",
-          createdAt: new Date().toISOString(),
-          summary: "Tracked edit",
-          before: beforeText,
-          after: afterText,
-          beforeDocument: baseline,
-          afterDocument: latest.document,
-          accepted: false,
-        };
-        setWorkspace((current) => current ? { ...current, revisions: [revision, ...current.revisions] } : current);
-        revisionBaseline.current = latest.document;
-        markDirty();
-      }, 1800);
+      const pendingBaseline = revisionBaseline.current ?? before;
+      // A comment (or other annotation) changes the document but not its plain
+      // text, so it must move the baseline forward instead of being folded into
+      // the next tracked revision — rejecting that revision would undo it too.
+      if (trackedText(pendingBaseline) === trackedText(document)) {
+        revisionBaseline.current = document;
+      } else {
+        revisionBaseline.current = pendingBaseline;
+        if (revisionTimer.current) window.clearTimeout(revisionTimer.current);
+        revisionTimer.current = window.setTimeout(() => {
+          const latest = workspaceRef.current;
+          const baseline = revisionBaseline.current;
+          if (!latest || !baseline) return;
+          const beforeText = documentPlainText(baseline);
+          const afterText = documentPlainText(latest.document);
+          if (beforeText === afterText) {
+            revisionBaseline.current = latest.document;
+            return;
+          }
+          const revision: Revision = {
+            id: crypto.randomUUID(),
+            author: gitAuthor.name || latest.settings.author || "You",
+            createdAt: new Date().toISOString(),
+            summary: "Tracked edit",
+            before: beforeText,
+            after: afterText,
+            beforeDocument: baseline,
+            afterDocument: latest.document,
+            accepted: false,
+          };
+          setWorkspace((current) => current ? { ...current, revisions: [revision, ...current.revisions] } : current);
+          revisionBaseline.current = latest.document;
+          markDirty();
+        }, 1800);
+      }
     }
   };
 
