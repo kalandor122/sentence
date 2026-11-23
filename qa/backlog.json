@@ -1658,10 +1658,25 @@
       ],
       "hint": "When the cursor is inside a table, show a small toolbar above it (or in the ribbon) with: add row above/below, delete row, add column left/right, delete column, toggle header row, merge/split cells, cell alignment, delete table. Use the existing Tiptap table extension commands through the editor. Add a caption field that emits \\caption{...} in LaTeX.",
       "source": "roadmap:table editing: a contextual table toolbar",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T03:19:37Z",
-      "lastAttemptAt": "2026-11-23T03:19:37Z"
+      "lastAttemptAt": "2026-11-23T03:19:37Z",
+      "doneAt": "2026-11-23T03:28:13Z"
+    },
+    {
+      "id": "qa-105",
+      "title": "Spell check that respects the LaTeX source",
+      "why": "Every word processor has it. A manuscript editor without spell check sends people to another app to proofread.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Use the WebView's native spellchecker on the ProseMirror surface (spellcheck attribute + lang) rather than shipping a dictionary; verify it does not underline LaTeX commands in source mode (turn spellcheck off in the .tex textarea). Add a Review-tab 'Spelling' toggle that persists in settings.",
+      "source": "roadmap:spell check that respects the latex source",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T03:28:43Z"
     }
   ]
 }
