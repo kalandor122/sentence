@@ -1131,8 +1131,9 @@
       "hint": "innerHTML unchanged",
       "source": "keyboard shortcut \"ctrl+5 line spacing\" has no visible effect on the document",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T01:49:05Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T01:49:05Z",
+      "lastAttemptAt": "2026-11-23T01:49:05Z"
     },
     {
       "id": "qa-072",

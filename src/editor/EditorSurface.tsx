@@ -19,6 +19,7 @@ import {
 } from "./extensions";
 import { FindHighlight } from "./find";
 import { changeIndent } from "./indent";
+import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
 import {
   ColorMark,
   FontFamilyMark,
@@ -48,12 +49,6 @@ const FONT_STACKS: Record<ProjectSettings["fontFamily"], string> = {
   default: '"Palatino Linotype", "Book Antiqua", Georgia, serif',
   times: '"Times New Roman", Times, Georgia, serif',
   palatino: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
-};
-
-const LINE_HEIGHTS: Record<ProjectSettings["lineSpacing"], string> = {
-  single: "1.72",
-  onehalf: "2.15",
-  double: "2.6",
 };
 
 // Tab keeps keyboard focus in the page: it nests list items or indents a block,
@@ -148,6 +143,7 @@ export default function EditorSurface({
       TableOfContents,
       CommentMark,
       FindHighlight,
+      LineSpacing,
       TabIndent,
     ],
     content: document,
@@ -217,6 +213,11 @@ export default function EditorSurface({
   useEffect(() => {
     editor?.commands.setMeta("comments", comments);
   }, [comments, editor]);
+
+  useEffect(() => {
+    if (!editor) return;
+    setLineSpacing(editor, settings.lineSpacing);
+  }, [editor, settings.lineSpacing]);
 
   useEffect(() => {
     if (!editor) return;
