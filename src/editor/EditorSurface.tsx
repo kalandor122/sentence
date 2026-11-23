@@ -5,7 +5,7 @@ import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import { Table, TableKit } from "@tiptap/extension-table";
 import TextAlign from "@tiptap/extension-text-align";
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   Citation,
   CommentMark,
@@ -21,6 +21,7 @@ import {
 import { FindHighlight } from "./find";
 import { changeIndent } from "./indent";
 import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
+import { pageBreakFill, pageCountFromBottom, pageGeometry } from "./pagination";
 import {
   ColorMark,
   FontFamilyMark,
@@ -80,10 +81,6 @@ const CaptionTable = Table.extend({
   },
 });
 
-// Visual pagination constants (layout px, unscaled by the editor zoom).
-const PAGE_HEIGHT = 1053;
-const PAGE_GAP = 64;
-
 // The WebView's native spellchecker uses lang to pick a dictionary; keeping
 // these in one place avoids drift between editor creation and later toggles.
 function editorAttributes(spellcheck: boolean) {
@@ -130,6 +127,8 @@ export default function EditorSurface({
     .map((name) => name.trim())
     .filter(Boolean);
   const lastEmitted = useRef("");
+  const [pageCount, setPageCount] = useState(1);
+  const geometry = pageGeometry(settings);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -251,8 +250,8 @@ export default function EditorSurface({
     if (!editor) return;
     const dom = editor.view.dom as HTMLElement;
     const sheet = dom.closest<HTMLElement>(".paper-sheet");
-    const scroll = dom.closest<HTMLElement>(".visual-editor-scroll");
-    if (!sheet || !scroll) {
+    if (!sheet) {
+      setPageCount(1);
       onPageCountChange(1);
       return;
     }
@@ -261,27 +260,27 @@ export default function EditorSurface({
     const paginate = () => {
       frame = 0;
       const wrappers = Array.from(dom.querySelectorAll<HTMLElement>("[data-page-break]"));
-      scroll.style.removeProperty("--sentence-sheet-min-height");
       for (const wrapper of wrappers) wrapper.style.paddingTop = "0px";
-      if (wrappers.length > 0) {
-        for (const wrapper of wrappers) {
-          const remainder = (offsetWithin(wrapper, sheet) + PAGE_GAP) % PAGE_HEIGHT;
-          const fill = remainder === 0 ? 0 : PAGE_HEIGHT - remainder;
-          wrapper.style.paddingTop = `${fill}px`;
-        }
-      }
-      // The editor has a min-height, so its own offsetHeight cannot tell us how
-      // much paper the content actually occupies. Measure the last block instead
-      // and treat every page break as at least one additional page.
+      // Measure every break before changing any padding: one break's fill moves
+      // all the breaks that follow it.
+      const tops = wrappers.map((wrapper) => offsetWithin(wrapper, sheet));
+      let shift = 0;
+      wrappers.forEach((wrapper, index) => {
+        const fill = pageBreakFill(tops[index] + shift, wrapper.offsetHeight, geometry);
+        wrapper.style.paddingTop = `${fill}px`;
+        shift += fill;
+      });
+      // The sheet's min-height is derived from the count, so measure the last
+      // block rather than the editor box. Explicit breaks always claim a page.
       const lastBlock = dom.lastElementChild as HTMLElement | null;
       const contentBottom = lastBlock
         ? offsetWithin(lastBlock, sheet) + lastBlock.offsetHeight
         : offsetWithin(dom, sheet);
-      const pages = Math.max(1, wrappers.length + 1, Math.ceil(contentBottom / PAGE_HEIGHT));
-      scroll.style.setProperty(
-        "--sentence-sheet-min-height",
-        `${pages * PAGE_HEIGHT}px`,
+      const pages = Math.max(
+        pageCountFromBottom(contentBottom, geometry),
+        wrappers.length + 1,
       );
+      setPageCount(pages);
       onPageCountChange(pages);
     };
 
@@ -294,26 +293,33 @@ export default function EditorSurface({
     window.addEventListener("resize", schedule);
     const observer = new ResizeObserver(schedule);
     observer.observe(dom);
+    // Front matter lives outside the editor but still consumes the first page.
+    observer.observe(sheet);
 
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
       editor.off("update", schedule);
       window.removeEventListener("resize", schedule);
       observer.disconnect();
-      scroll.style.removeProperty("--sentence-sheet-min-height");
       for (const wrapper of dom.querySelectorAll<HTMLElement>("[data-page-break]")) {
         wrapper.style.paddingTop = "";
       }
     };
-  }, [editor, settings, comments, onPageCountChange]);
+  }, [editor, geometry.height, geometry.margin, comments, onPageCountChange]);
 
   const paperStyle = {
     "--paper-font": FONT_STACKS[settings.fontFamily],
     "--paper-line-height": LINE_HEIGHTS[settings.lineSpacing],
+    "--paper-width": `${geometry.width}px`,
+    "--paper-height": `${geometry.height}px`,
+    "--paper-content-height": `${geometry.contentHeight}px`,
+    "--paper-margin": `${geometry.margin}px`,
+    "--paper-font-size": `${geometry.fontSize}px`,
+    "--sentence-page-count": pageCount,
   } as CSSProperties;
 
   return (
-    <div className="visual-editor-scroll">
+    <div className="visual-editor-scroll" style={paperStyle}>
       <div className="paper-stack" aria-hidden="true" />
       <article
         className={`paper-sheet ${settings.paragraphSpacing === "gap" ? "paper-parskip" : ""}`}
@@ -339,7 +345,7 @@ export default function EditorSurface({
             ) : null}
           </header>
         ) : null}
-        <EditorContent editor={editor} />
+        <EditorContent editor={editor} className="paper-editor-content" />
       </article>
     </div>
   );
