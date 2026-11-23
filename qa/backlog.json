@@ -467,10 +467,11 @@
       ],
       "hint": "Repro: Insert a 120x60 px image -> View/LaTeX\nActual: \\includegraphics[width=0.8\\linewidth]{...} with \\caption{qa-test.png}; a 120px image is stretched to 80% of the text block and the filename becomes the caption | evidence: src/lib/latex.ts:269-276 (width defaults to 0.8 when attrs.width is 0)",
       "source": "explore:insert:all images forced to 0.8\\linewidth; caption is the raw filename",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:12:22Z",
-      "lastAttemptAt": "2026-11-23T00:12:22Z"
+      "lastAttemptAt": "2026-11-23T00:12:22Z",
+      "doneAt": "2026-11-23T00:12:56Z"
     },
     {
       "id": "qa-030",
@@ -1362,6 +1363,56 @@
       "startedAt": "2026-11-23T00:00:55Z",
       "lastAttemptAt": "2026-11-23T00:00:55Z",
       "doneAt": "2026-11-23T00:01:29Z"
+    },
+    {
+      "id": "qa-090",
+      "title": "Rejecting an older tracked revision discards later edits and resurrects previously rejected text",
+      "why": "Exploratory pass on review (functional): expected Rejecting the EARLY revision should undo only ' EARLY' and leave ' LATE' intact; the previously rejected ' delta-two' must stay rejected.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. In a fresh document type 'Baseline revision text'. 2. Review tab > Track changes (button becomes 'Tracking on'). 3. Type ' delta-one', wait 2s, click Accept on the pending card. 4. Type ' delta-two', wait 2s, click Reject on its card; editor now reads 'Baseline revision text delta-one'. 5. Type ' EARLY', wait 2s, then type ' LATE', wait 2s. Two pending cards appear (newest first: LATE, then EARLY). 6. Click Reject on the second (older, EARLY) card. 7. Read the editor text and switch to View > LaTeX to read document.tex.\nActual: Editor text changed from 'Baseline revision text delta-one EARLY LATE' to 'Baseline revision text delta-one delta-two'; both EARLY and LATE were lost and the earlier rejected 'delta-two' came back. The exported LaTeX body showed the same 'Baseline revision text delta-one delta-two'. After the click only the LATE card remained, still claiming after='Baseline revision text delta-one EARLY LATE'.",
+      "source": "explore:review:rejecting an older tracked revision discards later edits and resurrects previously rejected text",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:17:32Z"
+    },
+    {
+      "id": "qa-091",
+      "title": "No UI to add a reply to a comment thread",
+      "why": "Exploratory pass on review (functional): expected A comment thread offers a way to add a reply, as implied by the review comment workflow and the reply pane in the thread model.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Type text, select it, Review tab > New comment, enter a body, click Comment. 2. In the Review sidebar click the comment thread, then double-click its body. 3. Inspect every control and input inside the thread and sidebar panel.\nActual: Thread exposes only two icon buttons (titles 'Resolve comment' and 'Delete comment'); inputs=[] and no reply/respond text appears before or after clicking or double-clicking. Thread reply count stays 0 and the probe's replyMatches list is empty.",
+      "source": "explore:review:no ui to add a reply to a comment thread",
+      "status": "open"
+    },
+    {
+      "id": "qa-092",
+      "title": "Deleting a comment leaves an orphaned highlight in the document",
+      "why": "Exploratory pass on review (functional): expected Deleting a thread removes its comment mark from the document, so the highlight disappears and cannot reference a missing thread.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Add a comment to selected text (e.g. 'Quoted sentence for review') and submit it. 2. In the Review sidebar click the 'Delete comment' icon on the thread. 3. Count [data-comment-id] elements in the editor and click the remaining highlighted text.\nActual: Thread count dropped 1 -> 0 but highlight count stayed 1 with the same mark id (e.g. '12db0404-998a-4630-9649-63aa56a2b36e') and class 'comment-highlight'. Clicking that orphan highlight switched the sidebar to Review/Comments yet showed zero threads ('Select text and choose New comment...' empty state).",
+      "source": "explore:review:deleting a comment leaves an orphaned highlight in the document",
+      "status": "open"
+    },
+    {
+      "id": "qa-093",
+      "title": "Rejecting a tracked revision leaves a stale baseline for the next revision",
+      "why": "Exploratory pass on review (functional): expected The next revision's before text should reflect the document after the rejection ('Baseline revision text delta-one'), not text that was just rejected.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Type 'Baseline revision text', turn on Track changes, type ' delta-one', wait 2s and Accept it. 2. Type ' delta-two', wait 2s, click Reject; editor returns to 'Baseline revision text delta-one'. 3. With tracking still on type ' EARLY', wait 2s, type ' LATE', wait 2s. 4. Read the 'before' text of the second (EARLY) revision card in the Review panel.\nActual: The EARLY card showed before='Baseline revision text delta-one delta-two' even though 'delta-two' had been rejected and was absent from the editor; probe flag staleBaselineEvidence=true.",
+      "source": "explore:review:rejecting a tracked revision leaves a stale baseline for the next revision",
+      "status": "open"
     }
   ]
 }
