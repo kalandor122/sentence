@@ -1303,8 +1303,9 @@
       "hint": "Repro: 1. Open the app and create a new project.\n2. On the Insert tab, click 'Inline equation'.\n3. In the LaTeX source textarea, enter `\\badcommand{x}`.\n4. Observe the preview and the Insert button state.\nActual: The preview renders the command in red error styling but the dialog reports no katex-error/invalid state (`hasKatexError: false`, no `math-preview-invalid` class) and the Insert button remains enabled. The same input can be inserted into the document.",
       "source": "explore:math:math dialog accepts unknown latex commands that katex renders as errors",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-22T23:59:46Z"
+      "attempts": 1,
+      "startedAt": "2026-11-22T23:59:46Z",
+      "lastAttemptAt": "2026-11-22T23:59:46Z"
     },
     {
       "id": "qa-089",

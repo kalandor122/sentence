@@ -179,3 +179,4 @@ Aborting
 2026-11-22T23:58:37Z START qa-087 on qa/qa-087-no-visual-controls-to-add-or-remove-tabl: No visual controls to add or remove table rows or columns
 2026-11-22T23:59:11Z DONE qa-087 (tsc -b, npm test, smoke all green)
 2026-11-22T23:59:32Z EXPLORE tables: 0 new items, agent exit 1
+2026-11-22T23:59:46Z START qa-088 on qa/qa-088-math-dialog-accepts-unknown-latex-comman: Math dialog accepts unknown LaTeX commands that KaTeX renders as errors
