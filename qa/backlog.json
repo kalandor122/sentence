@@ -1575,8 +1575,9 @@
       "hint": "Repro: In the demo document click at the end of the last paragraph, click Insert > Page break, then immediately click References > Table of contents without clicking back into the editor. Then, from a paragraph, click References > Table of contents followed immediately by Insert > Page break. Compare the [data-page-break] and [data-toc] counts in the visual DOM and the \\newpage / \\tableofcontents counts in View > LaTeX.\nActual: After the first break the DOM had 2 [data-page-break] and 1 [data-toc]; after the Contents click it had 1 break and 2 TOCs and the LaTeX had \\newpage count 1 and \\tableofcontents count 2, i.e. the newly inserted break was overwritten. In the reverse order there were 1 break and 4 TOCs before the Page break click and 2 breaks and 3 TOCs after it, with \\newpage count 2 and \\tableofcontents count 3: the last inserted TOC was overwritten. Probe qa/probes/insert-media.mjs steps 8 and 10: out.repeated.afterSecondBreak={breaks:2,tocs:1} vs out.repeated.dom.breaks=1, out.repeated.dom.tocs=2, out.repeated.latex.newpageCount=1; out.tocThenBreak.afterTocOnly={breaks:1,tocs:4} vs out.tocThenBreak.dom.breaks=2, out.tocThenBreak.dom.tocs=3.",
       "source": "explore:insert-media:a second page-furniture command replaces the previously inserted page break or contents block",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T02:11:52Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T02:11:52Z",
+      "lastAttemptAt": "2026-11-23T02:11:52Z"
     },
     {
       "id": "qa-101",
