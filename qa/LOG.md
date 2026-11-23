@@ -290,3 +290,5 @@ Aborting
 2026-11-23T04:05:27Z DONE qa-109 (tsc -b, npm test, smoke all green)
 2026-11-23T04:05:57Z PROMOTED from roadmap: qa-110 Track changes UI
 2026-11-23T04:05:57Z START qa-110 on qa/qa-110-track-changes-ui: Track changes UI
+2026-11-23T04:17:57Z DONE qa-110 (tsc -b, npm test, smoke all green)
+2026-11-23T04:28:33Z EXPLORE links-cites-footnotes: 1 new items, agent exit 0
