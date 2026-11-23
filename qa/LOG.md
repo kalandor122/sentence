@@ -221,3 +221,4 @@ Aborting
 2026-11-23T00:53:55Z DONE qa-030 (tsc -b, npm test, smoke all green)
 2026-11-23T00:54:29Z START qa-031 on qa/qa-031-toc-block-is-an-empty-placeholder-in-the: TOC block is an empty placeholder in the visual editor
 2026-11-23T00:58:31Z DONE qa-031 (tsc -b, npm test, smoke all green)
+2026-11-23T00:59:06Z START qa-045 on qa/qa-045-add-link-dialog-does-not-prefill-the-exi: Add link dialog does not prefill the existing URL when editing a link

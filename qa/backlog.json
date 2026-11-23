@@ -724,8 +724,9 @@
       "hint": "Repro: Create a project. Type `See example`, select it, Home > Add link, enter `https://example.com/a_b?x=1&y=2`, Insert. Click the linked text and click Home > Add link again.\nActual: The dialog opens with an empty Address field and placeholder `https://example.com`, even though the selected anchor's href is `https://example.com/a_b?x=1&y=2`.",
       "source": "explore:links-cites-footnotes:add link dialog does not prefill the existing url when editing a link",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T00:59:06Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T00:59:06Z",
+      "lastAttemptAt": "2026-11-23T00:59:06Z"
     },
     {
       "id": "qa-046",
