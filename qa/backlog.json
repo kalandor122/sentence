@@ -1931,8 +1931,9 @@
       "hint": "Repro: 1. Type 'Comment on tracked text'. 2. Turn on Review > Track changes. 3. Select the first word 'Comment' and add the comment 'Comment before tracked edit'. 4. Put the caret at the end and type ' tail', wait ~2 s, and open the History sidebar while the revision is pending.\nActual: The editor renders an insertion decoration with text ' on tracked text tail' and a deletion decoration with text ' on tracked text', so most of the unchanged sentence is shown as both deleted and inserted. The revision card text is correct; only the inline decorations are wrong.",
       "source": "explore:review:tracked-change decorations misreport existing text as deleted and re-inserted when the paragraph contains a comment mark",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T13:44:51Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T13:44:51Z",
+      "lastAttemptAt": "2026-11-23T13:44:51Z"
     },
     {
       "id": "qa-122",
@@ -1944,6 +1945,57 @@
       ],
       "hint": "Repro: 1. In an empty document (no text selected), open Review > New comment. 2. Type 'Comment without a selection' in the dialog and click Comment.\nActual: The dialog closes, a transient toast reads 'Select text before adding a comment.', no thread is created, and the typed comment body is discarded.",
       "source": "explore:review:new comment with no selection accepts a comment body and then discards it",
+      "status": "open"
+    },
+    {
+      "id": "qa-123",
+      "title": "Leaving the LaTeX view after a failed Apply silently discards the broken source draft",
+      "why": "Exploratory pass on source-editor (functional): expected The hand-written source, including the draft that failed validation, stays available so the user can fix the missing \\end{itemize}; alternatively the app warns before discarding it.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project, click View > LaTeX, put the caret at the end of the document body just before \\end{document}, and type a line `ZXBROKEN paragraph` followed by a newline and `\\begin{itemize}` with no closing `\\end{itemize}`. 2. Click 'Apply source': the toast reads `Invalid LaTeX: unbalanced environment \"itemize\".` and the visual document is correctly left unchanged. 3. Click View > Visual (the app switches to the visual document and repeats the error toast). 4. Click View > LaTeX and read the textarea.\nActual: The textarea is regenerated from the visual document and the typed lines are gone (source length returns from the edited value to the original 2794 characters, 'Apply source' is disabled). The probe reproduced this both through Apply source and by clicking Visual directly from the broken source (brokenTextStillInSourceAfterReturn=false in both cases). The visual document is preserved, but the unapplied source draft is lost with no confirmation.",
+      "source": "explore:source-editor:leaving the latex view after a failed apply silently discards the broken source draft",
+      "status": "in_progress",
+      "attempts": 1,
+      "startedAt": "2026-11-23T20:54:28Z",
+      "lastAttemptAt": "2026-11-23T20:54:28Z"
+    },
+    {
+      "id": "qa-124",
+      "title": "Headings and tables placed directly after text are escaped into literal text instead of being recognized",
+      "why": "Exploratory pass on source-editor (content): expected The section command immediately after paragraph text is valid LaTeX and should become a heading, and the following table should become a table.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and switch to View > LaTeX. 2. At the end of the body, before \\end{document}, add these lines without blank lines between the paragraph and the commands:\nZXTIGHT paragraph before a section\n\\section{ZXTIGHT SECTION}\nZXTIGHT section body\n\\begin{table}[htbp]\n\\centering\n\\begin{tabular}{ll}\nZXTIGHT & 9 \\\\\n\\end{tabular}\n\\end{table}\n3. Click 'Apply source', then View > Visual, then View > LaTeX.\nActual: Apply reports success (`Visual document synchronized from LaTeX.`), but the visual document has no ZXTIGHT SECTION heading and no table; it shows the literal text `\\section{ZXTIGHT SECTION}`, `\\begin{table}`, `\\begin{tabular}` and `\\end{tabular}`. Returning to the source shows the commands rewritten as `\\textbackslash{}section\\{ZXTIGHT SECTION\\}`, `\\textbackslash{}begin\\{table\\}`, etc., so the LaTeX is permanently corrupted as well. The same failure occurs for a \\section command alone without the table, so any block command that is not preceded by a blank line is affected.",
+      "source": "explore:source-editor:headings and tables placed directly after text are escaped into literal text instead of being recognized",
+      "status": "open"
+    },
+    {
+      "id": "qa-125",
+      "title": "Missing closing braces are accepted as valid LaTeX and the malformed text is rewritten on export",
+      "why": "Exploratory pass on source-editor (content): expected The parser should report the missing closing brace the way it reports an unbalanced environment, rather than applying the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project, switch to View > LaTeX, and before \\end{document} add:\n\\begin{tabular}{ll\nZXCOLCELL & 7 \\\\\n\\end{tabular}\n(notice the missing closing brace after `ll`). 2. Click 'Apply source' and read the toast. 3. Click View > Visual and inspect the table. 4. Switch back to View > LaTeX and read the table block.\nActual: No error is shown: the toast says `Visual document synchronized from LaTeX.` and the visual document contains a one-row table whose first cell is the literal text `{ll`. Re-exporting rewrites the block as a valid table with the cell `\\{ll`, changing the user's content. The same class of failure occurs with `\\section{ZXSEC UNCLOSED` (no closing brace): Apply reports success, the raw command appears as body text, and it is re-exported as `\\textbackslash{}section\\{ZXSEC UNCLOSED`.",
+      "source": "explore:source-editor:missing closing braces are accepted as valid latex and the malformed text is rewritten on export",
+      "status": "open"
+    },
+    {
+      "id": "qa-126",
+      "title": "Stale 'Retry save' error remains after the failed source draft has been discarded",
+      "why": "Exploratory pass on source-editor (ux): expected Once the broken draft is discarded and the source matches the saved visual document, the save-error indicator should clear.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project, switch to View > LaTeX, add `ZXFAIL persistent paragraph` plus an unclosed `\\begin{itemize}` before \\end{document}. 2. Click 'Apply source' (error toast appears). 3. Wait about 1.5 seconds so autosave attempts the same parse; a 'Retry save' button appears in the status bar. 4. Click View > Visual, then View > LaTeX. The broken draft is gone and the source has been regenerated from the visual document ('Apply source' is disabled). Look at the status bar.\nActual: The status bar still shows the 'Retry save' button after returning to the regenerated, clean source (saveErrorAfterReturn='Retry save' while 'Apply source' is disabled), suggesting unsaved or invalid work remains when there is none.",
+      "source": "explore:source-editor:stale 'retry save' error remains after the failed source draft has been discarded",
       "status": "open"
     }
   ]
