@@ -499,10 +499,11 @@
       ],
       "hint": "Repro: Insert > Contents\nActual: dashed box reading 'TABLE OF CONTENTS' only, no entries, even though the doc has H1/H2 headings; LaTeX gets \\tableofcontents correctly",
       "source": "explore:insert:toc block is an empty placeholder in the visual editor",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:54:29Z",
-      "lastAttemptAt": "2026-11-23T00:54:29Z"
+      "lastAttemptAt": "2026-11-23T00:54:29Z",
+      "doneAt": "2026-11-23T00:58:31Z"
     },
     {
       "id": "qa-032",
@@ -722,7 +723,9 @@
       ],
       "hint": "Repro: Create a project. Type `See example`, select it, Home > Add link, enter `https://example.com/a_b?x=1&y=2`, Insert. Click the linked text and click Home > Add link again.\nActual: The dialog opens with an empty Address field and placeholder `https://example.com`, even though the selected anchor's href is `https://example.com/a_b?x=1&y=2`.",
       "source": "explore:links-cites-footnotes:add link dialog does not prefill the existing url when editing a link",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:59:06Z"
     },
     {
       "id": "qa-046",
