@@ -148,7 +148,10 @@ try {
   } else observe("functional", "high", "no Compile control found in the ribbon", null);
 
   // 7. Regressions that shipped once and must not come back
-  const viewTab = page.getByRole("button", { name: "View", exact: true }).first();
+  // The ribbon tabs now expose role=tab; match either so a role change can never
+  // silently skip this block again.
+  const viewTab = page.getByRole("tab", { name: "View", exact: true })
+    .or(page.getByRole("button", { name: "View", exact: true })).first();
   if (await viewTab.count()) {
     // Ctrl+F find bar
     await page.keyboard.press("ControlOrMeta+f");
@@ -185,7 +188,8 @@ try {
     });
     await viewTab.click();
     await page.waitForTimeout(200);
-    const latexBtn = page.getByRole("button", { name: "LaTeX", exact: true }).first();
+    const latexBtn = page.getByRole("tab", { name: "LaTeX", exact: true })
+      .or(page.getByRole("button", { name: "LaTeX", exact: true })).first();
     hard("View tab exposes a LaTeX button", (await latexBtn.count()) > 0);
     if (await latexBtn.count()) {
       await latexBtn.click();
@@ -200,7 +204,8 @@ try {
         const injected = at >= 0 ? before.slice(0, at) + list + before.slice(at) : before + list;
         await area.fill(injected);
         await page.waitForTimeout(900);
-        await page.getByRole("button", { name: "Visual", exact: true }).first().click();
+        await page.getByRole("button", { name: "Visual", exact: true })
+          .or(page.getByRole("tab", { name: "Visual", exact: true })).first().click();
         await page.waitForTimeout(700);
         const roundTrip = await page.evaluate(() => {
           const ed = document.querySelector(".tiptap, .ProseMirror");
@@ -221,7 +226,7 @@ try {
       }
     }
   } else {
-    observe("ux", "medium", "no View ribbon tab found, cannot check source-view round trips", null);
+    hard("source-view round trip checks ran", false, "no View ribbon tab found — the regression block would be skipped silently");
   }
 
   // 8. Console gate

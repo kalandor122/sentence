@@ -308,3 +308,39 @@ Aborting
 2026-11-23T05:00:18Z START qa-115 on qa/qa-115-source-view-toggle-did-not-reveal-an-edi: source view toggle did not reveal an editable LaTeX surface
 2026-11-23T05:00:45Z DONE qa-115 (tsc -b, npm test, smoke all green)
 2026-11-23T05:01:15Z START qa-116 on qa/qa-116-no-view-ribbon-tab-found-cannot-check-so: no View ribbon tab found, cannot check source-view round trips
+2026-11-23T05:01:41Z DONE qa-116 (tsc -b, npm test, smoke all green)
+2026-11-23T05:02:11Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:04:32Z EXPLORE source-editor: 0 new items, agent exit 1
+2026-11-23T05:04:42Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:07:12Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:09:42Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:12:12Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:14:32Z EXPLORE long-document: 0 new items, agent exit 1
+2026-11-23T05:14:42Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:17:12Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:19:42Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:22:12Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:24:32Z EXPLORE persistence: 0 new items, agent exit 1
+2026-11-23T05:24:42Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:27:12Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:29:42Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:32:12Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:34:33Z EXPLORE keyboard: 0 new items, agent exit 1
+2026-11-23T05:34:43Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:37:13Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:39:43Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:42:13Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:44:33Z EXPLORE insert-media: 0 new items, agent exit 1
+2026-11-23T05:44:43Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:47:13Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:49:43Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:52:13Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:54:34Z EXPLORE lists: 0 new items, agent exit 1
+2026-11-23T05:54:44Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:57:14Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T05:59:44Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T06:02:14Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T06:04:34Z EXPLORE tables: 0 new items, agent exit 1
+2026-11-23T06:04:44Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T06:07:14Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T06:09:44Z BACKLOG EMPTY — nothing open, idle
