@@ -333,6 +333,51 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(parsed, settings)).toContain(nestedLatex);
   });
 
+  it("exports ordered list start numbers and round-trips them", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "orderedList",
+          attrs: { start: 3 },
+          content: [
+            {
+              type: "listItem",
+              content: [
+                { type: "paragraph", content: [{ type: "text", text: "apple" }] },
+                {
+                  type: "orderedList",
+                  attrs: { start: 5 },
+                  content: [
+                    {
+                      type: "listItem",
+                      content: [
+                        { type: "paragraph", content: [{ type: "text", text: "nested" }] },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const expected =
+      "\\begin{enumerate}\n\\setcounter{enumi}{2}\n\\item apple\n\\begin{enumerate}\n\\setcounter{enumii}{4}\n\\item nested\n\\end{enumerate}\n\\end{enumerate}";
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain(expected);
+
+    const parsed = latexToDocument(latex, settings).document;
+    const list = parsed.content[0];
+    expect(list?.type).toBe("orderedList");
+    expect(list?.attrs?.start).toBe(3);
+    const nested = list?.content?.[0]?.content?.[1];
+    expect(nested?.type).toBe("orderedList");
+    expect(nested?.attrs?.start).toBe(5);
+    expect(documentToLatex(parsed, settings)).toContain(expected);
+  });
+
   it("imports hand-authored mixed nested lists without flattening them", () => {
     const latex = [
       "\\begin{document}",
