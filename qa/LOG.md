@@ -258,3 +258,5 @@ Aborting
 2026-11-23T02:23:41Z START qa-082 on qa/qa-082-numbered-equations-lose-their-numbering: Numbered equations lose their numbering when copied or pasted
 2026-11-23T02:28:10Z DONE qa-082 (tsc -b, npm test, smoke all green)
 2026-11-23T02:28:40Z START qa-095 on qa/qa-095-ctrl-z-in-the-source-textarea-undoes-one: Ctrl+Z in the source textarea undoes one character at a time instead of the typed token
+2026-11-23T02:38:02Z DONE qa-095 (tsc -b, npm test, smoke all green)
+2026-11-23T02:43:20Z EXPLORE lists: 2 new items, agent exit 0
