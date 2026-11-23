@@ -1302,10 +1302,11 @@
       ],
       "hint": "Repro: 1. Open the app and create a new project.\n2. On the Insert tab, click 'Inline equation'.\n3. In the LaTeX source textarea, enter `\\badcommand{x}`.\n4. Observe the preview and the Insert button state.\nActual: The preview renders the command in red error styling but the dialog reports no katex-error/invalid state (`hasKatexError: false`, no `math-preview-invalid` class) and the Insert button remains enabled. The same input can be inserted into the document.",
       "source": "explore:math:math dialog accepts unknown latex commands that katex renders as errors",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-22T23:59:46Z",
-      "lastAttemptAt": "2026-11-22T23:59:46Z"
+      "lastAttemptAt": "2026-11-22T23:59:46Z",
+      "doneAt": "2026-11-23T00:00:20Z"
     },
     {
       "id": "qa-089",
@@ -1317,7 +1318,9 @@
       ],
       "hint": "Repro: 1. Create a new project.\n2. Insert an inline equation with value `x+1` (Insert > Inline equation, type `x+1`, click Insert).\n3. Click the inserted math node in the editor; the edit dialog opens.\n4. Press Escape to close the dialog.\n5. Press Backspace (or Delete).\nActual: After Escape closes the dialog, pressing Backspace or Delete does not remove the math node; the node remains in the document. The probe observed the node still present after both Backspace and Delete following dialog dismissal.",
       "source": "explore:math:math node cannot be removed with backspace/delete after closing its edit dialog",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:00:55Z"
     }
   ]
 }
