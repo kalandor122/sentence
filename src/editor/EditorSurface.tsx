@@ -40,6 +40,7 @@ interface EditorSurfaceProps {
   onStateChange: () => void;
   onCommentSelected: (markId: string) => void;
   onEditMath: (latex: string, display: boolean) => void;
+  onPageCountChange: (pages: number) => void;
 }
 
 const FONT_STACKS: Record<ProjectSettings["fontFamily"], string> = {
@@ -105,6 +106,7 @@ export default function EditorSurface({
   onStateChange,
   onCommentSelected,
   onEditMath,
+  onPageCountChange,
 }: EditorSurfaceProps) {
   const firstNode = document.content[0];
   const repeatsTitle =
@@ -234,19 +236,24 @@ export default function EditorSurface({
     const dom = editor.view.dom as HTMLElement;
     const sheet = dom.closest<HTMLElement>(".paper-sheet");
     const scroll = dom.closest<HTMLElement>(".visual-editor-scroll");
-    if (!sheet || !scroll) return;
+    if (!sheet || !scroll) {
+      onPageCountChange(1);
+      return;
+    }
     let frame = 0;
+    let lastPages = 0;
 
     const paginate = () => {
       frame = 0;
       const wrappers = Array.from(dom.querySelectorAll<HTMLElement>("[data-page-break]"));
       scroll.style.removeProperty("--sentence-sheet-min-height");
       for (const wrapper of wrappers) wrapper.style.paddingTop = "0px";
-      if (wrappers.length === 0) return;
-      for (const wrapper of wrappers) {
-        const remainder = (offsetWithin(wrapper, sheet) + PAGE_GAP) % PAGE_HEIGHT;
-        const fill = remainder === 0 ? 0 : PAGE_HEIGHT - remainder;
-        wrapper.style.paddingTop = `${fill}px`;
+      if (wrappers.length > 0) {
+        for (const wrapper of wrappers) {
+          const remainder = (offsetWithin(wrapper, sheet) + PAGE_GAP) % PAGE_HEIGHT;
+          const fill = remainder === 0 ? 0 : PAGE_HEIGHT - remainder;
+          wrapper.style.paddingTop = `${fill}px`;
+        }
       }
       const contentBottom = offsetWithin(dom, sheet) + dom.offsetHeight;
       const pages = Math.max(1, Math.ceil(contentBottom / PAGE_HEIGHT));
@@ -254,6 +261,10 @@ export default function EditorSurface({
         "--sentence-sheet-min-height",
         `${pages * PAGE_HEIGHT}px`,
       );
+      if (pages !== lastPages) {
+        lastPages = pages;
+        onPageCountChange(pages);
+      }
     };
 
     const schedule = () => {
@@ -276,7 +287,7 @@ export default function EditorSurface({
         wrapper.style.paddingTop = "";
       }
     };
-  }, [editor, settings, comments]);
+  }, [editor, settings, comments, onPageCountChange]);
 
   const paperStyle = {
     "--paper-font": FONT_STACKS[settings.fontFamily],

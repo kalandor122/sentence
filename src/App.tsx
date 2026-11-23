@@ -407,6 +407,7 @@ export default function App() {
     setDirty(false);
     setSaveState("saved");
     setCompileResult(null);
+    setVisualPages(null);
     if (!isDesktop) persistBrowser(project);
     rememberProject(project);
   };
@@ -1077,7 +1078,8 @@ export default function App() {
   });
 
   const words = workspace ? countWords(workspace.document) : 0;
-  const pages = Math.max(1, Math.ceil(words / 480));
+  const [visualPages, setVisualPages] = useState<number | null>(null);
+  const pages = visualPages ?? Math.max(1, Math.ceil(words / 480));
   const branch = workspace?.git.status.branch ?? "main";
 
   const findBar = find.open ? (
@@ -1283,6 +1285,7 @@ export default function App() {
                       setSidebarPanel("comments");
                     }}
                     onEditMath={(latex, display) => setMathEditor({ display, latex, editing: true })}
+                    onPageCountChange={setVisualPages}
                   />
                 </Suspense>
               </section>
