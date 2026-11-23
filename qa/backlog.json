@@ -356,8 +356,9 @@
       "hint": "Repro: Review > 'Tracking on' toggles to 'Track changes'\nActual: Toggle works but nothing in the status bar or sidebar shows whether tracking is active",
       "source": "explore:chrome:track-changes state is not surfaced outside the button",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T00:08:56Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T00:08:56Z",
+      "lastAttemptAt": "2026-11-23T00:08:56Z"
     },
     {
       "id": "qa-023",
