@@ -1802,10 +1802,25 @@
       ],
       "hint": "Tabs above the page area holding multiple open projects, with dirty indicators and per-tab close. Keep one editor instance and swap the workspace snapshot to avoid memory blowup. Desktop only for real projects; browser mode keeps the single demo workspace.",
       "source": "roadmap:multi-document workspace tabs",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T04:35:22Z",
-      "lastAttemptAt": "2026-11-23T04:35:22Z"
+      "lastAttemptAt": "2026-11-23T04:35:22Z",
+      "doneAt": "2026-11-23T04:47:35Z"
+    },
+    {
+      "id": "qa-114",
+      "title": "Export to HTML and Markdown alongside LaTeX",
+      "why": "People need to publish the same text as a blog post or a web page, and currently the only portable output is .tex.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Add exporters next to documentToLatex in src/lib, driven by the same document model, with round-trip tests for the supported subset. Wire them into a File/Export menu that is honest about which subset is supported.",
+      "source": "roadmap:export to html and markdown alongside latex",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T04:48:05Z"
     }
   ]
 }
