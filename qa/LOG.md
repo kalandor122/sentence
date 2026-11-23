@@ -235,3 +235,4 @@ Aborting
 2026-11-23T01:29:49Z EXPLORE persistence: 3 new items, agent exit 0
 2026-11-23T01:30:03Z START qa-096 on qa/qa-096-edits-inside-the-autosave-debounce-are-l: Edits inside the autosave debounce are lost on reload with no warning
 2026-11-23T01:32:42Z DONE qa-096 (tsc -b, npm test, smoke all green)
+2026-11-23T01:33:17Z START qa-063 on qa/qa-063-inactive-ribbon-toggles-omit-aria-presse: Inactive ribbon toggles omit aria-pressed instead of reporting false
