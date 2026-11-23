@@ -360,3 +360,4 @@ Aborting
 2026-11-23T20:58:27Z DONE qa-123 (tsc -b, npm test, smoke all green)
 2026-11-23T20:59:02Z START qa-124 on qa/qa-124-headings-and-tables-placed-directly-afte: Headings and tables placed directly after text are escaped into literal text instead of being recognized
 2026-11-23T21:01:28Z DONE qa-124 (tsc -b, npm test, smoke all green)
+2026-11-23T21:02:03Z START qa-125 on qa/qa-125-missing-closing-braces-are-accepted-as-v: Missing closing braces are accepted as valid LaTeX and the malformed text is rewritten on export

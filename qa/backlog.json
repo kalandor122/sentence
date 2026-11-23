@@ -1990,8 +1990,9 @@
       "hint": "Repro: 1. Create a project, switch to View > LaTeX, and before \\end{document} add:\n\\begin{tabular}{ll\nZXCOLCELL & 7 \\\\\n\\end{tabular}\n(notice the missing closing brace after `ll`). 2. Click 'Apply source' and read the toast. 3. Click View > Visual and inspect the table. 4. Switch back to View > LaTeX and read the table block.\nActual: No error is shown: the toast says `Visual document synchronized from LaTeX.` and the visual document contains a one-row table whose first cell is the literal text `{ll`. Re-exporting rewrites the block as a valid table with the cell `\\{ll`, changing the user's content. The same class of failure occurs with `\\section{ZXSEC UNCLOSED` (no closing brace): Apply reports success, the raw command appears as body text, and it is re-exported as `\\textbackslash{}section\\{ZXSEC UNCLOSED`.",
       "source": "explore:source-editor:missing closing braces are accepted as valid latex and the malformed text is rewritten on export",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T21:02:03Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T21:02:03Z",
+      "lastAttemptAt": "2026-11-23T21:02:03Z"
     },
     {
       "id": "qa-126",

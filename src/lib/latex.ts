@@ -940,6 +940,43 @@ function assertBalancedEnvironments(source: string): void {
   }
 }
 
+function assertBalancedBraces(source: string): void {
+  let depth = 0;
+  let verbatim: string | null = null;
+
+  for (const rawLine of source.split(/\r?\n/)) {
+    let line: string = verbatim ? rawLine : stripLatexComment(rawLine);
+    if (verbatim) {
+      const close = line.indexOf(`\\end{${verbatim}}`);
+      if (close < 0) continue;
+      line = line.slice(close + verbatim.length + 6);
+      verbatim = null;
+    }
+    for (let index = 0; index < line.length; index += 1) {
+      const character = line[index];
+      if (character !== "{" && character !== "}") continue;
+      if (precedingBackslashes(line, index) % 2 === 1) continue;
+      depth += character === "{" ? 1 : -1;
+      if (depth < 0) {
+        throw new Error("Invalid LaTeX: unexpected closing brace.");
+      }
+    }
+    const verbatimStart = line.match(/\\begin\{verbatim\}/);
+    if (
+      verbatimStart &&
+      !line.includes(
+        "\\end{verbatim}",
+        (verbatimStart.index ?? 0) + verbatimStart[0].length,
+      )
+    ) {
+      verbatim = "verbatim";
+    }
+  }
+  if (depth > 0) {
+    throw new Error("Invalid LaTeX: missing closing brace.");
+  }
+}
+
 function documentBody(latex: string): string {
   const begin = "\\begin{document}";
   const end = "\\end{document}";
@@ -1042,6 +1079,7 @@ export function latexToDocument(
 
   const body = documentBody(latex);
   assertBalancedEnvironments(body);
+  assertBalancedBraces(body);
   const source = body
     .replace(/\\begin\{abstract\}[\s\S]*?\\end\{abstract\}/g, "")
     .replace(/\\keywords\{[^}]*\}/g, "")
