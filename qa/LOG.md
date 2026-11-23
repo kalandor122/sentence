@@ -183,3 +183,4 @@ Aborting
 2026-11-23T00:00:20Z DONE qa-088 (tsc -b, npm test, smoke all green)
 2026-11-23T00:00:55Z START qa-089 on qa/qa-089-math-node-cannot-be-removed-with-backspa: Math node cannot be removed with Backspace/Delete after closing its edit dialog
 2026-11-23T00:01:29Z DONE qa-089 (tsc -b, npm test, smoke all green)
+2026-11-23T00:02:03Z START qa-007 on qa/qa-007-start-screen-footer-is-hardcoded-sentenc: Start screen footer is hardcoded 'Sentence 0.1' while the app is 0.2.0

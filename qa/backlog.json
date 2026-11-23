@@ -116,8 +116,9 @@
       ],
       "hint": "Inject the version at build time (define in vite.config.ts from package.json) and render it, so bumping package.json cannot drift.",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T00:02:03Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T00:02:03Z",
+      "lastAttemptAt": "2026-11-23T00:02:03Z"
     },
     {
       "id": "qa-008",
