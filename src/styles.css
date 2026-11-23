@@ -970,6 +970,18 @@ button:disabled {
   margin: 0 0 1.1em;
 }
 
+.sentence-editor p[data-line-spacing="single"] {
+  line-height: 1.72;
+}
+
+.sentence-editor p[data-line-spacing="onehalf"] {
+  line-height: 2.15;
+}
+
+.sentence-editor p[data-line-spacing="double"] {
+  line-height: 2.6;
+}
+
 .paper-parskip .sentence-editor p {
   margin: 0 0 1.5em;
 }
