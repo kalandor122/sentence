@@ -30,6 +30,7 @@ import {
   Quote,
   Redo2,
   Sigma,
+  SpellCheck,
   SquareSplitHorizontal,
   Strikethrough,
   Table2,
@@ -541,6 +542,17 @@ export default function Ribbon({
               <button type="button" className={`ribbon-command wide ${tracking ? "active" : ""}`} aria-pressed={tracking} onClick={onToggleTracking}>
                 <ChevronDown size={17} />
                 <span>{tracking ? "Tracking on" : "Track changes"}</span>
+              </button>
+            </RibbonGroup>
+            <RibbonGroup label="Spelling">
+              <button
+                type="button"
+                className={`ribbon-command wide ${settings.spellcheck ? "active" : ""}`}
+                aria-pressed={settings.spellcheck}
+                onClick={() => onSettingsChange({ spellcheck: !settings.spellcheck })}
+              >
+                <SpellCheck size={17} />
+                <span>{settings.spellcheck ? "Spelling on" : "Spelling off"}</span>
               </button>
             </RibbonGroup>
           </>

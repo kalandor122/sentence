@@ -275,3 +275,4 @@ Aborting
 2026-11-23T03:19:37Z START qa-104 on qa/qa-104-table-editing-a-contextual-table-toolbar: Table editing: a contextual table toolbar
 2026-11-23T03:28:13Z DONE qa-104 (tsc -b, npm test, smoke all green)
 2026-11-23T03:28:43Z PROMOTED from roadmap: qa-105 Spell check that respects the LaTeX source
+2026-11-23T03:28:43Z START qa-105 on qa/qa-105-spell-check-that-respects-the-latex-sour: Spell check that respects the LaTeX source

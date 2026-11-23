@@ -84,6 +84,18 @@ const CaptionTable = Table.extend({
 const PAGE_HEIGHT = 1053;
 const PAGE_GAP = 64;
 
+// The WebView's native spellchecker uses lang to pick a dictionary; keeping
+// these in one place avoids drift between editor creation and later toggles.
+function editorAttributes(spellcheck: boolean) {
+  return {
+    class: "sentence-editor",
+    spellcheck: spellcheck ? "true" : "false",
+    lang: "en",
+    autocorrect: "on",
+    "aria-label": "Document editor",
+  };
+}
+
 function offsetWithin(element: HTMLElement, ancestor: HTMLElement): number {
   let top = 0;
   let node: HTMLElement | null = element;
@@ -164,12 +176,7 @@ export default function EditorSurface({
     editable,
     immediatelyRender: false,
     editorProps: {
-      attributes: {
-        class: "sentence-editor",
-        spellcheck: "true",
-        autocorrect: "on",
-        "aria-label": "Document editor",
-      },
+      attributes: editorAttributes(settings.spellcheck),
       handleClick(_view, _position, event) {
         const target = event.target as HTMLElement;
         const math = target.closest<HTMLElement>("[data-math-inline],[data-math-block]");
@@ -229,6 +236,16 @@ export default function EditorSurface({
     if (!editor) return;
     setLineSpacing(editor, settings.lineSpacing);
   }, [editor, settings.lineSpacing]);
+
+  useEffect(() => {
+    if (!editor) return;
+    editor.setOptions({
+      editorProps: {
+        ...editor.options.editorProps,
+        attributes: editorAttributes(settings.spellcheck),
+      },
+    });
+  }, [editor, settings.spellcheck]);
 
   useEffect(() => {
     if (!editor) return;
