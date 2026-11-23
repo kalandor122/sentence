@@ -1130,10 +1130,11 @@
       ],
       "hint": "innerHTML unchanged",
       "source": "keyboard shortcut \"ctrl+5 line spacing\" has no visible effect on the document",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T01:49:05Z",
-      "lastAttemptAt": "2026-11-23T01:49:05Z"
+      "lastAttemptAt": "2026-11-23T01:49:05Z",
+      "doneAt": "2026-11-23T01:53:41Z"
     },
     {
       "id": "qa-072",
@@ -1209,7 +1210,9 @@
       ],
       "hint": "Repro: In a project inspect nav.ribbon-tabs, then focus the 'Home' tab and press ArrowRight. (Probe: ribbonTabs.)\nActual: The nav has role=null; all 8 tab buttons have role=null and aria-selected=null (active state is only a CSS class). Focus starts on 'Home', stays on 'Home' after ArrowRight, and the active tab remains 'Home'. All tabs are still reachable one-by-one with Tab.",
       "source": "explore:keyboard:ribbon tabs lack tab semantics and arrow-key navigation",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T01:54:11Z"
     },
     {
       "id": "qa-077",
