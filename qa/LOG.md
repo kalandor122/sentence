@@ -201,3 +201,4 @@ Aborting
 2026-11-23T00:09:30Z DONE qa-022 (tsc -b, npm test, smoke all green)
 2026-11-23T00:10:05Z START qa-023 on qa/qa-023-backdrop-click-does-not-dismiss-modals: Backdrop click does not dismiss modals
 2026-11-23T00:10:39Z DONE qa-023 (tsc -b, npm test, smoke all green)
+2026-11-23T00:11:13Z START qa-028 on qa/qa-028-adjacent-inline-atoms-are-emitted-glued: Adjacent inline atoms are emitted glued together
