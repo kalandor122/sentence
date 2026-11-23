@@ -483,7 +483,9 @@
       ],
       "hint": "Repro: Insert > Page break -> read the status bar\nActual: '1 page' with a page break present",
       "source": "explore:insert:status bar page count ignores page breaks",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:50:43Z"
     },
     {
       "id": "qa-031",
@@ -1438,10 +1440,11 @@
       ],
       "hint": "Repro: Create a project (New document), click View > LaTeX. At the end of the LaTeX source textarea type ZXRECLICK with the keyboard and do NOT click Apply source. Click the View ribbon tab, then click the LaTeX button again while LaTeX mode is already active, and read the textarea.\nActual: The textarea is regenerated from the visual document and ZXRECLICK is gone with no warning. The probe confirmed the marker is still present after clicking only the View tab (afterViewTabOnly=true) and disappears immediately after the LaTeX button click (before=true, after=false).",
       "source": "explore:source-editor:re-clicking the active latex mode button silently discards unapplied source edits",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:48:20Z",
-      "lastAttemptAt": "2026-11-23T00:48:21Z"
+      "lastAttemptAt": "2026-11-23T00:48:21Z",
+      "doneAt": "2026-11-23T00:50:09Z"
     },
     {
       "id": "qa-095",
