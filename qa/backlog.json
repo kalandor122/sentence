@@ -1546,7 +1546,9 @@
       ],
       "hint": "Repro: In the browser app, type a marker, wait 1.5 s until the heading says 'Saved locally', then reload. Press Ctrl+Z with focus in the editor, then click the 'Undo (Ctrl+Z)' ribbon button; compare document.body innerText before and after each action and read the button's disabled property.\nActual: After reload the Undo button reports disabled=false. document.body innerText length is 1452 before Ctrl+Z, 1452 after Ctrl+Z, and 1452 after clicking Undo; the marker remains in the document. No visible change occurs from either action.",
       "source": "explore:persistence:undo appears enabled but is a no-op after reload",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T02:52:57Z"
     },
     {
       "id": "qa-098",
@@ -1630,10 +1632,11 @@
       ],
       "hint": "Repro: Clear the editor and type '3. apple' in a paragraph so the ordered-list input rule fires. Switch to Source and read the LaTeX textarea.\nActual: The visual editor has <ol start=\"3\"><li><p>apple</p></li></ol>, but the LaTeX is '\\begin{enumerate}\\n\\item apple\\n\\end{enumerate}', which renders the item as '1. apple'.",
       "source": "explore:lists:ordered list start number is dropped from latex",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T02:48:23Z",
-      "lastAttemptAt": "2026-11-23T02:48:23Z"
+      "lastAttemptAt": "2026-11-23T02:48:23Z",
+      "doneAt": "2026-11-23T02:52:28Z"
     }
   ]
 }

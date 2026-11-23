@@ -263,3 +263,4 @@ Aborting
 2026-11-23T02:43:29Z START qa-102 on qa/qa-102-select-all-list-toggle-does-not-convert: Select-all + list toggle does not convert a list to paragraphs; it adds an empty item
 2026-11-23T02:47:53Z DONE qa-102 (tsc -b, npm test, smoke all green)
 2026-11-23T02:48:23Z START qa-103 on qa/qa-103-ordered-list-start-number-is-dropped-fro: Ordered list start number is dropped from LaTeX
+2026-11-23T02:52:28Z DONE qa-103 (tsc -b, npm test, smoke all green)
