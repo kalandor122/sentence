@@ -74,6 +74,7 @@ import type {
   ArxivPackageResult,
   CommentThread,
   CompileResult,
+  DocumentNode,
   EditorMode,
   GitAuthor,
   GitState,
@@ -243,6 +244,17 @@ function joinProjectPath(root: string, relative: string): string {
 
 function documentSource(document: SentenceDocument, settings: ProjectSettings): string {
   return documentToLatex(document, settings);
+}
+
+function withoutCommentMark(document: SentenceDocument, markId: string): SentenceDocument {
+  const strip = (node: DocumentNode): DocumentNode => ({
+    ...node,
+    ...(node.marks
+      ? { marks: node.marks.filter((mark) => !(mark.type === "comment" && mark.attrs?.markId === markId)) }
+      : {}),
+    ...(node.content ? { content: node.content.map(strip) } : {}),
+  });
+  return { ...document, content: document.content.map(strip) };
 }
 
 export default function App() {
@@ -1178,10 +1190,14 @@ export default function App() {
             markDirty();
           }}
           onDeleteComment={(id) => {
+            const thread = workspace.comments.find((item) => item.id === id);
+            if (!thread) return;
             setWorkspace((current) => current ? {
               ...current,
-              comments: current.comments.filter((thread) => thread.id !== id),
+              document: withoutCommentMark(current.document, thread.markId),
+              comments: current.comments.filter((item) => item.id !== id),
             } : current);
+            if (activeCommentId === thread.markId) setActiveCommentId(null);
             markDirty();
           }}
           onAddReply={(id, body) => {

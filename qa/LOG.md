@@ -210,3 +210,4 @@ Aborting
 2026-11-23T00:25:55Z DONE qa-090 (tsc -b, npm test, smoke all green)
 2026-11-23T00:26:29Z START qa-091 on qa/qa-091-no-ui-to-add-a-reply-to-a-comment-thread: No UI to add a reply to a comment thread
 2026-11-23T00:31:59Z DONE qa-091 (tsc -b, npm test, smoke all green)
+2026-11-23T00:32:33Z START qa-092 on qa/qa-092-deleting-a-comment-leaves-an-orphaned-hi: Deleting a comment leaves an orphaned highlight in the document
