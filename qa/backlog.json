@@ -131,10 +131,11 @@
         "src/styles.css"
       ],
       "hint": "Ctrl+P calls window.print(). Add an @media print block that hides ribbon, sidebar and status bar, removes page shadows and background chrome, and prints the page sheet at its true width. Verify with a headless PDF print in the smoke script (page.pdf()) that the ribbon does not appear.",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:03:12Z",
-      "lastAttemptAt": "2026-11-23T00:03:12Z"
+      "lastAttemptAt": "2026-11-23T00:03:12Z",
+      "doneAt": "2026-11-23T00:03:46Z"
     },
     {
       "id": "qa-009",
@@ -290,7 +291,9 @@
       ],
       "hint": "Repro: GitHub dialog > Continue in browser with empty client ID\nActual: Validation message renders as <p class=\"auth-message\"> with no role=alert and no aria-live",
       "source": "explore:chrome:inline validation error not announced",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:04:21Z"
     },
     {
       "id": "qa-019",
