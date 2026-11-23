@@ -103,7 +103,7 @@ type DialogState =
   | { kind: "citation" }
   | { kind: "footnote" }
   | { kind: "cross-reference" }
-  | { kind: "link" }
+  | { kind: "link"; initialValue: string }
   | { kind: "comment" }
   | null;
 
@@ -758,6 +758,11 @@ export default function App() {
     }
   };
 
+  const openLinkDialog = () => {
+    const href = editor?.getAttributes("link").href;
+    setDialog({ kind: "link", initialValue: typeof href === "string" ? href : "" });
+  };
+
   const handleDialogSubmit = (value: string) => {
     if (!dialog) return;
     switch (dialog.kind) {
@@ -1048,7 +1053,7 @@ export default function App() {
       }
       if (editingDocument && mod && !event.altKey && !event.shiftKey && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        setDialog({ kind: "link" });
+        openLinkDialog();
       }
       // Inside the page Tiptap already owns these list shortcuts; outside it,
       // route them to the same commands against the current selection.
@@ -1154,7 +1159,7 @@ export default function App() {
         onInsertCitation={() => setDialog({ kind: "citation" })}
         onInsertFootnote={() => setDialog({ kind: "footnote" })}
         onInsertCrossReference={() => setDialog({ kind: "cross-reference" })}
-        onInsertLink={() => setDialog({ kind: "link" })}
+        onInsertLink={openLinkDialog}
         onInsertToc={() => editor?.chain().focus().insertContent({ type: "toc" }).run()}
         onInsertPageBreak={() => editor?.chain().focus().insertContent({ type: "pageBreak" }).run()}
         onToggleTracking={() => {
@@ -1435,6 +1440,7 @@ export default function App() {
         title={dialogProps.title}
         description={"description" in dialogProps ? dialogProps.description : undefined}
         label={dialogProps.label}
+        initialValue={dialog?.kind === "link" ? dialog.initialValue : undefined}
         placeholder={"placeholder" in dialogProps ? dialogProps.placeholder : undefined}
         multiline={"multiline" in dialogProps ? dialogProps.multiline : false}
         confirmLabel={"confirmLabel" in dialogProps ? dialogProps.confirmLabel : "Insert"}
