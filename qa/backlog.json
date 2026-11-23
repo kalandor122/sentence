@@ -1422,10 +1422,37 @@
       ],
       "hint": "Repro: 1. Type 'Baseline revision text', turn on Track changes, type ' delta-one', wait 2s and Accept it. 2. Type ' delta-two', wait 2s, click Reject; editor returns to 'Baseline revision text delta-one'. 3. With tracking still on type ' EARLY', wait 2s, type ' LATE', wait 2s. 4. Read the 'before' text of the second (EARLY) revision card in the Review panel.\nActual: The EARLY card showed before='Baseline revision text delta-one delta-two' even though 'delta-two' had been rejected and was absent from the editor; probe flag staleBaselineEvidence=true.",
       "source": "explore:review:rejecting a tracked revision leaves a stale baseline for the next revision",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:36:07Z",
-      "lastAttemptAt": "2026-11-23T00:36:07Z"
+      "lastAttemptAt": "2026-11-23T00:36:07Z",
+      "doneAt": "2026-11-23T00:43:46Z"
+    },
+    {
+      "id": "qa-094",
+      "title": "Re-clicking the active LaTeX mode button silently discards unapplied source edits",
+      "why": "Exploratory pass on source-editor (functional): expected Re-selecting the already active mode is a no-op, so ZXRECLICK remains in the textarea, or the app warns before discarding unapplied source edits.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project (New document), click View > LaTeX. At the end of the LaTeX source textarea type ZXRECLICK with the keyboard and do NOT click Apply source. Click the View ribbon tab, then click the LaTeX button again while LaTeX mode is already active, and read the textarea.\nActual: The textarea is regenerated from the visual document and ZXRECLICK is gone with no warning. The probe confirmed the marker is still present after clicking only the View tab (afterViewTabOnly=true) and disappears immediately after the LaTeX button click (before=true, after=false).",
+      "source": "explore:source-editor:re-clicking the active latex mode button silently discards unapplied source edits",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:48:20Z"
+    },
+    {
+      "id": "qa-095",
+      "title": "Ctrl+Z in the source textarea undoes one character at a time instead of the typed token",
+      "why": "Exploratory pass on source-editor (ux): expected One Ctrl+Z removes the just-typed token, as in a native textarea; the probe's native textarea control went from \"ZXUNDO\" to \"\" with one Ctrl+Z.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project, click View > LaTeX, click at the end of the source textarea and type ZXUNDO as normal keystrokes. Press Ctrl+Z once and read the textarea tail.\nActual: Only the final character is removed: the tail reads ZXUND. Seven Ctrl+Z presses total are needed to restore the text before typing, and Ctrl+Shift+Z restores one character at a time. The source document itself is never damaged by the undos.",
+      "source": "explore:source-editor:ctrl+z in the source textarea undoes one character at a time instead of the typed token",
+      "status": "open"
     }
   ]
 }
