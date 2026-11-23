@@ -451,10 +451,11 @@
       ],
       "hint": "Repro: Insert two citations and a footnote consecutively -> View/LaTeX\nActual: \\cite{knuth1984}\\cite{lamport1994}\\footnote{A note about the analytical engine.} with no separator; renders as [1][2]^1 | evidence: source excerpt above",
       "source": "explore:insert:adjacent inline atoms are emitted glued together",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:11:13Z",
-      "lastAttemptAt": "2026-11-23T00:11:13Z"
+      "lastAttemptAt": "2026-11-23T00:11:13Z",
+      "doneAt": "2026-11-23T00:11:48Z"
     },
     {
       "id": "qa-029",
@@ -466,7 +467,9 @@
       ],
       "hint": "Repro: Insert a 120x60 px image -> View/LaTeX\nActual: \\includegraphics[width=0.8\\linewidth]{...} with \\caption{qa-test.png}; a 120px image is stretched to 80% of the text block and the filename becomes the caption | evidence: src/lib/latex.ts:269-276 (width defaults to 0.8 when attrs.width is 0)",
       "source": "explore:insert:all images forced to 0.8\\linewidth; caption is the raw filename",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:12:22Z"
     },
     {
       "id": "qa-030",
