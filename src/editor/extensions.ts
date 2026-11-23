@@ -21,6 +21,34 @@ export const ProjectImage = Image.extend({
       },
     };
   },
+
+  parseHTML() {
+    return [{ tag: "img[src]:not([data-inline-image])" }];
+  },
+});
+
+// An image dropped into a text block stays inside that block. The block image
+// above remains available for standalone figures.
+export const InlineProjectImage = ProjectImage.extend({
+  name: "inlineImage",
+  inline: true,
+  group: "inline",
+  atom: true,
+  selectable: true,
+
+  parseHTML() {
+    return [{ tag: "img[data-inline-image][src]" }];
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return [
+      "img",
+      mergeAttributes(HTMLAttributes, {
+        "data-inline-image": "",
+        class: "inline-image",
+      }),
+    ];
+  },
 });
 
 export const MathInline = Node.create({

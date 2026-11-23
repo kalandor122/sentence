@@ -291,6 +291,20 @@ function insertPageFurniture(editor: Editor | null, type: "pageBreak" | "toc") {
   editor.chain().focus().insertContent({ type }).run();
 }
 
+// A block image inserts at a mid-text caret by splitting the paragraph. Use
+// the inline node when the caret is strictly inside a text block so the
+// surrounding sentence stays intact; boundaries still insert standalone figures.
+function insertImage(editor: Editor | null, attrs: Record<string, string>) {
+  if (!editor) return;
+  const { $from, empty } = editor.state.selection;
+  const insideText =
+    empty &&
+    $from.parent.isTextblock &&
+    $from.parentOffset > 0 &&
+    $from.parentOffset < $from.parent.content.size;
+  editor.chain().focus().insertContent({ type: insideText ? "inlineImage" : "image", attrs }).run();
+}
+
 export default function App() {
   const [workspace, setWorkspace] = useState<Workspace | null>(loadBrowserWorkspace);
   const workspaceRef = useRef<Workspace | null>(workspace);
@@ -916,20 +930,22 @@ export default function App() {
         const relative = await importImage(current.path, file.name, base64);
         const absolute = joinProjectPath(current.path, relative);
         await authorizeAsset(absolute);
-        editor?.chain().focus().insertContent({
-          type: "image",
-          attrs: { src: assetUrl(current.path, relative), alt: file.name, path: relative },
-        }).run();
+        insertImage(editor, {
+          src: assetUrl(current.path, relative),
+          alt: file.name,
+          path: relative,
+        });
         markDirty();
         return;
       } catch (error) {
         setToast(error instanceof Error ? error.message : String(error));
       }
     }
-    editor?.chain().focus().insertContent({
-      type: "image",
-      attrs: { src: dataUrl, alt: file.name, path: imageAssetPath(file.name) },
-    }).run();
+    insertImage(editor, {
+      src: dataUrl,
+      alt: file.name,
+      path: imageAssetPath(file.name),
+    });
   };
 
   const refreshGit = async () => {

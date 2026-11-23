@@ -11,6 +11,7 @@ import {
   CommentMark,
   CrossReference,
   Footnote,
+  InlineProjectImage,
   MathBlock,
   MathInline,
   PageBreak,
@@ -116,6 +117,7 @@ export default function EditorSurface({
         allowBase64: true,
         inline: false,
       }),
+      InlineProjectImage.configure({ allowBase64: true }),
       Placeholder.configure({
         placeholder: "Begin with a sentence...",
         showOnlyWhenEditable: true,

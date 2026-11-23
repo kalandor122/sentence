@@ -1083,6 +1083,13 @@ button:disabled {
   border: 1px solid #e0dcd3;
 }
 
+.sentence-editor img.inline-image {
+  display: inline-block;
+  max-height: 1.5em;
+  margin: 0 0.2em;
+  vertical-align: middle;
+}
+
 .sentence-editor hr {
   margin: 2em 0;
   border: 0;
