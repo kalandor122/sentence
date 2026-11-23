@@ -197,3 +197,4 @@ Aborting
 2026-11-23T00:07:47Z START qa-021 on qa/qa-021-submission-check-opens-the-arxiv-packag: 'Submission check' opens the arXiv package dialog and performs no check
 2026-11-23T00:08:21Z DONE qa-021 (tsc -b, npm test, smoke all green)
 2026-11-23T00:08:42Z EXPLORE links-cites-footnotes: 0 new items, agent exit 1
+2026-11-23T00:08:56Z START qa-022 on qa/qa-022-track-changes-state-is-not-surfaced-outs: Track-changes state is not surfaced outside the button
