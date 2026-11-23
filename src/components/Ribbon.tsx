@@ -118,6 +118,16 @@ function activeMarkAttribute(editor: Editor | null, markName: string, attribute:
   return typeof value === "string" ? value : "";
 }
 
+function activeTextAlign(editor: Editor | null): string {
+  if (!editor) return "";
+  for (const align of ["center", "right", "justify"]) {
+    if (editor.isActive({ textAlign: align })) return align;
+  }
+  // Plain paragraphs and headings have no textAlign attribute yet render left,
+  // so Align left must read as pressed until another alignment is chosen.
+  return editor.isActive("paragraph") || editor.isActive("heading") ? "left" : "";
+}
+
 interface ColorPaletteProps {
   label: string;
   noneLabel: string;
@@ -216,6 +226,7 @@ export default function Ribbon({
 }: RibbonProps) {
   void editorVersion;
   const disabled = !editor;
+  const textAlign = activeTextAlign(editor);
   const activeFont = activeMarkAttribute(editor, "fontFamily", "family");
   const activeSize = activeMarkAttribute(editor, "fontSize", "size");
   const activeTextColor = activeMarkAttribute(editor, "color", "color");
@@ -347,16 +358,16 @@ export default function Ribbon({
               </IconButton>
             </RibbonGroup>
             <RibbonGroup label="Paragraph">
-              <IconButton label="Align left" active={editor?.isActive({ textAlign: "left" })} disabled={disabled} onClick={() => editor?.chain().focus().setTextAlign("left").run()}>
+              <IconButton label="Align left" active={textAlign === "left"} disabled={disabled} onClick={() => editor?.chain().focus().setTextAlign("left").run()}>
                 <AlignLeft size={18} />
               </IconButton>
-              <IconButton label="Align center" active={editor?.isActive({ textAlign: "center" })} disabled={disabled} onClick={() => editor?.chain().focus().setTextAlign("center").run()}>
+              <IconButton label="Align center" active={textAlign === "center"} disabled={disabled} onClick={() => editor?.chain().focus().setTextAlign("center").run()}>
                 <AlignCenter size={18} />
               </IconButton>
-              <IconButton label="Align right" active={editor?.isActive({ textAlign: "right" })} disabled={disabled} onClick={() => editor?.chain().focus().setTextAlign("right").run()}>
+              <IconButton label="Align right" active={textAlign === "right"} disabled={disabled} onClick={() => editor?.chain().focus().setTextAlign("right").run()}>
                 <AlignRight size={18} />
               </IconButton>
-              <IconButton label="Justify" active={editor?.isActive({ textAlign: "justify" })} disabled={disabled} onClick={() => editor?.chain().focus().setTextAlign("justify").run()}>
+              <IconButton label="Justify" active={textAlign === "justify"} disabled={disabled} onClick={() => editor?.chain().focus().setTextAlign("justify").run()}>
                 <AlignJustify size={18} />
               </IconButton>
               <IconButton label="Bulleted list" active={editor?.isActive("bulletList")} disabled={disabled} onClick={() => editor?.chain().focus().toggleBulletList().run()}>

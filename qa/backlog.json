@@ -801,8 +801,9 @@
       "hint": "Repro: Place the cursor in a plain left-aligned paragraph and read the pressed state of the four alignment buttons.\nActual: None of the four buttons is active until Align left is clicked explicitly; centre/right/justify then light up correctly.",
       "source": "explore:ribbon:align left button is not active by default",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T01:20:50Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T01:20:50Z",
+      "lastAttemptAt": "2026-11-23T01:20:50Z"
     },
     {
       "id": "qa-051",
