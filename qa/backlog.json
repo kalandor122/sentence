@@ -1915,8 +1915,9 @@
       "hint": "Repro: 1. Type 'Source sync target text'. 2. Select the last word 'text' and add the comment 'Comment through source sync'; confirm the Review sidebar shows one highlight. 3. View tab > LaTeX, change the body text to 'Source sync target text rewritten in source', click Apply source, then click Visual and open the Review sidebar.\nActual: The thread body 'Comment through source sync' is still listed with badge 1, but no [data-comment-id] highlight remains in the document, so the comment is unanchored. The only feedback was 'Visual document synchronized from LaTeX.'",
       "source": "explore:review:applying an edited latex source drops every comment highlight and leaves comment threads unanchored",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T13:37:16Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T13:37:16Z",
+      "lastAttemptAt": "2026-11-23T13:37:16Z"
     },
     {
       "id": "qa-121",
