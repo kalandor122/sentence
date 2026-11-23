@@ -723,10 +723,11 @@
       ],
       "hint": "Repro: Create a project. Type `See example`, select it, Home > Add link, enter `https://example.com/a_b?x=1&y=2`, Insert. Click the linked text and click Home > Add link again.\nActual: The dialog opens with an empty Address field and placeholder `https://example.com`, even though the selected anchor's href is `https://example.com/a_b?x=1&y=2`.",
       "source": "explore:links-cites-footnotes:add link dialog does not prefill the existing url when editing a link",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:59:06Z",
-      "lastAttemptAt": "2026-11-23T00:59:06Z"
+      "lastAttemptAt": "2026-11-23T00:59:06Z",
+      "doneAt": "2026-11-23T01:02:11Z"
     },
     {
       "id": "qa-046",
@@ -738,7 +739,9 @@
       ],
       "hint": "Repro: Create a project. Insert > Footnote with note `A useful note`, then Insert > Footnote with note `Second note text`, in the same paragraph.\nActual: Both `<sup class=\"footnote\">` elements display `1`; their `data-text` values differ (`A useful note`, `Second note text`) and the source contains two distinct `\\footnote{...}` commands.",
       "source": "explore:links-cites-footnotes:all footnotes render the marker 1 in the visual editor",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T01:10:12Z"
     },
     {
       "id": "qa-047",
