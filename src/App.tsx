@@ -103,7 +103,13 @@ type DialogState =
   | { kind: "citation" }
   | { kind: "footnote" }
   | { kind: "cross-reference" }
-  | { kind: "link"; initialValue: string }
+  | {
+      kind: "link";
+      initialValue: string;
+      range?: { from: number; to: number };
+      insertAtCaret?: boolean;
+      revertOnCancel?: boolean;
+    }
   | { kind: "comment" }
   | null;
 
@@ -257,6 +263,19 @@ function withoutCommentMark(document: SentenceDocument, markId: string): Sentenc
   return { ...document, content: document.content.map(strip) };
 }
 
+// With a collapsed caret Ctrl+K has no text to link, so target the word under
+// the caret instead. This gives the shortcut an immediate visible effect.
+function wordRangeAtCursor(editor: Editor): { from: number; to: number } | null {
+  const { $from, empty } = editor.state.selection;
+  if (!empty || !$from.parent.isTextblock) return null;
+  const before = $from.nodeBefore?.isText ? $from.nodeBefore.text ?? "" : "";
+  const after = $from.nodeAfter?.isText ? $from.nodeAfter.text ?? "" : "";
+  const start = before.match(/[\p{L}\p{N}_]*$/u)?.[0].length ?? 0;
+  const end = after.match(/^[\p{L}\p{N}_]*/u)?.[0].length ?? 0;
+  if (start === 0 && end === 0) return null;
+  return { from: $from.pos - start, to: $from.pos + end };
+}
+
 export default function App() {
   const [workspace, setWorkspace] = useState<Workspace | null>(loadBrowserWorkspace);
   const workspaceRef = useRef<Workspace | null>(workspace);
@@ -316,6 +335,7 @@ export default function App() {
   const imageInput = useRef<HTMLInputElement>(null);
   const findInput = useRef<HTMLInputElement>(null);
   const sourceTextarea = useRef<HTMLTextAreaElement>(null);
+  const linkSubmitted = useRef(false);
   const changeVersion = useRef(0);
   const revisionBaseline = useRef<SentenceDocument | null>(null);
   const revisionTimer = useRef<number | null>(null);
@@ -771,9 +791,27 @@ export default function App() {
     }
   };
 
+  const closeDialog = () => {
+    if (dialog?.kind === "link" && dialog.revertOnCancel && dialog.range && !linkSubmitted.current && editor) {
+      editor.chain().focus().undo().run();
+    }
+    linkSubmitted.current = false;
+    setDialog(null);
+  };
+
   const openLinkDialog = () => {
-    const href = editor?.getAttributes("link").href;
-    setDialog({ kind: "link", initialValue: typeof href === "string" ? href : "" });
+    if (!editor) return;
+    linkSubmitted.current = false;
+    const href = editor.getAttributes("link").href;
+    const existingHref = typeof href === "string" ? href : "";
+    const { selection } = editor.state;
+    const range = selection.empty ? wordRangeAtCursor(editor) : { from: selection.from, to: selection.to };
+    if (!existingHref && range) {
+      editor.chain().focus().setTextSelection(range).setLink({ href: "https://" }).run();
+      setDialog({ kind: "link", initialValue: "", range, revertOnCancel: true });
+      return;
+    }
+    setDialog({ kind: "link", initialValue: existingHref, insertAtCaret: !existingHref && !range });
   };
 
   const handleDialogSubmit = (value: string) => {
@@ -788,9 +826,22 @@ export default function App() {
       case "cross-reference":
         editor?.chain().focus().insertContent({ type: "crossReference", attrs: { label: value } }).run();
         break;
-      case "link":
-        editor?.chain().focus().extendMarkRange("link").setLink({ href: value }).run();
+      case "link": {
+        linkSubmitted.current = true;
+        if (!editor) break;
+        if (dialog.range) {
+          editor.chain().focus().setTextSelection(dialog.range).extendMarkRange("link").setLink({ href: value }).run();
+        } else if (dialog.insertAtCaret) {
+          editor.chain().focus().insertContent({
+            type: "text",
+            text: value,
+            marks: [{ type: "link", attrs: { href: value } }],
+          }).run();
+        } else {
+          editor.chain().focus().extendMarkRange("link").setLink({ href: value }).run();
+        }
         break;
+      }
       case "comment": {
         if (!workspace || !editor || editor.state.selection.empty) {
           setToast("Select text before adding a comment.");
@@ -1457,7 +1508,7 @@ export default function App() {
         placeholder={"placeholder" in dialogProps ? dialogProps.placeholder : undefined}
         multiline={"multiline" in dialogProps ? dialogProps.multiline : false}
         confirmLabel={"confirmLabel" in dialogProps ? dialogProps.confirmLabel : "Insert"}
-        onClose={() => setDialog(null)}
+        onClose={closeDialog}
         onSubmit={handleDialogSubmit}
       />
       <MathDialog
