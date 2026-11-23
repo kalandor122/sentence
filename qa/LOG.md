@@ -355,3 +355,4 @@ Aborting
 2026-11-23T13:30:33Z START qa-119 on qa/qa-119-adding-a-comment-to-a-selection-that-ove: Adding a comment to a selection that overlaps an existing comment silently removes the first comment's highlight
 2026-11-23T13:36:42Z DONE qa-119 (tsc -b, npm test, smoke all green)
 2026-11-23T13:37:16Z START qa-120 on qa/qa-120-applying-an-edited-latex-source-drops-ev: Applying an edited LaTeX source drops every comment highlight and leaves comment threads unanchored
+2026-11-23T13:44:17Z DONE qa-120 (tsc -b, npm test, smoke all green)

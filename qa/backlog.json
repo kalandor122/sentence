@@ -1914,10 +1914,11 @@
       ],
       "hint": "Repro: 1. Type 'Source sync target text'. 2. Select the last word 'text' and add the comment 'Comment through source sync'; confirm the Review sidebar shows one highlight. 3. View tab > LaTeX, change the body text to 'Source sync target text rewritten in source', click Apply source, then click Visual and open the Review sidebar.\nActual: The thread body 'Comment through source sync' is still listed with badge 1, but no [data-comment-id] highlight remains in the document, so the comment is unanchored. The only feedback was 'Visual document synchronized from LaTeX.'",
       "source": "explore:review:applying an edited latex source drops every comment highlight and leaves comment threads unanchored",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T13:37:16Z",
-      "lastAttemptAt": "2026-11-23T13:37:16Z"
+      "lastAttemptAt": "2026-11-23T13:37:16Z",
+      "doneAt": "2026-11-23T13:44:17Z"
     },
     {
       "id": "qa-121",
@@ -1929,7 +1930,9 @@
       ],
       "hint": "Repro: 1. Type 'Comment on tracked text'. 2. Turn on Review > Track changes. 3. Select the first word 'Comment' and add the comment 'Comment before tracked edit'. 4. Put the caret at the end and type ' tail', wait ~2 s, and open the History sidebar while the revision is pending.\nActual: The editor renders an insertion decoration with text ' on tracked text tail' and a deletion decoration with text ' on tracked text', so most of the unchanged sentence is shown as both deleted and inserted. The revision card text is correct; only the inline decorations are wrong.",
       "source": "explore:review:tracked-change decorations misreport existing text as deleted and re-inserted when the paragraph contains a comment mark",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T13:44:51Z"
     },
     {
       "id": "qa-122",
