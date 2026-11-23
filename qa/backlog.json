@@ -1374,10 +1374,11 @@
       ],
       "hint": "Repro: 1. In a fresh document type 'Baseline revision text'. 2. Review tab > Track changes (button becomes 'Tracking on'). 3. Type ' delta-one', wait 2s, click Accept on the pending card. 4. Type ' delta-two', wait 2s, click Reject on its card; editor now reads 'Baseline revision text delta-one'. 5. Type ' EARLY', wait 2s, then type ' LATE', wait 2s. Two pending cards appear (newest first: LATE, then EARLY). 6. Click Reject on the second (older, EARLY) card. 7. Read the editor text and switch to View > LaTeX to read document.tex.\nActual: Editor text changed from 'Baseline revision text delta-one EARLY LATE' to 'Baseline revision text delta-one delta-two'; both EARLY and LATE were lost and the earlier rejected 'delta-two' came back. The exported LaTeX body showed the same 'Baseline revision text delta-one delta-two'. After the click only the LATE card remained, still claiming after='Baseline revision text delta-one EARLY LATE'.",
       "source": "explore:review:rejecting an older tracked revision discards later edits and resurrects previously rejected text",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:17:32Z",
-      "lastAttemptAt": "2026-11-23T00:17:32Z"
+      "lastAttemptAt": "2026-11-23T00:17:32Z",
+      "doneAt": "2026-11-23T00:25:55Z"
     },
     {
       "id": "qa-091",
@@ -1389,7 +1390,9 @@
       ],
       "hint": "Repro: 1. Type text, select it, Review tab > New comment, enter a body, click Comment. 2. In the Review sidebar click the comment thread, then double-click its body. 3. Inspect every control and input inside the thread and sidebar panel.\nActual: Thread exposes only two icon buttons (titles 'Resolve comment' and 'Delete comment'); inputs=[] and no reply/respond text appears before or after clicking or double-clicking. Thread reply count stays 0 and the probe's replyMatches list is empty.",
       "source": "explore:review:no ui to add a reply to a comment thread",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:26:29Z"
     },
     {
       "id": "qa-092",

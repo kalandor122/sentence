@@ -207,3 +207,4 @@ Aborting
 2026-11-23T00:12:56Z DONE qa-029 (tsc -b, npm test, smoke all green)
 2026-11-23T00:17:17Z EXPLORE review: 4 new items, agent exit 0
 2026-11-23T00:17:32Z START qa-090 on qa/qa-090-rejecting-an-older-tracked-revision-disc: Rejecting an older tracked revision discards later edits and resurrects previously rejected text
+2026-11-23T00:25:55Z DONE qa-090 (tsc -b, npm test, smoke all green)
