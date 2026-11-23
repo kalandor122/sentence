@@ -829,6 +829,13 @@ export default function App() {
     setDialog(null);
   };
 
+  const closeMathEditor = () => {
+    setMathEditor(null);
+    // The dialog steals focus from the editor; restore it (and the selection on
+    // a clicked math node) so typing and Backspace/Delete work immediately.
+    editor?.commands.focus();
+  };
+
   const openLinkDialog = () => {
     if (!editor) return;
     linkSubmitted.current = false;
@@ -1547,7 +1554,7 @@ export default function App() {
         open={Boolean(mathEditor)}
         display={mathEditor?.display ?? false}
         initialLatex={mathEditor?.latex ?? ""}
-        onClose={() => setMathEditor(null)}
+        onClose={closeMathEditor}
         onSubmit={handleMathSubmit}
       />
     </div>
