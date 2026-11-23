@@ -301,3 +301,4 @@ Aborting
 2026-11-23T04:35:22Z START qa-113 on qa/qa-113-multi-document-workspace-tabs: Multi-document workspace tabs
 2026-11-23T04:47:35Z DONE qa-113 (tsc -b, npm test, smoke all green)
 2026-11-23T04:48:05Z PROMOTED from roadmap: qa-114 Export to HTML and Markdown alongside LaTeX
+2026-11-23T04:48:05Z START qa-114 on qa/qa-114-export-to-html-and-markdown-alongside-la: Export to HTML and Markdown alongside LaTeX

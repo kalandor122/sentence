@@ -1819,8 +1819,9 @@
       "hint": "Add exporters next to documentToLatex in src/lib, driven by the same document model, with round-trip tests for the supported subset. Wire them into a File/Export menu that is honest about which subset is supported.",
       "source": "roadmap:export to html and markdown alongside latex",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T04:48:05Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T04:48:05Z",
+      "lastAttemptAt": "2026-11-23T04:48:05Z"
     }
   ]
 }

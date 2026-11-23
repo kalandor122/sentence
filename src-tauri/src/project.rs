@@ -317,6 +317,16 @@ pub fn export_pdf(path: String, destination: String) -> Result<String, String> {
     Ok(destination.to_string_lossy().to_string())
 }
 
+#[tauri::command]
+pub fn export_text_file(destination: String, content: String) -> Result<String, String> {
+    let destination = PathBuf::from(destination);
+    if let Some(parent) = destination.parent() {
+        fs::create_dir_all(parent).map_err(|error| error.to_string())?;
+    }
+    fs::write(&destination, content).map_err(|error| format!("Could not export file: {error}"))?;
+    Ok(destination.to_string_lossy().to_string())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

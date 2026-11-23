@@ -42,7 +42,9 @@ import {
   Download,
   FileArchive,
   FileCheck2,
+  FileCode2,
   FileText,
+  FileType2,
 } from "lucide-react";
 import IconButton from "./IconButton";
 import TableToolbar from "./TableToolbar";
@@ -61,7 +63,7 @@ import {
   type TextColorOption,
 } from "../lib/textStyles";
 
-const TABS: RibbonTab[] = ["Home", "Insert", "Layout", "References", "Review", "Paper", "View", "Git"];
+const TABS: RibbonTab[] = ["File", "Home", "Insert", "Layout", "References", "Review", "Paper", "View", "Git"];
 
 interface RibbonProps {
   editor: Editor | null;
@@ -89,6 +91,9 @@ interface RibbonProps {
   onToggleInspector: () => void;
   onCompile: () => void;
   onExportArxiv: () => void;
+  onExportLatex: () => void;
+  onExportHtml: () => void;
+  onExportMarkdown: () => void;
 }
 
 function RibbonGroup({ label, children }: { label: string; children: React.ReactNode }) {
@@ -226,6 +231,9 @@ export default function Ribbon({
   onToggleInspector,
   onCompile,
   onExportArxiv,
+  onExportLatex,
+  onExportHtml,
+  onExportMarkdown,
 }: RibbonProps) {
   void editorVersion;
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -285,6 +293,32 @@ export default function Ribbon({
         id="ribbon-tabpanel"
         aria-labelledby={`ribbon-tab-${activeTab.toLowerCase()}`}
       >
+        {activeTab === "File" ? (
+          <>
+            <RibbonGroup label="Export">
+              <button type="button" className="ribbon-command wide" title="Export LaTeX source" onClick={onExportLatex}>
+                <FileCode2 size={17} />
+                <span>LaTeX (.tex)</span>
+              </button>
+              <button type="button" className="ribbon-command wide" title="Export a standalone web page" onClick={onExportHtml}>
+                <FileType2 size={17} />
+                <span>HTML (.html)</span>
+              </button>
+              <button type="button" className="ribbon-command wide" title="Export Markdown for blogs and static sites" onClick={onExportMarkdown}>
+                <FileText size={17} />
+                <span>Markdown (.md)</span>
+              </button>
+            </RibbonGroup>
+            <RibbonGroup label="Supported subset">
+              <p className="export-note">
+                Headings, paragraphs, styled text, links, lists, quotes, code, tables and images
+                are preserved. Math, citations, notes and cross-references stay as readable text;
+                page breaks and contents are omitted.
+              </p>
+            </RibbonGroup>
+          </>
+        ) : null}
+
         {activeTab === "Home" ? (
           <>
             <RibbonGroup label="Undo">

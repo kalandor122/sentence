@@ -177,4 +177,4 @@ export interface GitHubPollResult {
 }
 
 export type EditorMode = "visual" | "source" | "split";
-export type RibbonTab = "Home" | "Insert" | "Layout" | "References" | "Review" | "Paper" | "View" | "Git";
+export type RibbonTab = "File" | "Home" | "Insert" | "Layout" | "References" | "Review" | "Paper" | "View" | "Git";
