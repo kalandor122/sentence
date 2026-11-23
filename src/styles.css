@@ -394,6 +394,129 @@ button:disabled {
   background: var(--canvas);
 }
 
+.app-shell.with-document-tabs {
+  grid-template-rows: 40px auto auto minmax(0, 1fr) 24px;
+}
+
+.workspace-tabs {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  height: 32px;
+  padding: 3px 8px 0;
+  background: var(--chrome-strong);
+  border-bottom: 1px solid var(--line);
+  user-select: none;
+}
+
+.workspace-tab-list {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.workspace-tab-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+  padding-left: 6px;
+  margin-left: 6px;
+  border-left: 1px solid var(--line);
+}
+
+.workspace-tab-actions button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  min-height: 25px;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.workspace-tab-actions button:hover {
+  color: var(--ink);
+  background: #ddd9d0;
+}
+
+.workspace-tab {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  max-width: 220px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+}
+
+.workspace-tab:hover {
+  background: #e6e3dc;
+}
+
+.workspace-tab.active {
+  background: var(--chrome);
+  border-color: var(--line);
+  box-shadow: inset 0 2px 0 var(--accent);
+}
+
+.workspace-tab-select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 25px;
+  padding: 0 3px 0 9px;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.workspace-tab.active .workspace-tab-select {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.workspace-tab-select > span:not(.workspace-tab-dirty) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-tab-dirty {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  background: var(--ochre);
+  border-radius: 50%;
+}
+
+.workspace-tab-close {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 22px;
+  min-height: 25px;
+  margin-right: 3px;
+  color: var(--faint);
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.workspace-tab-close:hover {
+  color: var(--ink);
+  background: #ddd9d0;
+}
+
 .top-bar {
   display: flex;
   align-items: center;
