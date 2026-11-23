@@ -291,10 +291,11 @@
       ],
       "hint": "Repro: GitHub dialog > Continue in browser with empty client ID\nActual: Validation message renders as <p class=\"auth-message\"> with no role=alert and no aria-live",
       "source": "explore:chrome:inline validation error not announced",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:04:21Z",
-      "lastAttemptAt": "2026-11-23T00:04:21Z"
+      "lastAttemptAt": "2026-11-23T00:04:21Z",
+      "doneAt": "2026-11-23T00:04:55Z"
     },
     {
       "id": "qa-019",
@@ -306,7 +307,9 @@
       ],
       "hint": "Repro: Inspect nav.ribbon-tabs\nActual: nav[aria-label='Ribbon tabs'] containing plain <button>s; no role=tablist/tab, no aria-selected, active state only via class",
       "source": "explore:chrome:ribbon tabs lack tablist semantics",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:05:30Z"
     },
     {
       "id": "qa-020",
