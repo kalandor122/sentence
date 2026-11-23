@@ -898,6 +898,43 @@ describe("LaTeX generation", () => {
     expect(latex).toContain("{assets/images/image.png}");
     expect(latex).not.toContain("data:");
   });
+
+  it("keeps an inline image inside its paragraph", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "SPLIT BEFORE." },
+            {
+              type: "inlineImage",
+              attrs: {
+                src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==",
+                alt: "mid paragraph.png",
+                path: "assets/images/mid-paragraph.png",
+              },
+            },
+            { type: "text", text: " SPLIT AFTER." },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).not.toContain("\\begin{figure}");
+    expect(latex).toContain(
+      "SPLIT BEFORE.\\includegraphics[width=0.8\\linewidth]{assets/images/mid-paragraph.png}% Sentence alt: mid paragraph.png\n SPLIT AFTER.",
+    );
+
+    const parsed = latexToDocument(latex, DEFAULT_SETTINGS);
+    expect(parsed.document.content).toHaveLength(1);
+    const paragraph = parsed.document.content[0];
+    expect(paragraph.type).toBe("paragraph");
+    const image = paragraph.content?.find((node) => node.type === "inlineImage");
+    expect(image?.attrs?.path).toBe("assets/images/mid-paragraph.png");
+    expect(image?.attrs?.alt).toBe("mid paragraph.png");
+    expect(documentToLatex(parsed.document, settings)).toBe(latex);
+  });
 });
 
 describe("document statistics", () => {

@@ -183,6 +183,15 @@ function inlineContent(nodes: DocumentNode[] | undefined): string {
       if (node.type === "crossReference") {
         return `\\ref{${attribute(node, "label") ?? ""}}`;
       }
+      if (node.type === "inlineImage") {
+        const src = attribute(node, "path") ?? attribute(node, "src") ?? "";
+        const alt = attribute(node, "alt") ?? "";
+        const filename = imageSourcePath(src, alt);
+        const image = `\\includegraphics[${imageWidthArgument(node)}]{${escapeLatex(filename)}}`;
+        // The alt text is a comment so it survives source round trips without
+        // adding a caption or a paragraph break to the surrounding text.
+        return alt ? `${image}% Sentence alt: ${metadataComment(alt)}\n` : image;
+      }
       return inlineContent(node.content);
     })
     .join("");
@@ -289,16 +298,19 @@ function listItemToLatex(node: DocumentNode): string {
   return `\\item ${content}`;
 }
 
+function imageWidthArgument(node: DocumentNode): string {
+  const width = Number(node.attrs?.width ?? 0);
+  return width > 0 ? `width=${(width / 100).toFixed(2)}\\linewidth` : "width=0.8\\linewidth";
+}
+
 function imageToLatex(node: DocumentNode): string {
   const src = attribute(node, "path") ?? attribute(node, "src") ?? "";
   const alt = attribute(node, "alt") ?? "";
   const filename = imageSourcePath(src, alt);
-  const width = Number(node.attrs?.width ?? 0);
-  const widthArgument = width > 0 ? `width=${(width / 100).toFixed(2)}\\linewidth` : "width=0.8\\linewidth";
   return [
     "\\begin{figure}[htbp]",
     "\\centering",
-    `\\includegraphics[${widthArgument}]{${escapeLatex(filename)}}`,
+    `\\includegraphics[${imageWidthArgument(node)}]{${escapeLatex(filename)}}`,
     alt ? `\\caption{${escapeLatex(alt)}}` : "",
     "\\end{figure}",
   ]
@@ -664,6 +676,25 @@ function parseInline(source: string): InlineParseResult {
       flush();
       content.push({ type: "crossReference", attrs: { label: refMatch[1] } });
       index += refMatch[0].length;
+      continue;
+    }
+
+    const inlineImageMatch = remainder.match(/^\\includegraphics(?:\[([^\]]*)\])?\{([^}]*)\}/);
+    if (inlineImageMatch) {
+      flush();
+      const fileName = decodeLatexText(inlineImageMatch[2]);
+      let cursor = index + inlineImageMatch[0].length;
+      let alt = "";
+      const altComment = source.slice(cursor).match(/^[ \t]*% Sentence alt: ([^\r\n]*)\r?\n?/);
+      if (altComment) {
+        alt = decodeLatexText(altComment[1].trim());
+        cursor += altComment[0].length;
+      }
+      content.push({
+        type: "inlineImage",
+        attrs: { src: fileName, path: fileName, ...(alt ? { alt } : {}) },
+      });
+      index = cursor;
       continue;
     }
 
@@ -1036,7 +1067,12 @@ export function latexToDocument(
       });
       continue;
     }
-    const image = block.match(/\\includegraphics(?:\[[^\]]*\])?\{([^}]*)\}/);
+    // Only standalone figures are block images. An \includegraphics inside a
+    // paragraph belongs to parseInline so it can stay beside the surrounding text.
+    const image =
+      block.match(
+        /\\begin\{figure\}(?:\[[^\]]*\])?[\s\S]*?\\includegraphics(?:\[[^\]]*\])?\{([^}]*)\}[\s\S]*?\\end\{figure\}/,
+      ) ?? block.match(/^\\includegraphics(?:\[[^\]]*\])?\{([^}]*)\}$/);
     if (image) {
       const caption = block.match(/\\caption\{([^}]*)\}/);
       content.push({
