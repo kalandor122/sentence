@@ -359,3 +359,4 @@ Aborting
 2026-11-23T20:54:28Z START qa-123 on qa/qa-123-leaving-the-latex-view-after-a-failed-ap: Leaving the LaTeX view after a failed Apply silently discards the broken source draft
 2026-11-23T20:58:27Z DONE qa-123 (tsc -b, npm test, smoke all green)
 2026-11-23T20:59:02Z START qa-124 on qa/qa-124-headings-and-tables-placed-directly-afte: Headings and tables placed directly after text are escaped into literal text instead of being recognized
+2026-11-23T21:01:28Z DONE qa-124 (tsc -b, npm test, smoke all green)

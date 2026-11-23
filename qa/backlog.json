@@ -1973,10 +1973,11 @@
       ],
       "hint": "Repro: 1. Create a project and switch to View > LaTeX. 2. At the end of the body, before \\end{document}, add these lines without blank lines between the paragraph and the commands:\nZXTIGHT paragraph before a section\n\\section{ZXTIGHT SECTION}\nZXTIGHT section body\n\\begin{table}[htbp]\n\\centering\n\\begin{tabular}{ll}\nZXTIGHT & 9 \\\\\n\\end{tabular}\n\\end{table}\n3. Click 'Apply source', then View > Visual, then View > LaTeX.\nActual: Apply reports success (`Visual document synchronized from LaTeX.`), but the visual document has no ZXTIGHT SECTION heading and no table; it shows the literal text `\\section{ZXTIGHT SECTION}`, `\\begin{table}`, `\\begin{tabular}` and `\\end{tabular}`. Returning to the source shows the commands rewritten as `\\textbackslash{}section\\{ZXTIGHT SECTION\\}`, `\\textbackslash{}begin\\{table\\}`, etc., so the LaTeX is permanently corrupted as well. The same failure occurs for a \\section command alone without the table, so any block command that is not preceded by a blank line is affected.",
       "source": "explore:source-editor:headings and tables placed directly after text are escaped into literal text instead of being recognized",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T20:59:02Z",
-      "lastAttemptAt": "2026-11-23T20:59:02Z"
+      "lastAttemptAt": "2026-11-23T20:59:02Z",
+      "doneAt": "2026-11-23T21:01:28Z"
     },
     {
       "id": "qa-125",
@@ -1988,7 +1989,9 @@
       ],
       "hint": "Repro: 1. Create a project, switch to View > LaTeX, and before \\end{document} add:\n\\begin{tabular}{ll\nZXCOLCELL & 7 \\\\\n\\end{tabular}\n(notice the missing closing brace after `ll`). 2. Click 'Apply source' and read the toast. 3. Click View > Visual and inspect the table. 4. Switch back to View > LaTeX and read the table block.\nActual: No error is shown: the toast says `Visual document synchronized from LaTeX.` and the visual document contains a one-row table whose first cell is the literal text `{ll`. Re-exporting rewrites the block as a valid table with the cell `\\{ll`, changing the user's content. The same class of failure occurs with `\\section{ZXSEC UNCLOSED` (no closing brace): Apply reports success, the raw command appears as body text, and it is re-exported as `\\textbackslash{}section\\{ZXSEC UNCLOSED`.",
       "source": "explore:source-editor:missing closing braces are accepted as valid latex and the malformed text is rewritten on export",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T21:02:03Z"
     },
     {
       "id": "qa-126",
