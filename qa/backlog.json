@@ -1834,10 +1834,11 @@
       ],
       "hint": "",
       "source": "source view toggle did not reveal an editable latex surface",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T05:00:18Z",
-      "lastAttemptAt": "2026-11-23T05:00:18Z"
+      "lastAttemptAt": "2026-11-23T05:00:18Z",
+      "doneAt": "2026-11-23T05:00:45Z"
     },
     {
       "id": "qa-116",
@@ -1849,7 +1850,9 @@
       ],
       "hint": "",
       "source": "no view ribbon tab found, cannot check source-view round trips",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T05:01:15Z"
     }
   ]
 }
