@@ -206,3 +206,4 @@ Aborting
 2026-11-23T00:12:22Z START qa-029 on qa/qa-029-all-images-forced-to-0-8-linewidth-capti: All images forced to 0.8\linewidth; caption is the raw filename
 2026-11-23T00:12:56Z DONE qa-029 (tsc -b, npm test, smoke all green)
 2026-11-23T00:17:17Z EXPLORE review: 4 new items, agent exit 0
+2026-11-23T00:17:32Z START qa-090 on qa/qa-090-rejecting-an-older-tracked-revision-disc: Rejecting an older tracked revision discards later edits and resurrects previously rejected text
