@@ -1027,7 +1027,9 @@ export default function App() {
     }
     // Re-entering source from split keeps the already-visible source text; only
     // a transition from the visual-only view needs a fresh LaTeX snapshot.
-    if (nextMode === "source" && current && mode === "visual") {
+    // An unapplied draft stays dirty when Apply failed, so regenerating here
+    // would silently throw away the text the user still needs to fix.
+    if (nextMode === "source" && current && mode === "visual" && !sourceDirtyRef.current) {
       const latex = documentToLatex(current.document, current.settings);
       setSource(latex);
       sourceRef.current = latex;
