@@ -1547,8 +1547,9 @@
       "hint": "Repro: In the browser app, type a marker, wait 1.5 s until the heading says 'Saved locally', then reload. Press Ctrl+Z with focus in the editor, then click the 'Undo (Ctrl+Z)' ribbon button; compare document.body innerText before and after each action and read the button's disabled property.\nActual: After reload the Undo button reports disabled=false. document.body innerText length is 1452 before Ctrl+Z, 1452 after Ctrl+Z, and 1452 after clicking Undo; the marker remains in the document. No visible change occurs from either action.",
       "source": "explore:persistence:undo appears enabled but is a no-op after reload",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T02:52:57Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T02:52:57Z",
+      "lastAttemptAt": "2026-11-23T02:52:57Z"
     },
     {
       "id": "qa-098",

@@ -284,10 +284,18 @@ export default function Ribbon({
         {activeTab === "Home" ? (
           <>
             <RibbonGroup label="Undo">
-              <IconButton label="Undo (Ctrl+Z)" disabled={disabled} onClick={() => editor?.chain().focus().undo().run()}>
+              <IconButton
+                label="Undo (Ctrl+Z)"
+                disabled={disabled || !editor?.can().undo()}
+                onClick={() => editor?.chain().focus().undo().run()}
+              >
                 <Undo2 size={19} />
               </IconButton>
-              <IconButton label="Redo (Ctrl+Y)" disabled={disabled} onClick={() => editor?.chain().focus().redo().run()}>
+              <IconButton
+                label="Redo (Ctrl+Y)"
+                disabled={disabled || !editor?.can().redo()}
+                onClick={() => editor?.chain().focus().redo().run()}
+              >
                 <Redo2 size={19} />
               </IconButton>
             </RibbonGroup>
