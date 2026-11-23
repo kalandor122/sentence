@@ -1495,8 +1495,9 @@
       "hint": "Repro: In the browser app, type a unique marker such as 'persist-beta-X' at the end of the document, then immediately reload the page while the document heading still says 'Editing' (the probe reloads about 300 ms after typing, before the 1100 ms autosave timer). Inspect document.body innerText and the localStorage key sentence.workspace before and after the reload.\nActual: Before reload the marker is visible in the editor, the heading says 'Editing', and sentence.workspace does not contain the marker. The reload completes with no prompt; afterwards the marker is absent from both the editor and storage, while text autosaved earlier is still present.",
       "source": "explore:persistence:edits inside the autosave debounce are lost on reload with no warning",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T01:30:03Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T01:30:03Z",
+      "lastAttemptAt": "2026-11-23T01:30:03Z"
     },
     {
       "id": "qa-097",
