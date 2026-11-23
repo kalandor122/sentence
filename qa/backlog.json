@@ -1515,8 +1515,9 @@
       "hint": "Repro: Create a project, click View > LaTeX, click at the end of the source textarea and type ZXUNDO as normal keystrokes. Press Ctrl+Z once and read the textarea tail.\nActual: Only the final character is removed: the tail reads ZXUND. Seven Ctrl+Z presses total are needed to restore the text before typing, and Ctrl+Shift+Z restores one character at a time. The source document itself is never damaged by the undos.",
       "source": "explore:source-editor:ctrl+z in the source textarea undoes one character at a time instead of the typed token",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T02:28:40Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T02:28:40Z",
+      "lastAttemptAt": "2026-11-23T02:28:40Z"
     },
     {
       "id": "qa-096",
