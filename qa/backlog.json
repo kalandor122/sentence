@@ -1738,10 +1738,25 @@
       ],
       "hint": "A References-tab panel listing entries parsed from references.bib (key, author, year, title) with search, add, edit and delete; inserting a citation opens this list. Keep the .bib text the source of truth and parse/write it in src/lib (add round-trip tests next to latex.test.ts).",
       "source": "roadmap:bibliography manager",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T03:55:49Z",
-      "lastAttemptAt": "2026-11-23T03:55:49Z"
+      "lastAttemptAt": "2026-11-23T03:55:49Z",
+      "doneAt": "2026-11-23T04:05:27Z"
+    },
+    {
+      "id": "qa-110",
+      "title": "Track changes UI",
+      "why": "Revision data exists in the model but a reviewer cannot see, accept or reject individual changes.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Show insertions and deletions inline in the visual editor (marks with author colours), a Review-tab toggle for tracking, and per-change accept/reject plus accept-all/reject-all in the History panel. Review state must never leak into the exported LaTeX.",
+      "source": "roadmap:track changes ui",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T04:05:57Z"
     }
   ]
 }

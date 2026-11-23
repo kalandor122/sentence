@@ -287,3 +287,5 @@ Aborting
 2026-11-23T03:55:19Z DONE qa-108 (tsc -b, npm test, smoke all green)
 2026-11-23T03:55:49Z PROMOTED from roadmap: qa-109 Bibliography manager
 2026-11-23T03:55:49Z START qa-109 on qa/qa-109-bibliography-manager: Bibliography manager
+2026-11-23T04:05:27Z DONE qa-109 (tsc -b, npm test, smoke all green)
+2026-11-23T04:05:57Z PROMOTED from roadmap: qa-110 Track changes UI
