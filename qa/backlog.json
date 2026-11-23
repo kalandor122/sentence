@@ -1771,8 +1771,9 @@
       "hint": "Repro: Create a project. Type `Brace note `, choose Insert > Footnote, enter `Note with } and &`, and click Insert. View > Source shows `\\footnote{Note with \\} and \\&}`. Click Apply source, then switch back to Visual and to Source again.\nActual: After Apply source the footnote's text/title is `Note with \\`, the literal text ` and &}` appears in the paragraph after the marker, and the exported source is `\\footnote{Note with \\textbackslash{}} and \\&\\}`; part of the footnote moved into body text.",
       "source": "explore:links-cites-footnotes:footnote text containing a closing brace is corrupted on latex source round-trip",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T04:28:43Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T04:28:43Z",
+      "lastAttemptAt": "2026-11-23T04:28:43Z"
     }
   ]
 }

@@ -68,6 +68,32 @@ describe("LaTeX generation", () => {
     expect(latex).toContain("\\begin{itemize}");
   });
 
+  it("round-trips escaped braces and ampersands inside footnotes", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "Brace note " },
+            { type: "footnote", attrs: { text: "Note with } and &" } },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("\\footnote{Note with \\} and \\&}");
+
+    const parsed = latexToDocument(latex, settings).document;
+    const paragraph = parsed.content[0];
+    expect(paragraph?.content?.[0]?.text).toBe("Brace note ");
+    expect(paragraph?.content?.[1]?.type).toBe("footnote");
+    expect(paragraph?.content?.[1]?.attrs?.text).toBe("Note with } and &");
+    expect(documentToLatex(parsed, settings)).toContain(
+      "\\footnote{Note with \\} and \\&}",
+    );
+  });
+
   it("round-trips the Sentence subset", () => {
     const source: SentenceDocument = {
       type: "doc",

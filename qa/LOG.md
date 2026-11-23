@@ -292,3 +292,4 @@ Aborting
 2026-11-23T04:05:57Z START qa-110 on qa/qa-110-track-changes-ui: Track changes UI
 2026-11-23T04:17:57Z DONE qa-110 (tsc -b, npm test, smoke all green)
 2026-11-23T04:28:33Z EXPLORE links-cites-footnotes: 1 new items, agent exit 0
+2026-11-23T04:28:43Z START qa-111 on qa/qa-111-footnote-text-containing-a-closing-brace: Footnote text containing a closing brace is corrupted on LaTeX source round-trip
