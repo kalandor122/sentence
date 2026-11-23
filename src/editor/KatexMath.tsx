@@ -3,6 +3,10 @@ import katex from "katex";
 import "katex/dist/katex.min.css";
 import { useMemo } from "react";
 
+// KaTeX colours unrecognised commands with errorColor without emitting a
+// katex-error span. Render with a sentinel to detect those cases too.
+const ERROR_SENTINEL = "__sentence_katex_error__";
+
 export function renderLatex(latex: string, displayMode: boolean): string {
   const source = latex.trim();
   if (!source) return "";
@@ -17,6 +21,22 @@ export function renderLatex(latex: string, displayMode: boolean): string {
       character === "<" ? "&lt;" : character === ">" ? "&gt;" : "&amp;",
     );
     return `<span class="katex-error">${escaped}</span>`;
+  }
+}
+
+export function latexHasError(latex: string, displayMode: boolean): boolean {
+  const source = latex.trim();
+  if (!source) return false;
+  try {
+    const html = katex.renderToString(source, {
+      displayMode,
+      throwOnError: false,
+      strict: false,
+      errorColor: ERROR_SENTINEL,
+    });
+    return html.includes(ERROR_SENTINEL);
+  } catch {
+    return true;
   }
 }
 

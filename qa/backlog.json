@@ -1707,8 +1707,9 @@
       "hint": "Repro: 1. Create a new project and click the Insert tab.\n2. Click 'Inline equation', type `\\badcommand{x}` in the LaTeX source textarea.\n3. Observe the preview: the command is rendered in red via `mstyle mathcolor=\"#cc0000\"`, but the dialog reports no error (no `katex-error`, no `math-preview-invalid`) and the Insert button is enabled.\n4. Click Insert.\n5. Switch to View > LaTeX and read document.tex: it contains `\\(\\badcommand{x}\\)`. The same happens with `\\unknown{}`.\nActual: `\\badcommand{x}` and `\\unknown{}` leave the Insert button enabled and are inserted into the document and exported to LaTeX. By contrast `\\frac{`, `x^{`, `\\begin{` and `}{` correctly show `.math-preview-invalid` and disable Insert.",
       "source": "explore:math:unknown latex commands pass math validation and can be inserted",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T03:48:39Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T03:48:39Z",
+      "lastAttemptAt": "2026-11-23T03:48:39Z"
     },
     {
       "id": "qa-108",

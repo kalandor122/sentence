@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "./Modal";
-import { renderLatex } from "../editor/KatexMath";
+import { latexHasError, renderLatex } from "../editor/KatexMath";
 
 interface MathDialogProps {
   open: boolean;
@@ -44,7 +44,10 @@ export default function MathDialog({
   }, [initialLatex, open]);
 
   const html = useMemo(() => renderLatex(latex, display), [latex, display]);
-  const invalid = latex.trim().length > 0 && html.includes("katex-error");
+  const invalid = useMemo(
+    () => latex.trim().length > 0 && (html.includes("katex-error") || latexHasError(latex, display)),
+    [display, html, latex],
+  );
   const editing = initialLatex.trim().length > 0;
 
   const insertSnippet = (snippet: string) => {
@@ -65,7 +68,7 @@ export default function MathDialog({
   };
 
   const submit = () => {
-    if (!latex.trim()) return;
+    if (!latex.trim() || invalid) return;
     onSubmit(latex.trim());
     onClose();
   };
@@ -114,6 +117,7 @@ export default function MathDialog({
           rows={3}
           value={latex}
           placeholder={"\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}"}
+          aria-invalid={invalid}
           onChange={(event) => setLatex(event.target.value)}
           onKeyDown={(event) => {
             if ((event.ctrlKey || event.metaKey) && event.key === "Enter") submit();
