@@ -1,4 +1,4 @@
-import type { SentenceDocument } from "./types";
+import type { Revision, SentenceDocument } from "./types";
 
 type Path = (string | number)[];
 
@@ -169,4 +169,11 @@ export function undoDocumentChanges(document: SentenceDocument, changes: Change[
     }
   }
   return next;
+}
+
+// Rejection rewrites the document, so the next tracked edit must be measured
+// from that result rather than from the snapshot that still held the rejected text.
+export function applyRejection(document: SentenceDocument, revision: Revision): { document: SentenceDocument; changes: Change[] } {
+  const changes = documentChanges(revision.beforeDocument ?? document, revision.afterDocument ?? document);
+  return { document: undoDocumentChanges(document, changes), changes };
 }
