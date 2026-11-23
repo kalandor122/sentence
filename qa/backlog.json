@@ -1614,10 +1614,11 @@
       ],
       "hint": "Repro: Clear the editor, type 'one', click the 'Bulleted list' ribbon button, press Enter, type 'two'. Press Ctrl+A (getSelection() is 'one\\n\\ntwo\\n\\n'), then click 'Bulleted list' again. Switch to Source and read the LaTeX textarea. Repeating with 'Numbered list' gives the same result.\nActual: The editor stays a list and gains a third empty item: <ul><li>one</li><li>two</li><li><br class=\"ProseMirror-trailingBreak\"></li></ul>. LaTeX is '\\begin{itemize}\\n\\item one\\n\\item two\\n\\item \\n\\end{itemize}'. With Numbered list the LaTeX is '\\begin{enumerate}\\n\\item x\\n\\item y\\n\\item \\n\\end{enumerate}'.",
       "source": "explore:lists:select-all + list toggle does not convert a list to paragraphs; it adds an empty item",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T02:43:29Z",
-      "lastAttemptAt": "2026-11-23T02:43:29Z"
+      "lastAttemptAt": "2026-11-23T02:43:29Z",
+      "doneAt": "2026-11-23T02:47:53Z"
     },
     {
       "id": "qa-103",
@@ -1629,7 +1630,9 @@
       ],
       "hint": "Repro: Clear the editor and type '3. apple' in a paragraph so the ordered-list input rule fires. Switch to Source and read the LaTeX textarea.\nActual: The visual editor has <ol start=\"3\"><li><p>apple</p></li></ol>, but the LaTeX is '\\begin{enumerate}\\n\\item apple\\n\\end{enumerate}', which renders the item as '1. apple'.",
       "source": "explore:lists:ordered list start number is dropped from latex",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T02:48:23Z"
     }
   ]
 }
