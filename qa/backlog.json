@@ -1787,8 +1787,9 @@
       "hint": "A small gallery of named themes (e.g. Classic, Modern, Compact) that set documentClass/fontFamily/fontSize/lineSpacing/paragraphSpacing/margins at once, previewed as a styled thumbnail. Apply through the existing settings object so the LaTeX preamble follows.",
       "source": "roadmap:document themes and style gallery",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T04:30:26Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T04:30:26Z",
+      "lastAttemptAt": "2026-11-23T04:30:26Z"
     }
   ]
 }

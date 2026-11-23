@@ -1,5 +1,6 @@
 import { ChevronDown, FileSliders, FileText, Type, UserRound, X } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
+import { DOCUMENT_THEMES, activeDocumentTheme } from "../lib/themes";
 import type { GitAuthor, ProjectSettings } from "../lib/types";
 
 interface InspectorProps {
@@ -39,6 +40,8 @@ export default function Inspector({
     };
   }, [open]);
 
+  const activeTheme = activeDocumentTheme(settings);
+
   if (!open) return null;
   return (
     <aside className="inspector" role="dialog" aria-labelledby="inspector-title">
@@ -65,6 +68,41 @@ export default function Inspector({
         </section>
         <section className="inspector-section">
           <h3><Type size={15} /> Styles</h3>
+          <div className="theme-gallery" role="group" aria-label="Document theme">
+            <span className="theme-gallery-label">Theme</span>
+            <div className="theme-gallery-cards">
+              {DOCUMENT_THEMES.map((theme) => {
+                const active = activeTheme?.id === theme.id;
+                const previewStyle = {
+                  "--theme-font": theme.preview.fontFamily,
+                  "--theme-font-size": theme.preview.fontSize,
+                  "--theme-line-step": theme.preview.lineStep,
+                  "--theme-margin": theme.preview.margin,
+                  "--theme-paragraph-gap": theme.preview.paragraphGap,
+                  "--theme-indent": theme.preview.indent,
+                } as CSSProperties;
+                return (
+                  <button
+                    key={theme.id}
+                    type="button"
+                    className={`theme-card${active ? " active" : ""}`}
+                    aria-pressed={active}
+                    title={theme.description}
+                    onClick={() => onSettingsChange(theme.settings)}
+                  >
+                    <span className="theme-preview" style={previewStyle} aria-hidden="true">
+                      <span className="theme-preview-page">
+                        <strong className="theme-preview-heading">Aa</strong>
+                        <span className="theme-preview-paragraph">The quick brown fox jumps over the lazy dog.</span>
+                        <span className="theme-preview-paragraph">A document can be shaped without writing LaTeX.</span>
+                      </span>
+                    </span>
+                    <span className="theme-card-name">{theme.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           <label className="property-field">
             <span>Font family</span>
             <select
