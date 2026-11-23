@@ -1008,7 +1008,9 @@
       ],
       "hint": "Repro: Inspect a formatting toggle (Bold, Italic, alignment) with the cursor in plain text.\nActual: aria-pressed is only present when active ('true'); inactive buttons omit the attribute entirely and the ribbon tabs are plain buttons inside a nav with no tablist semantics.",
       "source": "explore:ribbon-full:inactive ribbon toggles omit aria-pressed instead of reporting false",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T01:33:17Z"
     },
     {
       "id": "qa-064",
@@ -1494,10 +1496,11 @@
       ],
       "hint": "Repro: In the browser app, type a unique marker such as 'persist-beta-X' at the end of the document, then immediately reload the page while the document heading still says 'Editing' (the probe reloads about 300 ms after typing, before the 1100 ms autosave timer). Inspect document.body innerText and the localStorage key sentence.workspace before and after the reload.\nActual: Before reload the marker is visible in the editor, the heading says 'Editing', and sentence.workspace does not contain the marker. The reload completes with no prompt; afterwards the marker is absent from both the editor and storage, while text autosaved earlier is still present.",
       "source": "explore:persistence:edits inside the autosave debounce are lost on reload with no warning",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T01:30:03Z",
-      "lastAttemptAt": "2026-11-23T01:30:03Z"
+      "lastAttemptAt": "2026-11-23T01:30:03Z",
+      "doneAt": "2026-11-23T01:32:42Z"
     },
     {
       "id": "qa-097",
