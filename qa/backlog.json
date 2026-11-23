@@ -1375,8 +1375,9 @@
       "hint": "Repro: 1. In a fresh document type 'Baseline revision text'. 2. Review tab > Track changes (button becomes 'Tracking on'). 3. Type ' delta-one', wait 2s, click Accept on the pending card. 4. Type ' delta-two', wait 2s, click Reject on its card; editor now reads 'Baseline revision text delta-one'. 5. Type ' EARLY', wait 2s, then type ' LATE', wait 2s. Two pending cards appear (newest first: LATE, then EARLY). 6. Click Reject on the second (older, EARLY) card. 7. Read the editor text and switch to View > LaTeX to read document.tex.\nActual: Editor text changed from 'Baseline revision text delta-one EARLY LATE' to 'Baseline revision text delta-one delta-two'; both EARLY and LATE were lost and the earlier rejected 'delta-two' came back. The exported LaTeX body showed the same 'Baseline revision text delta-one delta-two'. After the click only the LATE card remained, still claiming after='Baseline revision text delta-one EARLY LATE'.",
       "source": "explore:review:rejecting an older tracked revision discards later edits and resurrects previously rejected text",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T00:17:32Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T00:17:32Z",
+      "lastAttemptAt": "2026-11-23T00:17:32Z"
     },
     {
       "id": "qa-091",

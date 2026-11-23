@@ -42,6 +42,7 @@ import {
   imageAssetPath,
   latexToDocument,
 } from "./lib/latex";
+import { documentChanges, undoDocumentChanges } from "./lib/revisions";
 import {
   assetUrl,
   authorizeAsset,
@@ -1191,15 +1192,39 @@ export default function App() {
             markDirty();
           }}
           onRejectRevision={(id) => {
-            const revision = workspaceRef.current?.revisions.find((item) => item.id === id);
-            setWorkspace((current) => {
-              if (!current) return current;
-              return {
-                ...current,
-                document: revision?.beforeDocument ?? current.document,
-                revisions: current.revisions.map((item) => item.id === id ? { ...item, rejected: true, accepted: true } : item),
-              };
-            });
+            const current = workspaceRef.current;
+            const revision = current?.revisions.find((item) => item.id === id);
+            if (!current || !revision) return;
+            const changes = documentChanges(
+              revision.beforeDocument ?? current.document,
+              revision.afterDocument ?? current.document,
+            );
+            const nextDocument = undoDocumentChanges(current.document, changes);
+            const next: Workspace = {
+              ...current,
+              document: nextDocument,
+              revisions: current.revisions.map((item) => {
+                if (item.id === id) return { ...item, rejected: true, accepted: true };
+                if (!item.beforeDocument || !item.afterDocument) return item;
+                const beforeDocument = undoDocumentChanges(item.beforeDocument, changes);
+                const afterDocument = undoDocumentChanges(item.afterDocument, changes);
+                return {
+                  ...item,
+                  before: documentPlainText(beforeDocument),
+                  after: documentPlainText(afterDocument),
+                  beforeDocument,
+                  afterDocument,
+                };
+              }),
+            };
+            workspaceRef.current = next;
+            setWorkspace(next);
+            revisionBaseline.current = nextDocument;
+            if (!sourceDirtyRef.current) {
+              const latex = documentToLatex(nextDocument, current.settings);
+              setSource(latex);
+              sourceRef.current = latex;
+            }
             markDirty();
           }}
         />
