@@ -16,6 +16,8 @@ import {
   GitCommitHorizontal,
   Highlighter,
   Image,
+  IndentDecrease,
+  IndentIncrease,
   Italic,
   Link2,
   List,
@@ -42,6 +44,7 @@ import {
   FileText,
 } from "lucide-react";
 import IconButton from "./IconButton";
+import { changeIndent } from "../editor/indent";
 import type {
   EditorMode,
   ProjectSettings,
@@ -361,6 +364,12 @@ export default function Ribbon({
               </IconButton>
               <IconButton label="Numbered list" active={editor?.isActive("orderedList")} disabled={disabled} onClick={() => editor?.chain().focus().toggleOrderedList().run()}>
                 <ListOrdered size={18} />
+              </IconButton>
+              <IconButton label="Increase indent (Tab)" aria-keyshortcuts="Tab" disabled={disabled || editor?.isActive("table") || editor?.isActive("codeBlock")} onClick={() => editor && changeIndent(editor, false)}>
+                <IndentIncrease size={18} />
+              </IconButton>
+              <IconButton label="Decrease indent (Shift+Tab)" aria-keyshortcuts="Shift+Tab" disabled={disabled || editor?.isActive("table") || editor?.isActive("codeBlock")} onClick={() => editor && changeIndent(editor, true)}>
+                <IndentDecrease size={18} />
               </IconButton>
               <IconButton label="Block quote" active={editor?.isActive("blockquote")} disabled={disabled} onClick={() => editor?.chain().focus().toggleBlockquote().run()}>
                 <Quote size={18} />

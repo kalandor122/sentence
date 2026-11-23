@@ -785,8 +785,9 @@
       "hint": "Repro: Inspect every group on the Home and Layout tabs for an indent or outdent button.\nActual: No such controls exist. Paragraph indentation cannot be changed from the UI at all.",
       "source": "explore:ribbon:no indent / outdent controls anywhere in the ribbon",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T01:14:50Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T01:14:50Z",
+      "lastAttemptAt": "2026-11-23T01:14:50Z"
     },
     {
       "id": "qa-050",
