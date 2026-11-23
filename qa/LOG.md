@@ -185,3 +185,4 @@ Aborting
 2026-11-23T00:01:29Z DONE qa-089 (tsc -b, npm test, smoke all green)
 2026-11-23T00:02:03Z START qa-007 on qa/qa-007-start-screen-footer-is-hardcoded-sentenc: Start screen footer is hardcoded 'Sentence 0.1' while the app is 0.2.0
 2026-11-23T00:02:37Z DONE qa-007 (tsc -b, npm test, smoke all green)
+2026-11-23T00:03:12Z START qa-008 on qa/qa-008-no-print-path-ctrl-p-with-paper-accurate: No print path (Ctrl+P) with paper-accurate styles
