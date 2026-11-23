@@ -194,3 +194,4 @@ Aborting
 2026-11-23T00:06:04Z DONE qa-019 (tsc -b, npm test, smoke all green)
 2026-11-23T00:06:38Z START qa-020 on qa/qa-020-word-count-excludes-the-paper-title-fron: Word count excludes the paper title/front matter
 2026-11-23T00:07:13Z DONE qa-020 (tsc -b, npm test, smoke all green)
+2026-11-23T00:07:47Z START qa-021 on qa/qa-021-submission-check-opens-the-arxiv-packag: 'Submission check' opens the arXiv package dialog and performs no check

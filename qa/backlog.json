@@ -340,8 +340,9 @@
       "hint": "Repro: Paper > Submission check\nActual: Same dialog as 'Create arXiv ZIP' titled 'arXiv submission package'; no validation results shown",
       "source": "explore:chrome:'submission check' opens the arxiv package dialog and performs no check",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T00:07:47Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T00:07:47Z",
+      "lastAttemptAt": "2026-11-23T00:07:47Z"
     },
     {
       "id": "qa-022",
