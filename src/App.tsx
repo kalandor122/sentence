@@ -12,6 +12,7 @@ import {
 } from "react";
 import CloneProjectDialog from "./components/CloneProjectDialog";
 import ArxivExportDialog from "./components/ArxivExportDialog";
+import BibliographyDialog from "./components/BibliographyDialog";
 import GitHubAuthDialog from "./components/GitHubAuthDialog";
 import FindBar from "./components/FindBar";
 import GitPanel from "./components/GitPanel";
@@ -35,6 +36,14 @@ import {
   DEMO_DOCUMENT,
   EMPTY_GIT_STATE,
 } from "./lib/defaults";
+import {
+  addBibliographyEntry,
+  parseBibliography,
+  removeBibliographyEntry,
+  updateBibliographyEntry,
+  type BibliographyDraft,
+  type BibliographyEntry,
+} from "./lib/bibliography";
 import {
   countWords,
   documentPlainText,
@@ -357,6 +366,7 @@ export default function App() {
   const [gitBusy, setGitBusy] = useState(false);
   const [gitDiff, setGitDiff] = useState("");
   const [dialog, setDialog] = useState<DialogState>(null);
+  const [bibliographyEntry, setBibliographyEntry] = useState<BibliographyEntry | null | undefined>(undefined);
   const [mathEditor, setMathEditor] = useState<MathEditorState | null>(null);
   const [newProjectOpen, setNewProjectOpen] = useState(false);
   const [recent, setRecent] = useState<RecentProject[]>(loadRecent);
@@ -552,7 +562,7 @@ export default function App() {
       void persist();
     }, 1100);
     return () => window.clearTimeout(timer);
-  }, [dirty, workspace?.document, workspace?.settings, workspace?.comments, workspace?.revisions, source]);
+  }, [dirty, workspace?.document, workspace?.settings, workspace?.comments, workspace?.revisions, workspace?.bibliography, source]);
 
   useEffect(() => {
     // A page reload can happen before the autosave debounce fires. Flush the
@@ -666,8 +676,36 @@ export default function App() {
   };
 
   const handleBibliographyChange = (value: string) => {
-    setWorkspace((current) => current ? { ...current, bibliography: value } : current);
+    const current = workspaceRef.current;
+    if (!current) return;
+    const next = { ...current, bibliography: value };
+    workspaceRef.current = next;
+    setWorkspace(next);
     markDirty();
+  };
+
+  const openReferences = () => {
+    setSidebarOpen(true);
+    setSidebarPanel("references");
+  };
+
+  const insertCitation = (key: string) => {
+    editor?.chain().focus().insertContent({ type: "citation", attrs: { key } }).run();
+  };
+
+  const saveBibliographyEntry = (draft: BibliographyDraft) => {
+    const current = workspaceRef.current;
+    if (!current) return;
+    try {
+      const next = bibliographyEntry
+        ? updateBibliographyEntry(current.bibliography, bibliographyEntry.key, draft)
+        : addBibliographyEntry(current.bibliography, draft);
+      handleBibliographyChange(next);
+      setBibliographyEntry(undefined);
+      setToast(bibliographyEntry ? "Bibliography entry updated." : "Bibliography entry added.");
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : String(error));
+    }
   };
 
   const applySource = () => {
@@ -855,7 +893,7 @@ export default function App() {
     if (!dialog) return;
     switch (dialog.kind) {
       case "citation":
-        editor?.chain().focus().insertContent({ type: "citation", attrs: { key: value } }).run();
+        insertCitation(value);
         break;
       case "footnote":
         editor?.chain().focus().insertContent({ type: "footnote", attrs: { text: value } }).run();
@@ -1259,7 +1297,7 @@ export default function App() {
         onSettingsChange={handleSettingsChange}
         onInsertImage={() => imageInput.current?.click()}
         onInsertMath={(display) => setMathEditor({ display, latex: "", editing: false })}
-        onInsertCitation={() => setDialog({ kind: "citation" })}
+        onInsertCitation={openReferences}
         onInsertFootnote={() => setDialog({ kind: "footnote" })}
         onInsertCrossReference={() => setDialog({ kind: "cross-reference" })}
         onInsertLink={openLinkDialog}
@@ -1285,8 +1323,14 @@ export default function App() {
           comments={workspace.comments}
           revisions={workspace.revisions}
           history={workspace.git.history}
+          bibliography={workspace.bibliography}
           activeCommentId={activeCommentId}
           onPanelChange={setSidebarPanel}
+          onBibliographyChange={handleBibliographyChange}
+          onInsertCitationKey={insertCitation}
+          onInsertCitationManually={() => setDialog({ kind: "citation" })}
+          onAddBibliographyEntry={() => setBibliographyEntry(null)}
+          onEditBibliographyEntry={(entry) => setBibliographyEntry(entry)}
           onHeadingClick={(position) => {
             const heading = document.querySelectorAll<HTMLElement>(".sentence-editor h1, .sentence-editor h2, .sentence-editor h3")[position];
             heading?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1537,6 +1581,13 @@ export default function App() {
         token={githubToken}
         onClose={() => setCloneOpen(false)}
         onCloned={(project) => adoptWorkspace(hydrate(project))}
+      />
+      <BibliographyDialog
+        open={bibliographyEntry !== undefined}
+        entry={bibliographyEntry ?? null}
+        existingKeys={parseBibliography(workspace.bibliography).map((entry) => entry.key)}
+        onClose={() => setBibliographyEntry(undefined)}
+        onSave={saveBibliographyEntry}
       />
       <InputDialog
         open={Boolean(dialog)}
