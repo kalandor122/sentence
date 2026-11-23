@@ -226,3 +226,4 @@ Aborting
 2026-11-23T01:09:58Z EXPLORE long-document: 0 new items, agent exit 0
 2026-11-23T01:10:12Z START qa-046 on qa/qa-046-all-footnotes-render-the-marker-1-in-the: All footnotes render the marker 1 in the visual editor
 2026-11-23T01:14:15Z DONE qa-046 (tsc -b, npm test, smoke all green)
+2026-11-23T01:14:50Z START qa-049 on qa/qa-049-no-indent-outdent-controls-anywhere-in-t: No indent / outdent controls anywhere in the ribbon

@@ -18,6 +18,7 @@ import {
   TableOfContents,
 } from "./extensions";
 import { FindHighlight } from "./find";
+import { changeIndent } from "./indent";
 import {
   ColorMark,
   FontFamilyMark,
@@ -61,23 +62,9 @@ const TabIndent = Extension.create({
   name: "sentenceTabIndent",
   priority: 200,
   addKeyboardShortcuts() {
-    const indent = (outdent: boolean) => {
-      const { editor } = this;
-      if (!editor.isEditable || editor.isActive("table") || editor.isActive("codeBlock")) return false;
-      const chain = editor.chain().focus();
-      if (editor.isActive("listItem")) {
-        if (outdent) chain.liftListItem("listItem").run();
-        else chain.sinkListItem("listItem").run();
-      } else if (outdent) {
-        chain.lift("blockquote").run();
-      } else {
-        chain.wrapIn("blockquote").run();
-      }
-      return true;
-    };
     return {
-      Tab: () => indent(false),
-      "Shift-Tab": () => indent(true),
+      Tab: () => changeIndent(this.editor, false),
+      "Shift-Tab": () => changeIndent(this.editor, true),
     };
   },
 });
