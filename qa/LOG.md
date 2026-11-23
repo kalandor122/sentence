@@ -357,3 +357,4 @@ Aborting
 2026-11-23T13:37:16Z START qa-120 on qa/qa-120-applying-an-edited-latex-source-drops-ev: Applying an edited LaTeX source drops every comment highlight and leaves comment threads unanchored
 2026-11-23T13:44:17Z DONE qa-120 (tsc -b, npm test, smoke all green)
 2026-11-23T20:54:28Z START qa-123 on qa/qa-123-leaving-the-latex-view-after-a-failed-ap: Leaving the LaTeX view after a failed Apply silently discards the broken source draft
+2026-11-23T20:58:27Z DONE qa-123 (tsc -b, npm test, smoke all green)
