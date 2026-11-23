@@ -1307,8 +1307,9 @@
       "hint": "Repro: Switch to LaTeX, insert '\\begin{equation}E = mc^2\\end{equation}' before \\end{document}, switch to Visual. Inspect the rendered math block element ([data-math-block]) and read its data-numbered attribute.\nActual: getAttribute('data-numbered') is null because the KaTeX node view renders its own DOM instead of the renderHTML output, so copying and pasting the equation re-imports it as an unnumbered equation*. LaTeX serialisation is correct (equation survives a source round trip).",
       "source": "explore:math-nodeview:numbered equations lose their numbering when copied or pasted",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T02:23:41Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T02:23:41Z",
+      "lastAttemptAt": "2026-11-23T02:23:41Z"
     },
     {
       "id": "qa-083",
