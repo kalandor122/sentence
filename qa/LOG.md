@@ -283,3 +283,4 @@ Aborting
 2026-11-23T03:48:29Z EXPLORE math: 2 new items, agent exit 0
 2026-11-23T03:48:39Z START qa-107 on qa/qa-107-unknown-latex-commands-pass-math-validat: Unknown LaTeX commands pass math validation and can be inserted
 2026-11-23T03:51:47Z DONE qa-107 (tsc -b, npm test, smoke all green)
+2026-11-23T03:52:17Z START qa-108 on qa/qa-108-dismissing-a-math-edit-dialog-with-cance: Dismissing a math edit dialog with Cancel/Escape drops editor focus; typing and Backspace are swallowed
