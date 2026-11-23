@@ -32,7 +32,7 @@ QA = ROOT / "qa"
 BACKLOG = QA / "backlog.json"
 LOG = QA / "LOG.md"
 CYCLE_LOGS = QA / "cycles"
-MODEL = os.environ.get("QA_MODEL", "opencode/big-pickle")
+MODEL = os.environ.get("QA_MODEL", "opencode-go/deepseek-v4.1-flash")
 PORT = 1420
 SEV_ORDER = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 
@@ -148,7 +148,7 @@ When finished, reply with at most 6 lines: files changed, and what a user can no
 
 
 def run_fixer(item: dict, failures: str | None, timeout: int = 2400) -> tuple[int, str]:
-    p = subprocess.run(["opencode", "run", "-m", MODEL, prompt_for(item, failures)],
+    p = subprocess.run(["opencode", "run", "--standalone", "-m", MODEL, prompt_for(item, failures)],
                        cwd=ROOT, capture_output=True, text=True, timeout=timeout)
     return p.returncode, (p.stdout + p.stderr)
 

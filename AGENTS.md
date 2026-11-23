@@ -103,3 +103,11 @@ compiles a real LaTeX package (`arxiv::tests::extracted_package_compiles_with_te
 - `ensure_repository` must use `Repository::open`, never `Repository::discover`: discover walks up and finds whatever repo contains the project folder, so projects opened inside another checkout silently commit into the parent repo.
 - Windows is the shipping target (WebView2, Credential Manager, NSIS). Linux builds and runs for development; `.docx` interoperability is still out of scope.
 - No CI, lint, or formatter config exists; match the existing code style.
+
+## Model
+
+The QA loop runs its fixer and tester agents on `opencode-go/deepseek-v4.1-flash`
+(OpenCode Go gateway, `OPENCODE_GO_API_KEY` from `~/.hermes/.env`, passed to the
+systemd unit via `EnvironmentFile`). `opencode run --standalone` is used so each
+run picks up that key instead of reusing a background server started without it.
+Override with `QA_MODEL=opencode/<other>`.

@@ -25,7 +25,7 @@ AREAS = QA / "areas.json"
 PROBES = QA / "probes"
 FINDINGS = QA / "findings"
 BACKLOG = QA / "backlog.json"
-MODEL = os.environ.get("QA_MODEL", "opencode/big-pickle")
+MODEL = os.environ.get("QA_MODEL", "opencode-go/deepseek-v4.1-flash")
 
 
 def now() -> str:
@@ -134,7 +134,7 @@ def main() -> None:
     area = pick_area(sys.argv[1] if len(sys.argv) > 1 else None)
     print(f"{now()} EXPLORE {area['id']}", flush=True)
 
-    out = subprocess.run(["opencode", "run", "-m", MODEL, prompt(area)],
+    out = subprocess.run(["opencode", "run", "--standalone", "-m", MODEL, prompt(area)],
                          cwd=ROOT, capture_output=True, text=True, timeout=3600)
     (QA / "cycles").mkdir(exist_ok=True)
     (QA / "cycles" / f"explore-{area['id']}.log").write_text(out.stdout + out.stderr)
