@@ -115,10 +115,11 @@
         "src/vite-env.d.ts"
       ],
       "hint": "Inject the version at build time (define in vite.config.ts from package.json) and render it, so bumping package.json cannot drift.",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:02:03Z",
-      "lastAttemptAt": "2026-11-23T00:02:03Z"
+      "lastAttemptAt": "2026-11-23T00:02:03Z",
+      "doneAt": "2026-11-23T00:02:37Z"
     },
     {
       "id": "qa-008",
@@ -130,7 +131,9 @@
         "src/styles.css"
       ],
       "hint": "Ctrl+P calls window.print(). Add an @media print block that hides ribbon, sidebar and status bar, removes page shadows and background chrome, and prints the page sheet at its true width. Verify with a headless PDF print in the smoke script (page.pdf()) that the ribbon does not appear.",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:03:12Z"
     },
     {
       "id": "qa-009",
