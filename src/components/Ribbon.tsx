@@ -454,12 +454,12 @@ export default function Ribbon({
         {activeTab === "Layout" ? (
           <>
             <RibbonGroup label="Page setup">
-              <label className="ribbon-field">Size<select value={settings.paperSize} onChange={(event) => onSettingsChange({ paperSize: event.target.value as ProjectSettings["paperSize"] })}><option value="a4paper">A4</option><option value="letterpaper">Letter</option></select></label>
-              <label className="ribbon-field">Margins<select value={settings.margins} onChange={(event) => onSettingsChange({ margins: event.target.value as ProjectSettings["margins"] })}><option value="normal">Normal</option><option value="narrow">Narrow</option><option value="wide">Wide</option></select></label>
-              <label className="ribbon-field">Text size<select value={settings.fontSize} onChange={(event) => onSettingsChange({ fontSize: event.target.value as ProjectSettings["fontSize"] })}><option value="10pt">10 pt</option><option value="11pt">11 pt</option><option value="12pt">12 pt</option></select></label>
+              <label className="ribbon-field">Size<select aria-label="Paper size" value={settings.paperSize} onChange={(event) => onSettingsChange({ paperSize: event.target.value as ProjectSettings["paperSize"] })}><option value="a4paper">A4</option><option value="letterpaper">Letter</option></select></label>
+              <label className="ribbon-field">Margins<select aria-label="Margins" value={settings.margins} onChange={(event) => onSettingsChange({ margins: event.target.value as ProjectSettings["margins"] })}><option value="normal">Normal</option><option value="narrow">Narrow</option><option value="wide">Wide</option></select></label>
+              <label className="ribbon-field">Text size<select aria-label="Text size" value={settings.fontSize} onChange={(event) => onSettingsChange({ fontSize: event.target.value as ProjectSettings["fontSize"] })}><option value="10pt">10 pt</option><option value="11pt">11 pt</option><option value="12pt">12 pt</option></select></label>
             </RibbonGroup>
             <RibbonGroup label="Document">
-              <label className="ribbon-field">Type<select value={settings.documentClass} onChange={(event) => onSettingsChange({ documentClass: event.target.value as ProjectSettings["documentClass"] })}><option value="article">Article</option><option value="report">Report</option><option value="book">Book</option></select></label>
+              <label className="ribbon-field">Type<select aria-label="Document class" value={settings.documentClass} onChange={(event) => onSettingsChange({ documentClass: event.target.value as ProjectSettings["documentClass"] })}><option value="article">Article</option><option value="report">Report</option><option value="book">Book</option></select></label>
               <IconButton label="Toggle line numbers" active={settings.lineNumbers} onClick={() => onSettingsChange({ lineNumbers: !settings.lineNumbers })}>
                 <ListOrdered size={18} />
               </IconButton>
