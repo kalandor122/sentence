@@ -684,12 +684,19 @@ function parseInline(source: string): InlineParseResult {
       continue;
     }
 
-    const footnoteMatch = remainder.match(/^\\footnote\{([^}]*)\}/);
+    const footnoteMatch = remainder.match(/^\\footnote\{/);
     if (footnoteMatch) {
-      flush();
-      content.push({ type: "footnote", attrs: { text: decodeLatexText(footnoteMatch[1]) } });
-      index += footnoteMatch[0].length;
-      continue;
+      const open = index + footnoteMatch[0].length - 1;
+      const close = findMatchingBrace(source, open);
+      if (close > 0) {
+        flush();
+        content.push({
+          type: "footnote",
+          attrs: { text: decodeLatexText(source.slice(open + 1, close)) },
+        });
+        index = close + 1;
+        continue;
+      }
     }
 
     const refMatch = remainder.match(/^\\ref\s*\{([^}]*)\}/);
