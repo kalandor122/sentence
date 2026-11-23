@@ -272,3 +272,4 @@ Aborting
 2026-11-23T03:16:08Z START qa-099 on qa/qa-099-settings-button-is-not-activated-by-ente: Settings button is not activated by Enter when focused
 2026-11-23T03:19:07Z DONE qa-099 (tsc -b, npm test, smoke all green)
 2026-11-23T03:19:37Z PROMOTED from roadmap: qa-104 Table editing: a contextual table toolbar
+2026-11-23T03:19:37Z START qa-104 on qa/qa-104-table-editing-a-contextual-table-toolbar: Table editing: a contextual table toolbar

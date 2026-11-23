@@ -6,7 +6,7 @@ import {
   escapeLatex,
   latexToDocument,
 } from "./latex";
-import type { ProjectSettings, SentenceDocument } from "./types";
+import type { DocumentNode, ProjectSettings, SentenceDocument } from "./types";
 
 const settings: ProjectSettings = {
   ...DEFAULT_SETTINGS,
@@ -660,6 +660,73 @@ describe("LaTeX generation", () => {
       "second line",
     ]);
     expect(documentToLatex(parsed, settings)).toContain("first line\\par second line \\\\");
+  });
+
+  it("round-trips a table caption through LaTeX", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          attrs: { caption: "Results & discussion" },
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableHeader",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "H" }] }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("\\caption{Results \\& discussion}");
+    const parsed = latexToDocument(latex, settings).document;
+    expect(parsed.content[0]?.attrs?.caption).toBe("Results & discussion");
+    expect(documentToLatex(parsed, settings)).toContain("\\caption{Results \\& discussion}");
+  });
+
+  it("round-trips cell alignment through LaTeX column specs", () => {
+    const header = (align?: string): DocumentNode => ({
+      type: "tableHeader",
+      ...(align ? { attrs: { align } } : {}),
+      content: [{ type: "paragraph", content: [{ type: "text", text: align ?? "plain" }] }],
+    });
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            { type: "tableRow", content: [header("center"), header()] },
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  attrs: { align: "right" },
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "a" }] }],
+                },
+                {
+                  type: "tableCell",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "b" }] }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("\\begin{tabular}{cl}");
+    expect(latex).toContain("\\multicolumn{1}{r}{a}");
+    const parsed = latexToDocument(latex, settings).document;
+    expect(parsed.content[0]?.content?.[0]?.content?.[0]?.attrs?.align).toBe("center");
+    expect(parsed.content[0]?.content?.[1]?.content?.[0]?.attrs?.align).toBe("right");
   });
 
   it("round-trips page breaks", () => {

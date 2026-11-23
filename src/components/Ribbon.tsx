@@ -44,6 +44,7 @@ import {
   FileText,
 } from "lucide-react";
 import IconButton from "./IconButton";
+import TableToolbar from "./TableToolbar";
 import { changeIndent } from "../editor/indent";
 import { toggleList } from "../editor/listToggle";
 import type {
@@ -273,6 +274,8 @@ export default function Ribbon({
           );
         })}
       </nav>
+
+      <TableToolbar editor={editor} />
 
       <div
         className="ribbon-content"

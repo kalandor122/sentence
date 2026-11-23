@@ -197,38 +197,45 @@ function inlineContent(nodes: DocumentNode[] | undefined): string {
     .join("");
 }
 
-function tableCellToLatex(cell: DocumentNode): string {
+type LatexColumnAlign = "l" | "c" | "r";
+
+function cellAlign(cell: DocumentNode): LatexColumnAlign {
+  const align = attribute(cell, "align");
+  return align === "center" ? "c" : align === "right" ? "r" : "l";
+}
+
+function tableCellToLatex(cell: DocumentNode, columnAlign: LatexColumnAlign): string {
   const children = cell.content ?? [];
-  if (children.every((child) => child.type === "paragraph")) {
-    return children.map((child) => inlineContent(child.content)).join("\\par ");
-  }
-  return inlineContent(children);
+  const body = children.every((child) => child.type === "paragraph")
+    ? children.map((child) => inlineContent(child.content)).join("\\par ")
+    : inlineContent(children);
+  const align = cellAlign(cell);
+  return align === columnAlign ? body : `\\multicolumn{1}{${align}}{${body}}`;
 }
 
 function tableToLatex(node: DocumentNode): string {
-  const rows = (node.content ?? []).filter((row) => row.type === "tableRow");
-  const columnCount = Math.max(
-    1,
-    ...rows.map((row) => (row.content ?? []).filter((cell) => cell.type === "tableCell" || cell.type === "tableHeader").length),
+  const rows = (node.content ?? [])
+    .filter((row) => row.type === "tableRow")
+    .map((row) => (row.content ?? []).filter((cell) => cell.type === "tableCell" || cell.type === "tableHeader"));
+  const columnCount = Math.max(1, ...rows.map((row) => row.length));
+  const columnAligns = Array.from({ length: columnCount }, (_, index) =>
+    rows[0]?.[index] ? cellAlign(rows[0][index]) : "l",
   );
   const body = rows
-    .map((row) => {
-      const cells = (row.content ?? [])
-        .filter((cell) => cell.type === "tableCell" || cell.type === "tableHeader")
-        .map(tableCellToLatex);
-      return `${cells.join(" & ")} \\\\`;
-    })
+    .map((row) => `${row.map((cell, index) => tableCellToLatex(cell, columnAligns[index] ?? "l")).join(" & ")} \\\\`)
     .join("\n");
+  const caption = attribute(node, "caption");
   return [
     "\\begin{table}[htbp]",
     "\\centering",
-    `\\begin{tabular}{${"l".repeat(columnCount)}}`,
+    caption ? `\\caption{${escapeLatex(caption)}}` : "",
+    `\\begin{tabular}{${columnAligns.join("")}}`,
     "\\hline",
     body,
     "\\hline",
     "\\end{tabular}",
     "\\end{table}",
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 }
 
 function wrapAlignment(node: DocumentNode, body: string): string {
@@ -1120,9 +1127,14 @@ export function latexToDocument(
       continue;
     }
     if (/^\\begin\{(?:table|tabular)\}/.test(block)) {
-      const tabularBody = block.match(
-        /\\begin\{tabular\}(?:\s*\{[^{}]*\})?\s*([\s\S]*?)\\end\{tabular\}/,
-      )?.[1] ?? block;
+      const tabular = block.match(
+        /\\begin\{tabular\}(?:\s*\{([^}]*)\})?\s*([\s\S]*?)\\end\{tabular\}/,
+      );
+      const tabularBody = tabular?.[2] ?? block;
+      const columnAligns = Array.from(tabular?.[1] ?? "")
+        .filter((char) => char === "l" || char === "c" || char === "r")
+        .map((char) => (char === "c" ? "center" : char === "r" ? "right" : "left"));
+      const caption = block.match(/\\caption\{([^}]*)\}/)?.[1];
       const parts = tabularBody.split(/\\\\\s*(?:\n|$)/);
       const rows =
         parts.length > 1
@@ -1133,15 +1145,28 @@ export function latexToDocument(
       if (rows.length > 0) {
         content.push({
           type: "table",
+          ...(caption !== undefined ? { attrs: { caption: decodeLatexText(caption) } } : {}),
           content: rows.map((row, rowIndex) => ({
             type: "tableRow",
-            content: splitTableRow(row).map((cell) => ({
-              type: rowIndex === 0 ? "tableHeader" : "tableCell",
-              content: cell.trim().split(/(?<!\\)\\par\b/).map((paragraph) => ({
-                type: "paragraph",
-                content: parseInline(paragraph.trim()).content,
-              })),
-            })),
+            content: splitTableRow(row).map((rawCell, columnIndex) => {
+              const multiColumn = rawCell.trim().match(/^\\multicolumn\{1\}\{([lcr])\}\{([\s\S]*)\}$/);
+              const align = multiColumn
+                ? multiColumn[1] === "c"
+                  ? "center"
+                  : multiColumn[1] === "r"
+                    ? "right"
+                    : "left"
+                : columnAligns[columnIndex];
+              const cell = (multiColumn ? multiColumn[2] : rawCell).trim();
+              return {
+                type: rowIndex === 0 ? "tableHeader" : "tableCell",
+                ...(align && align !== "left" ? { attrs: { align } } : {}),
+                content: cell.split(/(?<!\\)\\par\b/).map((paragraph) => ({
+                  type: "paragraph",
+                  content: parseInline(paragraph.trim()).content,
+                })),
+              };
+            }),
           })),
         });
         continue;
