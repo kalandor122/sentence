@@ -784,10 +784,11 @@
       ],
       "hint": "Repro: Inspect every group on the Home and Layout tabs for an indent or outdent button.\nActual: No such controls exist. Paragraph indentation cannot be changed from the UI at all.",
       "source": "explore:ribbon:no indent / outdent controls anywhere in the ribbon",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T01:14:50Z",
-      "lastAttemptAt": "2026-11-23T01:14:50Z"
+      "lastAttemptAt": "2026-11-23T01:14:50Z",
+      "doneAt": "2026-11-23T01:20:15Z"
     },
     {
       "id": "qa-050",
@@ -799,7 +800,9 @@
       ],
       "hint": "Repro: Place the cursor in a plain left-aligned paragraph and read the pressed state of the four alignment buttons.\nActual: None of the four buttons is active until Align left is clicked explicitly; centre/right/justify then light up correctly.",
       "source": "explore:ribbon:align left button is not active by default",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T01:20:50Z"
     },
     {
       "id": "qa-051",
