@@ -215,3 +215,4 @@ Aborting
 2026-11-23T00:36:07Z START qa-093 on qa/qa-093-rejecting-a-tracked-revision-leaves-a-st: Rejecting a tracked revision leaves a stale baseline for the next revision
 2026-11-23T00:43:46Z DONE qa-093 (tsc -b, npm test, smoke all green)
 2026-11-23T00:48:06Z EXPLORE source-editor: 2 new items, agent exit 0
+2026-11-23T00:48:20Z START qa-094 on qa/qa-094-re-clicking-the-active-latex-mode-button: Re-clicking the active LaTeX mode button silently discards unapplied source edits

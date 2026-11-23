@@ -623,11 +623,14 @@ export default function App() {
   };
 
   const handleModeChange = (nextMode: EditorMode) => {
+    if (nextMode === mode) return;
     const current = workspaceRef.current;
     if (current && nextMode !== "source" && mode !== "visual" && sourceDirtyRef.current) {
       applySource();
     }
-    if (nextMode === "source" && current) {
+    // Re-entering source from split keeps the already-visible source text; only
+    // a transition from the visual-only view needs a fresh LaTeX snapshot.
+    if (nextMode === "source" && current && mode === "visual") {
       const latex = documentToLatex(current.document, current.settings);
       setSource(latex);
       sourceRef.current = latex;
