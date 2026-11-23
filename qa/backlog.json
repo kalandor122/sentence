@@ -1818,10 +1818,37 @@
       ],
       "hint": "Add exporters next to documentToLatex in src/lib, driven by the same document model, with round-trip tests for the supported subset. Wire them into a File/Export menu that is honest about which subset is supported.",
       "source": "roadmap:export to html and markdown alongside latex",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T04:48:05Z",
-      "lastAttemptAt": "2026-11-23T04:48:05Z"
+      "lastAttemptAt": "2026-11-23T04:48:05Z",
+      "doneAt": "2026-11-23T04:57:18Z"
+    },
+    {
+      "id": "qa-115",
+      "title": "source view toggle did not reveal an editable LaTeX surface",
+      "why": "Found by the automated pass (medium/functional).",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "",
+      "source": "source view toggle did not reveal an editable latex surface",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T05:00:18Z"
+    },
+    {
+      "id": "qa-116",
+      "title": "no View ribbon tab found, cannot check source-view round trips",
+      "why": "Found by the automated pass (medium/ux).",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "",
+      "source": "no view ribbon tab found, cannot check source-view round trips",
+      "status": "open"
     }
   ]
 }

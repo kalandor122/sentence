@@ -302,3 +302,6 @@ Aborting
 2026-11-23T04:47:35Z DONE qa-113 (tsc -b, npm test, smoke all green)
 2026-11-23T04:48:05Z PROMOTED from roadmap: qa-114 Export to HTML and Markdown alongside LaTeX
 2026-11-23T04:48:05Z START qa-114 on qa/qa-114-export-to-html-and-markdown-alongside-la: Export to HTML and Markdown alongside LaTeX
+2026-11-23T04:57:18Z DONE qa-114 (tsc -b, npm test, smoke all green)
+2026-11-23T04:57:38Z EXPLORE review: 0 new items, agent exit 1
+2026-11-23T04:57:48Z BACKLOG EMPTY — nothing open, idle
