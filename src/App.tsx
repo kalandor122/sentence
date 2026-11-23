@@ -276,6 +276,21 @@ function wordRangeAtCursor(editor: Editor): { from: number; to: number } | null 
   return { from: $from.pos - start, to: $from.pos + end };
 }
 
+function insertPageFurniture(editor: Editor | null, type: "pageBreak" | "toc") {
+  if (!editor) return;
+  const { selection } = editor.state;
+  // Tiptap leaves an inserted block atom node-selected. A following ribbon
+  // click would replace that node, so insert at the boundary after it instead.
+  if (
+    selection instanceof NodeSelection &&
+    (selection.node.type.name === "pageBreak" || selection.node.type.name === "toc")
+  ) {
+    editor.chain().focus().insertContentAt(selection.to, { type }).run();
+    return;
+  }
+  editor.chain().focus().insertContent({ type }).run();
+}
+
 export default function App() {
   const [workspace, setWorkspace] = useState<Workspace | null>(loadBrowserWorkspace);
   const workspaceRef = useRef<Workspace | null>(workspace);
@@ -1224,8 +1239,8 @@ export default function App() {
         onInsertFootnote={() => setDialog({ kind: "footnote" })}
         onInsertCrossReference={() => setDialog({ kind: "cross-reference" })}
         onInsertLink={openLinkDialog}
-        onInsertToc={() => editor?.chain().focus().insertContent({ type: "toc" }).run()}
-        onInsertPageBreak={() => editor?.chain().focus().insertContent({ type: "pageBreak" }).run()}
+        onInsertToc={() => insertPageFurniture(editor, "toc")}
+        onInsertPageBreak={() => insertPageFurniture(editor, "pageBreak")}
         onToggleTracking={() => {
           const next = !tracking;
           setTracking(next);
