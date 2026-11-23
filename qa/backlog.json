@@ -1423,8 +1423,9 @@
       "hint": "Repro: 1. Type 'Baseline revision text', turn on Track changes, type ' delta-one', wait 2s and Accept it. 2. Type ' delta-two', wait 2s, click Reject; editor returns to 'Baseline revision text delta-one'. 3. With tracking still on type ' EARLY', wait 2s, type ' LATE', wait 2s. 4. Read the 'before' text of the second (EARLY) revision card in the Review panel.\nActual: The EARLY card showed before='Baseline revision text delta-one delta-two' even though 'delta-two' had been rejected and was absent from the editor; probe flag staleBaselineEvidence=true.",
       "source": "explore:review:rejecting a tracked revision leaves a stale baseline for the next revision",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T00:36:07Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T00:36:07Z",
+      "lastAttemptAt": "2026-11-23T00:36:07Z"
     }
   ]
 }

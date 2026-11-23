@@ -42,7 +42,7 @@ import {
   imageAssetPath,
   latexToDocument,
 } from "./lib/latex";
-import { documentChanges, undoDocumentChanges } from "./lib/revisions";
+import { applyRejection, undoDocumentChanges } from "./lib/revisions";
 import {
   assetUrl,
   authorizeAsset,
@@ -1226,11 +1226,7 @@ export default function App() {
             const current = workspaceRef.current;
             const revision = current?.revisions.find((item) => item.id === id);
             if (!current || !revision) return;
-            const changes = documentChanges(
-              revision.beforeDocument ?? current.document,
-              revision.afterDocument ?? current.document,
-            );
-            const nextDocument = undoDocumentChanges(current.document, changes);
+            const { document: nextDocument, changes } = applyRejection(current.document, revision);
             const next: Workspace = {
               ...current,
               document: nextDocument,

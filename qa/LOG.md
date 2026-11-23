@@ -212,3 +212,4 @@ Aborting
 2026-11-23T00:31:59Z DONE qa-091 (tsc -b, npm test, smoke all green)
 2026-11-23T00:32:33Z START qa-092 on qa/qa-092-deleting-a-comment-leaves-an-orphaned-hi: Deleting a comment leaves an orphaned highlight in the document
 2026-11-23T00:35:32Z DONE qa-092 (tsc -b, npm test, smoke all green)
+2026-11-23T00:36:07Z START qa-093 on qa/qa-093-rejecting-a-tracked-revision-leaves-a-st: Rejecting a tracked revision leaves a stale baseline for the next revision
