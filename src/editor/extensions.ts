@@ -1,6 +1,7 @@
 import { Mark, Node, mergeAttributes } from "@tiptap/core";
 import Image from "@tiptap/extension-image";
 import { katexNodeView } from "./KatexMath";
+import { tocNodeView } from "./TocBlock";
 
 function stringAttribute(node: { attrs?: Record<string, unknown> }, name: string): string {
   const value = node.attrs?.[name];
@@ -250,6 +251,11 @@ export const TableOfContents = Node.create({
   name: "toc",
   group: "block",
   atom: true,
+  selectable: true,
+
+  addNodeView() {
+    return tocNodeView();
+  },
 
   parseHTML() {
     return [{ tag: "div[data-toc]" }];
