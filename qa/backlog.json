@@ -132,8 +132,9 @@
       ],
       "hint": "Ctrl+P calls window.print(). Add an @media print block that hides ribbon, sidebar and status bar, removes page shadows and background chrome, and prints the page sheet at its true width. Verify with a headless PDF print in the smoke script (page.pdf()) that the ribbon does not appear.",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T00:03:12Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T00:03:12Z",
+      "lastAttemptAt": "2026-11-23T00:03:12Z"
     },
     {
       "id": "qa-009",
