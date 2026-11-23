@@ -292,8 +292,9 @@
       "hint": "Repro: GitHub dialog > Continue in browser with empty client ID\nActual: Validation message renders as <p class=\"auth-message\"> with no role=alert and no aria-live",
       "source": "explore:chrome:inline validation error not announced",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T00:04:21Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T00:04:21Z",
+      "lastAttemptAt": "2026-11-23T00:04:21Z"
     },
     {
       "id": "qa-019",

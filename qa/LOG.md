@@ -188,3 +188,4 @@ Aborting
 2026-11-23T00:03:12Z START qa-008 on qa/qa-008-no-print-path-ctrl-p-with-paper-accurate: No print path (Ctrl+P) with paper-accurate styles
 2026-11-23T00:03:46Z DONE qa-008 (tsc -b, npm test, smoke all green)
 2026-11-23T00:04:07Z EXPLORE math: 0 new items, agent exit 1
+2026-11-23T00:04:21Z START qa-018 on qa/qa-018-inline-validation-error-not-announced: Inline validation error not announced
