@@ -349,3 +349,4 @@ Aborting
 2026-11-23T13:01:03Z EXPLORE links-cites-footnotes: 0 new items, agent exit 143
 2026-11-23T13:01:05Z SMOKE RED — queueing the failure as critical work: FAIL failures=1 observations=0 consoleErrors=0
   FAIL harness: Error: page.waitForTimeout: Target page, context or browser has been closed
+2026-11-23T13:15:47Z EXPLORE review: 5 new items, agent exit 0

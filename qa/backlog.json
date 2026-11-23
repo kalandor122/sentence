@@ -1871,6 +1871,68 @@
       "attempts": 0,
       "startedAt": "2026-11-23T13:01:05Z",
       "note": "the red gate was my own pkill of chromium mid-run; not an app defect \u2014 gate now retries once before queueing"
+    },
+    {
+      "id": "qa-118",
+      "title": "Rejecting a tracked edit made after a comment removes the comment highlight and leaves the thread unanchored",
+      "why": "Exploratory pass on review (functional): expected Rejecting the tracked edit should undo only ' tail'; the 'Comment' highlight should remain and the comment thread should still point at that word.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. In a fresh document type 'Comment on tracked text'. 2. Review tab > Track changes (the button changes to 'Tracking on'). 3. Select the first word 'Comment', Review tab > New comment, enter 'Comment before tracked edit' and click Comment. 4. Put the caret at the end and type ' tail', wait ~2 s for the tracked change to appear, open the History sidebar and click Reject on the pending revision. 5. Open the Review sidebar.\nActual: The editor text returned to 'Comment on tracked text', but zero [data-comment-id] highlight spans remained. The Review panel still listed 'Comment before tracked edit' with badge 1, so the thread survived with no anchor; clicking it cannot locate or highlight any text.",
+      "source": "explore:review:rejecting a tracked edit made after a comment removes the comment highlight and leaves the thread unanchored",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T13:16:01Z"
+    },
+    {
+      "id": "qa-119",
+      "title": "Adding a comment to a selection that overlaps an existing comment silently removes the first comment's highlight",
+      "why": "Exploratory pass on review (functional): expected Each comment keeps its own anchored highlight (two highlights), or the app refuses the overlapping comment and explains why.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. In a fresh document type 'Alpha beta gamma delta'. 2. Select 'Alpha' (Ctrl+Home, then Ctrl+Shift+Right) and add the comment 'First comment body'. 3. Select 'Alpha beta' (Ctrl+Home, then Ctrl+Shift+Right twice) and add the comment 'Second overlapping comment'. 4. Inspect the editor spans and the Review sidebar, then click the 'First comment body' thread.\nActual: The Review sidebar shows two threads (badge 2) but the editor has a single highlight, 'Alpha beta', carrying the second comment's mark id. The first comment's mark id is absent from the document. Clicking the first thread marks it active in the sidebar but no part of the document highlights (0 active highlight elements), so that thread can no longer locate its text.",
+      "source": "explore:review:adding a comment to a selection that overlaps an existing comment silently removes the first comment's highlight",
+      "status": "open"
+    },
+    {
+      "id": "qa-120",
+      "title": "Applying an edited LaTeX source drops every comment highlight and leaves comment threads unanchored",
+      "why": "Exploratory pass on review (functional): expected Comment highlights stay attached to their text across the source round trip, or the app warns that applying source will detach the comments.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Type 'Source sync target text'. 2. Select the last word 'text' and add the comment 'Comment through source sync'; confirm the Review sidebar shows one highlight. 3. View tab > LaTeX, change the body text to 'Source sync target text rewritten in source', click Apply source, then click Visual and open the Review sidebar.\nActual: The thread body 'Comment through source sync' is still listed with badge 1, but no [data-comment-id] highlight remains in the document, so the comment is unanchored. The only feedback was 'Visual document synchronized from LaTeX.'",
+      "source": "explore:review:applying an edited latex source drops every comment highlight and leaves comment threads unanchored",
+      "status": "open"
+    },
+    {
+      "id": "qa-121",
+      "title": "Tracked-change decorations misreport existing text as deleted and re-inserted when the paragraph contains a comment mark",
+      "why": "Exploratory pass on review (visual): expected The inline tracked-change decoration marks only the newly typed ' tail' as inserted, matching the revision card's before 'Comment on tracked text' / after 'Comment on tracked text tail'.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Type 'Comment on tracked text'. 2. Turn on Review > Track changes. 3. Select the first word 'Comment' and add the comment 'Comment before tracked edit'. 4. Put the caret at the end and type ' tail', wait ~2 s, and open the History sidebar while the revision is pending.\nActual: The editor renders an insertion decoration with text ' on tracked text tail' and a deletion decoration with text ' on tracked text', so most of the unchanged sentence is shown as both deleted and inserted. The revision card text is correct; only the inline decorations are wrong.",
+      "source": "explore:review:tracked-change decorations misreport existing text as deleted and re-inserted when the paragraph contains a comment mark",
+      "status": "open"
+    },
+    {
+      "id": "qa-122",
+      "title": "New comment with no selection accepts a comment body and then discards it",
+      "why": "Exploratory pass on review (ux): expected New comment is unavailable until text is selected, or the dialog stays open with the typed body and an inline error so the text is not lost.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. In an empty document (no text selected), open Review > New comment. 2. Type 'Comment without a selection' in the dialog and click Comment.\nActual: The dialog closes, a transient toast reads 'Select text before adding a comment.', no thread is created, and the typed comment body is discarded.",
+      "source": "explore:review:new comment with no selection accepts a comment body and then discards it",
+      "status": "open"
     }
   ]
 }
