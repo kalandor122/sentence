@@ -1274,10 +1274,11 @@
       ],
       "hint": "Repro: Click Insert > Page break once in the demo document, then read the status bar and the --sentence-sheet-min-height CSS variable on .visual-editor-scroll.\nActual: The status bar still reads '1 page' while the 64px page-break band renders and --sentence-sheet-min-height is 2106px (2 x 1053px). Probe step 3: out.pageBreak.domImmediately={sheetMinHeight:'2106px',status:['1 page']} and the same values remain in out.pageBreak.dom.",
       "source": "explore:insert-media:status bar page count ignores inserted page breaks",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T01:56:04Z",
-      "lastAttemptAt": "2026-11-23T01:56:04Z"
+      "lastAttemptAt": "2026-11-23T01:56:04Z",
+      "doneAt": "2026-11-23T02:01:14Z"
     },
     {
       "id": "qa-081",
@@ -1289,7 +1290,9 @@
       ],
       "hint": "Repro: In the demo document (which has H1 'Introduction' and H2 'Drafting with constraints'), click References > Table of contents and inspect the inserted block on the visual page.\nActual: The inserted [data-toc] block is a 608x59px dashed box whose entire text is the literal label 'Table of contents'; no headings or compile-time hint appear, even though the LaTeX correctly contains \\tableofcontents. Probe step 4: out.toc.dom.tocs[0] and out.toc.latex.toc=1.",
       "source": "explore:insert-media:visual table of contents shows no entries for the document's headings",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T02:01:44Z"
     },
     {
       "id": "qa-082",
