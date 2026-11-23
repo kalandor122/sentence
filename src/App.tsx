@@ -1249,7 +1249,7 @@ export default function App() {
           break;
         }
         const markId = crypto.randomUUID();
-        editor.chain().focus().setMark("comment", { markId }).run();
+        editor.chain().focus().addComment(markId).run();
         const thread: CommentThread = {
           id: crypto.randomUUID(),
           markId,

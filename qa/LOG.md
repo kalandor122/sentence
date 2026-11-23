@@ -352,3 +352,4 @@ Aborting
 2026-11-23T13:15:47Z EXPLORE review: 5 new items, agent exit 0
 2026-11-23T13:16:01Z START qa-118 on qa/qa-118-rejecting-a-tracked-edit-made-after-a-co: Rejecting a tracked edit made after a comment removes the comment highlight and leaves the thread unanchored
 2026-11-23T13:29:59Z DONE qa-118 (tsc -b, npm test, smoke all green)
+2026-11-23T13:30:33Z START qa-119 on qa/qa-119-adding-a-comment-to-a-selection-that-ove: Adding a comment to a selection that overlaps an existing comment silently removes the first comment's highlight

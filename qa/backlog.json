@@ -1899,8 +1899,9 @@
       "hint": "Repro: 1. In a fresh document type 'Alpha beta gamma delta'. 2. Select 'Alpha' (Ctrl+Home, then Ctrl+Shift+Right) and add the comment 'First comment body'. 3. Select 'Alpha beta' (Ctrl+Home, then Ctrl+Shift+Right twice) and add the comment 'Second overlapping comment'. 4. Inspect the editor spans and the Review sidebar, then click the 'First comment body' thread.\nActual: The Review sidebar shows two threads (badge 2) but the editor has a single highlight, 'Alpha beta', carrying the second comment's mark id. The first comment's mark id is absent from the document. Clicking the first thread marks it active in the sidebar but no part of the document highlights (0 active highlight elements), so that thread can no longer locate its text.",
       "source": "explore:review:adding a comment to a selection that overlaps an existing comment silently removes the first comment's highlight",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T13:30:33Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T13:30:33Z",
+      "lastAttemptAt": "2026-11-23T13:30:33Z"
     },
     {
       "id": "qa-120",
