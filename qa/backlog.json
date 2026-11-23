@@ -993,8 +993,9 @@
       "hint": "Repro: Inspect the four selects on the Layout tab (paper size, margins, text size, document class).\nActual: No aria-label/name/id on any of the four; their visible headings are unlinked sibling divs, so assistive tech announces unnamed comboboxes.",
       "source": "explore:ribbon-full:layout tab selects are unnamed for screen readers",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T01:23:59Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T01:23:59Z",
+      "lastAttemptAt": "2026-11-23T01:23:59Z"
     },
     {
       "id": "qa-063",
