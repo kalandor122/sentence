@@ -355,10 +355,11 @@
       ],
       "hint": "Repro: Review > 'Tracking on' toggles to 'Track changes'\nActual: Toggle works but nothing in the status bar or sidebar shows whether tracking is active",
       "source": "explore:chrome:track-changes state is not surfaced outside the button",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:08:56Z",
-      "lastAttemptAt": "2026-11-23T00:08:56Z"
+      "lastAttemptAt": "2026-11-23T00:08:56Z",
+      "doneAt": "2026-11-23T00:09:30Z"
     },
     {
       "id": "qa-023",
@@ -370,7 +371,9 @@
       ],
       "hint": "Repro: Open equation dialog, click the backdrop\nActual: Dialog stays; Escape and Close work",
       "source": "explore:chrome:backdrop click does not dismiss modals",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:10:05Z"
     },
     {
       "id": "qa-024",
