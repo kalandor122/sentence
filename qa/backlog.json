@@ -1722,10 +1722,25 @@
       ],
       "hint": "Repro: 1. Create a new project, use Insert > Inline equation to insert `x+1`.\n2. Click the inserted math node (the 'Edit inline equation' dialog opens).\n3. Press Escape or click Cancel.\n4. Check `document.activeElement`: it is `BODY`, not the editor.\n5. Press Backspace, or type `YY`, then switch to View > LaTeX and read document.tex.\nActual: Focus stays on BODY: Backspace leaves the math node in place (`\\(y=2\\)` still in the source) and typed text (`YY`) never reaches the document. The same occurs for a display 'Equation block' after clicking it and pressing Escape then Delete. Typing works again only after clicking the editor first; clicking earlier and deleting via a positioned caret does work, so there is no direct delete affordance after dialog dismissal.",
       "source": "explore:math:dismissing a math edit dialog with cancel/escape drops editor focus; typing and backspace are swallowed",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T03:52:17Z",
-      "lastAttemptAt": "2026-11-23T03:52:17Z"
+      "lastAttemptAt": "2026-11-23T03:52:17Z",
+      "doneAt": "2026-11-23T03:55:19Z"
+    },
+    {
+      "id": "qa-109",
+      "title": "Bibliography manager",
+      "why": "Citations exist but the .bib file can only be edited by hand. Word's citation manager is a core reason people stay.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "A References-tab panel listing entries parsed from references.bib (key, author, year, title) with search, add, edit and delete; inserting a citation opens this list. Keep the .bib text the source of truth and parse/write it in src/lib (add round-trip tests next to latex.test.ts).",
+      "source": "roadmap:bibliography manager",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T03:55:49Z"
     }
   ]
 }
