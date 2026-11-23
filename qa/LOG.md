@@ -181,3 +181,4 @@ Aborting
 2026-11-22T23:59:32Z EXPLORE tables: 0 new items, agent exit 1
 2026-11-22T23:59:46Z START qa-088 on qa/qa-088-math-dialog-accepts-unknown-latex-comman: Math dialog accepts unknown LaTeX commands that KaTeX renders as errors
 2026-11-23T00:00:20Z DONE qa-088 (tsc -b, npm test, smoke all green)
+2026-11-23T00:00:55Z START qa-089 on qa/qa-089-math-node-cannot-be-removed-with-backspa: Math node cannot be removed with Backspace/Delete after closing its edit dialog
