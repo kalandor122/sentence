@@ -1631,8 +1631,9 @@
       "hint": "Repro: Clear the editor and type '3. apple' in a paragraph so the ordered-list input rule fires. Switch to Source and read the LaTeX textarea.\nActual: The visual editor has <ol start=\"3\"><li><p>apple</p></li></ol>, but the LaTeX is '\\begin{enumerate}\\n\\item apple\\n\\end{enumerate}', which renders the item as '1. apple'.",
       "source": "explore:lists:ordered list start number is dropped from latex",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T02:48:23Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T02:48:23Z",
+      "lastAttemptAt": "2026-11-23T02:48:23Z"
     }
   ]
 }

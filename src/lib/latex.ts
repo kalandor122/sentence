@@ -240,7 +240,14 @@ function wrapAlignment(node: DocumentNode, body: string): string {
   return `\\begin{${environment}}\n${body}\n\\end{${environment}}`;
 }
 
-function blockToLatex(node: DocumentNode): string {
+const ENUM_COUNTERS = ["enumi", "enumii", "enumiii", "enumiv"];
+
+function orderedListStart(node: DocumentNode): number | null {
+  const start = Number(node.attrs?.start ?? 1);
+  return Number.isSafeInteger(start) && start > 1 ? start : null;
+}
+
+function blockToLatex(node: DocumentNode, enumDepth = 0): string {
   switch (node.type) {
     case "paragraph":
       return wrapAlignment(node, inlineContent(node.content));
@@ -252,19 +259,23 @@ function blockToLatex(node: DocumentNode): string {
     case "bulletList":
       return [
         "\\begin{itemize}",
-        ...(node.content ?? []).map(listItemToLatex),
+        ...(node.content ?? []).map((item) => listItemToLatex(item, enumDepth)),
         "\\end{itemize}",
       ].join("\n");
-    case "orderedList":
+    case "orderedList": {
+      const start = orderedListStart(node);
+      const counter = ENUM_COUNTERS[Math.min(enumDepth, ENUM_COUNTERS.length - 1)];
       return [
         "\\begin{enumerate}",
-        ...(node.content ?? []).map(listItemToLatex),
+        ...(start === null ? [] : [`\\setcounter{${counter}}{${start - 1}}`]),
+        ...(node.content ?? []).map((item) => listItemToLatex(item, enumDepth + 1)),
         "\\end{enumerate}",
       ].join("\n");
+    }
     case "blockquote":
       return [
         "\\begin{quote}",
-        ...(node.content ?? []).map(blockToLatex),
+        ...(node.content ?? []).map((child) => blockToLatex(child, enumDepth)),
         "\\end{quote}",
       ].join("\n");
     case "codeBlock":
@@ -286,13 +297,16 @@ function blockToLatex(node: DocumentNode): string {
     case "text":
       return applyMarks(node.text ?? "", node.marks);
     default:
-      return (node.content ?? []).map(blockToLatex).filter(Boolean).join("\n\n");
+      return (node.content ?? [])
+        .map((child) => blockToLatex(child, enumDepth))
+        .filter(Boolean)
+        .join("\n\n");
   }
 }
 
-function listItemToLatex(node: DocumentNode): string {
+function listItemToLatex(node: DocumentNode, enumDepth: number): string {
   const content = (node.content ?? [])
-    .map((child) => blockToLatex(child))
+    .map((child) => blockToLatex(child, enumDepth))
     .filter(Boolean)
     .join("\n");
   return `\\item ${content}`;
@@ -372,7 +386,7 @@ export function documentToLatex(
     plainText(firstNode.content).toLocaleLowerCase() ===
       settings.title.trim().toLocaleLowerCase();
   const body = (repeatsTitle ? content.slice(1) : content)
-    .map(blockToLatex)
+    .map((node) => blockToLatex(node))
     .filter((part) => part.trim().length > 0)
     .join("\n\n");
   const header = settings.header.trim()
@@ -785,9 +799,20 @@ function splitLatexBlocks(source: string): string[] {
 
 function parseList(source: string, type: "bulletList" | "orderedList"): DocumentNode {
   const environment = type === "bulletList" ? "itemize" : "enumerate";
-  const inner = source
+  let inner = source
     .replace(new RegExp(`^\\\\begin\\{${environment}\\}\\s*`), "")
     .replace(new RegExp(`\\s*\\\\end\\{${environment}\\}$`), "");
+  let start: number | null = null;
+  if (type === "orderedList") {
+    const counter = inner.match(/^\\setcounter\{enum(?:i|ii|iii|iv)\}\{(\d+)\}\s*/);
+    if (counter) {
+      const value = Number(counter[1]);
+      if (Number.isSafeInteger(value)) {
+        start = value + 1;
+        inner = inner.slice(counter[0].length);
+      }
+    }
+  }
   const starts: Array<{ start: number; bodyStart: number }> = [];
   let depth = 0;
   for (const match of inner.matchAll(/\\item\b|\\(?:begin|end)\{(?:itemize|enumerate)\}/g)) {
@@ -803,6 +828,7 @@ function parseList(source: string, type: "bulletList" | "orderedList"): Document
   if (starts.length === 0) starts.push({ start: 0, bodyStart: 0 });
   return {
     type,
+    ...(start !== null && start > 1 ? { attrs: { start } } : {}),
     content: starts.map((item, index) => ({
       type: "listItem",
       content: parseListItemContent(
