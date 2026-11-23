@@ -1406,10 +1406,11 @@
       ],
       "hint": "Repro: 1. Add a comment to selected text (e.g. 'Quoted sentence for review') and submit it. 2. In the Review sidebar click the 'Delete comment' icon on the thread. 3. Count [data-comment-id] elements in the editor and click the remaining highlighted text.\nActual: Thread count dropped 1 -> 0 but highlight count stayed 1 with the same mark id (e.g. '12db0404-998a-4630-9649-63aa56a2b36e') and class 'comment-highlight'. Clicking that orphan highlight switched the sidebar to Review/Comments yet showed zero threads ('Select text and choose New comment...' empty state).",
       "source": "explore:review:deleting a comment leaves an orphaned highlight in the document",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:32:33Z",
-      "lastAttemptAt": "2026-11-23T00:32:33Z"
+      "lastAttemptAt": "2026-11-23T00:32:33Z",
+      "doneAt": "2026-11-23T00:35:32Z"
     },
     {
       "id": "qa-093",
@@ -1421,7 +1422,9 @@
       ],
       "hint": "Repro: 1. Type 'Baseline revision text', turn on Track changes, type ' delta-one', wait 2s and Accept it. 2. Type ' delta-two', wait 2s, click Reject; editor returns to 'Baseline revision text delta-one'. 3. With tracking still on type ' EARLY', wait 2s, type ' LATE', wait 2s. 4. Read the 'before' text of the second (EARLY) revision card in the Review panel.\nActual: The EARLY card showed before='Baseline revision text delta-one delta-two' even though 'delta-two' had been rejected and was absent from the editor; probe flag staleBaselineEvidence=true.",
       "source": "explore:review:rejecting a tracked revision leaves a stale baseline for the next revision",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:36:07Z"
     }
   ]
 }
