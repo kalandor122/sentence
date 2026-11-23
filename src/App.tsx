@@ -504,6 +504,16 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [dirty, workspace?.document, workspace?.settings, workspace?.comments, workspace?.revisions, source]);
 
+  useEffect(() => {
+    // A page reload can happen before the autosave debounce fires. Flush the
+    // latest workspace synchronously on the way out so pending edits survive.
+    const flushPending = () => {
+      if (!isDesktop) void persist();
+    };
+    window.addEventListener("pagehide", flushPending);
+    return () => window.removeEventListener("pagehide", flushPending);
+  }, []);
+
   const handleCreate = async (name: string, parentPath: string) => {
     const document = createWelcomeDocument(name);
     const settings = { ...DEFAULT_SETTINGS, title: name };
@@ -559,6 +569,9 @@ export default function App() {
     const before = workspaceRef.current?.document;
     if (!isDesktop && before && JSON.stringify(before) === JSON.stringify(document)) return;
     const currentSettings = workspaceRef.current?.settings;
+    // Keep the ref current for the pagehide flush, which may run before React
+    // commits the state update from a rapid edit.
+    workspaceRef.current = workspaceRef.current ? { ...workspaceRef.current, document } : null;
     setWorkspace((current) => current ? { ...current, document } : current);
     if (!sourceDirtyRef.current && currentSettings) {
       const latex = documentToLatex(document, currentSettings);
