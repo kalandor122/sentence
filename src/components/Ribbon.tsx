@@ -1,5 +1,5 @@
 import type { Editor } from "@tiptap/react";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import {
   AlignCenter,
   AlignJustify,
@@ -225,6 +225,7 @@ export default function Ribbon({
   onExportArxiv,
 }: RibbonProps) {
   void editorVersion;
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const disabled = !editor;
   const textAlign = activeTextAlign(editor);
   const activeFont = activeMarkAttribute(editor, "fontFamily", "family");
@@ -238,15 +239,24 @@ export default function Ribbon({
     { label: "Category", ready: Boolean(settings.primaryCategory.trim()) },
   ];
 
+  function handleTabKeyDown(event: React.KeyboardEvent<HTMLButtonElement>, index: number) {
+    if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+    event.preventDefault();
+    const nextIndex = (index + (event.key === "ArrowRight" ? 1 : -1) + TABS.length) % TABS.length;
+    onTabChange(TABS[nextIndex]);
+    tabRefs.current[nextIndex]?.focus();
+  }
+
   return (
     <section className="ribbon" aria-label="Document commands">
       <nav className="ribbon-tabs" aria-label="Ribbon tabs" role="tablist">
-        {TABS.map((tab) => {
+        {TABS.map((tab, index) => {
           const selected = activeTab === tab;
           const tabId = `ribbon-tab-${tab.toLowerCase()}`;
           return (
             <button
               key={tab}
+              ref={(element) => { tabRefs.current[index] = element; }}
               id={tabId}
               type="button"
               role="tab"
@@ -255,6 +265,7 @@ export default function Ribbon({
               aria-controls="ribbon-tabpanel"
               className={selected ? "active" : ""}
               onClick={() => onTabChange(tab)}
+              onKeyDown={(event) => handleTabKeyDown(event, index)}
             >
               {tab}
             </button>
