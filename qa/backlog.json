@@ -1306,7 +1306,9 @@
       ],
       "hint": "Repro: Switch to LaTeX, insert '\\begin{equation}E = mc^2\\end{equation}' before \\end{document}, switch to Visual. Inspect the rendered math block element ([data-math-block]) and read its data-numbered attribute.\nActual: getAttribute('data-numbered') is null because the KaTeX node view renders its own DOM instead of the renderHTML output, so copying and pasting the equation re-imports it as an unnumbered equation*. LaTeX serialisation is correct (equation survives a source round trip).",
       "source": "explore:math-nodeview:numbered equations lose their numbering when copied or pasted",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T02:23:41Z"
     },
     {
       "id": "qa-083",
@@ -1590,10 +1592,11 @@
       ],
       "hint": "Repro: At the end of a paragraph type 'SPLIT BEFORE. SPLIT AFTER.', press Home then ArrowRight 13 times so the caret sits just after the first sentence, then supply a PNG to the hidden file input (the stubbed browser picker path) via Insert > Image. Inspect View > Visual DOM and View > LaTeX.\nActual: The visual DOM becomes <p>SPLIT BEFORE.</p><img alt=\"mid paragraph.png\" ...><p> SPLIT AFTER.</p> and the exported LaTeX places a \\begin{figure}...\\includegraphics[width=0.8\\linewidth]{assets/images/mid-paragraph.png}...\\end{figure} block between 'SPLIT BEFORE.' and ' SPLIT AFTER.', turning one sentence into two paragraphs. Probe qa/probes/insert-media.mjs step 3: out.imageMidParagraph.dom.html and out.imageMidParagraph.latex.bodyTail.",
       "source": "explore:insert-media:inserting an image at a caret inside a paragraph splits the sentence into two paragraphs",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T02:15:35Z",
-      "lastAttemptAt": "2026-11-23T02:15:35Z"
+      "lastAttemptAt": "2026-11-23T02:15:35Z",
+      "doneAt": "2026-11-23T02:23:11Z"
     }
   ]
 }

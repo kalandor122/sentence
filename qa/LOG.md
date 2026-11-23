@@ -254,3 +254,4 @@ Aborting
 2026-11-23T02:11:52Z START qa-100 on qa/qa-100-a-second-page-furniture-command-replaces: A second page-furniture command replaces the previously inserted page break or contents block
 2026-11-23T02:15:05Z DONE qa-100 (tsc -b, npm test, smoke all green)
 2026-11-23T02:15:35Z START qa-101 on qa/qa-101-inserting-an-image-at-a-caret-inside-a-p: Inserting an image at a caret inside a paragraph splits the sentence into two paragraphs
+2026-11-23T02:23:11Z DONE qa-101 (tsc -b, npm test, smoke all green)
