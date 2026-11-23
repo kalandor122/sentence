@@ -1291,8 +1291,9 @@
       "hint": "Repro: In the demo document (which has H1 'Introduction' and H2 'Drafting with constraints'), click References > Table of contents and inspect the inserted block on the visual page.\nActual: The inserted [data-toc] block is a 608x59px dashed box whose entire text is the literal label 'Table of contents'; no headings or compile-time hint appear, even though the LaTeX correctly contains \\tableofcontents. Probe step 4: out.toc.dom.tocs[0] and out.toc.latex.toc=1.",
       "source": "explore:insert-media:visual table of contents shows no entries for the document's headings",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T02:01:44Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T02:01:44Z",
+      "lastAttemptAt": "2026-11-23T02:01:44Z"
     },
     {
       "id": "qa-082",

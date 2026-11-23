@@ -248,3 +248,4 @@ Aborting
 2026-11-23T01:55:34Z DONE qa-076 (tsc -b, npm test, smoke all green)
 2026-11-23T01:56:04Z START qa-080 on qa/qa-080-status-bar-page-count-ignores-inserted-p: Status bar page count ignores inserted page breaks
 2026-11-23T02:01:14Z DONE qa-080 (tsc -b, npm test, smoke all green)
+2026-11-23T02:01:44Z START qa-081 on qa/qa-081-visual-table-of-contents-shows-no-entrie: Visual table of contents shows no entries for the document's headings

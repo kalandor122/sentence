@@ -2,7 +2,7 @@ import { Mark, Node, mergeAttributes } from "@tiptap/core";
 import Image from "@tiptap/extension-image";
 import { footnoteNodeView } from "./Footnote";
 import { katexNodeView } from "./KatexMath";
-import { tocNodeView } from "./TocBlock";
+import { TOC_COMPILE_NOTE, tocEntries, tocNodeView } from "./TocBlock";
 
 function stringAttribute(node: { attrs?: Record<string, unknown> }, name: string): string {
   const value = node.attrs?.[name];
@@ -267,14 +267,29 @@ export const TableOfContents = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
+    const entries = this.editor ? tocEntries(this.editor) : [];
     return [
       "div",
       mergeAttributes(HTMLAttributes, {
         "data-toc": "",
         class: "toc-block",
         contenteditable: "false",
+        "aria-label": "Table of contents preview",
       }),
-      "Table of contents",
+      ["div", { class: "toc-block-title" }, "Table of contents"],
+      entries.length > 0
+        ? [
+            "ol",
+            { class: "toc-entries" },
+            ...entries.map((entry) => [
+              "li",
+              { class: `toc-entry toc-entry-level-${entry.level}` },
+              ["span", { class: "toc-entry-number" }, entry.number],
+              ["span", { class: "toc-entry-text" }, entry.text || "Untitled section"],
+            ]),
+          ]
+        : ["p", { class: "toc-block-empty" }, "Add headings to see the entries."],
+      ["p", { class: "toc-block-note" }, TOC_COMPILE_NOTE],
     ];
   },
 });
