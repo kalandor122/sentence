@@ -323,10 +323,11 @@
       ],
       "hint": "Repro: Word count 94; in Inspector prepend 'two extra ' to the title\nActual: Page title updates to 'two extra The quiet architecture of a sentence' but the count stays 94",
       "source": "explore:chrome:word count excludes the paper title/front matter",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:06:38Z",
-      "lastAttemptAt": "2026-11-23T00:06:38Z"
+      "lastAttemptAt": "2026-11-23T00:06:38Z",
+      "doneAt": "2026-11-23T00:07:13Z"
     },
     {
       "id": "qa-021",
@@ -338,7 +339,9 @@
       ],
       "hint": "Repro: Paper > Submission check\nActual: Same dialog as 'Create arXiv ZIP' titled 'arXiv submission package'; no validation results shown",
       "source": "explore:chrome:'submission check' opens the arxiv package dialog and performs no check",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:07:47Z"
     },
     {
       "id": "qa-022",
