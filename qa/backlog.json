@@ -1946,8 +1946,9 @@
       "hint": "Repro: 1. In an empty document (no text selected), open Review > New comment. 2. Type 'Comment without a selection' in the dialog and click Comment.\nActual: The dialog closes, a transient toast reads 'Select text before adding a comment.', no thread is created, and the typed comment body is discarded.",
       "source": "explore:review:new comment with no selection accepts a comment body and then discards it",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T21:05:54Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T21:05:54Z",
+      "lastAttemptAt": "2026-11-23T21:05:54Z"
     },
     {
       "id": "qa-123",

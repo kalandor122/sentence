@@ -1230,6 +1230,12 @@ export default function App() {
     setDialog({ kind: "link", initialValue: existingHref, insertAtCaret: !existingHref && !range });
   };
 
+  const validateDialog = (): string | null => {
+    if (dialog?.kind !== "comment") return null;
+    if (!workspace || !editor) return "Open a document before adding a comment.";
+    return editor.state.selection.empty ? "Select text before adding a comment." : null;
+  };
+
   const handleDialogSubmit = (value: string) => {
     if (!dialog) return;
     switch (dialog.kind) {
@@ -1259,10 +1265,7 @@ export default function App() {
         break;
       }
       case "comment": {
-        if (!workspace || !editor || editor.state.selection.empty) {
-          setToast("Select text before adding a comment.");
-          break;
-        }
+        if (!workspace || !editor || editor.state.selection.empty) break;
         const markId = crypto.randomUUID();
         editor.chain().focus().addComment(markId).run();
         const thread: CommentThread = {
@@ -1929,6 +1932,7 @@ export default function App() {
         placeholder={"placeholder" in dialogProps ? dialogProps.placeholder : undefined}
         multiline={"multiline" in dialogProps ? dialogProps.multiline : false}
         confirmLabel={"confirmLabel" in dialogProps ? dialogProps.confirmLabel : "Insert"}
+        validate={dialog?.kind === "comment" ? validateDialog : undefined}
         onClose={closeDialog}
         onSubmit={handleDialogSubmit}
       />
