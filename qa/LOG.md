@@ -203,3 +203,4 @@ Aborting
 2026-11-23T00:10:39Z DONE qa-023 (tsc -b, npm test, smoke all green)
 2026-11-23T00:11:13Z START qa-028 on qa/qa-028-adjacent-inline-atoms-are-emitted-glued: Adjacent inline atoms are emitted glued together
 2026-11-23T00:11:48Z DONE qa-028 (tsc -b, npm test, smoke all green)
+2026-11-23T00:12:22Z START qa-029 on qa/qa-029-all-images-forced-to-0-8-linewidth-capti: All images forced to 0.8\linewidth; caption is the raw filename
