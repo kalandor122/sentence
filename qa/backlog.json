@@ -307,10 +307,11 @@
       ],
       "hint": "Repro: Inspect nav.ribbon-tabs\nActual: nav[aria-label='Ribbon tabs'] containing plain <button>s; no role=tablist/tab, no aria-selected, active state only via class",
       "source": "explore:chrome:ribbon tabs lack tablist semantics",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:05:30Z",
-      "lastAttemptAt": "2026-11-23T00:05:30Z"
+      "lastAttemptAt": "2026-11-23T00:05:30Z",
+      "doneAt": "2026-11-23T00:06:04Z"
     },
     {
       "id": "qa-020",
@@ -322,7 +323,9 @@
       ],
       "hint": "Repro: Word count 94; in Inspector prepend 'two extra ' to the title\nActual: Page title updates to 'two extra The quiet architecture of a sentence' but the count stays 94",
       "source": "explore:chrome:word count excludes the paper title/front matter",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:06:38Z"
     },
     {
       "id": "qa-021",
