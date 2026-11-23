@@ -52,7 +52,11 @@ import {
   imageAssetPath,
   latexToDocument,
 } from "./lib/latex";
-import { applyRejection, undoDocumentChanges } from "./lib/revisions";
+import {
+  acceptRevisions,
+  pendingRevisions,
+  rejectRevisions,
+} from "./lib/revisions";
 import {
   assetUrl,
   authorizeAsset,
@@ -666,6 +670,34 @@ export default function App() {
       }, 1800);
     }
   };
+
+  const acceptTrackedChanges = (ids: string[]) => {
+    const current = workspaceRef.current;
+    if (!current || ids.length === 0) return;
+    const next: Workspace = { ...current, revisions: acceptRevisions(current.revisions, ids) };
+    workspaceRef.current = next;
+    setWorkspace(next);
+    markDirty();
+  };
+
+  const rejectTrackedChanges = (ids: string[]) => {
+    const current = workspaceRef.current;
+    if (!current || ids.length === 0) return;
+    const { document, revisions } = rejectRevisions(current.document, current.revisions, ids);
+    if (revisionTimer.current) window.clearTimeout(revisionTimer.current);
+    const next: Workspace = { ...current, document, revisions };
+    workspaceRef.current = next;
+    setWorkspace(next);
+    revisionBaseline.current = document;
+    if (!sourceDirtyRef.current) {
+      const latex = documentToLatex(document, current.settings);
+      setSource(latex);
+      sourceRef.current = latex;
+    }
+    markDirty();
+  };
+
+  const activeRevisionIds = () => pendingRevisions(workspaceRef.current?.revisions ?? []).map((revision) => revision.id);
 
   const handleSourceChange = (value: string) => {
     setSource(value);
@@ -1372,45 +1404,10 @@ export default function App() {
             } : current);
             markDirty();
           }}
-          onAcceptRevision={(id) => {
-            setWorkspace((current) => current ? {
-              ...current,
-              revisions: current.revisions.map((revision) => revision.id === id ? { ...revision, accepted: true } : revision),
-            } : current);
-            markDirty();
-          }}
-          onRejectRevision={(id) => {
-            const current = workspaceRef.current;
-            const revision = current?.revisions.find((item) => item.id === id);
-            if (!current || !revision) return;
-            const { document: nextDocument, changes } = applyRejection(current.document, revision);
-            const next: Workspace = {
-              ...current,
-              document: nextDocument,
-              revisions: current.revisions.map((item) => {
-                if (item.id === id) return { ...item, rejected: true, accepted: true };
-                if (!item.beforeDocument || !item.afterDocument) return item;
-                const beforeDocument = undoDocumentChanges(item.beforeDocument, changes);
-                const afterDocument = undoDocumentChanges(item.afterDocument, changes);
-                return {
-                  ...item,
-                  before: documentPlainText(beforeDocument),
-                  after: documentPlainText(afterDocument),
-                  beforeDocument,
-                  afterDocument,
-                };
-              }),
-            };
-            workspaceRef.current = next;
-            setWorkspace(next);
-            revisionBaseline.current = nextDocument;
-            if (!sourceDirtyRef.current) {
-              const latex = documentToLatex(nextDocument, current.settings);
-              setSource(latex);
-              sourceRef.current = latex;
-            }
-            markDirty();
-          }}
+          onAcceptRevision={(id) => acceptTrackedChanges([id])}
+          onRejectRevision={(id) => rejectTrackedChanges([id])}
+          onAcceptAllRevisions={() => acceptTrackedChanges(activeRevisionIds())}
+          onRejectAllRevisions={() => rejectTrackedChanges(activeRevisionIds())}
         />
         <main className="document-stage">
           <div className={`editor-workspace layout-${mode} ${previewOpen ? "with-preview" : ""}`}>
@@ -1427,6 +1424,7 @@ export default function App() {
                     document={workspace.document}
                     settings={workspace.settings}
                     comments={workspace.comments}
+                    revisions={workspace.revisions}
                     editable
                     onUpdate={handleDocumentUpdate}
                     onReady={setEditor}
