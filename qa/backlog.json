@@ -739,10 +739,11 @@
       ],
       "hint": "Repro: Create a project. Insert > Footnote with note `A useful note`, then Insert > Footnote with note `Second note text`, in the same paragraph.\nActual: Both `<sup class=\"footnote\">` elements display `1`; their `data-text` values differ (`A useful note`, `Second note text`) and the source contains two distinct `\\footnote{...}` commands.",
       "source": "explore:links-cites-footnotes:all footnotes render the marker 1 in the visual editor",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T01:10:12Z",
-      "lastAttemptAt": "2026-11-23T01:10:12Z"
+      "lastAttemptAt": "2026-11-23T01:10:12Z",
+      "doneAt": "2026-11-23T01:14:15Z"
     },
     {
       "id": "qa-047",
@@ -783,7 +784,9 @@
       ],
       "hint": "Repro: Inspect every group on the Home and Layout tabs for an indent or outdent button.\nActual: No such controls exist. Paragraph indentation cannot be changed from the UI at all.",
       "source": "explore:ribbon:no indent / outdent controls anywhere in the ribbon",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T01:14:50Z"
     },
     {
       "id": "qa-050",
