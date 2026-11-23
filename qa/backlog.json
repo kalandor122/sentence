@@ -1659,8 +1659,9 @@
       "hint": "When the cursor is inside a table, show a small toolbar above it (or in the ribbon) with: add row above/below, delete row, add column left/right, delete column, toggle header row, merge/split cells, cell alignment, delete table. Use the existing Tiptap table extension commands through the editor. Add a caption field that emits \\caption{...} in LaTeX.",
       "source": "roadmap:table editing: a contextual table toolbar",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T03:19:37Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T03:19:37Z",
+      "lastAttemptAt": "2026-11-23T03:19:37Z"
     }
   ]
 }

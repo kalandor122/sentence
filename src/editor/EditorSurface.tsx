@@ -3,7 +3,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
-import { TableKit } from "@tiptap/extension-table";
+import { Table, TableKit } from "@tiptap/extension-table";
 import TextAlign from "@tiptap/extension-text-align";
 import { useEffect, useRef, type CSSProperties } from "react";
 import {
@@ -61,6 +61,21 @@ const TabIndent = Extension.create({
     return {
       Tab: () => changeIndent(this.editor, false),
       "Shift-Tab": () => changeIndent(this.editor, true),
+    };
+  },
+});
+
+// Tables carry their caption as a node attribute so it survives the visual/LaTeX
+// round trip without becoming a paragraph inside the table.
+const CaptionTable = Table.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      caption: {
+        default: "",
+        parseHTML: (element) => element.getAttribute("data-caption") ?? "",
+        renderHTML: (attributes) => (attributes.caption ? { "data-caption": attributes.caption } : {}),
+      },
     };
   },
 });
@@ -124,11 +139,8 @@ export default function EditorSurface({
       }),
       Subscript,
       Superscript,
-      TableKit.configure({
-        table: {
-          resizable: true,
-        },
-      }),
+      TableKit.configure({ table: false }),
+      CaptionTable.configure({ resizable: true }),
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
