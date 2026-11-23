@@ -1945,10 +1945,11 @@
       ],
       "hint": "Repro: 1. In an empty document (no text selected), open Review > New comment. 2. Type 'Comment without a selection' in the dialog and click Comment.\nActual: The dialog closes, a transient toast reads 'Select text before adding a comment.', no thread is created, and the typed comment body is discarded.",
       "source": "explore:review:new comment with no selection accepts a comment body and then discards it",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T21:05:54Z",
-      "lastAttemptAt": "2026-11-23T21:05:54Z"
+      "lastAttemptAt": "2026-11-23T21:05:54Z",
+      "doneAt": "2026-11-23T21:08:21Z"
     },
     {
       "id": "qa-123",
@@ -2008,6 +2009,68 @@
       ],
       "hint": "Repro: 1. Create a project, switch to View > LaTeX, add `ZXFAIL persistent paragraph` plus an unclosed `\\begin{itemize}` before \\end{document}. 2. Click 'Apply source' (error toast appears). 3. Wait about 1.5 seconds so autosave attempts the same parse; a 'Retry save' button appears in the status bar. 4. Click View > Visual, then View > LaTeX. The broken draft is gone and the source has been regenerated from the visual document ('Apply source' is disabled). Look at the status bar.\nActual: The status bar still shows the 'Retry save' button after returning to the regenerated, clean source (saveErrorAfterReturn='Retry save' while 'Apply source' is disabled), suggesting unsaved or invalid work remains when there is none.",
       "source": "explore:source-editor:stale 'retry save' error remains after the failed source draft has been discarded",
+      "status": "open"
+    },
+    {
+      "id": "qa-127",
+      "title": "Split view silently discards visual-pane edits when the source pane has an unapplied draft",
+      "why": "Exploratory pass on source-editor (functional): expected The app keeps the visual edit or warns that it is about to be replaced by the older, unapplied source draft.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and make sure the source is clean (View > LaTeX, then 'Apply source' is disabled). 2. Click View > Split. 3. In the source pane, put the caret before \\end{document} and type `ZXDRAFTPARAGRAPH unapplied` on its own line. Do not click Apply. 4. Click at the end of the visual text in the other pane and type `ZXVISUALTYPED`; the text appears at the end of the last paragraph. 5. Click View > Visual.\nActual: The mode switches with the success toast `Visual document synchronized from LaTeX.` and the freshly typed visual text is gone: the visual document shows `ZXDRAFTPARAGRAPH unapplied` and no longer contains `ZXVISUALTYPED` (probe: visualAcceptedTyping=true, visualStillHasTypedText=false, visualHasSourceDraft=true). The source pane keeps the draft and 'Apply source' remains enabled, so the same overwrite happens with no warning and no way to recover the visual typing.",
+      "source": "explore:source-editor:split view silently discards visual-pane edits when the source pane has an unapplied draft",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T21:32:56Z"
+    },
+    {
+      "id": "qa-128",
+      "title": "Clicking Apply source drops keyboard focus, so subsequent typing and redo are silently ignored",
+      "why": "Exploratory pass on source-editor (ux): expected Focus and the caret stay in the source textarea, so continued typing edits the source and redo works.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View > LaTeX and click into the textarea before \\end{document}. 2. Type `ZXFOCUS` and click 'Apply source'. 3. Without clicking back into the textarea, type `ZXLOST`. 4. Press Ctrl+Z, then Ctrl+Shift+Z. 5. Click back into the textarea and press Ctrl+Shift+Z again.\nActual: After Apply, document.activeElement is BODY (the Apply button is disabled and blurred) and `ZXLOST` never reaches the source (typingAfterApplyReachedEditor=false). Ctrl+Z does undo `ZXFOCUS`, but Ctrl+Shift+Z does nothing (redoAfterApplyWorked=false) until the user clicks into the textarea, after which redo restores `ZXFOCUS` and typing works again. The same happens after a failed Apply, where the enabled button keeps focus (activeElement=BUTTON): typing is lost and Ctrl+Shift+Z does not redo the draft (redoRestoredDraft=false).",
+      "source": "explore:source-editor:clicking apply source drops keyboard focus, so subsequent typing and redo are silently ignored",
+      "status": "open"
+    },
+    {
+      "id": "qa-129",
+      "title": "LaTeX comments in the document body become visible text and are escaped on export",
+      "why": "Exploratory pass on source-editor (content): expected Text after an unescaped `%` is a LaTeX comment: it should be ignored by the document (or at least preserved as a comment), not turned into body text.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View > LaTeX and before \\end{document} add two lines: `ZXCOMMENTBLOCK text body` followed by `% ZXCOMMENTBLOCK ignored by LaTeX`, then a blank line and `ZXCOMMENTINLINE text % ZXCOMMENTINLINE note`. 2. Click 'Apply source'. 3. Click View > Visual. 4. Click View > LaTeX and read the textarea.\nActual: Apply reports success and the visual document shows the literal text `% ZXCOMMENTBLOCK ignored by LaTeX` and `% ZXCOMMENTINLINE note`. Returning to the source shows both comments rewritten with escaped percent signs (`\\% ZXCOMMENTBLOCK ignored by LaTeX`, `\\% ZXCOMMENTINLINE note`), so the comments are permanently converted into visible document content. Reproduced for both a whole-line comment and a trailing comment.",
+      "source": "explore:source-editor:latex comments in the document body become visible text and are escaped on export",
+      "status": "open"
+    },
+    {
+      "id": "qa-130",
+      "title": "Unclosed math delimiters are accepted as valid and escaped instead of reported",
+      "why": "Exploratory pass on source-editor (functional): expected Like an unbalanced environment or brace, the unclosed math delimiter should be reported as invalid and the draft left unapplied.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View > LaTeX and before \\end{document} add a line `ZXUNCLOSEDPAREN \\(a^2 + b^2` (no closing `\\)`). 2. Click 'Apply source' and read the toast. 3. Click View > Visual, then View > LaTeX. 4. Repeat with `ZXUNCLOSEDDOLLAR $a^2 + b^2` (no closing `$`).\nActual: Both applies report success (`Visual document synchronized from LaTeX.`) and 'Apply source' becomes disabled, so the broken input is committed. The visual document contains the delimiter as literal text, and the regenerated source escapes it: `\\textbackslash{}(a\\textasciicircum{}2 + b\\textasciicircum{}2` for the unclosed `\\(` and `\\$a\\textasciicircum{}2 + b\\textasciicircum{}2` for the unclosed `$`. No error is shown at any point.",
+      "source": "explore:source-editor:unclosed math delimiters are accepted as valid and escaped instead of reported",
+      "status": "open"
+    },
+    {
+      "id": "qa-131",
+      "title": "Undo history is discarded after leaving and re-entering the LaTeX view",
+      "why": "Exploratory pass on source-editor (ux): expected Ctrl+Z undoes the last source edit (`ZXVISIT`), since the user has not done anything else in between.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View > LaTeX and put the caret before \\end{document}. 2. Type `ZXVISIT`. 3. Click View > Visual, then View > LaTeX. 4. Press Ctrl+Z.\nActual: Ctrl+Z does nothing: the reminder of the edit stays in the source (`ZXVISIT` is still present), 'Apply source' is disabled, and there is no indication that undo history was dropped. The source editor is remounted on every view switch with a fresh history, so the normal source > visual > source check loses undo for the whole visit.",
+      "source": "explore:source-editor:undo history is discarded after leaving and re-entering the latex view",
       "status": "open"
     }
   ]
