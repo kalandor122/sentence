@@ -28,6 +28,11 @@ import SourceEditor from "./components/SourceEditor";
 import StartScreen, { type RecentProject } from "./components/StartScreen";
 import StatusBar from "./components/StatusBar";
 import TopBar from "./components/TopBar";
+import WorkspaceTabs, {
+  WORKSPACE_PANEL_ID,
+  workspaceTabId,
+  type WorkspaceTabInfo,
+} from "./components/WorkspaceTabs";
 import { findDocumentMatches, findTextRanges, setFindHighlight } from "./editor/find";
 import { toggleList } from "./editor/listToggle";
 import {
@@ -111,6 +116,14 @@ interface Workspace {
   comments: CommentThread[];
   revisions: Revision[];
   git: GitState;
+}
+
+// Inactive tabs keep their whole snapshot in memory (including un-applied
+// source edits) so switching tabs never remounts the editor or loses work.
+interface WorkspaceTab extends WorkspaceTabInfo {
+  workspace: Workspace;
+  source: string;
+  sourceDirty: boolean;
 }
 
 type DialogState =
@@ -322,6 +335,9 @@ function insertImage(editor: Editor | null, attrs: Record<string, string>) {
 export default function App() {
   const [workspace, setWorkspace] = useState<Workspace | null>(loadBrowserWorkspace);
   const workspaceRef = useRef<Workspace | null>(workspace);
+  const [tabs, setTabsState] = useState<WorkspaceTab[]>([]);
+  const tabsRef = useRef<WorkspaceTab[]>(tabs);
+  const dirtyRef = useRef(false);
   const [source, setSource] = useState(() =>
     workspace ? documentSource(workspace.document, workspace.settings) : "");
   const sourceRef = useRef(source);
@@ -397,6 +413,10 @@ export default function App() {
   }, [sourceDirty]);
 
   useEffect(() => {
+    dirtyRef.current = dirty;
+  }, [dirty]);
+
+  useEffect(() => {
     localStorage.setItem("sentence.gitAuthor", JSON.stringify(gitAuthor));
   }, [gitAuthor]);
 
@@ -426,10 +446,86 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [toast]);
 
+  const setTabs = (next: WorkspaceTab[]) => {
+    tabsRef.current = next;
+    setTabsState(next);
+  };
+
+  const replaceTab = (tab: WorkspaceTab) => {
+    const current = tabsRef.current;
+    const next = current.map((item) => item.path === tab.path ? tab : item);
+    setTabs(next.some((item) => item.path === tab.path) ? next : [...next, tab]);
+  };
+
+  const setDirtyState = (value: boolean) => {
+    dirtyRef.current = value;
+    setDirty(value);
+  };
+
+  const stashActive = () => {
+    if (!isDesktop) return;
+    const current = workspaceRef.current;
+    if (!current?.path) return;
+    replaceTab({
+      path: current.path,
+      name: current.name,
+      workspace: current,
+      source: sourceRef.current,
+      sourceDirty: sourceDirtyRef.current,
+      dirty: dirtyRef.current,
+    });
+  };
+
   const markDirty = () => {
     changeVersion.current += 1;
-    setDirty(true);
+    setDirtyState(true);
     setSaveState("dirty");
+    const path = workspaceRef.current?.path;
+    if (isDesktop && path && tabsRef.current.some((tab) => tab.path === path && !tab.dirty)) {
+      setTabs(tabsRef.current.map((tab) => tab.path === path ? { ...tab, dirty: true } : tab));
+    }
+  };
+
+  const activateTab = (tab: WorkspaceTab, stashCurrent = true) => {
+    if (stashCurrent) stashActive();
+    setWorkspace(tab.workspace);
+    workspaceRef.current = tab.workspace;
+    setSource(tab.source);
+    sourceRef.current = tab.source;
+    setSourceFile("document.tex");
+    setSourceDirty(tab.sourceDirty);
+    sourceDirtyRef.current = tab.sourceDirty;
+    setDirtyState(tab.dirty);
+    setSaveState(tab.dirty ? "dirty" : "saved");
+    setCompileResult(null);
+    setVisualPages(null);
+    setActiveCommentId(null);
+    revisionBaseline.current = null;
+    rememberProject(tab.workspace);
+  };
+
+  const openTab = (path: string) => {
+    if (path === workspaceRef.current?.path) return;
+    const tab = tabsRef.current.find((item) => item.path === path);
+    if (tab) activateTab(tab);
+  };
+
+  const clearWorkspace = () => {
+    workspaceRef.current = null;
+    setWorkspace(null);
+    sourceRef.current = "";
+    setSource("");
+    sourceDirtyRef.current = false;
+    setSourceDirty(false);
+    setDirtyState(false);
+    setSaveState("saved");
+    setCompileResult(null);
+    setVisualPages(null);
+    setPreviewOpen(false);
+    setGitOpen(false);
+    setInspectorOpen(false);
+    setActiveCommentId(null);
+    revisionBaseline.current = null;
   };
 
   const rememberProject = (project: Workspace) => {
@@ -461,6 +557,17 @@ export default function App() {
 
   const adoptWorkspace = (project: Workspace) => {
     const latex = documentSource(project.document, project.settings);
+    if (isDesktop && project.path) {
+      stashActive();
+      replaceTab({
+        path: project.path,
+        name: project.name,
+        workspace: project,
+        source: latex,
+        sourceDirty: false,
+        dirty: false,
+      });
+    }
     setWorkspace(project);
     workspaceRef.current = project;
     setSource(latex);
@@ -468,10 +575,12 @@ export default function App() {
     setSourceFile("document.tex");
     setSourceDirty(false);
     sourceDirtyRef.current = false;
-    setDirty(false);
+    setDirtyState(false);
     setSaveState("saved");
     setCompileResult(null);
     setVisualPages(null);
+    setActiveCommentId(null);
+    revisionBaseline.current = null;
     if (!isDesktop) persistBrowser(project);
     rememberProject(project);
   };
@@ -479,12 +588,16 @@ export default function App() {
   const persist = async (): Promise<Workspace | null> => {
     let current = workspaceRef.current;
     if (!current) return null;
+    const pathAtStart = current.path;
+    const stillActive = () => workspaceRef.current?.path === pathAtStart;
     if (sourceDirtyRef.current && !sourceRef.current.includes("<<<<<<<")) {
       try {
         const parsed = latexToDocument(sourceRef.current, current.settings);
         current = { ...current, document: parsed.document, settings: parsed.settings };
-        workspaceRef.current = current;
-        setWorkspace(current);
+        if (stillActive()) {
+          workspaceRef.current = current;
+          setWorkspace(current);
+        }
         setSourceDirty(false);
         sourceDirtyRef.current = false;
         setSaveError(null);
@@ -503,16 +616,16 @@ export default function App() {
     if (!isDesktop) {
       if (!persistBrowser(current)) return null;
       rememberProject(current);
-      setDirty(false);
+      setDirtyState(false);
       setSaveState("saved");
       return current;
     }
     if (!current.path) {
-      setDirty(false);
+      setDirtyState(false);
       setSaveState("saved");
       return current;
     }
-    setSaveState("saving");
+    if (stillActive()) setSaveState("saving");
     setSaveError(null);
     try {
       const snapshot = await saveProject(
@@ -537,23 +650,126 @@ export default function App() {
         name: updated.name,
         git: updated.git,
       };
-      if (versionAtStart === changeVersion.current) {
-        setWorkspace(merged);
-        setDirty(false);
-        setSaveState("saved");
-      } else {
-        setWorkspace((existing) => existing ? { ...existing, git: updated.git } : updated);
+      // A switch or a new edit can happen while saveProject is in flight.
+      // Update the saved tab without replacing newer work on screen.
+      const changedDuringSave = versionAtStart !== changeVersion.current;
+      if (tabsRef.current.some((tab) => tab.path === pathAtStart)) {
+        replaceTab({
+          path: pathAtStart,
+          name: merged.name,
+          workspace: merged,
+          source: latex,
+          sourceDirty: false,
+          dirty: stillActive() && changedDuringSave && dirtyRef.current,
+        });
       }
-      workspaceRef.current = merged;
-      rememberProject(merged);
+      if (stillActive()) {
+        if (changedDuringSave) {
+          const live = workspaceRef.current;
+          if (live) {
+            const next = { ...live, git: updated.git };
+            workspaceRef.current = next;
+            setWorkspace(next);
+          }
+        } else {
+          workspaceRef.current = merged;
+          setWorkspace(merged);
+          setDirtyState(false);
+          setSaveState("saved");
+        }
+        rememberProject(merged);
+      }
       return merged;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setSaveError(message);
-      setSaveState("error");
+      if (stillActive()) setSaveState("error");
       setToast(message);
       return null;
     }
+  };
+
+  // Closing a tab must not silently drop its unsaved edits, even when that tab
+  // is not the one currently on screen.
+  const persistTab = async (tab: WorkspaceTab): Promise<boolean> => {
+    if (!isDesktop || !tab.workspace.path) return true;
+    let workspace = tab.workspace;
+    let latex = tab.source;
+    if (tab.sourceDirty) {
+      try {
+        const parsed = latexToDocument(tab.source, workspace.settings);
+        workspace = { ...workspace, document: parsed.document, settings: parsed.settings };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        setSaveError(message);
+        setToast(message);
+        return false;
+      }
+    } else {
+      latex = documentSource(workspace.document, workspace.settings);
+    }
+    setSaveError(null);
+    try {
+      const snapshot = await saveProject(
+        workspace.path,
+        workspace.name,
+        workspace.document,
+        workspace.settings,
+        latex,
+        workspace.bibliography,
+        workspace.comments,
+        workspace.revisions,
+      );
+      const updated = hydrate(snapshot);
+      replaceTab({
+        path: tab.path,
+        name: updated.name,
+        workspace: { ...workspace, path: updated.path, name: updated.name, git: updated.git },
+        source: latex,
+        sourceDirty: false,
+        dirty: false,
+      });
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setSaveError(message);
+      if (workspaceRef.current?.path === tab.path) setSaveState("error");
+      setToast(message);
+      return false;
+    }
+  };
+
+  const closeTab = async (path: string) => {
+    const index = tabsRef.current.findIndex((tab) => tab.path === path);
+    if (index < 0) return;
+    const tab = tabsRef.current[index];
+    const wasActive = workspaceRef.current?.path === path;
+    if (tab.dirty && !(await persistTab(tab))) return;
+    const remaining = tabsRef.current.filter((item) => item.path !== path);
+    setTabs(remaining);
+    if (!wasActive) {
+      const activeIndex = remaining.findIndex((item) => item.path === workspaceRef.current?.path);
+      if (activeIndex >= 0) {
+        window.requestAnimationFrame(() => document.getElementById(workspaceTabId(activeIndex))?.focus());
+      }
+      return;
+    }
+    const next = remaining[Math.min(index, remaining.length - 1)];
+    if (next) {
+      activateTab(next, false);
+      window.requestAnimationFrame(() => document.getElementById(workspaceTabId(remaining.indexOf(next)))?.focus());
+    } else {
+      clearWorkspace();
+    }
+  };
+
+  const cycleTab = (step: number) => {
+    const ordered = tabsRef.current;
+    if (ordered.length < 2) return;
+    const index = ordered.findIndex((tab) => tab.path === workspaceRef.current?.path);
+    const next = (index + step + ordered.length) % ordered.length;
+    openTab(ordered[next].path);
+    window.requestAnimationFrame(() => document.getElementById(workspaceTabId(next))?.focus());
   };
 
   useEffect(() => {
@@ -597,6 +813,10 @@ export default function App() {
   const handleOpenRecent = async (path: string) => {
     if (!isDesktop) {
       adoptWorkspace(loadBrowserWorkspace() ?? demoWorkspace());
+      return;
+    }
+    if (tabsRef.current.some((tab) => tab.path === path)) {
+      openTab(path);
       return;
     }
     try {
@@ -1196,6 +1416,10 @@ export default function App() {
       const editingDocument = mode !== "source" && !inTextField && !dialog && !mathEditor;
       const pressedDigit = (digit: string) =>
         event.key === digit || event.code === `Digit${digit}` || event.code === `Numpad${digit}`;
+      if (isDesktop && mod && !event.altKey && event.key === "Tab") {
+        event.preventDefault();
+        cycleTab(event.shiftKey ? -1 : 1);
+      }
       if (mod && event.altKey && !event.shiftKey) {
         const nextMode: EditorMode | null = pressedDigit("1") ? "visual" : pressedDigit("2") ? "source" : pressedDigit("3") ? "split" : null;
         if (nextMode) {
@@ -1259,6 +1483,8 @@ export default function App() {
   const [visualPages, setVisualPages] = useState<number | null>(null);
   const pages = visualPages ?? 1;
   const branch = workspace?.git.status.branch ?? "main";
+  const showTabs = isDesktop && tabs.length > 0;
+  const activeTabIndex = tabs.findIndex((tab) => tab.path === workspace?.path);
 
   const findBar = find.open ? (
     <FindBar
@@ -1305,7 +1531,7 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell" style={{ "--editor-zoom": zoom / 100 } as React.CSSProperties}>
+    <div className={`app-shell ${showTabs ? "with-document-tabs" : ""}`} style={{ "--editor-zoom": zoom / 100 } as React.CSSProperties}>
       <TopBar
         projectName={workspace.name}
         saveState={saveState}
@@ -1347,7 +1573,22 @@ export default function App() {
         onCompile={() => void handleCompile()}
         onExportArxiv={() => { setArxivError(null); setArxivOpen(true); }}
       />
-      <div className="workspace-row">
+      {showTabs ? (
+        <WorkspaceTabs
+          tabs={tabs}
+          activePath={workspace.path}
+          onSelect={openTab}
+          onClose={(path) => void closeTab(path)}
+          onNew={() => setNewProjectOpen(true)}
+          onOpen={() => void handleOpen()}
+        />
+      ) : null}
+      <div
+        className="workspace-row"
+        id={showTabs ? WORKSPACE_PANEL_ID : undefined}
+        role={showTabs ? "tabpanel" : undefined}
+        aria-labelledby={showTabs && activeTabIndex >= 0 ? workspaceTabId(activeTabIndex) : undefined}
+      >
         <Sidebar
           open={sidebarOpen}
           panel={sidebarPanel}
