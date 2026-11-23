@@ -1275,8 +1275,9 @@
       "hint": "Repro: Click Insert > Page break once in the demo document, then read the status bar and the --sentence-sheet-min-height CSS variable on .visual-editor-scroll.\nActual: The status bar still reads '1 page' while the 64px page-break band renders and --sentence-sheet-min-height is 2106px (2 x 1053px). Probe step 3: out.pageBreak.domImmediately={sheetMinHeight:'2106px',status:['1 page']} and the same values remain in out.pageBreak.dom.",
       "source": "explore:insert-media:status bar page count ignores inserted page breaks",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T01:56:04Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T01:56:04Z",
+      "lastAttemptAt": "2026-11-23T01:56:04Z"
     },
     {
       "id": "qa-081",
