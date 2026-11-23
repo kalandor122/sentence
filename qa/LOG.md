@@ -238,3 +238,4 @@ Aborting
 2026-11-23T01:33:17Z START qa-063 on qa/qa-063-inactive-ribbon-toggles-omit-aria-presse: Inactive ribbon toggles omit aria-pressed instead of reporting false
 2026-11-23T01:35:19Z DONE qa-063 (tsc -b, npm test, smoke all green)
 2026-11-23T01:35:48Z START qa-069 on qa/qa-069-start-screen-footer-shows-version-0-1-wh: start screen footer shows version 0.1 while package.json is 0.2.0 — hardcoded version?
+2026-11-23T01:37:47Z DONE qa-069 (tsc -b, npm test, smoke all green)

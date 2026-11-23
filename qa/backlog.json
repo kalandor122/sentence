@@ -1098,10 +1098,11 @@
       ],
       "hint": "Sentence 0.1 in footer",
       "source": "start screen footer shows version 0.1 while package.json is 0.2.0 \u2014 hardcoded version?",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T01:35:48Z",
-      "lastAttemptAt": "2026-11-23T01:35:48Z"
+      "lastAttemptAt": "2026-11-23T01:35:48Z",
+      "doneAt": "2026-11-23T01:37:47Z"
     },
     {
       "id": "qa-070",
@@ -1113,7 +1114,9 @@
       ],
       "hint": "innerHTML unchanged",
       "source": "keyboard shortcut \"ctrl+k link\" has no visible effect on the document",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T01:38:17Z"
     },
     {
       "id": "qa-071",
