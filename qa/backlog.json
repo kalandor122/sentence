@@ -483,10 +483,11 @@
       ],
       "hint": "Repro: Insert > Page break -> read the status bar\nActual: '1 page' with a page break present",
       "source": "explore:insert:status bar page count ignores page breaks",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:50:43Z",
-      "lastAttemptAt": "2026-11-23T00:50:43Z"
+      "lastAttemptAt": "2026-11-23T00:50:43Z",
+      "doneAt": "2026-11-23T00:53:55Z"
     },
     {
       "id": "qa-031",
@@ -498,7 +499,9 @@
       ],
       "hint": "Repro: Insert > Contents\nActual: dashed box reading 'TABLE OF CONTENTS' only, no entries, even though the doc has H1/H2 headings; LaTeX gets \\tableofcontents correctly",
       "source": "explore:insert:toc block is an empty placeholder in the visual editor",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:54:29Z"
     },
     {
       "id": "qa-032",
