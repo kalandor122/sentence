@@ -307,3 +307,4 @@ Aborting
 2026-11-23T04:57:48Z BACKLOG EMPTY — nothing open, idle
 2026-11-23T05:00:18Z START qa-115 on qa/qa-115-source-view-toggle-did-not-reveal-an-edi: source view toggle did not reveal an editable LaTeX surface
 2026-11-23T05:00:45Z DONE qa-115 (tsc -b, npm test, smoke all green)
+2026-11-23T05:01:15Z START qa-116 on qa/qa-116-no-view-ribbon-tab-found-cannot-check-so: no View ribbon tab found, cannot check source-view round trips

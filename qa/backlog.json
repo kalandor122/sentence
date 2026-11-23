@@ -1851,8 +1851,9 @@
       "hint": "",
       "source": "no view ribbon tab found, cannot check source-view round trips",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T05:01:15Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T05:01:15Z",
+      "lastAttemptAt": "2026-11-23T05:01:15Z"
     }
   ]
 }
