@@ -3422,6 +3422,11 @@ button:disabled {
   gap: 6px;
 }
 
+.dialog-field > .dialog-field-error {
+  color: var(--danger);
+  font-size: 10px;
+}
+
 .dialog-field > span {
   color: #626860;
   font-size: 10px;
