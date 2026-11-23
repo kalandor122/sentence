@@ -1785,6 +1785,41 @@ button:disabled {
   font-size: 10px;
 }
 
+.comment-reply-toggle {
+  margin-top: 7px;
+  font-size: 10px;
+}
+
+.comment-reply-form {
+  display: grid;
+  gap: 7px;
+  margin-top: 9px;
+  cursor: default;
+}
+
+.comment-reply-field {
+  display: grid;
+  gap: 5px;
+}
+
+.comment-reply-field > span {
+  color: #626860;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.comment-reply-field textarea {
+  min-height: 52px;
+  resize: vertical;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.comment-reply-actions {
+  display: flex;
+  gap: 6px;
+}
+
 .revision-list {
   display: grid;
   gap: 7px;
@@ -1951,7 +1986,8 @@ button:disabled {
 .remote-field input,
 .inline-create input,
 .dialog-field input,
-.dialog-field textarea {
+.dialog-field textarea,
+.comment-reply-field textarea {
   width: 100%;
   min-height: 31px;
   padding: 6px 9px;
@@ -1973,6 +2009,7 @@ button:disabled {
 .inline-create input:focus,
 .dialog-field input:focus,
 .dialog-field textarea:focus,
+.comment-reply-field textarea:focus,
 .commit-message:focus {
   border-color: #7c9c88;
   outline: none;
