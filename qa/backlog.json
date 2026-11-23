@@ -1739,8 +1739,9 @@
       "hint": "A References-tab panel listing entries parsed from references.bib (key, author, year, title) with search, add, edit and delete; inserting a citation opens this list. Keep the .bib text the source of truth and parse/write it in src/lib (add round-trip tests next to latex.test.ts).",
       "source": "roadmap:bibliography manager",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T03:55:49Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T03:55:49Z",
+      "lastAttemptAt": "2026-11-23T03:55:49Z"
     }
   ]
 }

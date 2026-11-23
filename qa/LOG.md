@@ -286,3 +286,4 @@ Aborting
 2026-11-23T03:52:17Z START qa-108 on qa/qa-108-dismissing-a-math-edit-dialog-with-cance: Dismissing a math edit dialog with Cancel/Escape drops editor focus; typing and Backspace are swallowed
 2026-11-23T03:55:19Z DONE qa-108 (tsc -b, npm test, smoke all green)
 2026-11-23T03:55:49Z PROMOTED from roadmap: qa-109 Bibliography manager
+2026-11-23T03:55:49Z START qa-109 on qa/qa-109-bibliography-manager: Bibliography manager

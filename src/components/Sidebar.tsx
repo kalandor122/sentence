@@ -1,13 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  BookMarked,
   CheckCircle2,
   Circle,
   GitCommitHorizontal,
   ListTree,
   MessageSquareText,
+  Pencil,
+  Plus,
+  Search,
   Trash2,
   Undo2,
 } from "lucide-react";
+import {
+  parseBibliography,
+  removeBibliographyEntry,
+  type BibliographyEntry,
+} from "../lib/bibliography";
 import type {
   CommentThread,
   DocumentNode,
@@ -15,8 +24,9 @@ import type {
   Revision,
   SentenceDocument,
 } from "../lib/types";
+import IconButton from "./IconButton";
 
-export type SidebarPanel = "outline" | "comments" | "history";
+export type SidebarPanel = "outline" | "comments" | "history" | "references";
 
 interface HeadingEntry {
   level: number;
@@ -179,6 +189,109 @@ function CommentThreadCard({
   );
 }
 
+interface ReferencesPanelProps {
+  bibliography: string;
+  onChange: (value: string) => void;
+  onInsertCitation: (key: string) => void;
+  onInsertManually: () => void;
+  onAddEntry: () => void;
+  onEditEntry: (entry: BibliographyEntry) => void;
+}
+
+function ReferencesPanel({
+  bibliography,
+  onChange,
+  onInsertCitation,
+  onInsertManually,
+  onAddEntry,
+  onEditEntry,
+}: ReferencesPanelProps) {
+  const entries = useMemo(() => parseBibliography(bibliography), [bibliography]);
+  const [query, setQuery] = useState("");
+  const [confirmKey, setConfirmKey] = useState<string | null>(null);
+  const needle = query.trim().toLowerCase();
+  const visible = needle
+    ? entries.filter((entry) =>
+        [entry.key, entry.type, entry.author, entry.year, entry.title]
+          .some((value) => value.toLowerCase().includes(needle)))
+    : entries;
+
+  const insertFirst = () => {
+    if (visible.length > 0) onInsertCitation(visible[0].key);
+  };
+
+  return (
+    <>
+      <header className="panel-heading">
+        <div>
+          <span className="eyebrow">Bibliography</span>
+          <h2>References</h2>
+        </div>
+        <button type="button" className="accent-button small" onClick={onAddEntry} aria-label="Add bibliography entry">
+          <Plus size={12} /> Add
+        </button>
+      </header>
+      <div className="bib-tools">
+        <form className="bib-search" role="search" aria-label="Search references" onSubmit={(event) => {
+          event.preventDefault();
+          insertFirst();
+        }}>
+          <Search size={13} aria-hidden="true" />
+          <input
+            autoFocus
+            type="search"
+            aria-label="Search bibliography"
+            placeholder="Key, author, year or title"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape" && query) {
+                event.preventDefault();
+                event.stopPropagation();
+                setQuery("");
+              }
+            }}
+          />
+        </form>
+        <span className="bib-count" aria-live="polite">{visible.length} of {entries.length}</span>
+      </div>
+      <div className="bib-list">
+        {entries.length === 0 ? <p className="panel-empty">No bibliography entries yet. Add one to cite it in the document.</p> : null}
+        {entries.length > 0 && visible.length === 0 ? <p className="panel-empty">No entries match “{query}”.</p> : null}
+        {visible.map((entry) => (
+          <article className="bib-entry" key={entry.key}>
+            <div className="bib-entry-heading">
+              <code>{entry.key}</code>
+              <small>{entry.type}</small>
+            </div>
+            <strong>{entry.title || "Untitled reference"}</strong>
+            <p>{[entry.author, entry.year].filter(Boolean).join(" · ") || "No author or year"}</p>
+            {confirmKey === entry.key ? (
+              <div className="bib-confirm" role="group" aria-label={`Delete ${entry.key}?`}>
+                <span>Delete this entry?</span>
+                <button type="button" className="secondary-button small" onClick={() => setConfirmKey(null)}>Cancel</button>
+                <button type="button" className="primary-button small" onClick={() => {
+                  onChange(removeBibliographyEntry(bibliography, entry.key));
+                  setConfirmKey(null);
+                }}>Delete</button>
+              </div>
+            ) : (
+              <div className="bib-entry-actions">
+                <button type="button" className="accent-button small" onClick={() => onInsertCitation(entry.key)}>Cite</button>
+                <IconButton label={`Edit ${entry.key}`} compact onClick={() => onEditEntry(entry)}><Pencil size={13} /></IconButton>
+                <IconButton label={`Delete ${entry.key}`} compact className="danger" onClick={() => setConfirmKey(entry.key)}><Trash2 size={13} /></IconButton>
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+      <footer className="bib-panel-footer">
+        <button type="button" className="text-button" onClick={onInsertManually}>Enter a key manually</button>
+      </footer>
+    </>
+  );
+}
+
 interface SidebarProps {
   open: boolean;
   panel: SidebarPanel;
@@ -186,8 +299,14 @@ interface SidebarProps {
   comments: CommentThread[];
   revisions: Revision[];
   history: GitCommit[];
+  bibliography: string;
   activeCommentId: string | null;
   onPanelChange: (panel: SidebarPanel) => void;
+  onBibliographyChange: (value: string) => void;
+  onInsertCitationKey: (key: string) => void;
+  onInsertCitationManually: () => void;
+  onAddBibliographyEntry: () => void;
+  onEditBibliographyEntry: (entry: BibliographyEntry) => void;
   onHeadingClick: (position: number) => void;
   onCommentSelected: (id: string) => void;
   onResolveComment: (id: string, resolved: boolean) => void;
@@ -204,8 +323,14 @@ export default function Sidebar({
   comments,
   revisions,
   history,
+  bibliography,
   activeCommentId,
   onPanelChange,
+  onBibliographyChange,
+  onInsertCitationKey,
+  onInsertCitationManually,
+  onAddBibliographyEntry,
+  onEditBibliographyEntry,
   onHeadingClick,
   onCommentSelected,
   onResolveComment,
@@ -217,6 +342,7 @@ export default function Sidebar({
   const headings = headingEntries(document);
   const unresolved = comments.filter((thread) => !thread.resolved);
   const pendingRevisions = revisions.filter((revision) => !revision.accepted && !revision.rejected);
+  const bibliographyCount = useMemo(() => parseBibliography(bibliography).length, [bibliography]);
 
   if (!open) return null;
   return (
@@ -230,6 +356,11 @@ export default function Sidebar({
           <MessageSquareText size={18} />
           <span>Review</span>
           {unresolved.length > 0 ? <b>{unresolved.length}</b> : null}
+        </button>
+        <button type="button" className={panel === "references" ? "active" : ""} onClick={() => onPanelChange("references")}>
+          <BookMarked size={18} />
+          <span>References</span>
+          {bibliographyCount > 0 ? <b>{bibliographyCount}</b> : null}
         </button>
         <button type="button" className={panel === "history" ? "active" : ""} onClick={() => onPanelChange("history")}>
           <GitCommitHorizontal size={18} />
@@ -310,6 +441,17 @@ export default function Sidebar({
               </div>
             ) : null}
           </>
+        ) : null}
+
+        {panel === "references" ? (
+          <ReferencesPanel
+            bibliography={bibliography}
+            onChange={onBibliographyChange}
+            onInsertCitation={onInsertCitationKey}
+            onInsertManually={onInsertCitationManually}
+            onAddEntry={onAddBibliographyEntry}
+            onEditEntry={onEditBibliographyEntry}
+          />
         ) : null}
 
         {panel === "history" ? (

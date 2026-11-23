@@ -1854,6 +1854,141 @@ button:disabled {
   color: #6e736b;
 }
 
+/* Bibliography panel */
+
+.bib-tools {
+  display: grid;
+  gap: 5px;
+  padding: 10px 11px 8px;
+  border-bottom: 1px solid #dedad1;
+}
+
+.bib-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #7b8078;
+}
+
+.bib-search input {
+  flex: 1;
+  min-width: 0;
+  height: 27px;
+  padding: 0 8px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  font-size: 10px;
+}
+
+.bib-search input::placeholder {
+  color: var(--faint);
+}
+
+.bib-count {
+  color: #8b8f87;
+  font-size: 9px;
+  text-align: right;
+}
+
+.bib-list {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.bib-entry {
+  display: grid;
+  gap: 5px;
+  padding: 9px;
+  background: #fffdf8;
+  border: 1px solid #ddd9d0;
+  border-radius: 5px;
+}
+
+.bib-entry-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bib-entry-heading code {
+  overflow: hidden;
+  color: #2f5a45;
+  font-size: 10px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bib-entry-heading small {
+  color: #9a9d96;
+  font-size: 8px;
+  text-transform: uppercase;
+}
+
+.bib-entry strong {
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.bib-entry p {
+  margin: 0;
+  color: #777c74;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.bib-entry-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.bib-entry-actions .icon-button:first-of-type {
+  margin-left: auto;
+}
+
+.bib-confirm {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-top: 3px;
+  padding-top: 7px;
+  border-top: 1px solid #e7e3da;
+}
+
+.bib-confirm span {
+  margin-right: auto;
+  color: var(--danger);
+  font-size: 9px;
+}
+
+.bib-panel-footer {
+  padding: 2px 12px 16px;
+}
+
+.bib-panel-footer .text-button {
+  font-size: 10px;
+}
+
+.dialog-form {
+  display: grid;
+  gap: 12px;
+}
+
+.bib-form-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 10px;
+}
+
 .comment-list {
   display: grid;
   gap: 9px;
