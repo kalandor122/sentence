@@ -240,3 +240,5 @@ Aborting
 2026-11-23T01:35:48Z START qa-069 on qa/qa-069-start-screen-footer-shows-version-0-1-wh: start screen footer shows version 0.1 while package.json is 0.2.0 — hardcoded version?
 2026-11-23T01:37:47Z DONE qa-069 (tsc -b, npm test, smoke all green)
 2026-11-23T01:38:17Z START qa-070 on qa/qa-070-keyboard-shortcut-ctrl-k-link-has-no-vis: keyboard shortcut "Ctrl+K link" has no visible effect on the document
+2026-11-23T01:45:19Z DONE qa-070 (tsc -b, npm test, smoke all green)
+2026-11-23T01:48:55Z EXPLORE keyboard: 1 new items, agent exit 0

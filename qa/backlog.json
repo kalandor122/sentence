@@ -1114,10 +1114,11 @@
       ],
       "hint": "innerHTML unchanged",
       "source": "keyboard shortcut \"ctrl+k link\" has no visible effect on the document",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T01:38:17Z",
-      "lastAttemptAt": "2026-11-23T01:38:17Z"
+      "lastAttemptAt": "2026-11-23T01:38:17Z",
+      "doneAt": "2026-11-23T01:45:19Z"
     },
     {
       "id": "qa-071",
@@ -1129,7 +1130,9 @@
       ],
       "hint": "innerHTML unchanged",
       "source": "keyboard shortcut \"ctrl+5 line spacing\" has no visible effect on the document",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T01:49:05Z"
     },
     {
       "id": "qa-072",
@@ -1533,6 +1536,18 @@
       ],
       "hint": "Repro: In the browser app, type text and wait for 'Saved locally'. Switch View > LaTeX, insert a plain sentence before \\end{document}, wait 1.5 s for autosave, then reload. Observe the heading immediately after reload, wait another 1.5 s without editing, and re-read localStorage sentence.workspace.\nActual: Immediately after reload the heading says 'Editing' and the saved check icon disappears despite no user edit. After another 1.5 s, autosave rewrites the stored document JSON from 1302 to 1471 characters while text, node types, and marks are unchanged, and the heading returns to 'Saved locally'. Opening a fresh document shows the same pattern without input: stored document grows from 1174 to 1316 characters after 1.5 s idle.",
       "source": "explore:persistence:a restored source-edited document is marked dirty and silently rewritten",
+      "status": "open"
+    },
+    {
+      "id": "qa-099",
+      "title": "Settings button is not activated by Enter when focused",
+      "why": "Exploratory pass on keyboard (ux): expected The Settings panel/dialog opens (same effect as clicking the Settings button).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the editor (browser/dev build). Tab to focus the Settings (gear) button in the top bar (aria-label \"Settings\"). Press Enter.\nActual: Pressing Enter while the Settings button is focused does not open the Settings UI in the observed run (no modal/dialog opened).",
+      "source": "explore:keyboard:settings button is not activated by enter when focused",
       "status": "open"
     }
   ]
