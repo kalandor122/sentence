@@ -21,7 +21,7 @@ export default function IconButton({
       className={`icon-button ${compact ? "compact" : ""} ${active ? "active" : ""} ${className}`}
       title={label}
       aria-label={label}
-      aria-pressed={active || undefined}
+      aria-pressed={active}
       {...props}
     >
       {children}

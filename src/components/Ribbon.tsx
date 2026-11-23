@@ -240,20 +240,35 @@ export default function Ribbon({
 
   return (
     <section className="ribbon" aria-label="Document commands">
-      <nav className="ribbon-tabs" aria-label="Ribbon tabs">
-        {TABS.map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            className={activeTab === tab ? "active" : ""}
-            onClick={() => onTabChange(tab)}
-          >
-            {tab}
-          </button>
-        ))}
+      <nav className="ribbon-tabs" aria-label="Ribbon tabs" role="tablist">
+        {TABS.map((tab) => {
+          const selected = activeTab === tab;
+          const tabId = `ribbon-tab-${tab.toLowerCase()}`;
+          return (
+            <button
+              key={tab}
+              id={tabId}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              tabIndex={selected ? 0 : -1}
+              aria-controls="ribbon-tabpanel"
+              className={selected ? "active" : ""}
+              onClick={() => onTabChange(tab)}
+            >
+              {tab}
+            </button>
+          );
+        })}
       </nav>
 
-      <div className="ribbon-content" key={activeTab}>
+      <div
+        className="ribbon-content"
+        key={activeTab}
+        role="tabpanel"
+        id="ribbon-tabpanel"
+        aria-labelledby={`ribbon-tab-${activeTab.toLowerCase()}`}
+      >
         {activeTab === "Home" ? (
           <>
             <RibbonGroup label="Undo">
@@ -500,7 +515,7 @@ export default function Ribbon({
               </button>
             </RibbonGroup>
             <RibbonGroup label="Tracking">
-              <button type="button" className={`ribbon-command wide ${tracking ? "active" : ""}`} onClick={onToggleTracking}>
+              <button type="button" className={`ribbon-command wide ${tracking ? "active" : ""}`} aria-pressed={tracking} onClick={onToggleTracking}>
                 <ChevronDown size={17} />
                 <span>{tracking ? "Tracking on" : "Track changes"}</span>
               </button>
