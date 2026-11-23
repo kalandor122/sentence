@@ -1674,10 +1674,25 @@
       ],
       "hint": "Use the WebView's native spellchecker on the ProseMirror surface (spellcheck attribute + lang) rather than shipping a dictionary; verify it does not underline LaTeX commands in source mode (turn spellcheck off in the .tex textarea). Add a Review-tab 'Spelling' toggle that persists in settings.",
       "source": "roadmap:spell check that respects the latex source",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T03:28:43Z",
-      "lastAttemptAt": "2026-11-23T03:28:43Z"
+      "lastAttemptAt": "2026-11-23T03:28:43Z",
+      "doneAt": "2026-11-23T03:33:39Z"
+    },
+    {
+      "id": "qa-106",
+      "title": "Real pagination in the visual editor",
+      "why": "The visual page is a single long sheet and the status bar guesses page count. Without page breaks WYSIWYG means nothing for a print-first tool.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Measure the rendered block positions against the configured page height and draw page-break rules (a repeating background or absolutely positioned separators) so the user sees where pages split; derive the page count from the same measurement instead of word count. Use the settings' paperSize/margins/fontSize to compute the content height. Keep it CSS/measurement only \u2014 no full layout engine.",
+      "source": "roadmap:real pagination in the visual editor",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T03:34:09Z"
     }
   ]
 }
