@@ -1579,8 +1579,9 @@
       "hint": "Repro: Open the editor (browser/dev build). Tab to focus the Settings (gear) button in the top bar (aria-label \"Settings\"). Press Enter.\nActual: Pressing Enter while the Settings button is focused does not open the Settings UI in the observed run (no modal/dialog opened).",
       "source": "explore:keyboard:settings button is not activated by enter when focused",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T03:16:08Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T03:16:08Z",
+      "lastAttemptAt": "2026-11-23T03:16:08Z"
     },
     {
       "id": "qa-100",
