@@ -270,3 +270,5 @@ Aborting
 2026-11-23T03:00:52Z DONE qa-098 (tsc -b, npm test, smoke all green)
 2026-11-23T03:15:58Z EXPLORE tables: 0 new items, agent exit 0
 2026-11-23T03:16:08Z START qa-099 on qa/qa-099-settings-button-is-not-activated-by-ente: Settings button is not activated by Enter when focused
+2026-11-23T03:19:07Z DONE qa-099 (tsc -b, npm test, smoke all green)
+2026-11-23T03:19:37Z PROMOTED from roadmap: qa-104 Table editing: a contextual table toolbar

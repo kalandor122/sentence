@@ -1578,10 +1578,11 @@
       ],
       "hint": "Repro: Open the editor (browser/dev build). Tab to focus the Settings (gear) button in the top bar (aria-label \"Settings\"). Press Enter.\nActual: Pressing Enter while the Settings button is focused does not open the Settings UI in the observed run (no modal/dialog opened).",
       "source": "explore:keyboard:settings button is not activated by enter when focused",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T03:16:08Z",
-      "lastAttemptAt": "2026-11-23T03:16:08Z"
+      "lastAttemptAt": "2026-11-23T03:16:08Z",
+      "doneAt": "2026-11-23T03:19:07Z"
     },
     {
       "id": "qa-100",
@@ -1646,6 +1647,20 @@
       "startedAt": "2026-11-23T02:48:23Z",
       "lastAttemptAt": "2026-11-23T02:48:23Z",
       "doneAt": "2026-11-23T02:52:28Z"
+    },
+    {
+      "id": "qa-104",
+      "title": "Table editing: a contextual table toolbar",
+      "why": "Word users edit tables constantly. Tiptap ships table commands; the app exposes only 'insert 3x3', so a table cannot be reshaped after creation.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "When the cursor is inside a table, show a small toolbar above it (or in the ribbon) with: add row above/below, delete row, add column left/right, delete column, toggle header row, merge/split cells, cell alignment, delete table. Use the existing Tiptap table extension commands through the editor. Add a caption field that emits \\caption{...} in LaTeX.",
+      "source": "roadmap:table editing: a contextual table toolbar",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T03:19:37Z"
     }
   ]
 }
