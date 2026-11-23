@@ -3,13 +3,16 @@ import { useEffect, useState } from "react";
 import type { Editor } from "@tiptap/core";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 
+export const TOC_COMPILE_NOTE =
+  "Final contents and page numbers are generated when the PDF compiles.";
+
 interface TocEntry {
   level: number;
   number: string;
   text: string;
 }
 
-function tocEntries(editor: Editor): TocEntry[] {
+export function tocEntries(editor: Editor): TocEntry[] {
   const counters = [0, 0, 0];
   const entries: TocEntry[] = [];
   editor.state.doc.descendants((node: ProseMirrorNode) => {
@@ -77,7 +80,7 @@ function TocNodeView({ editor }: NodeViewProps) {
       ) : (
         <p className="toc-block-empty">Add headings to see the entries.</p>
       )}
-      <p className="toc-block-note">Final contents and page numbers are generated when the PDF compiles.</p>
+      <p className="toc-block-note">{TOC_COMPILE_NOTE}</p>
     </NodeViewWrapper>
   );
 }
