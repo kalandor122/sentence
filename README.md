@@ -1,6 +1,6 @@
 # Sentence
 
-Sentence is a Windows desktop document editor that combines a Word-like writing surface with readable LaTeX and visual Git. It is built with Tauri 2, Rust, React, TypeScript, Tectonic, and libgit2.
+Sentence is a desktop document editor (Windows and Linux) that combines a Word-like writing surface with readable LaTeX and visual Git. It is built with Tauri 2, Rust, React, TypeScript, Tectonic, and libgit2.
 
 ## What works
 
@@ -113,7 +113,7 @@ The first Tectonic build downloads missing LaTeX packages and caches them under 
 
 ## Current scope
 
-Version 1 targets Windows and GitHub. Linux and real-time multi-author editing are planned for version 2. Arbitrary external LaTeX projects and Microsoft `.docx` interoperability are intentionally outside the current visual-editing boundary.
+Version 1 targets Windows and GitHub. A Linux build runs for development (see AGENTS.md); real-time multi-author editing is planned for version 2. Arbitrary external LaTeX projects and Microsoft `.docx` interoperability are intentionally outside the current visual-editing boundary.
 
 ## License
 

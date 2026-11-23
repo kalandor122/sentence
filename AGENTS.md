@@ -1,12 +1,14 @@
 # AGENTS.md
 
-Sentence is a Windows-first Tauri 2 desktop app: a Word-like visual editor that writes readable LaTeX, compiles PDFs through a bundled Tectonic sidecar, and adds visual Git (libgit2), GitHub sync, and arXiv packaging. Frontend: React 19 + Tiptap 3 + Vite, strict TS. Backend: Rust in `src-tauri/`. Read `README.md` for product-level detail.
+Sentence is a Tauri 2 desktop app (Windows-first, also builds and runs on Linux): a Word-like visual editor that writes readable LaTeX, compiles PDFs through a bundled Tectonic sidecar, and adds visual Git (libgit2), GitHub sync, and arXiv packaging. Frontend: React 19 + Tiptap 3 + Vite, strict TS. Backend: Rust in `src-tauri/`. Read `README.md` for product-level detail.
 
 ## Commands
 
 - `npm install` — one-time setup.
 - `npm run desktop` — full desktop app. Runs `.tools/tauri.ps1`, which sets the `.tools` env vars, starts the cargo proxy, then runs `tauri dev`. Plain `npm run tauri dev` fails with `cargo metadata: program not found` because cargo is not installed globally on this machine. The Vite dev server uses `strictPort` 1420; kill any stale process holding that port first.
-- `npm run desktop:build` — release build: `src-tauri/target/release/sentence.exe`, Tectonic sidecar beside it, installers under `src-tauri/target/release/bundle/`.
+- `npm run desktop:build` — Windows release build: `src-tauri/target/release/sentence.exe`, Tectonic sidecar beside it, installers under `src-tauri/target/release/bundle/`.
+- `npm run desktop:linux` — Linux dev run (needs port 1420, so stop the QA loop first).
+- `npm run desktop:linux:build` — Linux release binary at `src-tauri/target/release/sentence` (`--no-bundle`: deb/AppImage packaging also needs `patchelf`).
 - `npm run dev` — UI in a plain browser. Desktop-only actions are stubbed via the `isDesktop` guard in `src/lib/tauri.ts`.
 - `npm test` — Vitest in the default node environment (no jsdom needed).
 - `npx tsc -b` — the real typecheck (see gotcha below).
@@ -73,10 +75,31 @@ When the backlog empties, `qa/roadmap.json` is promoted into it.
   degrade with a message. Never weaken `qa/smoke.mjs` or the tests to pass a gate;
   fix the app instead. Blocked items keep their branch with a `wip` commit.
 
+## Linux desktop
+
+Works on this machine (Omarchy/Arch, Wayland). Verified: release binary launches,
+`cargo test` passes all five backend tests, and the packaged Tectonic sidecar
+compiles a real LaTeX package (`arxiv::tests::extracted_package_compiles_with_tectonic`).
+
+- Rust toolchain: `mise use -g rust@stable` (no system cargo needed).
+- System packages already present: `webkit2gtk-4.1`, `gtk3`, `libsoup3`, `librsvg`,
+  `base-devel`. Bundling deb/AppImage additionally needs `patchelf`.
+- Sidecar: `bash scripts/fetch-tectonic.sh` installs
+  `src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu`. `npm run desktop:linux:build`
+  does not copy it next to the binary — copy it to `src-tauri/target/release/tectonic`
+  if you run the binary directly instead of through `tauri dev`.
+- WebKitGTK on Wayland aborts with `Error 71 (Protocol error) dispatching to Wayland
+  display`. Both npm scripts above set `WEBKIT_DISABLE_DMABUF_RENDERER=1`; add
+  `WEBKIT_DISABLE_COMPOSITING_MODE=1` if it still crashes.
+- `keyring` uses the `linux-native` (kernel keyutils) backend on Linux, so GitHub
+  tokens are session-scoped there; `windows-native` stays for Windows
+  (see the target-specific dependency blocks in `src-tauri/Cargo.toml`).
+
 ## Conventions
 
 - Version is triple-tracked — `package.json`, `src-tauri/Cargo.toml`, `src-tauri/tauri.conf.json` — bump all three together.
 - Update `THIRD_PARTY_NOTICES.md` when adding a significant runtime dependency.
-- Tectonic is a required sidecar (`bundle.externalBin` in `tauri.conf.json`): dev and builds fail without `src-tauri/binaries/tectonic-x86_64-pc-windows-msvc.exe` (a copy is archived in `.tools/tectonic.zip`).
-- Windows-only in v1 (WebView2, Windows Credential Manager for GitHub tokens, NSIS bundling). Linux and `.docx` interoperability are intentionally out of scope.
+- Tectonic is a required sidecar (`bundle.externalBin` in `tauri.conf.json`): dev and builds fail without `src-tauri/binaries/tectonic-<target-triple>[.exe]` — `scripts/fetch-tectonic.ps1` for Windows (a copy is archived in `.tools/tectonic.zip`), `scripts/fetch-tectonic.sh` for Linux/macOS.
+- `ensure_repository` must use `Repository::open`, never `Repository::discover`: discover walks up and finds whatever repo contains the project folder, so projects opened inside another checkout silently commit into the parent repo.
+- Windows is the shipping target (WebView2, Credential Manager, NSIS). Linux builds and runs for development; `.docx` interoperability is still out of scope.
 - No CI, lint, or formatter config exists; match the existing code style.

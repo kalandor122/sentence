@@ -107,7 +107,10 @@ fn run_git_with_token(path: &Path, args: &[&str], token: Option<&str>) -> Result
 }
 
 pub fn ensure_repository(path: &Path) -> Result<(), String> {
-    if let Ok(repository) = Repository::discover(path) {
+    // open(), not discover(): discover() walks up and happily finds the repo that
+    // happens to contain the project folder, so the project never gets its own
+    // repository — and every later commit/branch lands in the *parent* repo.
+    if let Ok(repository) = Repository::open(path) {
         drop(repository);
         return Ok(());
     }

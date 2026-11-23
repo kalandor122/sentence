@@ -344,3 +344,5 @@ Aborting
 2026-11-23T06:04:44Z BACKLOG EMPTY — nothing open, idle
 2026-11-23T06:07:14Z BACKLOG EMPTY — nothing open, idle
 2026-11-23T06:09:44Z BACKLOG EMPTY — nothing open, idle
+2026-11-23T12:47:57Z EXPLORE math: 0 new items, agent exit 1
+2026-11-23T12:48:14Z BACKLOG EMPTY — nothing open, idle

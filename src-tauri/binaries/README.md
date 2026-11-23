@@ -8,6 +8,15 @@ Expected filename (Tauri appends the Rust target triple automatically, so the
 
     tectonic-x86_64-pc-windows-msvc.exe
 
-Fetch the pinned release (Tectonic 0.17.0) and verify its checksum:
+Linux/macOS (Tectonic 0.17.0):
+
+    tectonic-x86_64-unknown-linux-gnu
+    tectonic-aarch64-apple-darwin
+
+Fetch the pinned release and drop it here under the right name:
+
+    bash scripts/fetch-tectonic.sh
+
+Windows:
 
     powershell -ExecutionPolicy Bypass -File scripts/fetch-tectonic.ps1

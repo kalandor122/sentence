@@ -12,7 +12,9 @@
     "test:watch": "vitest",
     "check": "tsc --noEmit",
     "desktop": "powershell -ExecutionPolicy Bypass -File .tools/tauri.ps1 dev",
-    "desktop:build": "powershell -ExecutionPolicy Bypass -File .tools/tauri.ps1 build"
+    "desktop:build": "powershell -ExecutionPolicy Bypass -File .tools/tauri.ps1 build",
+    "desktop:linux": "WEBKIT_DISABLE_DMABUF_RENDERER=1 WEBKIT_DISABLE_COMPOSITING_MODE=1 tauri dev",
+    "desktop:linux:build": "WEBKIT_DISABLE_DMABUF_RENDERER=1 tauri build --no-bundle"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.12.4",

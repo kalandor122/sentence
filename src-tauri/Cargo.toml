@@ -17,7 +17,6 @@ tauri-build = { version = "2", features = [] }
 base64 = "0.22"
 chrono = { version = "0.4", features = ["serde"] }
 git2 = "0.20"
-keyring = { version = "3", features = ["windows-native"] }
 open = "5"
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
@@ -28,6 +27,13 @@ tauri-plugin-dialog = "2"
 tauri-plugin-shell = "2"
 uuid = { version = "1", features = ["v4"] }
 zip = { version = "9", default-features = false, features = ["deflate"] }
+
+[target.'cfg(windows)'.dependencies]
+keyring = { version = "3", features = ["windows-native"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# kernel keyutils backend: no dbus/keyring daemon needed for local Linux dev
+keyring = { version = "3", features = ["linux-native"] }
 
 [profile.release]
 panic = "abort"

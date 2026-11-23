@@ -8,6 +8,9 @@ src-tauri/gen/schemas/
 
 # Bundled engine sidecar (fetched by scripts/fetch-tectonic.ps1, see README)
 src-tauri/binaries/*.exe
+src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu
+src-tauri/binaries/tectonic-aarch64-apple-darwin
+src-tauri/binaries/tectonic-x86_64-apple-darwin
 
 # Local toolchain and caches (self-contained Rust/npm setup)
 .tools/
