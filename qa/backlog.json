@@ -992,10 +992,11 @@
       ],
       "hint": "Repro: Inspect the four selects on the Layout tab (paper size, margins, text size, document class).\nActual: No aria-label/name/id on any of the four; their visible headings are unlinked sibling divs, so assistive tech announces unnamed comboboxes.",
       "source": "explore:ribbon-full:layout tab selects are unnamed for screen readers",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T01:23:59Z",
-      "lastAttemptAt": "2026-11-23T01:23:59Z"
+      "lastAttemptAt": "2026-11-23T01:23:59Z",
+      "doneAt": "2026-11-23T01:25:22Z"
     },
     {
       "id": "qa-063",
@@ -1481,6 +1482,44 @@
       ],
       "hint": "Repro: Create a project, click View > LaTeX, click at the end of the source textarea and type ZXUNDO as normal keystrokes. Press Ctrl+Z once and read the textarea tail.\nActual: Only the final character is removed: the tail reads ZXUND. Seven Ctrl+Z presses total are needed to restore the text before typing, and Ctrl+Shift+Z restores one character at a time. The source document itself is never damaged by the undos.",
       "source": "explore:source-editor:ctrl+z in the source textarea undoes one character at a time instead of the typed token",
+      "status": "open"
+    },
+    {
+      "id": "qa-096",
+      "title": "Edits inside the autosave debounce are lost on reload with no warning",
+      "why": "Exploratory pass on persistence (functional): expected Recent edits are flushed or the app warns before navigating away, so the typed marker survives the reload.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the browser app, type a unique marker such as 'persist-beta-X' at the end of the document, then immediately reload the page while the document heading still says 'Editing' (the probe reloads about 300 ms after typing, before the 1100 ms autosave timer). Inspect document.body innerText and the localStorage key sentence.workspace before and after the reload.\nActual: Before reload the marker is visible in the editor, the heading says 'Editing', and sentence.workspace does not contain the marker. The reload completes with no prompt; afterwards the marker is absent from both the editor and storage, while text autosaved earlier is still present.",
+      "source": "explore:persistence:edits inside the autosave debounce are lost on reload with no warning",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T01:30:03Z"
+    },
+    {
+      "id": "qa-097",
+      "title": "Undo appears enabled but is a no-op after reload",
+      "why": "Exploratory pass on persistence (ux): expected Undo is disabled when no undo history exists, or an enabled Undo performs a visible change.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the browser app, type a marker, wait 1.5 s until the heading says 'Saved locally', then reload. Press Ctrl+Z with focus in the editor, then click the 'Undo (Ctrl+Z)' ribbon button; compare document.body innerText before and after each action and read the button's disabled property.\nActual: After reload the Undo button reports disabled=false. document.body innerText length is 1452 before Ctrl+Z, 1452 after Ctrl+Z, and 1452 after clicking Undo; the marker remains in the document. No visible change occurs from either action.",
+      "source": "explore:persistence:undo appears enabled but is a no-op after reload",
+      "status": "open"
+    },
+    {
+      "id": "qa-098",
+      "title": "A restored source-edited document is marked dirty and silently rewritten",
+      "why": "Exploratory pass on persistence (functional): expected A saved document that is restored without user input stays 'Saved locally' and its stored model is not rewritten.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the browser app, type text and wait for 'Saved locally'. Switch View > LaTeX, insert a plain sentence before \\end{document}, wait 1.5 s for autosave, then reload. Observe the heading immediately after reload, wait another 1.5 s without editing, and re-read localStorage sentence.workspace.\nActual: Immediately after reload the heading says 'Editing' and the saved check icon disappears despite no user edit. After another 1.5 s, autosave rewrites the stored document JSON from 1302 to 1471 characters while text, node types, and marks are unchanged, and the heading returns to 'Saved locally'. Opening a fresh document shows the same pattern without input: stored document grows from 1174 to 1316 characters after 1.5 s idle.",
+      "source": "explore:persistence:a restored source-edited document is marked dirty and silently rewritten",
       "status": "open"
     }
   ]
