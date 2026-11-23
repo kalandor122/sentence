@@ -49,6 +49,7 @@ import {
   type BibliographyDraft,
   type BibliographyEntry,
 } from "./lib/bibliography";
+import { commentAnchors, restoreCommentMarks } from "./lib/comments";
 import {
   documentToHtml,
   documentToMarkdown,
@@ -285,6 +286,14 @@ function joinProjectPath(root: string, relative: string): string {
 
 function documentSource(document: SentenceDocument, settings: ProjectSettings): string {
   return documentToLatex(document, settings);
+}
+
+// LaTeX carries the document body but no visual-only review state, so parse
+// the source and put comment marks back on the text they still cover.
+function parseSourceDocument(document: SentenceDocument, source: string, settings: ProjectSettings) {
+  const parsed = latexToDocument(source, settings);
+  const restored = restoreCommentMarks(parsed.document, commentAnchors(document));
+  return { ...parsed, document: restored.document, detached: restored.detached };
 }
 
 function downloadTextFile(fileName: string, content: string, mime: string): void {
@@ -611,7 +620,7 @@ export default function App() {
     const stillActive = () => workspaceRef.current?.path === pathAtStart;
     if (sourceDirtyRef.current && !sourceRef.current.includes("<<<<<<<")) {
       try {
-        const parsed = latexToDocument(sourceRef.current, current.settings);
+        const parsed = parseSourceDocument(current.document, sourceRef.current, current.settings);
         current = { ...current, document: parsed.document, settings: parsed.settings };
         if (stillActive()) {
           workspaceRef.current = current;
@@ -716,7 +725,7 @@ export default function App() {
     let latex = tab.source;
     if (tab.sourceDirty) {
       try {
-        const parsed = latexToDocument(tab.source, workspace.settings);
+        const parsed = parseSourceDocument(workspace.document, tab.source, workspace.settings);
         workspace = { ...workspace, document: parsed.document, settings: parsed.settings };
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
@@ -994,13 +1003,17 @@ export default function App() {
     const current = workspaceRef.current;
     if (!current) return;
     try {
-      const parsed = latexToDocument(sourceRef.current, current.settings);
+      const parsed = parseSourceDocument(current.document, sourceRef.current, current.settings);
       setWorkspace({ ...current, document: parsed.document, settings: parsed.settings });
       setSourceDirty(false);
       sourceDirtyRef.current = false;
       setSaveError(null);
       markDirty();
-      setToast("Visual document synchronized from LaTeX.");
+      setToast(parsed.detached.length === 0
+        ? "Visual document synchronized from LaTeX."
+        : parsed.detached.length === 1
+          ? "Visual document synchronized from LaTeX. 1 comment no longer matches any text and lost its highlight."
+          : `Visual document synchronized from LaTeX. ${parsed.detached.length} comments no longer match any text and lost their highlight.`);
     } catch (error) {
       setToast(error instanceof Error ? error.message : String(error));
     }
