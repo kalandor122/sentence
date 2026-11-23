@@ -322,13 +322,37 @@ export const TableOfContents = Node.create({
   },
 });
 
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    comment: {
+      addComment: (markId: string) => ReturnType;
+    };
+  }
+}
+
 export const CommentMark = Mark.create({
   name: "comment",
   inclusive: false,
+  // Overlapping comments are distinct marks that must coexist on the same text.
+  excludes: "",
 
   addAttributes() {
     return {
       markId: { default: null },
+    };
+  },
+
+  addCommands() {
+    return {
+      addComment: (markId: string) => ({ tr, state }) => {
+        const { from, to } = state.selection;
+        const mark = this.type.create({ markId });
+        state.doc.nodesBetween(from, to, (node, pos) => {
+          if (!node.isText) return;
+          tr.addMark(Math.max(pos, from), Math.min(pos + node.nodeSize, to), mark);
+        });
+        return true;
+      },
     };
   },
 
