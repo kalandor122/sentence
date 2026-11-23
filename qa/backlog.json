@@ -372,8 +372,9 @@
       "hint": "Repro: Open equation dialog, click the backdrop\nActual: Dialog stays; Escape and Close work",
       "source": "explore:chrome:backdrop click does not dismiss modals",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T00:10:05Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T00:10:05Z",
+      "lastAttemptAt": "2026-11-23T00:10:05Z"
     },
     {
       "id": "qa-024",
