@@ -296,3 +296,5 @@ Aborting
 2026-11-23T04:29:56Z DONE qa-111 (tsc -b, npm test, smoke all green)
 2026-11-23T04:30:26Z PROMOTED from roadmap: qa-112 Document themes and style gallery
 2026-11-23T04:30:26Z START qa-112 on qa/qa-112-document-themes-and-style-gallery: Document themes and style gallery
+2026-11-23T04:34:52Z DONE qa-112 (tsc -b, npm test, smoke all green)
+2026-11-23T04:35:22Z PROMOTED from roadmap: qa-113 Multi-document workspace tabs
