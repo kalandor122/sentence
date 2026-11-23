@@ -1867,9 +1867,10 @@
       ],
       "hint": "Detail: Error: page.waitForTimeout: Target page, context or browser has been closed",
       "source": "smoke-fail:harness",
-      "status": "in_progress",
+      "status": "superseded",
       "attempts": 0,
-      "startedAt": "2026-11-23T13:01:05Z"
+      "startedAt": "2026-11-23T13:01:05Z",
+      "note": "the red gate was my own pkill of chromium mid-run; not an app defect \u2014 gate now retries once before queueing"
     }
   ]
 }

@@ -197,8 +197,13 @@ def cycle(dry_run: bool = False) -> str:
 
     gate_ok, gate_out = smoke()
     if not gate_ok:
-        # A red gate is the work, not a reason to stall: triage turns the failure
-        # into a critical item and the normal flow below picks it up.
+        # One flake (a killed browser, a slow first paint) is not a defect: re-run
+        # before spending a cycle on it.
+        log(f"SMOKE RED — retrying once: {gate_out[-300:]}")
+        gate_ok, gate_out = smoke()
+    if not gate_ok:
+        # Still red: that is the work, not a reason to stall. Triage turns the
+        # failure into a critical item and the normal flow below picks it up.
         log(f"SMOKE RED — queueing the failure as critical work: {gate_out[-400:]}")
         subprocess.run([sys.executable, str(QA / "triage.py")], cwd=ROOT)
 
