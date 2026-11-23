@@ -7,6 +7,7 @@ import {
   documentChanges,
   nodeText,
   rejectRevisions,
+  trackedText,
   undoDocumentChanges,
 } from "./revisions";
 import type { Revision, SentenceDocument } from "./types";
@@ -59,6 +60,45 @@ describe("undoing tracked revisions", () => {
     expect(documentPlainText(undoDocumentChanges(doc("Baseline revision text delta-one EARLY LATE"), changes))).toBe(
       "Baseline revision text delta-one LATE",
     );
+  });
+});
+
+describe("tracked text comparison", () => {
+  const annotated: SentenceDocument = {
+    type: "doc",
+    content: [
+      {
+        type: "paragraph",
+        content: [
+          { type: "text", text: "Comment", marks: [{ type: "comment", attrs: { markId: "c1" } }] },
+          { type: "text", text: " on tracked text" },
+        ],
+      },
+    ],
+  };
+
+  it("ignores comment marks and the text nodes they split", () => {
+    expect(trackedText(annotated)).toBe(trackedText(doc("Comment on tracked text")));
+  });
+
+  it("still sees the text of a later edit", () => {
+    const edited: SentenceDocument = {
+      ...annotated,
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "Comment", marks: [{ type: "comment", attrs: { markId: "c1" } }] },
+            { type: "text", text: " on tracked text tail" },
+          ],
+        },
+      ],
+    };
+    expect(trackedText(edited)).not.toBe(trackedText(annotated));
+  });
+
+  it("treats a typed trailing space as an edit", () => {
+    expect(trackedText(doc("alpha "))).not.toBe(trackedText(doc("alpha")));
   });
 });
 

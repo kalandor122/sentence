@@ -350,3 +350,4 @@ Aborting
 2026-11-23T13:01:05Z SMOKE RED — queueing the failure as critical work: FAIL failures=1 observations=0 consoleErrors=0
   FAIL harness: Error: page.waitForTimeout: Target page, context or browser has been closed
 2026-11-23T13:15:47Z EXPLORE review: 5 new items, agent exit 0
+2026-11-23T13:16:01Z START qa-118 on qa/qa-118-rejecting-a-tracked-edit-made-after-a-co: Rejecting a tracked edit made after a comment removes the comment highlight and leaves the thread unanchored
