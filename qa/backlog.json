@@ -1974,8 +1974,9 @@
       "hint": "Repro: 1. Create a project and switch to View > LaTeX. 2. At the end of the body, before \\end{document}, add these lines without blank lines between the paragraph and the commands:\nZXTIGHT paragraph before a section\n\\section{ZXTIGHT SECTION}\nZXTIGHT section body\n\\begin{table}[htbp]\n\\centering\n\\begin{tabular}{ll}\nZXTIGHT & 9 \\\\\n\\end{tabular}\n\\end{table}\n3. Click 'Apply source', then View > Visual, then View > LaTeX.\nActual: Apply reports success (`Visual document synchronized from LaTeX.`), but the visual document has no ZXTIGHT SECTION heading and no table; it shows the literal text `\\section{ZXTIGHT SECTION}`, `\\begin{table}`, `\\begin{tabular}` and `\\end{tabular}`. Returning to the source shows the commands rewritten as `\\textbackslash{}section\\{ZXTIGHT SECTION\\}`, `\\textbackslash{}begin\\{table\\}`, etc., so the LaTeX is permanently corrupted as well. The same failure occurs for a \\section command alone without the table, so any block command that is not preceded by a blank line is affected.",
       "source": "explore:source-editor:headings and tables placed directly after text are escaped into literal text instead of being recognized",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T20:59:02Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T20:59:02Z",
+      "lastAttemptAt": "2026-11-23T20:59:02Z"
     },
     {
       "id": "qa-125",
