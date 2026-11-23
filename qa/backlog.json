@@ -1690,10 +1690,37 @@
       ],
       "hint": "Measure the rendered block positions against the configured page height and draw page-break rules (a repeating background or absolutely positioned separators) so the user sees where pages split; derive the page count from the same measurement instead of word count. Use the settings' paperSize/margins/fontSize to compute the content height. Keep it CSS/measurement only \u2014 no full layout engine.",
       "source": "roadmap:real pagination in the visual editor",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T03:34:09Z",
-      "lastAttemptAt": "2026-11-23T03:34:09Z"
+      "lastAttemptAt": "2026-11-23T03:34:09Z",
+      "doneAt": "2026-11-23T03:41:35Z"
+    },
+    {
+      "id": "qa-107",
+      "title": "Unknown LaTeX commands pass math validation and can be inserted",
+      "why": "Exploratory pass on math (functional): expected Input that KaTeX itself renders as a red error should be flagged as invalid, so Insert/Update is disabled as it is for malformed input like `\\frac{`, preventing uncompilable LaTeX entering the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a new project and click the Insert tab.\n2. Click 'Inline equation', type `\\badcommand{x}` in the LaTeX source textarea.\n3. Observe the preview: the command is rendered in red via `mstyle mathcolor=\"#cc0000\"`, but the dialog reports no error (no `katex-error`, no `math-preview-invalid`) and the Insert button is enabled.\n4. Click Insert.\n5. Switch to View > LaTeX and read document.tex: it contains `\\(\\badcommand{x}\\)`. The same happens with `\\unknown{}`.\nActual: `\\badcommand{x}` and `\\unknown{}` leave the Insert button enabled and are inserted into the document and exported to LaTeX. By contrast `\\frac{`, `x^{`, `\\begin{` and `}{` correctly show `.math-preview-invalid` and disable Insert.",
+      "source": "explore:math:unknown latex commands pass math validation and can be inserted",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T03:48:39Z"
+    },
+    {
+      "id": "qa-108",
+      "title": "Dismissing a math edit dialog with Cancel/Escape drops editor focus; typing and Backspace are swallowed",
+      "why": "Exploratory pass on math (ux): expected After the edit dialog closes, keyboard focus should return to the editor so the user can keep typing or delete the clicked math node with Backspace/Delete.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a new project, use Insert > Inline equation to insert `x+1`.\n2. Click the inserted math node (the 'Edit inline equation' dialog opens).\n3. Press Escape or click Cancel.\n4. Check `document.activeElement`: it is `BODY`, not the editor.\n5. Press Backspace, or type `YY`, then switch to View > LaTeX and read document.tex.\nActual: Focus stays on BODY: Backspace leaves the math node in place (`\\(y=2\\)` still in the source) and typed text (`YY`) never reaches the document. The same occurs for a display 'Equation block' after clicking it and pressing Escape then Delete. Typing works again only after clicking the editor first; clicking earlier and deleting via a positioned caret does work, so there is no direct delete affordance after dialog dismissal.",
+      "source": "explore:math:dismissing a math edit dialog with cancel/escape drops editor focus; typing and backspace are swallowed",
+      "status": "open"
     }
   ]
 }
