@@ -1290,10 +1290,11 @@
       ],
       "hint": "Repro: In the demo document (which has H1 'Introduction' and H2 'Drafting with constraints'), click References > Table of contents and inspect the inserted block on the visual page.\nActual: The inserted [data-toc] block is a 608x59px dashed box whose entire text is the literal label 'Table of contents'; no headings or compile-time hint appear, even though the LaTeX correctly contains \\tableofcontents. Probe step 4: out.toc.dom.tocs[0] and out.toc.latex.toc=1.",
       "source": "explore:insert-media:visual table of contents shows no entries for the document's headings",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T02:01:44Z",
-      "lastAttemptAt": "2026-11-23T02:01:44Z"
+      "lastAttemptAt": "2026-11-23T02:01:44Z",
+      "doneAt": "2026-11-23T02:06:21Z"
     },
     {
       "id": "qa-082",
@@ -1561,6 +1562,32 @@
       ],
       "hint": "Repro: Open the editor (browser/dev build). Tab to focus the Settings (gear) button in the top bar (aria-label \"Settings\"). Press Enter.\nActual: Pressing Enter while the Settings button is focused does not open the Settings UI in the observed run (no modal/dialog opened).",
       "source": "explore:keyboard:settings button is not activated by enter when focused",
+      "status": "open"
+    },
+    {
+      "id": "qa-100",
+      "title": "A second page-furniture command replaces the previously inserted page break or contents block",
+      "why": "Exploratory pass on insert-media (functional): expected Each ribbon command inserts its own block: two page breaks should yield two \\newpage commands and two contents blocks should yield two \\tableofcontents commands.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the demo document click at the end of the last paragraph, click Insert > Page break, then immediately click References > Table of contents without clicking back into the editor. Then, from a paragraph, click References > Table of contents followed immediately by Insert > Page break. Compare the [data-page-break] and [data-toc] counts in the visual DOM and the \\newpage / \\tableofcontents counts in View > LaTeX.\nActual: After the first break the DOM had 2 [data-page-break] and 1 [data-toc]; after the Contents click it had 1 break and 2 TOCs and the LaTeX had \\newpage count 1 and \\tableofcontents count 2, i.e. the newly inserted break was overwritten. In the reverse order there were 1 break and 4 TOCs before the Page break click and 2 breaks and 3 TOCs after it, with \\newpage count 2 and \\tableofcontents count 3: the last inserted TOC was overwritten. Probe qa/probes/insert-media.mjs steps 8 and 10: out.repeated.afterSecondBreak={breaks:2,tocs:1} vs out.repeated.dom.breaks=1, out.repeated.dom.tocs=2, out.repeated.latex.newpageCount=1; out.tocThenBreak.afterTocOnly={breaks:1,tocs:4} vs out.tocThenBreak.dom.breaks=2, out.tocThenBreak.dom.tocs=3.",
+      "source": "explore:insert-media:a second page-furniture command replaces the previously inserted page break or contents block",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T02:11:52Z"
+    },
+    {
+      "id": "qa-101",
+      "title": "Inserting an image at a caret inside a paragraph splits the sentence into two paragraphs",
+      "why": "Exploratory pass on insert-media (functional): expected The image is inserted inline or as a separate block without cutting an existing sentence into two paragraphs.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: At the end of a paragraph type 'SPLIT BEFORE. SPLIT AFTER.', press Home then ArrowRight 13 times so the caret sits just after the first sentence, then supply a PNG to the hidden file input (the stubbed browser picker path) via Insert > Image. Inspect View > Visual DOM and View > LaTeX.\nActual: The visual DOM becomes <p>SPLIT BEFORE.</p><img alt=\"mid paragraph.png\" ...><p> SPLIT AFTER.</p> and the exported LaTeX places a \\begin{figure}...\\includegraphics[width=0.8\\linewidth]{assets/images/mid-paragraph.png}...\\end{figure} block between 'SPLIT BEFORE.' and ' SPLIT AFTER.', turning one sentence into two paragraphs. Probe qa/probes/insert-media.mjs step 3: out.imageMidParagraph.dom.html and out.imageMidParagraph.latex.bodyTail.",
+      "source": "explore:insert-media:inserting an image at a caret inside a paragraph splits the sentence into two paragraphs",
       "status": "open"
     }
   ]
