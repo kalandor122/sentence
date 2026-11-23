@@ -7,6 +7,7 @@ import {
   Github,
   ShieldCheck,
 } from "lucide-react";
+import packageJson from "../../package.json";
 
 export interface RecentProject {
   path: string;
@@ -123,7 +124,7 @@ export default function StartScreen({
         </aside>
       </div>
       <footer className="start-footer">
-        <span>Sentence 0.1</span>
+        <span>Sentence {packageJson.version}</span>
         <span>Documents stay on this computer unless you push them to GitHub.</span>
       </footer>
     </main>
