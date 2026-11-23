@@ -229,7 +229,6 @@ export default function EditorSurface({
       return;
     }
     let frame = 0;
-    let lastPages = 0;
 
     const paginate = () => {
       frame = 0;
@@ -243,16 +242,19 @@ export default function EditorSurface({
           wrapper.style.paddingTop = `${fill}px`;
         }
       }
-      const contentBottom = offsetWithin(dom, sheet) + dom.offsetHeight;
-      const pages = Math.max(1, Math.ceil(contentBottom / PAGE_HEIGHT));
+      // The editor has a min-height, so its own offsetHeight cannot tell us how
+      // much paper the content actually occupies. Measure the last block instead
+      // and treat every page break as at least one additional page.
+      const lastBlock = dom.lastElementChild as HTMLElement | null;
+      const contentBottom = lastBlock
+        ? offsetWithin(lastBlock, sheet) + lastBlock.offsetHeight
+        : offsetWithin(dom, sheet);
+      const pages = Math.max(1, wrappers.length + 1, Math.ceil(contentBottom / PAGE_HEIGHT));
       scroll.style.setProperty(
         "--sentence-sheet-min-height",
         `${pages * PAGE_HEIGHT}px`,
       );
-      if (pages !== lastPages) {
-        lastPages = pages;
-        onPageCountChange(pages);
-      }
+      onPageCountChange(pages);
     };
 
     const schedule = () => {

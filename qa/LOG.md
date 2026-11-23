@@ -246,3 +246,4 @@ Aborting
 2026-11-23T01:53:41Z DONE qa-071 (tsc -b, npm test, smoke all green)
 2026-11-23T01:54:11Z START qa-076 on qa/qa-076-ribbon-tabs-lack-tab-semantics-and-arrow: Ribbon tabs lack tab semantics and arrow-key navigation
 2026-11-23T01:55:34Z DONE qa-076 (tsc -b, npm test, smoke all green)
+2026-11-23T01:56:04Z START qa-080 on qa/qa-080-status-bar-page-count-ignores-inserted-p: Status bar page count ignores inserted page breaks
