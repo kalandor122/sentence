@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import {
   CheckCircle2,
   Circle,
@@ -42,6 +43,142 @@ function headingEntries(document: SentenceDocument): HeadingEntry[] {
   return result;
 }
 
+interface CommentThreadCardProps {
+  thread: CommentThread;
+  active: boolean;
+  onSelected: (markId: string) => void;
+  onResolve: (id: string, resolved: boolean) => void;
+  onDelete: (id: string) => void;
+  onAddReply: (id: string, body: string) => void;
+}
+
+function CommentThreadCard({
+  thread,
+  active,
+  onSelected,
+  onResolve,
+  onDelete,
+  onAddReply,
+}: CommentThreadCardProps) {
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [reply, setReply] = useState("");
+  const replyButton = useRef<HTMLButtonElement>(null);
+  const restoreFocus = useRef(false);
+
+  useEffect(() => {
+    if (!replyOpen && restoreFocus.current) {
+      restoreFocus.current = false;
+      replyButton.current?.focus();
+    }
+  }, [replyOpen]);
+
+  const closeReply = () => {
+    setReply("");
+    setReplyOpen(false);
+    restoreFocus.current = true;
+  };
+
+  const submitReply = () => {
+    const body = reply.trim();
+    if (!body) return;
+    onAddReply(thread.id, body);
+    closeReply();
+  };
+
+  return (
+    <article
+      className={`comment-thread ${thread.resolved ? "resolved" : ""} ${active ? "active" : ""}`}
+      onClick={() => onSelected(thread.markId)}
+    >
+      <header>
+        <span className="author-avatar">{thread.author.slice(0, 1).toUpperCase()}</span>
+        <div>
+          <strong>{thread.author}</strong>
+          <small>{new Date(thread.createdAt).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</small>
+        </div>
+        <button
+          type="button"
+          className="icon-button compact"
+          onClick={(event) => {
+            event.stopPropagation();
+            onResolve(thread.id, !thread.resolved);
+          }}
+          title={thread.resolved ? "Reopen comment" : "Resolve comment"}
+        >
+          {thread.resolved ? <Undo2 size={14} /> : <CheckCircle2 size={14} />}
+        </button>
+        <button
+          type="button"
+          className="icon-button compact danger"
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete(thread.id);
+          }}
+          title="Delete comment"
+        >
+          <Trash2 size={14} />
+        </button>
+      </header>
+      <p>{thread.body}</p>
+      {thread.replies.map((item) => (
+        <div className="comment-reply" key={item.id}>
+          <strong>{item.author}</strong>
+          <p>{item.body}</p>
+        </div>
+      ))}
+      {replyOpen ? (
+        <form
+          className="comment-reply-form"
+          onClick={(event) => event.stopPropagation()}
+          onSubmit={(event) => {
+            event.preventDefault();
+            submitReply();
+          }}
+        >
+          <label className="comment-reply-field">
+            <span>Reply to {thread.author}</span>
+            <textarea
+              autoFocus
+              rows={3}
+              value={reply}
+              placeholder="Write a reply..."
+              onChange={(event) => setReply(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  closeReply();
+                } else if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  submitReply();
+                }
+              }}
+            />
+          </label>
+          <div className="comment-reply-actions">
+            <button type="submit" className="primary-button small" disabled={!reply.trim()}>Reply</button>
+            <button type="button" className="secondary-button small" onClick={closeReply}>Cancel</button>
+          </div>
+        </form>
+      ) : (
+        <button
+          ref={replyButton}
+          type="button"
+          className="text-button comment-reply-toggle"
+          aria-label={`Reply to ${thread.author}'s comment`}
+          onClick={(event) => {
+            event.stopPropagation();
+            setReplyOpen(true);
+          }}
+        >
+          Reply
+        </button>
+      )}
+    </article>
+  );
+}
+
 interface SidebarProps {
   open: boolean;
   panel: SidebarPanel;
@@ -55,6 +192,7 @@ interface SidebarProps {
   onCommentSelected: (id: string) => void;
   onResolveComment: (id: string, resolved: boolean) => void;
   onDeleteComment: (id: string) => void;
+  onAddReply: (id: string, body: string) => void;
   onAcceptRevision: (id: string) => void;
   onRejectRevision: (id: string) => void;
 }
@@ -72,6 +210,7 @@ export default function Sidebar({
   onCommentSelected,
   onResolveComment,
   onDeleteComment,
+  onAddReply,
   onAcceptRevision,
   onRejectRevision,
 }: SidebarProps) {
@@ -137,48 +276,15 @@ export default function Sidebar({
             <div className="comment-list">
               {comments.length === 0 ? <p className="panel-empty">Select text and choose New comment from the Review tab.</p> : null}
               {comments.map((thread) => (
-                <article
+                <CommentThreadCard
                   key={thread.id}
-                  className={`comment-thread ${thread.resolved ? "resolved" : ""} ${activeCommentId === thread.markId ? "active" : ""}`}
-                  onClick={() => onCommentSelected(thread.markId)}
-                >
-                  <header>
-                    <span className="author-avatar">{thread.author.slice(0, 1).toUpperCase()}</span>
-                    <div>
-                      <strong>{thread.author}</strong>
-                      <small>{new Date(thread.createdAt).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</small>
-                    </div>
-                    <button
-                      type="button"
-                      className="icon-button compact"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onResolveComment(thread.id, !thread.resolved);
-                      }}
-                      title={thread.resolved ? "Reopen comment" : "Resolve comment"}
-                    >
-                      {thread.resolved ? <Undo2 size={14} /> : <CheckCircle2 size={14} />}
-                    </button>
-                    <button
-                      type="button"
-                      className="icon-button compact danger"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onDeleteComment(thread.id);
-                      }}
-                      title="Delete comment"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </header>
-                  <p>{thread.body}</p>
-                  {thread.replies.map((reply) => (
-                    <div className="comment-reply" key={reply.id}>
-                      <strong>{reply.author}</strong>
-                      <p>{reply.body}</p>
-                    </div>
-                  ))}
-                </article>
+                  thread={thread}
+                  active={activeCommentId === thread.markId}
+                  onSelected={onCommentSelected}
+                  onResolve={onResolveComment}
+                  onDelete={onDeleteComment}
+                  onAddReply={onAddReply}
+                />
               ))}
             </div>
             {pendingRevisions.length > 0 ? (

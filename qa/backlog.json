@@ -1391,8 +1391,9 @@
       "hint": "Repro: 1. Type text, select it, Review tab > New comment, enter a body, click Comment. 2. In the Review sidebar click the comment thread, then double-click its body. 3. Inspect every control and input inside the thread and sidebar panel.\nActual: Thread exposes only two icon buttons (titles 'Resolve comment' and 'Delete comment'); inputs=[] and no reply/respond text appears before or after clicking or double-clicking. Thread reply count stays 0 and the probe's replyMatches list is empty.",
       "source": "explore:review:no ui to add a reply to a comment thread",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T00:26:29Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T00:26:29Z",
+      "lastAttemptAt": "2026-11-23T00:26:29Z"
     },
     {
       "id": "qa-092",

@@ -1184,6 +1184,21 @@ export default function App() {
             } : current);
             markDirty();
           }}
+          onAddReply={(id, body) => {
+            setWorkspace((current) => current ? {
+              ...current,
+              comments: current.comments.map((thread) => thread.id === id ? {
+                ...thread,
+                replies: [...thread.replies, {
+                  id: crypto.randomUUID(),
+                  author: gitAuthor.name || current.settings.author || "You",
+                  body,
+                  createdAt: new Date().toISOString(),
+                }],
+              } : thread),
+            } : current);
+            markDirty();
+          }}
           onAcceptRevision={(id) => {
             setWorkspace((current) => current ? {
               ...current,
