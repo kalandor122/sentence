@@ -222,6 +222,36 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("rejects a missing closing brace instead of rewriting the content", () => {
+    const tabular = [
+      "\\begin{document}",
+      "\\begin{tabular}{ll",
+      "ZXCOLCELL & 7 \\\\",
+      "\\end{tabular}",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(tabular, DEFAULT_SETTINGS)).toThrow(
+      "Invalid LaTeX: missing closing brace.",
+    );
+    const heading = [
+      "\\begin{document}",
+      "\\section{ZXSEC UNCLOSED",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(heading, DEFAULT_SETTINGS)).toThrow(
+      "Invalid LaTeX: missing closing brace.",
+    );
+  });
+
+  it("accepts escaped braces when checking brace balance", () => {
+    const source = [
+      "\\begin{document}",
+      "A literal \\{ brace and \\} brace.",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(source, DEFAULT_SETTINGS)).not.toThrow();
+  });
+
   it("imports hand-authored \\href as an editable link and re-exports it", () => {
     const source = [
       "\\begin{document}",
