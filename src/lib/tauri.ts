@@ -235,6 +235,23 @@ export async function exportPdf(projectPath: string, destination: string): Promi
   return invoke<string>("export_pdf", { path: projectPath, destination });
 }
 
+export async function chooseExportDestination(
+  defaultPath: string,
+  label: string,
+  extension: string,
+): Promise<string | null> {
+  if (!isDesktop) return null;
+  return save({
+    title: `Export ${label}`,
+    defaultPath,
+    filters: [{ name: label, extensions: [extension] }],
+  });
+}
+
+export async function exportTextFile(destination: string, content: string): Promise<string> {
+  return invoke<string>("export_text_file", { destination, content });
+}
+
 export async function chooseArxivDestination(suggestedName: string): Promise<string | null> {
   if (!isDesktop) return null;
   const base = suggestedName.replace(/\.zip$/i, "");

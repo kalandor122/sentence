@@ -37,6 +37,7 @@ pub fn run() {
             project::authorize_asset,
             project::github_clone_repository,
             project::export_pdf,
+            project::export_text_file,
             arxiv::export_arxiv_package,
             latex::compile_project,
             latex::tectonic_status,

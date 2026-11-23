@@ -50,6 +50,11 @@ import {
   type BibliographyEntry,
 } from "./lib/bibliography";
 import {
+  documentToHtml,
+  documentToMarkdown,
+  type TextExportFormat,
+} from "./lib/exporters";
+import {
   countWords,
   documentPlainText,
   documentToLatex,
@@ -67,6 +72,7 @@ import {
   authorizeAsset,
   checkoutBranch,
   chooseArxivDestination,
+  chooseExportDestination,
   choosePdfDestination,
   chooseProject,
   commitChanges,
@@ -75,6 +81,7 @@ import {
   createProject,
   exportArxivPackage,
   exportPdf,
+  exportTextFile,
   fetchRemote,
   getGitDiff,
   getGitHubSession,
@@ -277,6 +284,17 @@ function joinProjectPath(root: string, relative: string): string {
 
 function documentSource(document: SentenceDocument, settings: ProjectSettings): string {
   return documentToLatex(document, settings);
+}
+
+function downloadTextFile(fileName: string, content: string, mime: string): void {
+  const url = URL.createObjectURL(new Blob([content], { type: mime }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function withoutCommentMark(document: SentenceDocument, markId: string): SentenceDocument {
@@ -1089,6 +1107,50 @@ export default function App() {
     }
   };
 
+  const handleExportText = async (format: TextExportFormat | "latex") => {
+    const saved = await persist();
+    if (!saved) return;
+    const baseName = saved.name.replace(/\.[^./\\]+$/, "") || "document";
+    const exportOptions = {
+      latex: {
+        label: "LaTeX",
+        extension: "tex",
+        mime: "application/x-tex",
+        content: documentToLatex(saved.document, saved.settings),
+      },
+      html: {
+        label: "HTML",
+        extension: "html",
+        mime: "text/html",
+        content: documentToHtml(saved.document, saved.settings),
+      },
+      markdown: {
+        label: "Markdown",
+        extension: "md",
+        mime: "text/markdown",
+        content: documentToMarkdown(saved.document, saved.settings),
+      },
+    }[format];
+    const fileName = `${baseName}.${exportOptions.extension}`;
+    try {
+      if (isDesktop) {
+        const destination = await chooseExportDestination(
+          fileName,
+          exportOptions.label,
+          exportOptions.extension,
+        );
+        if (!destination) return;
+        await exportTextFile(destination, exportOptions.content);
+        setToast(`${exportOptions.label} exported.`);
+      } else {
+        downloadTextFile(fileName, exportOptions.content, exportOptions.mime);
+        setToast(`${exportOptions.label} downloaded.`);
+      }
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : String(error));
+    }
+  };
+
   const handleMathSubmit = (latex: string) => {
     if (!mathEditor || !editor) return;
     const selection = editor.state.selection;
@@ -1572,6 +1634,9 @@ export default function App() {
         onToggleInspector={() => { setInspectorOpen(!inspectorOpen); setGitOpen(false); }}
         onCompile={() => void handleCompile()}
         onExportArxiv={() => { setArxivError(null); setArxivOpen(true); }}
+        onExportLatex={() => void handleExportText("latex")}
+        onExportHtml={() => void handleExportText("html")}
+        onExportMarkdown={() => void handleExportText("markdown")}
       />
       {showTabs ? (
         <WorkspaceTabs
