@@ -260,3 +260,4 @@ Aborting
 2026-11-23T02:28:40Z START qa-095 on qa/qa-095-ctrl-z-in-the-source-textarea-undoes-one: Ctrl+Z in the source textarea undoes one character at a time instead of the typed token
 2026-11-23T02:38:02Z DONE qa-095 (tsc -b, npm test, smoke all green)
 2026-11-23T02:43:20Z EXPLORE lists: 2 new items, agent exit 0
+2026-11-23T02:43:29Z START qa-102 on qa/qa-102-select-all-list-toggle-does-not-convert: Select-all + list toggle does not convert a list to paragraphs; it adds an empty item

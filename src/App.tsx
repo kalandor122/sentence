@@ -28,6 +28,7 @@ import StartScreen, { type RecentProject } from "./components/StartScreen";
 import StatusBar from "./components/StatusBar";
 import TopBar from "./components/TopBar";
 import { findDocumentMatches, findTextRanges, setFindHighlight } from "./editor/find";
+import { toggleList } from "./editor/listToggle";
 import {
   createWelcomeDocument,
   DEFAULT_SETTINGS,
@@ -1155,10 +1156,10 @@ export default function App() {
       if (editingDocument && !inEditor && mod && event.shiftKey && !event.altKey && editor) {
         if (pressedDigit("7")) {
           event.preventDefault();
-          editor.chain().focus().toggleOrderedList().run();
+          toggleList(editor, "orderedList");
         } else if (pressedDigit("8")) {
           event.preventDefault();
-          editor.chain().focus().toggleBulletList().run();
+          toggleList(editor, "bulletList");
         }
       }
       if (editingDocument && mod && !event.shiftKey && !event.altKey) {

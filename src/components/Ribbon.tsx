@@ -45,6 +45,7 @@ import {
 } from "lucide-react";
 import IconButton from "./IconButton";
 import { changeIndent } from "../editor/indent";
+import { toggleList } from "../editor/listToggle";
 import type {
   EditorMode,
   ProjectSettings,
@@ -396,10 +397,10 @@ export default function Ribbon({
               <IconButton label="Justify" active={textAlign === "justify"} disabled={disabled} onClick={() => editor?.chain().focus().setTextAlign("justify").run()}>
                 <AlignJustify size={18} />
               </IconButton>
-              <IconButton label="Bulleted list" active={editor?.isActive("bulletList")} disabled={disabled} onClick={() => editor?.chain().focus().toggleBulletList().run()}>
+              <IconButton label="Bulleted list" active={editor?.isActive("bulletList")} disabled={disabled} onClick={() => editor && toggleList(editor, "bulletList")}>
                 <List size={18} />
               </IconButton>
-              <IconButton label="Numbered list" active={editor?.isActive("orderedList")} disabled={disabled} onClick={() => editor?.chain().focus().toggleOrderedList().run()}>
+              <IconButton label="Numbered list" active={editor?.isActive("orderedList")} disabled={disabled} onClick={() => editor && toggleList(editor, "orderedList")}>
                 <ListOrdered size={18} />
               </IconButton>
               <IconButton label="Increase indent (Tab)" aria-keyshortcuts="Tab" disabled={disabled || editor?.isActive("table") || editor?.isActive("codeBlock")} onClick={() => editor && changeIndent(editor, false)}>
