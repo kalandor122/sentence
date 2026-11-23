@@ -1115,8 +1115,9 @@
       "hint": "innerHTML unchanged",
       "source": "keyboard shortcut \"ctrl+k link\" has no visible effect on the document",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T01:38:17Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T01:38:17Z",
+      "lastAttemptAt": "2026-11-23T01:38:17Z"
     },
     {
       "id": "qa-071",
