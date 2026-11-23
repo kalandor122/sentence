@@ -245,3 +245,4 @@ Aborting
 2026-11-23T01:49:05Z START qa-071 on qa/qa-071-keyboard-shortcut-ctrl-5-line-spacing-ha: keyboard shortcut "Ctrl+5 line spacing" has no visible effect on the document
 2026-11-23T01:53:41Z DONE qa-071 (tsc -b, npm test, smoke all green)
 2026-11-23T01:54:11Z START qa-076 on qa/qa-076-ribbon-tabs-lack-tab-semantics-and-arrow: Ribbon tabs lack tab semantics and arrow-key navigation
+2026-11-23T01:55:34Z DONE qa-076 (tsc -b, npm test, smoke all green)

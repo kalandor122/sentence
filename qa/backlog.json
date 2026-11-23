@@ -1210,10 +1210,11 @@
       ],
       "hint": "Repro: In a project inspect nav.ribbon-tabs, then focus the 'Home' tab and press ArrowRight. (Probe: ribbonTabs.)\nActual: The nav has role=null; all 8 tab buttons have role=null and aria-selected=null (active state is only a CSS class). Focus starts on 'Home', stays on 'Home' after ArrowRight, and the active tab remains 'Home'. All tabs are still reachable one-by-one with Tab.",
       "source": "explore:keyboard:ribbon tabs lack tab semantics and arrow-key navigation",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T01:54:11Z",
-      "lastAttemptAt": "2026-11-23T01:54:11Z"
+      "lastAttemptAt": "2026-11-23T01:54:11Z",
+      "doneAt": "2026-11-23T01:55:34Z"
     },
     {
       "id": "qa-077",
@@ -1273,7 +1274,9 @@
       ],
       "hint": "Repro: Click Insert > Page break once in the demo document, then read the status bar and the --sentence-sheet-min-height CSS variable on .visual-editor-scroll.\nActual: The status bar still reads '1 page' while the 64px page-break band renders and --sentence-sheet-min-height is 2106px (2 x 1053px). Probe step 3: out.pageBreak.domImmediately={sheetMinHeight:'2106px',status:['1 page']} and the same values remain in out.pageBreak.dom.",
       "source": "explore:insert-media:status bar page count ignores inserted page breaks",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T01:56:04Z"
     },
     {
       "id": "qa-081",
