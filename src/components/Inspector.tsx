@@ -1,4 +1,5 @@
 import { ChevronDown, FileSliders, FileText, Type, UserRound, X } from "lucide-react";
+import { useEffect, useRef } from "react";
 import type { GitAuthor, ProjectSettings } from "../lib/types";
 
 interface InspectorProps {
@@ -20,15 +21,33 @@ export default function Inspector({
   onSettingsChange,
   onGitAuthorChange,
 }: InspectorProps) {
+  const closeRef = useRef<HTMLButtonElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onCloseRef.current();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      previous?.focus();
+    };
+  }, [open]);
+
   if (!open) return null;
   return (
-    <aside className="inspector">
+    <aside className="inspector" role="dialog" aria-labelledby="inspector-title">
       <header className="inspector-header">
         <div>
           <span className="eyebrow">Project</span>
-          <h2>Properties</h2>
+          <h2 id="inspector-title">Properties</h2>
         </div>
-        <button className="icon-button" type="button" onClick={onClose} aria-label="Close properties"><X size={16} /></button>
+        <button ref={closeRef} className="icon-button" type="button" onClick={onClose} aria-label="Close properties"><X size={16} /></button>
       </header>
       <div className="inspector-scroll">
         <section className="inspector-section">

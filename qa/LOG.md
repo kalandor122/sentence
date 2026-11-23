@@ -269,3 +269,4 @@ Aborting
 2026-11-23T02:55:50Z START qa-098 on qa/qa-098-a-restored-source-edited-document-is-mar: A restored source-edited document is marked dirty and silently rewritten
 2026-11-23T03:00:52Z DONE qa-098 (tsc -b, npm test, smoke all green)
 2026-11-23T03:15:58Z EXPLORE tables: 0 new items, agent exit 0
+2026-11-23T03:16:08Z START qa-099 on qa/qa-099-settings-button-is-not-activated-by-ente: Settings button is not activated by Enter when focused
