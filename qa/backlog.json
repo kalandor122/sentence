@@ -308,8 +308,9 @@
       "hint": "Repro: Inspect nav.ribbon-tabs\nActual: nav[aria-label='Ribbon tabs'] containing plain <button>s; no role=tablist/tab, no aria-selected, active state only via class",
       "source": "explore:chrome:ribbon tabs lack tablist semantics",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T00:05:30Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T00:05:30Z",
+      "lastAttemptAt": "2026-11-23T00:05:30Z"
     },
     {
       "id": "qa-020",
