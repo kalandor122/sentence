@@ -1691,8 +1691,9 @@
       "hint": "Measure the rendered block positions against the configured page height and draw page-break rules (a repeating background or absolutely positioned separators) so the user sees where pages split; derive the page count from the same measurement instead of word count. Use the settings' paperSize/margins/fontSize to compute the content height. Keep it CSS/measurement only \u2014 no full layout engine.",
       "source": "roadmap:real pagination in the visual editor",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T03:34:09Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T03:34:09Z",
+      "lastAttemptAt": "2026-11-23T03:34:09Z"
     }
   ]
 }

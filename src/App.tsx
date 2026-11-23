@@ -1180,7 +1180,7 @@ export default function App() {
 
   const words = workspace ? countWords(workspace.document) : 0;
   const [visualPages, setVisualPages] = useState<number | null>(null);
-  const pages = visualPages ?? Math.max(1, Math.ceil(words / 480));
+  const pages = visualPages ?? 1;
   const branch = workspace?.git.status.branch ?? "main";
 
   const findBar = find.open ? (
