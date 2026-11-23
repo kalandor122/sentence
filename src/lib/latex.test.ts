@@ -588,6 +588,34 @@ describe("LaTeX generation", () => {
     }
   });
 
+  it("recognizes block commands placed directly after text without a blank line", () => {
+    const source = [
+      "\\begin{document}",
+      "TIGHT paragraph before a section",
+      "\\section{TIGHT SECTION}",
+      "TIGHT section body",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\begin{tabular}{ll}",
+      "TIGHT & 9 \\\\",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    expect(parsed.content.map((node) => node.type)).toEqual([
+      "paragraph",
+      "heading",
+      "paragraph",
+      "table",
+    ]);
+    expect(parsed.content[1]?.content?.[0]?.text).toBe("TIGHT SECTION");
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\section{TIGHT SECTION}");
+    expect(exported).toContain("\\begin{tabular}{ll}");
+    expect(exported).not.toContain("\\textbackslash{}");
+  });
+
   it("keeps escaped ampersands inside table cells on import", () => {
     const source = [
       "\\begin{document}",

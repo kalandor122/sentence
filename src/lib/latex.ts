@@ -788,6 +788,16 @@ function parseListItemContent(body: string): DocumentNode[] {
   return content;
 }
 
+// A block command directly after paragraph text (no blank line) still starts a
+// new block: LaTeX treats it that way, so a missing blank line must not turn
+// \section or \begin{table} into escaped literal text.
+const BLOCK_COMMAND_START =
+  /^\s*\\(?:begin\{[a-zA-Z*]+\}|(?:section|subsection|subsubsection)\*?\{|newpage\b|tableofcontents\b|includegraphics\b|noindent\s*\\rule\b)/;
+// Commands whose whole block is the line itself, so the following line starts a
+// new block as well.
+const BLOCK_COMMAND_LINE =
+  /^\s*\\(?:(?:section|subsection|subsubsection)\*?\{|newpage\b|tableofcontents\b|includegraphics\b|noindent\s*\\rule\b)/;
+
 function splitLatexBlocks(source: string): string[] {
   const blocks: string[] = [];
   let current: string[] = [];
@@ -798,6 +808,9 @@ function splitLatexBlocks(source: string): string[] {
     current = [];
   };
   for (const line of source.split(/\r?\n/)) {
+    if (depth === 0 && current.length > 0 && BLOCK_COMMAND_START.test(line)) {
+      flush();
+    }
     if (!line.trim() && depth === 0) {
       flush();
       continue;
@@ -806,6 +819,7 @@ function splitLatexBlocks(source: string): string[] {
     for (const match of line.matchAll(/\\(begin|end)\{[a-zA-Z*]+\}/g)) {
       depth += match[1] === "begin" ? 1 : -1;
     }
+    if (depth === 0 && BLOCK_COMMAND_LINE.test(line)) flush();
   }
   flush();
   return blocks;
