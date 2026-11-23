@@ -371,10 +371,11 @@
       ],
       "hint": "Repro: Open equation dialog, click the backdrop\nActual: Dialog stays; Escape and Close work",
       "source": "explore:chrome:backdrop click does not dismiss modals",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:10:05Z",
-      "lastAttemptAt": "2026-11-23T00:10:05Z"
+      "lastAttemptAt": "2026-11-23T00:10:05Z",
+      "doneAt": "2026-11-23T00:10:39Z"
     },
     {
       "id": "qa-024",
@@ -450,7 +451,9 @@
       ],
       "hint": "Repro: Insert two citations and a footnote consecutively -> View/LaTeX\nActual: \\cite{knuth1984}\\cite{lamport1994}\\footnote{A note about the analytical engine.} with no separator; renders as [1][2]^1 | evidence: source excerpt above",
       "source": "explore:insert:adjacent inline atoms are emitted glued together",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:11:13Z"
     },
     {
       "id": "qa-029",
