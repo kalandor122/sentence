@@ -115,7 +115,9 @@
         "src/vite-env.d.ts"
       ],
       "hint": "Inject the version at build time (define in vite.config.ts from package.json) and render it, so bumping package.json cannot drift.",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-23T00:02:03Z"
     },
     {
       "id": "qa-008",
@@ -1318,10 +1320,11 @@
       ],
       "hint": "Repro: 1. Create a new project.\n2. Insert an inline equation with value `x+1` (Insert > Inline equation, type `x+1`, click Insert).\n3. Click the inserted math node in the editor; the edit dialog opens.\n4. Press Escape to close the dialog.\n5. Press Backspace (or Delete).\nActual: After Escape closes the dialog, pressing Backspace or Delete does not remove the math node; the node remains in the document. The probe observed the node still present after both Backspace and Delete following dialog dismissal.",
       "source": "explore:math:math node cannot be removed with backspace/delete after closing its edit dialog",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-23T00:00:55Z",
-      "lastAttemptAt": "2026-11-23T00:00:55Z"
+      "lastAttemptAt": "2026-11-23T00:00:55Z",
+      "doneAt": "2026-11-23T00:01:29Z"
     }
   ]
 }
