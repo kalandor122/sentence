@@ -1675,8 +1675,9 @@
       "hint": "Use the WebView's native spellchecker on the ProseMirror surface (spellcheck attribute + lang) rather than shipping a dictionary; verify it does not underline LaTeX commands in source mode (turn spellcheck off in the .tex textarea). Add a Review-tab 'Spelling' toggle that persists in settings.",
       "source": "roadmap:spell check that respects the latex source",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T03:28:43Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T03:28:43Z",
+      "lastAttemptAt": "2026-11-23T03:28:43Z"
     }
   ]
 }

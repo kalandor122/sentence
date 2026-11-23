@@ -47,6 +47,7 @@ export interface ProjectSettings {
   header: string;
   footer: string;
   lineNumbers: boolean;
+  spellcheck: boolean;
 }
 
 export interface CommentThread {
