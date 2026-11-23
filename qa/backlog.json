@@ -740,8 +740,9 @@
       "hint": "Repro: Create a project. Insert > Footnote with note `A useful note`, then Insert > Footnote with note `Second note text`, in the same paragraph.\nActual: Both `<sup class=\"footnote\">` elements display `1`; their `data-text` values differ (`A useful note`, `Second note text`) and the source contains two distinct `\\footnote{...}` commands.",
       "source": "explore:links-cites-footnotes:all footnotes render the marker 1 in the visual editor",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T01:10:12Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T01:10:12Z",
+      "lastAttemptAt": "2026-11-23T01:10:12Z"
     },
     {
       "id": "qa-047",

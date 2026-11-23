@@ -1,5 +1,6 @@
 import { Mark, Node, mergeAttributes } from "@tiptap/core";
 import Image from "@tiptap/extension-image";
+import { footnoteNodeView } from "./Footnote";
 import { katexNodeView } from "./KatexMath";
 import { tocNodeView } from "./TocBlock";
 
@@ -159,6 +160,10 @@ export const Footnote = Node.create({
     return {
       text: { default: "" },
     };
+  },
+
+  addNodeView() {
+    return footnoteNodeView();
   },
 
   parseHTML() {
