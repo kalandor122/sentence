@@ -1420,6 +1420,32 @@ button:disabled {
   cursor: pointer;
 }
 
+/* Tracked changes. Author colours are shared by document marks and review cards. */
+
+.revision-author-0 { --revision-color: #356f8c; --revision-wash: #e6f1f6; }
+.revision-author-1 { --revision-color: #86549a; --revision-wash: #f2eaf6; }
+.revision-author-2 { --revision-color: #9a641c; --revision-wash: #fbf0df; }
+.revision-author-3 { --revision-color: #3d7d5a; --revision-wash: #e8f3eb; }
+.revision-author-4 { --revision-color: #a24848; --revision-wash: #f8e9e9; }
+
+.sentence-revision-insertion {
+  color: var(--revision-color, #356f8c);
+  background: var(--revision-wash, #e6f1f6);
+  border-bottom: 1px solid currentColor;
+  border-radius: 2px;
+}
+
+.sentence-revision-deletion {
+  display: inline;
+  padding: 0 1px;
+  color: var(--revision-color, #a24848);
+  background: var(--revision-wash, #f8e9e9);
+  border-radius: 2px;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  white-space: pre-wrap;
+}
+
 /* Find and replace */
 
 .find-bar {
@@ -2119,6 +2145,25 @@ button:disabled {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.revision-bulk {
+  display: flex;
+  gap: 6px;
+  padding-bottom: 3px;
+}
+
+.revision-bulk button {
+  flex: 1;
+}
+
+.revision-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  background: var(--revision-color, #70766e);
+  border-radius: 50%;
 }
 
 .revision-card {

@@ -1,10 +1,32 @@
 import { describe, expect, it } from "vitest";
-import { documentPlainText } from "./latex";
-import { applyRejection, documentChanges, undoDocumentChanges } from "./revisions";
+import { DEFAULT_SETTINGS } from "./defaults";
+import { documentPlainText, documentToLatex } from "./latex";
+import {
+  acceptRevisions,
+  applyRejection,
+  documentChanges,
+  nodeText,
+  rejectRevisions,
+  undoDocumentChanges,
+} from "./revisions";
 import type { Revision, SentenceDocument } from "./types";
 
 function doc(text: string): SentenceDocument {
   return { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text }] }] };
+}
+
+function revision(id: string, before: SentenceDocument, after: SentenceDocument): Revision {
+  return {
+    id,
+    author: "Ada",
+    createdAt: "",
+    summary: "Tracked edit",
+    before: documentPlainText(before),
+    after: documentPlainText(after),
+    beforeDocument: before,
+    afterDocument: after,
+    accepted: false,
+  };
 }
 
 describe("undoing tracked revisions", () => {
@@ -29,23 +51,46 @@ describe("undoing tracked revisions", () => {
   it("bases the next tracked edit on the document after a rejection", () => {
     const before = doc("Baseline revision text delta-one");
     const after = doc("Baseline revision text delta-one delta-two");
-    const revision: Revision = {
-      id: "r1",
-      author: "You",
-      createdAt: "",
-      summary: "Tracked edit",
-      before: documentPlainText(before),
-      after: documentPlainText(after),
-      beforeDocument: before,
-      afterDocument: after,
-      accepted: false,
-    };
-    const { document: baseline } = applyRejection(after, revision);
+    const tracked = revision("r1", before, after);
+    const { document: baseline } = applyRejection(after, tracked);
     expect(documentPlainText(baseline)).toBe("Baseline revision text delta-one");
 
     const changes = documentChanges(baseline, doc("Baseline revision text delta-one EARLY"));
     expect(documentPlainText(undoDocumentChanges(doc("Baseline revision text delta-one EARLY LATE"), changes))).toBe(
       "Baseline revision text delta-one LATE",
     );
+  });
+});
+
+describe("reviewing tracked changes", () => {
+  it("treats an inserted block as an addition rather than a text replacement", () => {
+    const before = doc("one");
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [...before.content, doc("two").content[0]],
+    };
+    const changes = documentChanges(before, after);
+    expect(changes.some((change) => change.kind === "text" && /paragraph/.test(change.after))).toBe(false);
+    expect(changes.some((change) => change.kind === "value" && nodeText(change.after) === "two")).toBe(true);
+  });
+
+  it("rejects several changes newest first without leaving review state in the document", () => {
+    const first = doc("alpha");
+    const second = doc("alpha beta");
+    const third = doc("alpha beta gamma");
+    const revisions = [revision("r2", second, third), revision("r1", first, second)];
+    const { document, revisions: reviewed } = rejectRevisions(third, revisions, ["r2", "r1"]);
+    expect(documentPlainText(document)).toBe("alpha");
+    expect(reviewed.every((item) => item.accepted && item.rejected)).toBe(true);
+    const latex = documentToLatex(document, DEFAULT_SETTINGS);
+    expect(latex).not.toMatch(/revision|accepted|rejected|Ada/);
+  });
+
+  it("accepts only the requested changes", () => {
+    const before = doc("alpha");
+    const after = doc("alpha beta");
+    const revisions = [revision("r1", before, after), revision("r2", after, doc("alpha beta gamma"))];
+    const reviewed = acceptRevisions(revisions, ["r2"]);
+    expect(reviewed.map((item) => item.accepted)).toEqual([false, true]);
   });
 });

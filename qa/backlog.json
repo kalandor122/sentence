@@ -1755,8 +1755,9 @@
       "hint": "Show insertions and deletions inline in the visual editor (marks with author colours), a Review-tab toggle for tracking, and per-change accept/reject plus accept-all/reject-all in the History panel. Review state must never leak into the exported LaTeX.",
       "source": "roadmap:track changes ui",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T04:05:57Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T04:05:57Z",
+      "lastAttemptAt": "2026-11-23T04:05:57Z"
     }
   ]
 }

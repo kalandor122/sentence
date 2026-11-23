@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BookMarked,
+  CheckCheck,
   CheckCircle2,
   Circle,
   GitCommitHorizontal,
@@ -11,12 +12,14 @@ import {
   Search,
   Trash2,
   Undo2,
+  XCircle,
 } from "lucide-react";
 import {
   parseBibliography,
   removeBibliographyEntry,
   type BibliographyEntry,
 } from "../lib/bibliography";
+import { pendingRevisions, revisionAuthorClass } from "../lib/revisions";
 import type {
   CommentThread,
   DocumentNode,
@@ -189,6 +192,71 @@ function CommentThreadCard({
   );
 }
 
+interface RevisionListProps {
+  revisions: Revision[];
+  onAccept: (id: string) => void;
+  onReject: (id: string) => void;
+  onAcceptAll: () => void;
+  onRejectAll: () => void;
+}
+
+function RevisionList({
+  revisions,
+  onAccept,
+  onReject,
+  onAcceptAll,
+  onRejectAll,
+}: RevisionListProps) {
+  return (
+    <div className="revision-list">
+      <header className="revision-heading">
+        <span>Tracked changes</span>
+        <b aria-live="polite">{revisions.length}</b>
+      </header>
+      {revisions.length > 0 ? (
+        <div className="revision-bulk" role="group" aria-label="Review all tracked changes">
+          <button type="button" className="secondary-button small" onClick={onAcceptAll} aria-label="Accept all tracked changes">
+            <CheckCheck size={12} /> Accept all
+          </button>
+          <button type="button" className="secondary-button small" onClick={onRejectAll} aria-label="Reject all tracked changes">
+            <XCircle size={12} /> Reject all
+          </button>
+        </div>
+      ) : (
+        <p className="panel-empty">Edits made with Tracking on appear here for review.</p>
+      )}
+      {revisions.map((revision) => (
+        <article className={`revision-card ${revisionAuthorClass(revision.author)}`} key={revision.id}>
+          <header>
+            <strong><span className="revision-dot" aria-hidden="true" />{revision.author}</strong>
+            <small>{new Date(revision.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small>
+          </header>
+          <p className="revision-before">{revision.before.slice(-180) || "Empty document"}</p>
+          <p className="revision-after">{revision.after.slice(-180)}</p>
+          <div role="group" aria-label={`Review change by ${revision.author}`}>
+            <button
+              type="button"
+              className="accent-button small"
+              onClick={() => onAccept(revision.id)}
+              aria-label={`Accept change by ${revision.author}`}
+            >
+              Accept
+            </button>
+            <button
+              type="button"
+              className="secondary-button small"
+              onClick={() => onReject(revision.id)}
+              aria-label={`Reject change by ${revision.author}`}
+            >
+              Reject
+            </button>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 interface ReferencesPanelProps {
   bibliography: string;
   onChange: (value: string) => void;
@@ -314,6 +382,8 @@ interface SidebarProps {
   onAddReply: (id: string, body: string) => void;
   onAcceptRevision: (id: string) => void;
   onRejectRevision: (id: string) => void;
+  onAcceptAllRevisions: () => void;
+  onRejectAllRevisions: () => void;
 }
 
 export default function Sidebar({
@@ -338,10 +408,12 @@ export default function Sidebar({
   onAddReply,
   onAcceptRevision,
   onRejectRevision,
+  onAcceptAllRevisions,
+  onRejectAllRevisions,
 }: SidebarProps) {
   const headings = headingEntries(document);
   const unresolved = comments.filter((thread) => !thread.resolved);
-  const pendingRevisions = revisions.filter((revision) => !revision.accepted && !revision.rejected);
+  const pending = pendingRevisions(revisions);
   const bibliographyCount = useMemo(() => parseBibliography(bibliography).length, [bibliography]);
 
   if (!open) return null;
@@ -365,6 +437,7 @@ export default function Sidebar({
         <button type="button" className={panel === "history" ? "active" : ""} onClick={() => onPanelChange("history")}>
           <GitCommitHorizontal size={18} />
           <span>History</span>
+          {pending.length > 0 ? <b>{pending.length}</b> : null}
         </button>
       </nav>
       <section className="sidebar-panel">
@@ -418,28 +491,6 @@ export default function Sidebar({
                 />
               ))}
             </div>
-            {pendingRevisions.length > 0 ? (
-              <div className="revision-list">
-                <header className="revision-heading">
-                  <span>Tracked edits</span>
-                  <b>{pendingRevisions.length}</b>
-                </header>
-                {pendingRevisions.map((revision) => (
-                  <article className="revision-card" key={revision.id}>
-                    <header>
-                      <strong>{revision.author}</strong>
-                      <small>{new Date(revision.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small>
-                    </header>
-                    <p className="revision-before">{revision.before.slice(-180) || "Empty document"}</p>
-                    <p className="revision-after">{revision.after.slice(-180)}</p>
-                    <div>
-                      <button type="button" className="accent-button" onClick={() => onAcceptRevision(revision.id)}>Accept</button>
-                      <button type="button" className="secondary-button" onClick={() => onRejectRevision(revision.id)}>Reject</button>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            ) : null}
           </>
         ) : null}
 
@@ -476,6 +527,13 @@ export default function Sidebar({
                 </div>
               ))}
             </div>
+            <RevisionList
+              revisions={pending}
+              onAccept={onAcceptRevision}
+              onReject={onRejectRevision}
+              onAcceptAll={onAcceptAllRevisions}
+              onRejectAll={onRejectAllRevisions}
+            />
           </>
         ) : null}
       </section>

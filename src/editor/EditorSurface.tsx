@@ -22,6 +22,7 @@ import { FindHighlight } from "./find";
 import { changeIndent } from "./indent";
 import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
 import { pageBreakFill, pageCountFromBottom, pageGeometry } from "./pagination";
+import { RevisionMarks, setRevisionMarks } from "./revisions";
 import {
   ColorMark,
   FontFamilyMark,
@@ -31,6 +32,7 @@ import {
 import type {
   CommentThread,
   ProjectSettings,
+  Revision,
   SentenceDocument,
 } from "../lib/types";
 
@@ -38,6 +40,7 @@ interface EditorSurfaceProps {
   document: SentenceDocument;
   settings: ProjectSettings;
   comments: CommentThread[];
+  revisions: Revision[];
   editable?: boolean;
   onUpdate: (document: SentenceDocument) => void;
   onReady: (editor: Editor | null) => void;
@@ -107,6 +110,7 @@ export default function EditorSurface({
   document,
   settings,
   comments,
+  revisions,
   editable = true,
   onUpdate,
   onReady,
@@ -168,6 +172,7 @@ export default function EditorSurface({
       TableOfContents,
       CommentMark,
       FindHighlight,
+      RevisionMarks,
       LineSpacing,
       TabIndent,
     ],
@@ -230,6 +235,11 @@ export default function EditorSurface({
   useEffect(() => {
     editor?.commands.setMeta("comments", comments);
   }, [comments, editor]);
+
+  useEffect(() => {
+    if (!editor) return;
+    setRevisionMarks(editor, revisions);
+  }, [editor, revisions]);
 
   useEffect(() => {
     if (!editor) return;

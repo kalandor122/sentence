@@ -1,14 +1,18 @@
+import { documentPlainText } from "./latex";
 import type { Revision, SentenceDocument } from "./types";
 
 type Path = (string | number)[];
 
-interface TextChange {
+export interface TextChange {
   kind: "text";
   path: Path;
   prefix: string;
   removed: string;
   inserted: string;
   suffix: string;
+  // Kept verbatim: prefix + suffix can overlap for pure deletions, so the
+  // changed text must not be reconstructed from the other fields.
+  after: string;
 }
 
 interface ValueChange {
@@ -18,7 +22,7 @@ interface ValueChange {
   after: unknown;
 }
 
-type Change = TextChange | ValueChange;
+export type Change = TextChange | ValueChange;
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -42,7 +46,7 @@ function textChange(path: Path, before: string, after: string): Change[] {
   const removed = before.slice(prefix, before.length - suffix);
   const inserted = after.slice(prefix, after.length - suffix);
   if (!removed && !inserted) return [];
-  return [{ kind: "text", path, prefix: prefixText, removed, inserted, suffix: suffixText }];
+  return [{ kind: "text", path, prefix: prefixText, removed, inserted, suffix: suffixText, after }];
 }
 
 function changesBetween(before: unknown, after: unknown, path: Path): Change[] {
@@ -52,8 +56,32 @@ function changesBetween(before: unknown, after: unknown, path: Path): Change[] {
   }
   if (Array.isArray(before) && Array.isArray(after)) {
     const changes: Change[] = [];
-    for (let index = 0; index < Math.max(before.length, after.length); index += 1) {
-      changes.push(...changesBetween(before[index], after[index], [...path, index]));
+    // Align unchanged items first. Comparing by raw index reports a bogus text
+    // replacement when a paragraph is inserted ahead of another block.
+    const matchedBefore = new Set<number>();
+    const matchedAfter = new Set<number>();
+    after.forEach((item, index) => {
+      const found = before.findIndex((candidate, beforeIndex) =>
+        !matchedBefore.has(beforeIndex) && equalValue(candidate, item));
+      if (found >= 0) {
+        matchedBefore.add(found);
+        matchedAfter.add(index);
+      }
+    });
+    const remainingBefore = before.map((_, index) => index).filter((index) => !matchedBefore.has(index));
+    const remainingAfter = after.map((_, index) => index).filter((index) => !matchedAfter.has(index));
+    for (let position = 0; position < Math.max(remainingBefore.length, remainingAfter.length); position += 1) {
+      const beforeIndex = remainingBefore[position];
+      const afterIndex = remainingAfter[position];
+      const left = beforeIndex === undefined ? undefined : before[beforeIndex];
+      const right = afterIndex === undefined ? undefined : after[afterIndex];
+      const index = afterIndex ?? beforeIndex ?? position;
+      if (isObject(left) && isObject(right) && left.type !== right.type) {
+        changes.push({ kind: "value", path: [...path, index], before: left, after: undefined });
+        changes.push({ kind: "value", path: [...path, index], before: undefined, after: right });
+      } else {
+        changes.push(...changesBetween(left, right, [...path, index]));
+      }
     }
     return changes;
   }
@@ -176,4 +204,87 @@ export function undoDocumentChanges(document: SentenceDocument, changes: Change[
 export function applyRejection(document: SentenceDocument, revision: Revision): { document: SentenceDocument; changes: Change[] } {
   const changes = documentChanges(revision.beforeDocument ?? document, revision.afterDocument ?? document);
   return { document: undoDocumentChanges(document, changes), changes };
+}
+
+export function revisionChanges(revision: Revision): Change[] {
+  if (!revision.beforeDocument || !revision.afterDocument) return [];
+  return documentChanges(revision.beforeDocument, revision.afterDocument);
+}
+
+export function pendingRevisions(revisions: Revision[]): Revision[] {
+  return revisions.filter((revision) => !revision.accepted && !revision.rejected);
+}
+
+export function acceptRevisions(revisions: Revision[], ids: string[]): Revision[] {
+  const targets = new Set(ids);
+  return revisions.map((revision) =>
+    targets.has(revision.id) && !revision.accepted && !revision.rejected
+      ? { ...revision, accepted: true }
+      : revision,
+  );
+}
+
+// Process newest first: each rejection rewrites the remaining revisions'
+// snapshots, so older changes must still be locatable in the resulting text.
+export function rejectRevisions(
+  document: SentenceDocument,
+  revisions: Revision[],
+  ids: string[],
+): { document: SentenceDocument; revisions: Revision[] } {
+  let nextDocument = document;
+  let nextRevisions = revisions;
+  for (const id of ids) {
+    const revision = nextRevisions.find((item) => item.id === id);
+    if (!revision || revision.accepted || revision.rejected) continue;
+    const { document: undone, changes } = applyRejection(nextDocument, revision);
+    nextDocument = undone;
+    nextRevisions = nextRevisions.map((item) => {
+      if (item.id === id) return { ...item, accepted: true, rejected: true };
+      if (!item.beforeDocument || !item.afterDocument) return item;
+      const beforeDocument = undoDocumentChanges(item.beforeDocument, changes);
+      const afterDocument = undoDocumentChanges(item.afterDocument, changes);
+      return {
+        ...item,
+        before: documentPlainText(beforeDocument),
+        after: documentPlainText(afterDocument),
+        beforeDocument,
+        afterDocument,
+      };
+    });
+  }
+  return { document: nextDocument, revisions: nextRevisions };
+}
+
+export function revisionAuthorClass(author: string): string {
+  let hash = 0;
+  for (let index = 0; index < author.length; index += 1) {
+    hash = (hash * 31 + author.charCodeAt(index)) % 5;
+  }
+  return `revision-author-${hash}`;
+}
+
+export function nodeText(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) return value.map(nodeText).join("\n");
+  if (isObject(value)) {
+    if (typeof value.text === "string") return value.text;
+    if (Array.isArray(value.content)) return nodeText(value.content);
+  }
+  return "";
+}
+
+// A removed node has no position in the current document, so give the editor
+// surrounding text it can still use to place the strike-through inline.
+export function deletionAnchor(revision: Revision, change: Change): { text: string; prefix: string; suffix: string } | null {
+  if (change.kind !== "value" || change.before === undefined || change.after !== undefined || !revision.beforeDocument) return null;
+  const text = nodeText(change.before);
+  if (!text) return null;
+  const parent = getAt(revision.beforeDocument, change.path.slice(0, -1));
+  const key = change.path[change.path.length - 1];
+  if (!Array.isArray(parent) || typeof key !== "number") return null;
+  return {
+    text,
+    prefix: nodeText(parent.slice(0, key)).trim(),
+    suffix: nodeText(parent.slice(key + 1)).trim(),
+  };
 }
