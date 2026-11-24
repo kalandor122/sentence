@@ -375,3 +375,4 @@ Aborting
 2026-11-24T17:24:52Z DONE qa-132 (tsc -b, npm test, smoke all green)
 2026-11-24T17:40:05Z EXPLORE persistence: 1 new items, agent exit 0
 2026-11-24T17:40:20Z START qa-134 on qa/qa-134-visual-edits-are-never-saved-while-an-in: Visual edits are never saved while an invalid LaTeX draft is left in the hidden source pane, and are lost on reload
+2026-11-24T17:44:45Z DONE qa-134 (tsc -b, npm test, smoke all green)
