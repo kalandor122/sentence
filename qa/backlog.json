@@ -2408,10 +2408,11 @@
       ],
       "hint": "Repro: Create a project. At the end of the last paragraph press Enter, type `Footnotes `, then Insert > Footnote, enter `First note` and Insert, then repeat with `Second note`. Double-click the `2` marker on the page, then type `Z`.\nActual: Double-clicking only selects the atom: no dialog and no inline input appear, and the marker is `contenteditable=false`. Typing `Z` replaces the selected footnote with body text; the page becomes `Footnotes 1Z` and the exported LaTeX loses `\\footnote{Second note}` (`Footnotes \\footnote{First note}Z`).",
       "source": "explore:links-cites-footnotes:footnote text cannot be edited in the visual editor; typing over the marker deletes the note",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T21:02:06Z",
-      "lastAttemptAt": "2026-11-24T21:02:06Z"
+      "lastAttemptAt": "2026-11-24T21:02:06Z",
+      "doneAt": "2026-11-24T21:05:49Z"
     },
     {
       "id": "qa-152",
@@ -2423,7 +2424,9 @@
       ],
       "hint": "Repro: Create a project. Click the last paragraph, press Ctrl+End, Enter and type `End marker`. Open View > LaTeX, then View > Visual. Without clicking in the page, open References > Insert citation and click Cite; then Insert > Footnote with `Note after round trip`; then References > Cross-reference with `sec:after-roundtrip`. Open View > LaTeX.\nActual: All three nodes are inserted at position 0, inside the `Introduction` heading. The page begins `[sentence2026]1ref: sec:after-roundtripIntroduction` and the exported source contains `\\section{\\cite{sentence2026}\\footnote{Note after round trip}\\ref{sec:after-roundtrip}Introduction}`, while `End marker` remains unchanged at the end.",
       "source": "explore:links-cites-footnotes:inserting a citation, footnote or cross-reference after a latex round-trip puts it inside the title heading",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T21:06:25Z"
     },
     {
       "id": "qa-153",
