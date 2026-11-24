@@ -441,3 +441,7 @@ Aborting
 2026-11-24T21:37:03Z PUSHED main
 2026-11-24T21:37:03Z DONE qa-157 (tsc -b, npm test, smoke all green)
 2026-11-24T21:37:37Z START qa-158 on qa/qa-158-rejecting-a-tracked-insertion-of-a-new-p: Rejecting a tracked insertion of a new paragraph leaves an empty paragraph behind
+2026-11-24T21:42:11Z PUSHED main
+2026-11-24T21:42:11Z DONE qa-158 (tsc -b, npm test, smoke all green)
+2026-11-24T21:42:46Z RECOVERED qa-121 (in_progress for 1917 min)
+2026-11-24T21:42:46Z RECOVERED qa-127 (in_progress for 1449 min)
