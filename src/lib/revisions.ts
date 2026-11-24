@@ -200,6 +200,25 @@ export function trackedText(document: SentenceDocument): string {
   return (document.content ?? []).map(visit).join("");
 }
 
+// Structural edits need their own signature: splitting a paragraph or adding an
+// empty one leaves the joined text unchanged ("Only paragraph" is the same
+// characters as "Only" + " paragraph"), so a text-only comparison would fold the
+// block change into the next revision's baseline and rejecting that revision
+// would leave the empty block behind. Marks and attributes stay out of the
+// comparison so a comment or formatting change is still not a tracked edit.
+export function trackedShape(document: SentenceDocument): string {
+  const visit = (node: DocumentNode): string => {
+    if (typeof node.text === "string") return node.text;
+    if (node.type === "hardBreak") return "\n";
+    if (node.type === "footnote") {
+      const text = node.attrs?.text;
+      return typeof text === "string" ? text : "";
+    }
+    return `${node.type}{${(node.content ?? []).map(visit).join("")}}`;
+  };
+  return (document.content ?? []).map(visit).join("");
+}
+
 export function documentChanges(before: SentenceDocument, after: SentenceDocument): Change[] {
   return changesBetween(before, after, []);
 }

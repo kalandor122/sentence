@@ -2514,8 +2514,9 @@
       "hint": "Repro: 1. In a fresh document type 'Only paragraph'. 2. Review tab > Track changes. 3. Put the caret at the end, press Enter, type 'Second paragraph', and wait 2.3 s for the revision card. 4. Open History and click Reject on the card whose before text is 'Only paragraph' and after text is 'Only paragraph Second paragraph'.\nActual: The revision card disappears and 'Second paragraph' is removed, but the document keeps a second, empty paragraph with the 'Begin with a sentence...' placeholder. The probe read the editor HTML ('<p>Only paragraph</p><p ... is-empty><br></p>') and the saved workspace document, which still contains two paragraph nodes, the second with no content.",
       "source": "explore:review:rejecting a tracked insertion of a new paragraph leaves an empty paragraph behind",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T21:37:37Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T21:37:37Z",
+      "lastAttemptAt": "2026-11-24T21:37:37Z"
     },
     {
       "id": "qa-159",
