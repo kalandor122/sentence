@@ -2200,10 +2200,61 @@
       ],
       "hint": "Repro: On the Home ribbon tab, Tab to the 'Text color' button, press Enter to open the swatch popover, then press Escape.\nActual: The .color-popover is still open after Escape and focus remains on the 'Text color' trigger; nothing else closes it except toggling the trigger or clicking the backdrop.",
       "source": "explore:keyboard:escape does not close the text color popover",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T18:28:43Z",
-      "lastAttemptAt": "2026-11-24T18:28:43Z"
+      "lastAttemptAt": "2026-11-24T18:28:43Z",
+      "doneAt": "2026-11-24T18:29:54Z"
+    },
+    {
+      "id": "qa-139",
+      "title": "Page furniture and block images inserted in a table cell disappear from the exported LaTeX",
+      "why": "Exploratory pass on insert-media (functional): expected Either the commands are disabled inside table cells, or the inserted contents/page-break/figure are exported inside the cell (\\tableofcontents, \\newpage, \\includegraphics).",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the demo document click Insert > Insert table. Click an empty body cell and click References > Table of contents. Click a second empty body cell and click Insert > Page break. Click a third empty body cell, click Insert > Image and supply any PNG through the hidden file input. Compare the visual page with View > LaTeX.\nActual: The cells visibly contain nav[data-toc], div[data-page-break] and img (probe cell counts toc=1, breaks=1, images=1), but the exported document body has \\tableofcontents count 0, \\newpage count 0 and \\includegraphics count 0, and the tabular rows contain only empty cells. Nothing warns that the content will be missing from the PDF. The page break also stretches its cell to 752px tall in the visual page. Probe qa/probes/insert-media.mjs scenario blockMediaInTableCell.",
+      "source": "explore:insert-media:page furniture and block images inserted in a table cell disappear from the exported latex",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T18:43:56Z"
+    },
+    {
+      "id": "qa-140",
+      "title": "Typing after inserting an image, page break or table of contents replaces the just-inserted block",
+      "why": "Exploratory pass on insert-media (functional): expected The inserted page break/figure/contents block stays in the document and typing continues after it; a second media command adds a second item instead of replacing the first.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Type 'Alpha.' at the end of a paragraph. Click Insert > Page break, then type 'Bravo.' without clicking back into the page. Repeat with Insert > Image (supply a PNG through the hidden file input) then typing, and with References > Table of contents then typing. Also click Insert > Page break followed immediately by Insert > Image, and Insert > Image followed immediately by Insert > Page break.\nActual: The inserted atom keeps a ProseMirror node selection (probe selectedAtoms=1). Typing one character replaces it: the page break count goes 1 -> 0, \\newpage 1 -> 0 and the page count 2 -> 1; the image count goes 1 -> 0 and \\includegraphics 1 -> 0; the contents block count goes 1 -> 0 and \\tableofcontents 1 -> 0. Inserting an image after a page break leaves only the image (\\newpage 0), and inserting a page break after an image leaves only the break (\\includegraphics 0). Probe qa/probes/insert-media.mjs scenario insertThenTypeOrInsert.",
+      "source": "explore:insert-media:typing after inserting an image, page break or table of contents replaces the just-inserted block",
+      "status": "open"
+    },
+    {
+      "id": "qa-141",
+      "title": "Applying the LaTeX source turns an inserted image into a broken image",
+      "why": "Exploratory pass on insert-media (visual): expected The image keeps rendering after the visual document is synchronised from LaTeX, or the app reports that the asset cannot be loaded.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Type 'Caption target paragraph.', click Insert > Image and supply a PNG through the hidden file input. Switch to View > LaTeX, press Ctrl+End, type a space and press Backspace so Apply source becomes enabled, click Apply source, then View > Visual.\nActual: Before Apply the img has a data: src and naturalWidth/Height 1x1. After Apply its src is the relative path 'assets/images/qa-image--1.png' with naturalWidth/Height 0x0, so the page shows the browser's broken-image box with the alt text, while the toast says 'Visual document synchronized from LaTeX.' No warning is shown. Probe qa/probes/insert-media.mjs scenario blockImageSourceRoundTrip (screenshot qa/shots/probe-insert-media-image-after-apply.png).",
+      "source": "explore:insert-media:applying the latex source turns an inserted image into a broken image",
+      "status": "open"
+    },
+    {
+      "id": "qa-142",
+      "title": "Exported figure captions use the file name and are invisible in the visual editor",
+      "why": "Exploratory pass on insert-media (content): expected The caption that will appear in the PDF is shown under the figure in the visual editor (and is editable), or no caption is generated at all.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Type a paragraph, click Insert > Image and supply a file named 'qa image #1.png' through the hidden file input. Read the visual page, then switch to View > LaTeX.\nActual: The visual page renders only img (no caption element or caption text). The exported LaTeX adds \\caption{qa image \\#1.png}, so the PDF will show the raw file name as a caption that the user never saw or edited. Probe qa/probes/insert-media.mjs scenario blockImageSourceRoundTrip.",
+      "source": "explore:insert-media:exported figure captions use the file name and are invisible in the visual editor",
+      "status": "open"
     }
   ]
 }
