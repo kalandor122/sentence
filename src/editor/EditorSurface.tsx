@@ -409,12 +409,22 @@ export default function EditorSurface({
           const block = blocks[index];
           if (!(block instanceof HTMLElement) || block.hasAttribute("data-page-break")) continue;
           const top = offsetWithin(block, sheet);
-          const boundary = pageBoundaryWithin(top, top + block.offsetHeight, geometry);
-          if (boundary === null || block.offsetHeight > geometry.contentHeight) continue;
+          // A nudge is padding, so it moves the content but not the border box.
+          // Measure the content box: otherwise a shifted block still straddles
+          // the same rule and collects another shift on every pass.
+          const padding = parseFloat(getComputedStyle(block).paddingTop) || 0;
+          const contentTop = top + padding;
+          const contentHeight = block.offsetHeight - padding;
+          const boundary = pageBoundaryWithin(
+            contentTop,
+            contentTop + contentHeight,
+            geometry,
+          );
+          if (boundary === null || contentHeight > geometry.contentHeight) continue;
           let shift: number;
           if (/^H[1-3]$/.test(block.tagName)) {
             // A heading on a rule reads as a strikethrough; start it on the next page.
-            shift = boundary + geometry.margin - top;
+            shift = boundary + geometry.margin - contentTop;
           } else {
             const boxes = lineBoxes(block, zoom);
             const line = boxes.findIndex(
@@ -425,7 +435,7 @@ export default function EditorSurface({
             // rules are painted with; the line gap is wider than this.
             shift =
               line === 0
-                ? boundary + geometry.margin - top
+                ? boundary + geometry.margin - contentTop
                 : boundary + 4 - top - boxes[line].top;
           }
           if (shift <= 0) continue;

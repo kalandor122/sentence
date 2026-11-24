@@ -465,3 +465,4 @@ Aborting
 2026-11-24T22:36:56Z PUSHED main
 2026-11-24T22:36:56Z DONE qa-163 (tsc -b, npm test, smoke all green)
 2026-11-24T23:00:13Z EXPLORE long-document: 2 new items, agent exit 0
+2026-11-24T23:00:27Z START qa-170 on qa/qa-170-a-heading-at-a-page-boundary-is-pushed-t: A heading at a page boundary is pushed to the bottom of a nearly blank page
