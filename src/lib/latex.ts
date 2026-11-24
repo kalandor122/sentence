@@ -680,7 +680,7 @@ function parseInline(source: string): InlineParseResult {
       }
     }
 
-    const markMatch = remainder.match(/^\\(textbf|textit|underline|sout|texttt|textsuperscript|textsubscript)\{/);
+    const markMatch = remainder.match(/^\\(textbf|textit|emph|underline|sout|texttt|textsuperscript|textsubscript)\{/);
     if (markMatch) {
       flush();
       const command = markMatch[1];
@@ -697,6 +697,7 @@ function parseInline(source: string): InlineParseResult {
       const markType: Record<string, string> = {
         textbf: "bold",
         textit: "italic",
+        emph: "italic",
         underline: "underline",
         sout: "strike",
         texttt: "code",
