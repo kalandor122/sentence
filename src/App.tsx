@@ -62,6 +62,7 @@ import {
   hasCitations,
   imageAssetPath,
   latexToDocument,
+  restoreImageSources,
 } from "./lib/latex";
 import {
   acceptRevisions,
@@ -293,7 +294,11 @@ function documentSource(document: SentenceDocument, settings: ProjectSettings): 
 function parseSourceDocument(document: SentenceDocument, source: string, settings: ProjectSettings) {
   const parsed = latexToDocument(source, settings);
   const restored = restoreCommentMarks(parsed.document, commentAnchors(document));
-  return { ...parsed, document: restored.document, detached: restored.detached };
+  return {
+    ...parsed,
+    document: restoreImageSources(restored.document, document),
+    detached: restored.detached,
+  };
 }
 
 function downloadTextFile(fileName: string, content: string, mime: string): void {

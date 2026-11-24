@@ -65,6 +65,50 @@ export function hasCitations(document: SentenceDocument): boolean {
   return nodesContainCitations(document.content);
 }
 
+// LaTeX refers to images by project-relative path, which the browser cannot
+// load on its own. The visual document already holds a renderable source (a
+// data URL or an asset URL) for every image it shows, so carry that source
+// across a source synchronization instead of replacing it with the path.
+export function restoreImageSources(
+  document: SentenceDocument,
+  previous: SentenceDocument,
+): SentenceDocument {
+  const sources = new Map<string, { src: string; path: string | null }>();
+  const collect = (nodes: DocumentNode[] | undefined) => {
+    for (const node of nodes ?? []) {
+      if (node.type === "image" || node.type === "inlineImage") {
+        const src = attribute(node, "src");
+        const path = attribute(node, "path");
+        if (src) {
+          for (const key of [path, src]) {
+            if (key) sources.set(key, { src, path });
+          }
+        }
+      }
+      collect(node.content);
+    }
+  };
+  collect(previous.content);
+  if (sources.size === 0) return document;
+  const restore = (nodes: DocumentNode[]): DocumentNode[] =>
+    nodes.map((node) => {
+      const restored = node.content ? { ...node, content: restore(node.content) } : node;
+      if (node.type !== "image" && node.type !== "inlineImage") return restored;
+      const key = attribute(node, "path") ?? attribute(node, "src");
+      const source = key ? sources.get(key) : undefined;
+      if (!source) return restored;
+      return {
+        ...restored,
+        attrs: {
+          ...node.attrs,
+          src: source.src,
+          ...(source.path ? { path: source.path } : {}),
+        },
+      };
+    });
+  return { ...document, content: restore(document.content) };
+}
+
 function plainText(nodes: DocumentNode[] | undefined): string {
   return (nodes ?? [])
     .map((node) => node.text ?? plainText(node.content))

@@ -6,6 +6,7 @@ import {
   documentToLatex,
   escapeLatex,
   latexToDocument,
+  restoreImageSources,
 } from "./latex";
 import type { DocumentNode, ProjectSettings, SentenceDocument } from "./types";
 
@@ -1238,6 +1239,60 @@ describe("LaTeX generation", () => {
     expect(image?.attrs?.path).toBe("assets/images/mid-paragraph.png");
     expect(image?.attrs?.alt).toBe("mid paragraph.png");
     expect(documentToLatex(parsed.document, settings)).toBe(latex);
+  });
+
+  it("keeps a renderable source when a document is synchronized from LaTeX", () => {
+    const previous: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "image",
+          attrs: {
+            src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==",
+            path: "assets/images/qa-image--1.png",
+            alt: "qa image #1.png",
+          },
+        },
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "Mid " },
+            {
+              type: "inlineImage",
+              attrs: {
+                src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==",
+                path: "assets/images/mid.png",
+                alt: "mid.png",
+              },
+            },
+          ],
+        },
+      ],
+    };
+    const parsed = latexToDocument(documentToLatex(previous, settings), DEFAULT_SETTINGS);
+    expect(parsed.document.content[0].attrs?.src).toBe("assets/images/qa-image--1.png");
+    const paragraph = parsed.document.content[1];
+    expect(paragraph.content?.[1].attrs?.src).toBe("assets/images/mid.png");
+
+    const restored = restoreImageSources(parsed.document, previous);
+    expect(restored.content[0].attrs?.src).toBe("data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==");
+    expect(restored.content[1].content?.[1].attrs?.src).toBe(
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==",
+    );
+    // The paths that LaTeX and the export pipeline rely on stay untouched.
+    expect(restored.content[0].attrs?.path).toBe("assets/images/qa-image--1.png");
+    expect(restored.content[1].content?.[1].attrs?.path).toBe("assets/images/mid.png");
+
+    // A second synchronization starts from the restored document, so the
+    // source paths still have to resolve to the same rendered images.
+    const second = restoreImageSources(
+      latexToDocument(documentToLatex(restored, settings), DEFAULT_SETTINGS).document,
+      restored,
+    );
+    expect(second.content[0].attrs?.src).toBe("data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==");
+    expect(second.content[1].content?.[1].attrs?.src).toBe(
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==",
+    );
   });
 });
 

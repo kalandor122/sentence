@@ -2249,8 +2249,9 @@
       "hint": "Repro: Type 'Caption target paragraph.', click Insert > Image and supply a PNG through the hidden file input. Switch to View > LaTeX, press Ctrl+End, type a space and press Backspace so Apply source becomes enabled, click Apply source, then View > Visual.\nActual: Before Apply the img has a data: src and naturalWidth/Height 1x1. After Apply its src is the relative path 'assets/images/qa-image--1.png' with naturalWidth/Height 0x0, so the page shows the browser's broken-image box with the alt text, while the toast says 'Visual document synchronized from LaTeX.' No warning is shown. Probe qa/probes/insert-media.mjs scenario blockImageSourceRoundTrip (screenshot qa/shots/probe-insert-media-image-after-apply.png).",
       "source": "explore:insert-media:applying the latex source turns an inserted image into a broken image",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T18:55:32Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T18:55:32Z",
+      "lastAttemptAt": "2026-11-24T18:55:32Z"
     },
     {
       "id": "qa-142",
