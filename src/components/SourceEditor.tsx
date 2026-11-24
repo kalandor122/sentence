@@ -6,6 +6,7 @@ interface SourceEditorProps {
   activeLine?: number;
   readOnly?: boolean;
   textareaRef?: RefObject<HTMLTextAreaElement | null>;
+  historyRef?: RefObject<SourceHistory | null>;
 }
 
 interface HistoryEntry {
@@ -13,6 +14,13 @@ interface HistoryEntry {
   selectionStart: number;
   selectionEnd: number;
   inputType: string;
+}
+
+export interface SourceHistory {
+  entries: HistoryEntry[];
+  index: number;
+  selectionStart: number;
+  selectionEnd: number;
 }
 
 interface PendingEdit {
@@ -28,16 +36,38 @@ export default function SourceEditor({
   activeLine,
   readOnly = false,
   textareaRef,
+  historyRef,
 }: SourceEditorProps) {
   const localTextarea = useRef<HTMLTextAreaElement>(null);
   const textarea = textareaRef ?? localTextarea;
   const initialValue = useRef(value);
   const gutter = useRef<HTMLDivElement>(null);
   const lines = useMemo(() => value.split("\n").length, [value]);
-  const history = useRef<{ entries: HistoryEntry[]; index: number }>({
-    entries: [{ value: initialValue.current, selectionStart: 0, selectionEnd: 0, inputType: "external" }],
-    index: 0,
-  });
+  // The source column unmounts when the view switches to visual or split, so a
+  // stack kept only in this component would be dropped on the way back. Restore
+  // the saved one (and the caret) when the text it edits is still the same.
+  const initial = useRef<{ history: { entries: HistoryEntry[]; index: number }; selection: { start: number; end: number } | null }>(null);
+  if (initial.current === null) {
+    const saved = historyRef?.current;
+    initial.current = saved && saved.entries[saved.index]?.value === value
+      ? {
+        history: { entries: saved.entries.map((entry) => ({ ...entry })), index: saved.index },
+        selection: {
+          start: Math.min(saved.selectionStart, value.length),
+          end: Math.min(saved.selectionEnd, value.length),
+        },
+      }
+      : {
+        history: {
+          entries: [{ value: initialValue.current, selectionStart: 0, selectionEnd: 0, inputType: "external" }],
+          index: 0,
+        },
+        selection: null,
+      };
+  }
+  const history = useRef(initial.current.history);
+  const caret = useRef({ start: initial.current.selection?.start ?? 0, end: initial.current.selection?.end ?? 0 });
+  const restoredSelection = useRef(initial.current.selection);
   const pending = useRef<PendingEdit | null>(null);
   const onChangeRef = useRef(onChange);
   const actions = useRef({ undo: () => {}, redo: () => {} });
@@ -45,6 +75,17 @@ export default function SourceEditor({
   useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
+
+  useEffect(() => () => {
+    if (historyRef) {
+      historyRef.current = {
+        entries: history.current.entries.map((entry) => ({ ...entry })),
+        index: history.current.index,
+        selectionStart: caret.current.start,
+        selectionEnd: caret.current.end,
+      };
+    }
+  }, [historyRef]);
 
   const resetHistory = (nextValue: string, selectionStart: number, selectionEnd: number) => {
     history.current = {
@@ -60,6 +101,7 @@ export default function SourceEditor({
     history.current.index = index;
     node.value = entry.value;
     node.setSelectionRange(entry.selectionStart, entry.selectionEnd);
+    caret.current = { start: entry.selectionStart, end: entry.selectionEnd };
     onChangeRef.current(entry.value);
   };
 
@@ -98,7 +140,14 @@ export default function SourceEditor({
     const onInput = () => {
       const edit = pending.current;
       pending.current = null;
-      if (!edit || edit.value === node.value) return;
+      caret.current = { start: node.selectionStart, end: node.selectionEnd };
+      if (!edit) {
+        // The text was replaced without a beforeinput of our own (paste via the
+        // DOM, autofill, script): that is not an edit step, so start over.
+        resetHistory(node.value, node.selectionStart, node.selectionEnd);
+        return;
+      }
+      if (edit.value === node.value) return;
       const current = history.current;
       if (current.index < current.entries.length - 1) {
         current.entries = current.entries.slice(0, current.index + 1);
@@ -147,13 +196,23 @@ export default function SourceEditor({
       const end = Math.min(node.selectionEnd, value.length);
       node.value = value;
       node.setSelectionRange(start, end);
+      caret.current = { start, end };
+      restoredSelection.current = null;
       resetHistory(value, start, end);
+    } else if (restoredSelection.current) {
+      // Coming back from another view: put the caret where it was left so the
+      // next keystroke (or undo) continues in place instead of at the start.
+      const { start, end } = restoredSelection.current;
+      restoredSelection.current = null;
+      node.setSelectionRange(start, end);
     }
     if (!activeLine) return;
     const starts = value.split("\n").slice(0, activeLine - 1).map((line) => line.length + 1);
     const offset = starts.reduce((sum, length) => sum + length, 0);
+    const length = value.split("\n")[activeLine - 1]?.length ?? 0;
     node.focus();
-    node.setSelectionRange(offset, offset + (value.split("\n")[activeLine - 1]?.length ?? 0));
+    node.setSelectionRange(offset, offset + length);
+    caret.current = { start: offset, end: offset + length };
     const lineHeight = 22;
     node.scrollTop = Math.max(0, (activeLine - 3) * lineHeight);
   }, [activeLine, value]);
@@ -174,6 +233,10 @@ export default function SourceEditor({
         readOnly={readOnly}
         spellCheck={false}
         onChange={(event) => onChange(event.target.value)}
+        onSelect={(event) => {
+          const node = event.currentTarget;
+          caret.current = { start: node.selectionStart, end: node.selectionEnd };
+        }}
         onKeyDown={(event) => {
           if (!(event.ctrlKey || event.metaKey) || event.altKey || readOnly) return;
           const key = event.key.toLowerCase();

@@ -24,7 +24,7 @@ import NewProjectDialog from "./components/NewProjectDialog";
 import PdfPreview from "./components/PdfPreview";
 import Ribbon from "./components/Ribbon";
 import Sidebar, { type SidebarPanel } from "./components/Sidebar";
-import SourceEditor from "./components/SourceEditor";
+import SourceEditor, { type SourceHistory } from "./components/SourceEditor";
 import StartScreen, { type RecentProject } from "./components/StartScreen";
 import StatusBar from "./components/StatusBar";
 import TopBar from "./components/TopBar";
@@ -426,6 +426,13 @@ export default function App() {
   const imageInput = useRef<HTMLInputElement>(null);
   const findInput = useRef<HTMLInputElement>(null);
   const sourceTextarea = useRef<HTMLTextAreaElement>(null);
+  // Undo history of the source editor, kept here because the editor unmounts
+  // whenever the view leaves the LaTeX pane.
+  const sourceHistory = useRef<SourceHistory | null>(null);
+  // Document the current clean source was last applied from. Re-entering the
+  // source view regenerates LaTeX from the document, which would rewrite a
+  // hand-written draft (and drop its undo history) even though nothing changed.
+  const appliedSourceDocument = useRef<string | null>(null);
   const linkSubmitted = useRef(false);
   const changeVersion = useRef(0);
   const revisionBaseline = useRef<SentenceDocument | null>(null);
@@ -442,6 +449,13 @@ export default function App() {
   useEffect(() => {
     sourceDirtyRef.current = sourceDirty;
   }, [sourceDirty]);
+
+  useEffect(() => {
+    if (mode !== "source") return;
+    // A mode switch remounts the textarea, so the caret (and the keyboard
+    // focus the source view owns) must be handed back explicitly.
+    sourceTextarea.current?.focus();
+  }, [mode]);
 
   useEffect(() => {
     dirtyRef.current = dirty;
@@ -523,6 +537,7 @@ export default function App() {
     workspaceRef.current = tab.workspace;
     setSource(tab.source);
     sourceRef.current = tab.source;
+    sourceHistory.current = null;
     setSourceFile("document.tex");
     setSourceDirty(tab.sourceDirty);
     sourceDirtyRef.current = tab.sourceDirty;
@@ -546,6 +561,7 @@ export default function App() {
     setWorkspace(null);
     sourceRef.current = "";
     setSource("");
+    sourceHistory.current = null;
     sourceDirtyRef.current = false;
     setSourceDirty(false);
     setDirtyState(false);
@@ -602,6 +618,7 @@ export default function App() {
     workspaceRef.current = project;
     setSource(latex);
     sourceRef.current = latex;
+    sourceHistory.current = null;
     setSourceFile("document.tex");
     setSourceDirty(false);
     sourceDirtyRef.current = false;
@@ -1027,6 +1044,7 @@ export default function App() {
     try {
       const parsed = parseSourceDocument(current.document, sourceRef.current, current.settings);
       setWorkspace({ ...current, document: parsed.document, settings: parsed.settings });
+      appliedSourceDocument.current = JSON.stringify(parsed.document);
       setSourceDirty(false);
       sourceDirtyRef.current = false;
       draftSaveError.current = null;
@@ -1070,11 +1088,16 @@ export default function App() {
     // Re-entering source from split keeps the already-visible source text; only
     // a transition from the visual-only view needs a fresh LaTeX snapshot.
     // An unapplied draft stays dirty when Apply failed, so regenerating here
-    // would silently throw away the text the user still needs to fix.
+    // would silently throw away the text the user still needs to fix. A clean
+    // draft that is already applied to the untouched document is kept too:
+    // regenerating it only reformats the text and would drop the undo history.
     if (nextMode === "source" && current && mode === "visual" && !sourceDirtyRef.current) {
-      const latex = documentToLatex(current.document, current.settings);
-      setSource(latex);
-      sourceRef.current = latex;
+      if (appliedSourceDocument.current !== JSON.stringify(current.document)) {
+        const latex = documentToLatex(current.document, current.settings);
+        setSource(latex);
+        sourceRef.current = latex;
+        appliedSourceDocument.current = null;
+      }
       setSourceDirty(false);
       sourceDirtyRef.current = false;
     }
@@ -1857,6 +1880,7 @@ export default function App() {
                   onChange={sourceFile === "document.tex" ? handleSourceChange : handleBibliographyChange}
                   activeLine={sourceFile === "document.tex" ? compileResult?.diagnostics.find((item) => item.line)?.line : undefined}
                   textareaRef={sourceTextarea}
+                  historyRef={sourceHistory}
                 />
               </section>
             ) : null}
