@@ -572,7 +572,6 @@ export default function App() {
   const persistBrowser = (project: Workspace): boolean => {
     try {
       saveBrowserWorkspace(project);
-      setSaveError(null);
       return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -605,6 +604,7 @@ export default function App() {
     sourceDirtyRef.current = false;
     setDirtyState(false);
     setSaveState("saved");
+    setSaveError(null);
     setCompileResult(null);
     setVisualPages(null);
     setActiveCommentId(null);
@@ -618,6 +618,7 @@ export default function App() {
     if (!current) return null;
     const pathAtStart = current.path;
     const stillActive = () => workspaceRef.current?.path === pathAtStart;
+    let draftError: string | null = null;
     if (sourceDirtyRef.current && !sourceRef.current.includes("<<<<<<<")) {
       try {
         const parsed = parseSourceDocument(current.document, sourceRef.current, current.settings);
@@ -630,31 +631,46 @@ export default function App() {
         sourceDirtyRef.current = false;
         setSaveError(null);
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        setSaveError(message);
+        // An unapplied draft can be hidden behind the visual editor. Letting
+        // that parse block every later autosave would leave visible edits
+        // unsaved and drop them on reload, so save the visual document and
+        // keep reporting the draft error until it is fixed or discarded.
+        draftError = error instanceof Error ? error.message : String(error);
+        setSaveError(draftError);
         setSaveState("error");
-        setToast(message);
-        return null;
+        setToast(draftError);
       }
     }
     const versionAtStart = changeVersion.current;
-    const latex = sourceDirtyRef.current
+    // An invalid draft is never written; fall back to LaTeX generated from
+    // the document that is actually on screen.
+    const latex = sourceDirtyRef.current && !draftError
       ? sourceRef.current
       : documentSource(current.document, current.settings);
     if (!isDesktop) {
       if (!persistBrowser(current)) return null;
       rememberProject(current);
-      setDirtyState(false);
-      setSaveState("saved");
+      setSaveError(draftError);
+      if (draftError) {
+        setSaveState("error");
+      } else {
+        setDirtyState(false);
+        setSaveState("saved");
+      }
       return current;
     }
     if (!current.path) {
-      setDirtyState(false);
-      setSaveState("saved");
+      setSaveError(draftError);
+      if (draftError) {
+        setSaveState("error");
+      } else {
+        setDirtyState(false);
+        setSaveState("saved");
+      }
       return current;
     }
     if (stillActive()) setSaveState("saving");
-    setSaveError(null);
+    setSaveError(draftError);
     try {
       const snapshot = await saveProject(
         current.path,
@@ -686,9 +702,9 @@ export default function App() {
           path: pathAtStart,
           name: merged.name,
           workspace: merged,
-          source: latex,
-          sourceDirty: false,
-          dirty: stillActive() && changedDuringSave && dirtyRef.current,
+          source: draftError ? sourceRef.current : latex,
+          sourceDirty: Boolean(draftError),
+          dirty: Boolean(draftError) || (stillActive() && changedDuringSave && dirtyRef.current),
         });
       }
       if (stillActive()) {
@@ -702,8 +718,8 @@ export default function App() {
         } else {
           workspaceRef.current = merged;
           setWorkspace(merged);
-          setDirtyState(false);
-          setSaveState("saved");
+          if (!draftError) setDirtyState(false);
+          setSaveState(draftError ? "error" : "saved");
         }
         rememberProject(merged);
       }
@@ -1381,7 +1397,11 @@ export default function App() {
     const saved = await persist();
     if (saved) {
       await refreshGit();
-      setToast(isDesktop ? "Saved to disk." : "Saved in this browser.");
+      // A draft that still cannot be parsed stays pending; keep its error
+      // visible instead of reporting the whole document as saved.
+      if (!sourceDirtyRef.current) {
+        setToast(isDesktop ? "Saved to disk." : "Saved in this browser.");
+      }
     }
   };
 
@@ -1884,7 +1904,7 @@ export default function App() {
         onZoomChange={setZoom}
         onModeChange={handleModeChange}
       />
-      {saveError ? <button className="save-error" type="button" onClick={() => void handleSave()}><Save size={14} /> Retry save</button> : null}
+      {saveError ? <button className="save-error" type="button" title={saveError} aria-label={`Retry save: ${saveError}`} onClick={() => void handleSave()}><Save size={14} /> Retry save</button> : null}
       {toast ? <div className="toast" role="alert">{toast}</div> : null}
       <input
         ref={imageInput}
