@@ -2356,10 +2356,11 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table (3x3 with header row). Type 'Head' in the top-left cell, click a body cell, then click 'Header row' in the Table toolbar so the first row changes from TH to TD. Switch to View > LaTeX and read the table block. Click Apply source, then View > Visual and inspect the first row.\nActual: The exported LaTeX is identical to the header-row-on export (only \\hline above and below the body; no bold text and no header rule), so the header state has no representation. After Apply source the first row is rebuilt as TH and the Table toolbar's Header row button reports pressed: the header the user disabled has come back.",
       "source": "explore:tables:turning the header row off is not exported and is silently re-enabled by a source round trip",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T20:13:48Z",
-      "lastAttemptAt": "2026-11-24T20:13:48Z"
+      "lastAttemptAt": "2026-11-24T20:13:48Z",
+      "doneAt": "2026-11-24T20:15:29Z"
     },
     {
       "id": "qa-149",
@@ -2371,7 +2372,9 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table (3x3 with header row). Click a cell in the first (header) row, then click 'Add row above' in the Table toolbar. Inspect the first two rows, then switch to View > LaTeX, click Apply source and return to View > Visual.\nActual: A TD row is inserted above the header row, so the table's TH cells end up in row 2 while row 1 is plain TD. The Table toolbar's 'Header row' button now reports unpressed (aria-pressed=false) even though row 2 is still a header row. After Apply source the header is back in row 1, so the same document looks different before and after the round trip.",
       "source": "explore:tables:add row above the header row moves the header into row 2 and the toolbar then reports no header row",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T20:16:03Z"
     },
     {
       "id": "qa-150",

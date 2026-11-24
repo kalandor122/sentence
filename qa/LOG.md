@@ -412,3 +412,4 @@ Aborting
 2026-11-24T20:11:19Z START qa-147 on qa/qa-147-inserting-a-table-inside-a-table-silentl: Inserting a table inside a table silently flattens the nested table's cells into the parent cell
 2026-11-24T20:13:14Z DONE qa-147 (tsc -b, npm test, smoke all green)
 2026-11-24T20:13:48Z START qa-148 on qa/qa-148-turning-the-header-row-off-is-not-export: Turning the header row off is not exported and is silently re-enabled by a source round trip
+2026-11-24T20:15:29Z DONE qa-148 (tsc -b, npm test, smoke all green)
