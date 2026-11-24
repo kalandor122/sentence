@@ -278,10 +278,14 @@ function tableToLatex(node: DocumentNode): string {
     .map((row) => `${row.map((cell, index) => tableCellToLatex(cell, columnAligns[index] ?? "l")).join(" & ")} \\\\`)
     .join("\n");
   const caption = attribute(node, "caption");
+  // A header row changes the first row's cell type, which LaTeX itself cannot
+  // express. Mark the header-less case so a source round trip keeps it off.
+  const headerRow = rows[0]?.[0]?.type === "tableHeader";
   return [
     "\\begin{table}[htbp]",
     "\\centering",
     caption ? `\\caption{${escapeLatex(caption)}}` : "",
+    headerRow ? "" : "% Sentence table header: none",
     `\\begin{tabular}{${columnAligns.join("")}}`,
     "\\hline",
     body,
@@ -978,13 +982,13 @@ function stripLatexComment(line: string): string {
 }
 
 // LaTeX drops everything from an unescaped % to the end of the line, so comments
-// must not become body text. The image alt comment is metadata read back by
-// parseInline, so it is the one comment kept in the document body.
+// must not become body text. The image alt and table header comments are
+// metadata read back while parsing, so they are the comments kept in the body.
 function stripBodyComment(line: string): string {
   for (let index = 0; index < line.length; index += 1) {
     if (line[index] !== "%" || precedingBackslashes(line, index) % 2 === 1) continue;
     const comment = line.slice(index);
-    if (comment.startsWith("% Sentence alt:")) return line;
+    if (comment.startsWith("% Sentence alt:") || comment.startsWith("% Sentence table header:")) return line;
     return line.slice(0, index).replace(/[ \t]+$/, "");
   }
   return line;
@@ -1391,6 +1395,7 @@ export function latexToDocument(
         .filter((char) => char === "l" || char === "c" || char === "r")
         .map((char) => (char === "c" ? "center" : char === "r" ? "right" : "left"));
       const caption = block.match(/\\caption\{([^}]*)\}/)?.[1];
+      const headerless = /% Sentence table header:\s*(?:none|off|false)/i.test(block);
       const parts = tabularBody.split(/\\\\\s*(?:\n|$)/);
       const rows =
         parts.length > 1
@@ -1415,7 +1420,7 @@ export function latexToDocument(
                 : columnAligns[columnIndex];
               const cell = (multiColumn ? multiColumn[2] : rawCell).trim();
               return {
-                type: rowIndex === 0 ? "tableHeader" : "tableCell",
+                type: rowIndex === 0 && !headerless ? "tableHeader" : "tableCell",
                 ...(align && align !== "left" ? { attrs: { align } } : {}),
                 content: cell.split(/(?<!\\)\\par\b/).map((paragraph) => ({
                   type: "paragraph",
