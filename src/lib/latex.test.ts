@@ -713,6 +713,56 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("\\textbackslash{}");
   });
 
+  it("imports a list followed by text without a blank line", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{itemize}",
+      "\\item a",
+      "\\item b",
+      "\\end{itemize}",
+      "Following paragraph",
+      "\\begin{enumerate}",
+      "\\item one",
+      "\\end{enumerate}",
+      "After numbered list",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    expect(parsed.content.map((node) => node.type)).toEqual([
+      "bulletList",
+      "paragraph",
+      "orderedList",
+      "paragraph",
+    ]);
+    expect(parsed.content[0]?.content).toHaveLength(2);
+    expect(parsed.content[1]?.content?.[0]?.text).toBe("Following paragraph");
+    expect(parsed.content[3]?.content?.[0]?.text).toBe("After numbered list");
+    const between = latexToDocument(
+      [
+        "\\begin{document}",
+        "\\begin{itemize}",
+        "\\item a",
+        "\\end{itemize}",
+        "Between the lists",
+        "\\begin{itemize}",
+        "\\item c",
+        "\\end{itemize}",
+        "\\end{document}",
+      ].join("\n"),
+      DEFAULT_SETTINGS,
+    ).document;
+    expect(between.content.map((node) => node.type)).toEqual([
+      "bulletList",
+      "paragraph",
+      "bulletList",
+    ]);
+    expect(between.content[1]?.content?.[0]?.text).toBe("Between the lists");
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\begin{itemize}");
+    expect(exported).toContain("\\begin{enumerate}");
+    expect(exported).not.toContain("\\textbackslash{}begin");
+  });
+
   it("keeps escaped ampersands inside table cells on import", () => {
     const source = [
       "\\begin{document}",

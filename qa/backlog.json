@@ -2297,8 +2297,9 @@
       "hint": "Repro: Create a new document and click Source in the status bar. Replace the body between \\begin{document} and \\end{document} with exactly: '\\begin{itemize}' newline '\\item a' newline '\\item b' newline '\\end{itemize}' newline 'Following paragraph' (no blank line after \\end{itemize}). Click Apply source, click Visual, then reopen Source and click Refresh from visual.\nActual: Apply reports 'Visual document synchronized from LaTeX.' but the visual document is one plain paragraph containing the literal text '\\begin{itemize}', '\\item a', '\\item b', '\\end{itemize}' and 'Following paragraph'. The regenerated LaTeX escapes it as '\\textbackslash{}begin\\{itemize\\}', '\\textbackslash{}item a', '\\textbackslash{}item b' and '\\textbackslash{}end\\{itemize\\}' followed by the text, so the list is permanently corrupted. The same happens with an enumerate and when two itemize environments are separated by text with no blank lines. Adding a blank line after \\end{itemize} makes the same source import correctly.",
       "source": "explore:lists:a list followed by paragraph text without a blank line is imported as escaped literal text",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T19:43:18Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T19:43:18Z",
+      "lastAttemptAt": "2026-11-24T19:43:18Z"
     },
     {
       "id": "qa-145",

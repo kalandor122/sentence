@@ -871,10 +871,30 @@ function splitLatexBlocks(source: string): string[] {
       flush();
       continue;
     }
-    current.push(line);
+    // An environment opened on an earlier line ends its own block: LaTeX ends
+    // the paragraph at \end{...}, so following text starts a new block even
+    // without a blank line.
+    const depthAtLineStart = depth;
+    let closedAt: number | null = null;
     for (const match of line.matchAll(/\\(begin|end)\{[a-zA-Z*]+\}/g)) {
       depth += match[1] === "begin" ? 1 : -1;
+      if (depthAtLineStart > 0 && depth === 0 && match[1] === "end" && closedAt === null) {
+        closedAt = (match.index ?? 0) + match[0].length;
+      }
     }
+    if (closedAt !== null) {
+      const trailing = line.slice(closedAt);
+      if (trailing.trim()) {
+        current.push(line.slice(0, closedAt));
+        flush();
+        current.push(trailing);
+      } else {
+        current.push(line);
+        flush();
+      }
+      continue;
+    }
+    current.push(line);
     if (depth === 0 && BLOCK_COMMAND_LINE.test(line)) flush();
   }
   flush();
