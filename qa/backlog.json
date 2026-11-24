@@ -2457,8 +2457,9 @@
       "hint": "Repro: Create a project. At the end, open References > Insert citation > Enter a key manually, type `bad key}` and click Insert. Open View > LaTeX. Then insert a cross-reference with the label `fig}` from References > Cross-reference and check the source again.\nActual: The exported lines are `BadCite \\cite{bad key}}` and `BadRef \\ref{fig}}` (one extra closing brace each, unmatched). The node accepts and displays `[bad key}]` / `ref: fig}` without any validation warning.",
       "source": "explore:links-cites-footnotes:bibtex keys and cross-reference labels are written to latex unescaped, so `}` breaks the command",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T21:15:35Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T21:15:35Z",
+      "lastAttemptAt": "2026-11-24T21:15:35Z"
     },
     {
       "id": "qa-155",

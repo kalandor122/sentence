@@ -31,6 +31,21 @@ export function escapeLatex(value: string): string {
   return value.replace(/[\\&%$#_{}~^]/g, (character) => SPECIAL_CHARACTERS[character]);
 }
 
+// Citation keys and cross-reference labels are written verbatim into a `{...}`
+// argument and cannot be escaped there: a `\{` would become part of the key.
+// So anything that would end the group or break the line has to be refused.
+const REFERENCE_TARGET_PATTERN = /^[^\s{},%\\#()]+$/;
+
+export function isLatexReferenceTarget(value: string): boolean {
+  return REFERENCE_TARGET_PATTERN.test(value);
+}
+
+// Keys still arrive from imported LaTeX or a hand-edited .bib, so the exporter
+// removes the characters that would break the command instead of trusting them.
+export function latexReferenceTarget(value: string): string {
+  return value.replace(/[\s{},%\\#()]+/g, "");
+}
+
 export function imageAssetPath(fileName: string): string {
   const safeName = fileName
     .replace(/^.*[\\/]/, "")
@@ -219,13 +234,13 @@ function inlineContent(nodes: DocumentNode[] | undefined): string {
         return `\\(${attribute(node, "latex") ?? ""}\\)`;
       }
       if (node.type === "citation") {
-        return `\\cite{${attribute(node, "key") ?? ""}}`;
+        return `\\cite{${latexReferenceTarget(attribute(node, "key") ?? "")}}`;
       }
       if (node.type === "footnote") {
         return `\\footnote{${escapeLatex(attribute(node, "text") ?? "")}}`;
       }
       if (node.type === "crossReference") {
-        return `\\ref{${attribute(node, "label") ?? ""}}`;
+        return `\\ref{${latexReferenceTarget(attribute(node, "label") ?? "")}}`;
       }
       if (node.type === "inlineImage") {
         return inlineImageToLatex(node);

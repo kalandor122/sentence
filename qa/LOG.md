@@ -433,3 +433,4 @@ Aborting
 2026-11-24T21:13:26Z START qa-153 on qa/qa-153-no-way-to-remove-a-hyperlink-clearing-th: No way to remove a hyperlink: clearing the address disables Insert and Escape keeps the link
 2026-11-24T21:15:01Z PUSHED main
 2026-11-24T21:15:01Z DONE qa-153 (tsc -b, npm test, smoke all green)
+2026-11-24T21:15:35Z START qa-154 on qa/qa-154-bibtex-keys-and-cross-reference-labels-a: BibTeX keys and cross-reference labels are written to LaTeX unescaped, so `}` breaks the command
