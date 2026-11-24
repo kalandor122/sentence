@@ -403,3 +403,4 @@ Aborting
 2026-11-24T19:38:07Z EXPLORE lists: 3 new items, agent exit 0
 2026-11-24T19:38:21Z START qa-143 on qa/qa-143-tab-on-the-first-item-of-a-list-moves-fo: Tab on the first item of a list moves focus out of the editor instead of nesting
 2026-11-24T19:42:44Z DONE qa-143 (tsc -b, npm test, smoke all green)
+2026-11-24T19:43:18Z START qa-144 on qa/qa-144-a-list-followed-by-paragraph-text-withou: A list followed by paragraph text without a blank line is imported as escaped literal text
