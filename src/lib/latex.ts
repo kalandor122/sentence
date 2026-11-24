@@ -1461,7 +1461,9 @@ export function latexToDocument(
         .map((char) => (char === "c" ? "center" : char === "r" ? "right" : "left"));
       const caption = block.match(/\\caption\{([^}]*)\}/)?.[1];
       const headerless = /% Sentence table header:\s*(?:none|off|false)/i.test(block);
-      const parts = tabularBody.split(/\\\\\s*(?:\n|$)/);
+      // A row break may carry an optional vertical-space argument such as
+      // \\[4pt]; it is row spacing, not cell text, so it ends the row too.
+      const parts = tabularBody.split(/\\\\\s*(?:\[[^\]]*\])?\s*(?:\n|$)/);
       const rows =
         parts.length > 1
           ? parts

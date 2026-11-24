@@ -481,3 +481,4 @@ Aborting
 2026-11-24T23:24:02Z START qa-172 on qa/qa-172-a-failed-localstorage-write-for-the-rece: A failed localStorage write for the recent-projects list unmounts the whole app to a blank page
 2026-11-24T23:26:55Z PUSHED main
 2026-11-24T23:26:55Z DONE qa-172 (tsc -b, npm test, smoke all green)
+2026-11-24T23:27:29Z START qa-167 on qa/qa-167-table-rows-ending-with-4pt-make-the-enti: Table rows ending with \\[4pt] make the entire table fall back to escaped literal text

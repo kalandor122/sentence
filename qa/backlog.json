@@ -2656,8 +2656,9 @@
       "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add a table whose rows are `Name & Value \\\\[4pt]` and `ZXSPACED & 77 \\\\[4pt]` (valid LaTeX row spacing) inside a tabular{ll}. 3. Click Apply source, then View tab > Visual.\nActual: Apply reports success, but no table node is created: the visual pane shows the whole raw `\\begin{table}...\\end{table}` block as paragraph text, with `[4pt]` split onto its own lines. Refresh from visual escapes every command (`\\textbackslash{}begin\\{tabular\\}`, `\\textbackslash{}hline`, `\\&`, `\\textbackslash{}end\\{table\\}`), so the table is lost.",
       "source": "explore:source-editor:table rows ending with \\\\[4pt] make the entire table fall back to escaped literal text",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T23:27:29Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T23:27:29Z",
+      "lastAttemptAt": "2026-11-24T23:27:29Z"
     },
     {
       "id": "qa-168",
