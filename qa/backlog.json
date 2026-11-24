@@ -2640,8 +2640,9 @@
       "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add `ZXEMPH before \\emph{important word} after.`. 3. Click Apply source, then View tab > Visual. 4. View tab > LaTeX and click Refresh from visual.\nActual: Apply reports success and the visual paragraph contains the literal command `\\emph{important word}` with no italic markup. Refresh from visual exports `\\textbackslash{}emph\\{important word\\}`, so the emphasis is destroyed in the saved LaTeX.",
       "source": "explore:source-editor:\\emph{...} is not recognised: italics are shown as the raw command and escaped on export",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T23:11:57Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T23:11:57Z",
+      "lastAttemptAt": "2026-11-24T23:11:57Z"
     },
     {
       "id": "qa-167",

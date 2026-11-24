@@ -260,6 +260,25 @@ describe("LaTeX generation", () => {
     expect(exported).toContain("\\begin{quote}");
   });
 
+  it("reads \\emph as italic and exports it as \\textit", () => {
+    const latex = [
+      "\\begin{document}",
+      "",
+      "ZXEMPH before \\emph{important word} after.",
+      "",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(latex, DEFAULT_SETTINGS).document;
+    expect(parsed.content[0]?.content).toEqual([
+      { type: "text", text: "ZXEMPH before " },
+      { type: "text", text: "important word", marks: [{ type: "italic" }] },
+      { type: "text", text: " after." },
+    ]);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("ZXEMPH before \\textit{important word} after.");
+    expect(exported).not.toContain("\\textbackslash{}emph");
+  });
+
   it("rejects LaTeX with a missing document end instead of clearing the body", () => {
     const source = [
       "\\begin{document}",
