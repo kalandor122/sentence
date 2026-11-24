@@ -812,6 +812,48 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(parsed, settings)).toContain("first line\\par second line \\\\");
   });
 
+  it("exports a block image inside a table cell as an inline graphic", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableHeader",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "H" }] }],
+                },
+              ],
+            },
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [
+                    { type: "paragraph", content: [{ type: "text", text: "Cell" }] },
+                    {
+                      type: "image",
+                      attrs: { path: "assets/images/cell.png", alt: "cell image" },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).not.toContain("\\begin{figure}");
+    expect(latex).toContain(
+      "Cell\\par \\includegraphics[width=0.8\\linewidth]{assets/images/cell.png}% Sentence alt: cell image",
+    );
+  });
+
   it("round-trips a table caption through LaTeX", () => {
     const document: SentenceDocument = {
       type: "doc",

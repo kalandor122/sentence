@@ -392,3 +392,4 @@ Aborting
 2026-11-24T18:28:43Z START qa-138 on qa/qa-138-escape-does-not-close-the-text-color-pop: Escape does not close the Text color popover
 2026-11-24T18:29:54Z DONE qa-138 (tsc -b, npm test, smoke all green)
 2026-11-24T18:43:42Z EXPLORE insert-media: 4 new items, agent exit 0
+2026-11-24T18:43:56Z START qa-139 on qa/qa-139-page-furniture-and-block-images-inserted: Page furniture and block images inserted in a table cell disappear from the exported LaTeX
