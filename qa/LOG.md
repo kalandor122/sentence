@@ -430,3 +430,4 @@ Aborting
 2026-11-24T21:06:25Z START qa-152 on qa/qa-152-inserting-a-citation-footnote-or-cross-r: Inserting a citation, footnote or cross-reference after a LaTeX round-trip puts it inside the title heading
 2026-11-24T21:12:52Z PUSHED main
 2026-11-24T21:12:52Z DONE qa-152 (tsc -b, npm test, smoke all green)
+2026-11-24T21:13:26Z START qa-153 on qa/qa-153-no-way-to-remove-a-hyperlink-clearing-th: No way to remove a hyperlink: clearing the address disables Insert and Escape keeps the link

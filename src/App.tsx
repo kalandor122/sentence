@@ -146,6 +146,7 @@ type DialogState =
       range?: { from: number; to: number };
       insertAtCaret?: boolean;
       revertOnCancel?: boolean;
+      existingLink?: boolean;
     }
   | { kind: "comment" }
   | null;
@@ -1339,7 +1340,12 @@ export default function App() {
       setDialog({ kind: "link", initialValue: "", range, revertOnCancel: true });
       return;
     }
-    setDialog({ kind: "link", initialValue: existingHref, insertAtCaret: !existingHref && !range });
+    setDialog({ kind: "link", initialValue: existingHref, insertAtCaret: !existingHref && !range, existingLink: Boolean(existingHref) });
+  };
+
+  const removeLink = () => {
+    editor?.chain().focus().extendMarkRange("link").unsetLink().run();
+    setDialog(null);
   };
 
   const validateDialog = (): string | null => {
@@ -1420,7 +1426,9 @@ export default function App() {
       case "cross-reference":
         return { title: "Insert cross-reference", label: "Label", placeholder: "fig:architecture" };
       case "link":
-        return { title: "Add link", label: "Address", placeholder: "https://example.com" };
+        return dialog.existingLink
+          ? { title: "Edit link", label: "Address", placeholder: "https://example.com" }
+          : { title: "Add link", label: "Address", placeholder: "https://example.com" };
       case "comment":
         return { title: "Add a comment", description: "The comment stays inside Sentence and is not written into the LaTeX.", label: "Comment", placeholder: "What should be reviewed?", multiline: true, confirmLabel: "Comment" };
       default:
@@ -2066,6 +2074,8 @@ export default function App() {
         multiline={"multiline" in dialogProps ? dialogProps.multiline : false}
         confirmLabel={"confirmLabel" in dialogProps ? dialogProps.confirmLabel : "Insert"}
         validate={dialog?.kind === "comment" ? validateDialog : undefined}
+        removeLabel={dialog?.kind === "link" && dialog.existingLink ? "Remove link" : undefined}
+        onRemove={dialog?.kind === "link" && dialog.existingLink ? removeLink : undefined}
         onClose={closeDialog}
         onSubmit={handleDialogSubmit}
       />
