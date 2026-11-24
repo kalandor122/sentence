@@ -2168,10 +2168,11 @@
       ],
       "hint": "Repro: Focus the editor, press Ctrl+K to open the Add link dialog, then with the dialog still open press Ctrl+F (and separately Ctrl+Enter).\nActual: Ctrl+F opens .find-bar (computed z-index 12) behind the modal backdrop (z-index 100), moves focus to the Find input outside the dialog, and leaves the Add link dialog open. In the same state Ctrl+Enter fires compilation and shows the 'Compilation is available in the desktop application.' toast while the dialog is still open.",
       "source": "explore:keyboard:ctrl+f opens the find bar behind an open modal and moves focus out of the dialog",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T18:23:57Z",
-      "lastAttemptAt": "2026-11-24T18:23:57Z"
+      "lastAttemptAt": "2026-11-24T18:23:57Z",
+      "doneAt": "2026-11-24T18:25:43Z"
     },
     {
       "id": "qa-137",
@@ -2183,7 +2184,9 @@
       ],
       "hint": "Repro: Open the editor, select the Paper ribbon tab, Tab to the 'Create arXiv ZIP' button, press Enter, then press Tab once and Escape.\nActual: On open, document.activeElement is the 'Create arXiv ZIP' ribbon button behind the aria-modal dialog (not inside it); the first Tab moves focus to the dialog's Close button. Escape closes the dialog but leaves document.activeElement on <body>, so the next Tab restarts at the top of the page instead of the invoking button.",
       "source": "explore:keyboard:arxiv dialog opens with focus still on the ribbon button and loses focus to <body> when closed",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T18:26:17Z"
     },
     {
       "id": "qa-138",
