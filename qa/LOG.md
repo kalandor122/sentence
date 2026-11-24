@@ -397,3 +397,4 @@ Aborting
 2026-11-24T18:52:24Z START qa-140 on qa/qa-140-typing-after-inserting-an-image-page-bre: Typing after inserting an image, page break or table of contents replaces the just-inserted block
 2026-11-24T18:54:57Z DONE qa-140 (tsc -b, npm test, smoke all green)
 2026-11-24T18:55:32Z START qa-141 on qa/qa-141-applying-the-latex-source-turns-an-inser: Applying the LaTeX source turns an inserted image into a broken image
+2026-11-24T19:01:26Z DONE qa-141 (tsc -b, npm test, smoke all green)
