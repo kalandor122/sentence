@@ -138,7 +138,7 @@ interface WorkspaceTab extends WorkspaceTabInfo {
 
 type DialogState =
   | { kind: "citation" }
-  | { kind: "footnote" }
+  | { kind: "footnote"; initialValue?: string; position?: number }
   | { kind: "cross-reference" }
   | {
       kind: "link";
@@ -1331,9 +1331,18 @@ export default function App() {
       case "citation":
         insertCitation(value);
         break;
-      case "footnote":
-        editor?.chain().focus().insertContent({ type: "footnote", attrs: { text: value } }).run();
+      case "footnote": {
+        if (!editor) break;
+        const position = dialog.position;
+        if (position === undefined) {
+          editor.chain().focus().insertContent({ type: "footnote", attrs: { text: value } }).run();
+          break;
+        }
+        if (editor.state.doc.nodeAt(position)?.type.name === "footnote") {
+          editor.chain().focus().setNodeSelection(position).updateAttributes("footnote", { text: value }).run();
+        }
         break;
+      }
       case "cross-reference":
         editor?.chain().focus().insertContent({ type: "crossReference", attrs: { label: value } }).run();
         break;
@@ -1382,7 +1391,9 @@ export default function App() {
       case "citation":
         return { title: "Insert citation", label: "BibTeX key", placeholder: "einstein1905" };
       case "footnote":
-        return { title: "Insert footnote", label: "Note", placeholder: "A useful note" };
+        return dialog.position === undefined
+          ? { title: "Insert footnote", label: "Note", placeholder: "A useful note" }
+          : { title: "Edit footnote", label: "Note", placeholder: "A useful note", confirmLabel: "Update" };
       case "cross-reference":
         return { title: "Insert cross-reference", label: "Label", placeholder: "fig:architecture" };
       case "link":
@@ -1867,6 +1878,7 @@ export default function App() {
                       setSidebarPanel("comments");
                     }}
                     onEditMath={(latex, display) => setMathEditor({ display, latex, editing: true })}
+                    onEditFootnote={(text, position) => setDialog({ kind: "footnote", initialValue: text, position })}
                     onPageCountChange={setVisualPages}
                   />
                 </Suspense>
@@ -2026,7 +2038,7 @@ export default function App() {
         title={dialogProps.title}
         description={"description" in dialogProps ? dialogProps.description : undefined}
         label={dialogProps.label}
-        initialValue={dialog?.kind === "link" ? dialog.initialValue : undefined}
+        initialValue={dialog?.kind === "link" || dialog?.kind === "footnote" ? dialog.initialValue : undefined}
         placeholder={"placeholder" in dialogProps ? dialogProps.placeholder : undefined}
         multiline={"multiline" in dialogProps ? dialogProps.multiline : false}
         confirmLabel={"confirmLabel" in dialogProps ? dialogProps.confirmLabel : "Insert"}

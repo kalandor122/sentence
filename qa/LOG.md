@@ -424,3 +424,4 @@ Aborting
 2026-11-24T20:36:45Z BACKLOG EMPTY — nothing open, idle
 2026-11-24T20:39:19Z BACKLOG EMPTY — nothing open, idle
 2026-11-24T21:01:52Z EXPLORE links-cites-footnotes: 5 new items, agent exit 0
+2026-11-24T21:02:06Z START qa-151 on qa/qa-151-footnote-text-cannot-be-edited-in-the-vi: Footnote text cannot be edited in the visual editor; typing over the marker deletes the note

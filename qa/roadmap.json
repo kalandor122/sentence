@@ -2,6 +2,12 @@
   "notes": "Work orders for the QA loop, in order. cycle.py promotes the first item that is not already in the backlog whenever the queue is empty, then the loop builds it under qa/cycle.py's usual branch -> verify -> merge flow. Product definition: docs/PRODUCT.md. Keep items small enough for one cycle; split anything bigger instead of widening an item.",
   "items": [
     {
+      "title": "Word-style design foundation: typography, density and colour tokens",
+      "why": "The UI must read as Microsoft Word 365 at a glance: Segoe UI, dense ribbon, light grey chrome, blue accent. Everything else inherits these tokens, so do this before the chrome work.",
+      "severity": "high",
+      "hint": "In src/styles.css introduce :root tokens for chrome (#f3f2f1), canvas (#faf9f8), ink (#201f1e), muted (#605e5c), border (#e1dfdd), accent (#2b579a) and the Word type stack (\"Segoe UI\", \"Segoe UI Web (West European)\", system-ui, sans-serif). Set the chrome font-size to 12px, ribbon buttons to the icon-above-label 3-row layout, tab labels with the accent underline on the active tab, and keep the page sheet pure white with a soft shadow. Do not restyle the document typography itself \u2014 the page keeps its serif faces. Acceptance: no hard-coded chrome colours left in the stylesheet outside :root, smoke gate green in both themes, and a screenshot that a Word user would not blink at."
+    },
+    {
       "title": "Two-column documents: settings, preamble and round trip",
       "why": "A two-column arXiv paper is the single most common LaTeX target the app cannot produce.",
       "severity": "high",
@@ -95,7 +101,7 @@
       "title": "Source view syntax highlighting",
       "why": "A 300-line .tex file in a mono textarea is hard to read.",
       "severity": "medium",
-      "hint": "Wrap the textarea in a highlighted overlay (a pre element behind a transparent textarea) with a small hand-written tokenizer for comments, commands, braces, math delimiters and environments — do not add CodeMirror unless the overlay proves unworkable. Keep selection, scroll sync and IME behaviour intact. Acceptance: gate stays green and typing still reaches state; a unit test covers the tokenizer."
+      "hint": "Wrap the textarea in a highlighted overlay (a pre element behind a transparent textarea) with a small hand-written tokenizer for comments, commands, braces, math delimiters and environments \u2014 do not add CodeMirror unless the overlay proves unworkable. Keep selection, scroll sync and IME behaviour intact. Acceptance: gate stays green and typing still reaches state; a unit test covers the tokenizer."
     },
     {
       "title": "File backstage",

@@ -5,6 +5,7 @@ import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import { TableKit } from "@tiptap/extension-table";
 import TextAlign from "@tiptap/extension-text-align";
+import { NodeSelection } from "@tiptap/pm/state";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   Citation,
@@ -54,6 +55,7 @@ interface EditorSurfaceProps {
   onStateChange: () => void;
   onCommentSelected: (markId: string) => void;
   onEditMath: (latex: string, display: boolean) => void;
+  onEditFootnote: (text: string, position: number) => void;
   onPageCountChange: (pages: number) => void;
 }
 
@@ -181,8 +183,13 @@ export default function EditorSurface({
   onStateChange,
   onCommentSelected,
   onEditMath,
+  onEditFootnote,
   onPageCountChange,
 }: EditorSurfaceProps) {
+  const editFootnoteRef = useRef(onEditFootnote);
+  useEffect(() => {
+    editFootnoteRef.current = onEditFootnote;
+  }, [onEditFootnote]);
   const firstNode = document.content[0];
   const repeatsTitle =
     firstNode?.type === "heading" &&
@@ -259,6 +266,30 @@ export default function EditorSurface({
           onCommentSelected(mark.dataset.commentId);
         }
         return false;
+      },
+      // Editing a note mirrors math: the atom itself is not editable in place,
+      // so double-clicking its marker opens the note for correction. Typing
+      // while the atom is selected would otherwise replace the note with text.
+      handleDoubleClick(view, _position, event) {
+        const target = event.target as HTMLElement;
+        const marker = target.closest<HTMLElement>("[data-footnote]");
+        if (!marker) return false;
+        const position = view.posAtDOM(marker, 0);
+        const node = view.state.doc.nodeAt(position);
+        if (node?.type.name !== "footnote") return false;
+        editFootnoteRef.current(typeof node.attrs.text === "string" ? node.attrs.text : "", position);
+        return true;
+      },
+      // Keyboard access to the same editor: select the marker with the arrow
+      // keys and press Enter.
+      handleKeyDown(view, event) {
+        if (event.key !== "Enter" || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return false;
+        const { selection } = view.state;
+        if (!(selection instanceof NodeSelection) || selection.node.type.name !== "footnote") return false;
+        event.preventDefault();
+        const text = selection.node.attrs.text;
+        editFootnoteRef.current(typeof text === "string" ? text : "", selection.from);
+        return true;
       },
     },
     onUpdate: ({ editor: current, transaction, appendedTransactions }) => {
