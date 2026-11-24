@@ -2623,10 +2623,11 @@
       ],
       "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add `\\section*{ZXSTAR SECTION}`, a blank line, and `ZXSTAR BODY`. 3. Click Apply source, then View tab > Visual. 4. View tab > LaTeX and click Refresh from visual.\nActual: Apply reports success, but the visual headings remain only the two demo headings and the body shows the raw command `\\section*{ZXSTAR SECTION}` as a paragraph. Refresh from visual rewrites it as `\\textbackslash{}section*\\{ZXSTAR SECTION\\}`, so the section heading is permanently converted to literal text.",
       "source": "explore:source-editor:starred section \\section*{...} is shown as literal text and escaped on export",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T23:09:03Z",
-      "lastAttemptAt": "2026-11-24T23:09:03Z"
+      "lastAttemptAt": "2026-11-24T23:09:03Z",
+      "doneAt": "2026-11-24T23:11:21Z"
     },
     {
       "id": "qa-166",
@@ -2638,7 +2639,9 @@
       ],
       "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add `ZXEMPH before \\emph{important word} after.`. 3. Click Apply source, then View tab > Visual. 4. View tab > LaTeX and click Refresh from visual.\nActual: Apply reports success and the visual paragraph contains the literal command `\\emph{important word}` with no italic markup. Refresh from visual exports `\\textbackslash{}emph\\{important word\\}`, so the emphasis is destroyed in the saved LaTeX.",
       "source": "explore:source-editor:\\emph{...} is not recognised: italics are shown as the raw command and escaped on export",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T23:11:57Z"
     },
     {
       "id": "qa-167",

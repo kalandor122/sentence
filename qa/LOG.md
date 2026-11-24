@@ -472,3 +472,5 @@ Aborting
 2026-11-24T23:08:29Z PUSHED main
 2026-11-24T23:08:29Z DONE qa-164 (tsc -b, npm test, smoke all green)
 2026-11-24T23:09:03Z START qa-165 on qa/qa-165-starred-section-section-is-shown-as-lite: Starred section \section*{...} is shown as literal text and escaped on export
+2026-11-24T23:11:23Z PUSHED main
+2026-11-24T23:11:23Z DONE qa-165 (tsc -b, npm test, smoke all green)
