@@ -1442,7 +1442,13 @@ export function latexToDocument(
       const tabular = block.match(
         /\\begin\{tabular\}(?:\s*\{([^}]*)\})?\s*([\s\S]*?)\\end\{tabular\}/,
       );
-      const tabularBody = tabular?.[2] ?? block;
+      // Booktabs and \hline rules are row separators, not cell text: drop them
+      // so a hand-written ruled table imports as its rows instead of rows that
+      // begin with the rule name.
+      const tabularBody = (tabular?.[2] ?? block).replace(
+        /\\(?:toprule|midrule|bottomrule|hline|addlinespace|cmidrule)(?![a-zA-Z])(?:\([^)]*\))?(?:\{[^}]*\})?/g,
+        "",
+      );
       const columnAligns = Array.from(tabular?.[1] ?? "")
         .filter((char) => char === "l" || char === "c" || char === "r")
         .map((char) => (char === "c" ? "center" : char === "r" ? "right" : "left"));
