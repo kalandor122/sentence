@@ -20,6 +20,7 @@ import {
 } from "./extensions";
 import { FindHighlight } from "./find";
 import { changeIndent, nestListItem } from "./indent";
+import { toggleList } from "./listToggle";
 import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
 import {
   pageBoundaryWithin,
@@ -75,6 +76,21 @@ const TabIndent = Extension.create({
       "Mod-]": () => changeIndent(this.editor, false),
       "Mod-[": () => changeIndent(this.editor, true),
       Escape: () => focusAfterEditor(this.editor),
+    };
+  },
+});
+
+// Tiptap's own list shortcuts call toggleBulletList/toggleOrderedList, which
+// append an empty item instead of unwrapping when the whole document is
+// selected. Route them through the shared toggle for the same behaviour as the
+// ribbon buttons.
+const ListShortcuts = Extension.create({
+  name: "sentenceListShortcuts",
+  priority: 200,
+  addKeyboardShortcuts() {
+    return {
+      "Mod-Shift-7": () => toggleList(this.editor, "orderedList"),
+      "Mod-Shift-8": () => toggleList(this.editor, "bulletList"),
     };
   },
 });
@@ -231,6 +247,7 @@ export default function EditorSurface({
       RevisionMarks,
       LineSpacing,
       TabIndent,
+      ListShortcuts,
     ],
     content: document,
     editable,
