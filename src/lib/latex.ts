@@ -184,17 +184,23 @@ function inlineContent(nodes: DocumentNode[] | undefined): string {
         return `\\ref{${attribute(node, "label") ?? ""}}`;
       }
       if (node.type === "inlineImage") {
-        const src = attribute(node, "path") ?? attribute(node, "src") ?? "";
-        const alt = attribute(node, "alt") ?? "";
-        const filename = imageSourcePath(src, alt);
-        const image = `\\includegraphics[${imageWidthArgument(node)}]{${escapeLatex(filename)}}`;
-        // The alt text is a comment so it survives source round trips without
-        // adding a caption or a paragraph break to the surrounding text.
-        return alt ? `${image}% Sentence alt: ${metadataComment(alt)}\n` : image;
+        return inlineImageToLatex(node);
       }
       return inlineContent(node.content);
     })
     .join("");
+}
+
+// Inline images have no caption and no float, so they also work inside a
+// tabular cell where a figure environment would either break or escape it.
+function inlineImageToLatex(node: DocumentNode): string {
+  const src = attribute(node, "path") ?? attribute(node, "src") ?? "";
+  const alt = attribute(node, "alt") ?? "";
+  const filename = imageSourcePath(src, alt);
+  const image = `\\includegraphics[${imageWidthArgument(node)}]{${escapeLatex(filename)}}`;
+  // The alt text is a comment so it survives source round trips without
+  // adding a caption or a paragraph break to the surrounding text.
+  return alt ? `${image}% Sentence alt: ${metadataComment(alt)}\n` : image;
 }
 
 type LatexColumnAlign = "l" | "c" | "r";
@@ -206,9 +212,12 @@ function cellAlign(cell: DocumentNode): LatexColumnAlign {
 
 function tableCellToLatex(cell: DocumentNode, columnAlign: LatexColumnAlign): string {
   const children = cell.content ?? [];
-  const body = children.every((child) => child.type === "paragraph")
-    ? children.map((child) => inlineContent(child.content)).join("\\par ")
-    : inlineContent(children);
+  // A figure cannot float inside a tabular cell, so a block image is written as
+  // an inline graphic that stays in its own cell.
+  const body = children
+    .map((child) => (child.type === "image" ? inlineImageToLatex(child) : inlineContent([child])))
+    .filter(Boolean)
+    .join("\\par ");
   const align = cellAlign(cell);
   return align === columnAlign ? body : `\\multicolumn{1}{${align}}{${body}}`;
 }

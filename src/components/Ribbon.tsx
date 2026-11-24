@@ -249,6 +249,10 @@ export default function Ribbon({
   void editorVersion;
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const disabled = !editor;
+  // Page furniture is a page-level construct: LaTeX cannot put a \newpage or a
+  // \tableofcontents inside a tabular cell, so those commands are unavailable
+  // there rather than inserting a block that would vanish from the PDF.
+  const inTable = Boolean(editor?.isActive("table"));
   const textAlign = activeTextAlign(editor);
   const activeFont = activeMarkAttribute(editor, "fontFamily", "family");
   const activeSize = activeMarkAttribute(editor, "fontSize", "size");
@@ -523,11 +527,11 @@ export default function Ribbon({
               </button>
             </RibbonGroup>
             <RibbonGroup label="Pages">
-              <button type="button" className="ribbon-command wide" disabled={disabled} onClick={onInsertPageBreak}>
+              <button type="button" className="ribbon-command wide" disabled={disabled || inTable} onClick={onInsertPageBreak}>
                 <SquareSplitHorizontal size={18} />
                 <span>Page break</span>
               </button>
-              <button type="button" className="ribbon-command wide" disabled={disabled} onClick={onInsertToc}>
+              <button type="button" className="ribbon-command wide" disabled={disabled || inTable} onClick={onInsertToc}>
                 <ListTree size={18} />
                 <span>Contents</span>
               </button>
@@ -567,7 +571,7 @@ export default function Ribbon({
               </button>
             </RibbonGroup>
             <RibbonGroup label="Contents">
-              <button type="button" className="ribbon-command wide" disabled={disabled} onClick={onInsertToc}>
+              <button type="button" className="ribbon-command wide" disabled={disabled || inTable} onClick={onInsertToc}>
                 <ListTree size={18} />
                 <span>Table of contents</span>
               </button>

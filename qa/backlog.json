@@ -2217,8 +2217,9 @@
       "hint": "Repro: In the demo document click Insert > Insert table. Click an empty body cell and click References > Table of contents. Click a second empty body cell and click Insert > Page break. Click a third empty body cell, click Insert > Image and supply any PNG through the hidden file input. Compare the visual page with View > LaTeX.\nActual: The cells visibly contain nav[data-toc], div[data-page-break] and img (probe cell counts toc=1, breaks=1, images=1), but the exported document body has \\tableofcontents count 0, \\newpage count 0 and \\includegraphics count 0, and the tabular rows contain only empty cells. Nothing warns that the content will be missing from the PDF. The page break also stretches its cell to 752px tall in the visual page. Probe qa/probes/insert-media.mjs scenario blockMediaInTableCell.",
       "source": "explore:insert-media:page furniture and block images inserted in a table cell disappear from the exported latex",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T18:43:56Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T18:43:56Z",
+      "lastAttemptAt": "2026-11-24T18:43:56Z"
     },
     {
       "id": "qa-140",
