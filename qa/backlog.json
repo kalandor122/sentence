@@ -2010,8 +2010,9 @@
       "hint": "Repro: 1. Create a project, switch to View > LaTeX, add `ZXFAIL persistent paragraph` plus an unclosed `\\begin{itemize}` before \\end{document}. 2. Click 'Apply source' (error toast appears). 3. Wait about 1.5 seconds so autosave attempts the same parse; a 'Retry save' button appears in the status bar. 4. Click View > Visual, then View > LaTeX. The broken draft is gone and the source has been regenerated from the visual document ('Apply source' is disabled). Look at the status bar.\nActual: The status bar still shows the 'Retry save' button after returning to the regenerated, clean source (saveErrorAfterReturn='Retry save' while 'Apply source' is disabled), suggesting unsaved or invalid work remains when there is none.",
       "source": "explore:source-editor:stale 'retry save' error remains after the failed source draft has been discarded",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T17:47:04Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T17:47:04Z",
+      "lastAttemptAt": "2026-11-24T17:47:04Z"
     },
     {
       "id": "qa-127",

@@ -420,6 +420,9 @@ export default function App() {
   const [recent, setRecent] = useState<RecentProject[]>(loadRecent);
   const [toast, setToast] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  // The message that autosave reported for an unapplied source draft, so
+  // discarding that draft can drop the error with it.
+  const draftSaveError = useRef<string | null>(null);
   const imageInput = useRef<HTMLInputElement>(null);
   const findInput = useRef<HTMLInputElement>(null);
   const sourceTextarea = useRef<HTMLTextAreaElement>(null);
@@ -605,6 +608,7 @@ export default function App() {
     setDirtyState(false);
     setSaveState("saved");
     setSaveError(null);
+    draftSaveError.current = null;
     setCompileResult(null);
     setVisualPages(null);
     setActiveCommentId(null);
@@ -641,6 +645,7 @@ export default function App() {
         setToast(draftError);
       }
     }
+    draftSaveError.current = draftError;
     const versionAtStart = changeVersion.current;
     // An invalid draft is never written; fall back to LaTeX generated from
     // the document that is actually on screen.
@@ -753,6 +758,7 @@ export default function App() {
       latex = documentSource(workspace.document, workspace.settings);
     }
     setSaveError(null);
+    draftSaveError.current = null;
     try {
       const snapshot = await saveProject(
         workspace.path,
@@ -1023,6 +1029,7 @@ export default function App() {
       setWorkspace({ ...current, document: parsed.document, settings: parsed.settings });
       setSourceDirty(false);
       sourceDirtyRef.current = false;
+      draftSaveError.current = null;
       setSaveError(null);
       markDirty();
       setToast(parsed.detached.length === 0
@@ -1041,6 +1048,17 @@ export default function App() {
     // focus onto <body>; on failure it keeps focus. Either way the caret must
     // stay in the editor, or the next keystrokes and Ctrl+Shift+Z are lost.
     sourceTextarea.current?.focus();
+  };
+
+  const discardSourceDraft = () => {
+    // The autosave error came from the draft's parse failure, not from a
+    // failed write. Once the draft is replaced by LaTeX from the saved visual
+    // document there is nothing left to retry. Pending visual edits stay
+    // dirty, so the next autosave still saves them.
+    if (draftSaveError.current === null || saveError !== draftSaveError.current) return;
+    draftSaveError.current = null;
+    setSaveError(null);
+    setSaveState(dirtyRef.current ? "dirty" : "saved");
   };
 
   const handleModeChange = (nextMode: EditorMode) => {
@@ -1821,6 +1839,7 @@ export default function App() {
                           setSource(latex);
                           setSourceDirty(false);
                           sourceDirtyRef.current = false;
+                          discardSourceDraft();
                         }}>
                           Refresh from visual
                         </button>

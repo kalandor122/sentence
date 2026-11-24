@@ -378,3 +378,4 @@ Aborting
 2026-11-24T17:44:45Z DONE qa-134 (tsc -b, npm test, smoke all green)
 2026-11-24T17:45:20Z START qa-133 on qa/qa-133-outline-entry-drops-inline-math-from-a-h: Outline entry drops inline math from a heading
 2026-11-24T17:46:30Z DONE qa-133 (tsc -b, npm test, smoke all green)
+2026-11-24T17:47:04Z START qa-126 on qa/qa-126-stale-retry-save-error-remains-after-the: Stale 'Retry save' error remains after the failed source draft has been discarded
