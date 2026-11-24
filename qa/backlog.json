@@ -2053,8 +2053,9 @@
       "hint": "Repro: 1. View > LaTeX and before \\end{document} add two lines: `ZXCOMMENTBLOCK text body` followed by `% ZXCOMMENTBLOCK ignored by LaTeX`, then a blank line and `ZXCOMMENTINLINE text % ZXCOMMENTINLINE note`. 2. Click 'Apply source'. 3. Click View > Visual. 4. Click View > LaTeX and read the textarea.\nActual: Apply reports success and the visual document shows the literal text `% ZXCOMMENTBLOCK ignored by LaTeX` and `% ZXCOMMENTINLINE note`. Returning to the source shows both comments rewritten with escaped percent signs (`\\% ZXCOMMENTBLOCK ignored by LaTeX`, `\\% ZXCOMMENTINLINE note`), so the comments are permanently converted into visible document content. Reproduced for both a whole-line comment and a trailing comment.",
       "source": "explore:source-editor:latex comments in the document body become visible text and are escaped on export",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T16:57:30Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T16:57:30Z",
+      "lastAttemptAt": "2026-11-24T16:57:30Z"
     },
     {
       "id": "qa-130",

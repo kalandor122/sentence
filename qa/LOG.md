@@ -367,3 +367,4 @@ Aborting
 2026-11-23T21:32:42Z EXPLORE source-editor: 5 new items, agent exit 0
 2026-11-24T16:52:46Z START qa-128 on qa/qa-128-clicking-apply-source-drops-keyboard-foc: Clicking Apply source drops keyboard focus, so subsequent typing and redo are silently ignored
 2026-11-24T16:56:47Z DONE qa-128 (tsc -b, npm test, smoke all green)
+2026-11-24T16:57:30Z START qa-129 on qa/qa-129-latex-comments-in-the-document-body-beco: LaTeX comments in the document body become visible text and are escaped on export

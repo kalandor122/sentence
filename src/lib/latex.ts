@@ -901,6 +901,42 @@ function stripLatexComment(line: string): string {
   return line;
 }
 
+// LaTeX drops everything from an unescaped % to the end of the line, so comments
+// must not become body text. The image alt comment is metadata read back by
+// parseInline, so it is the one comment kept in the document body.
+function stripBodyComment(line: string): string {
+  for (let index = 0; index < line.length; index += 1) {
+    if (line[index] !== "%" || precedingBackslashes(line, index) % 2 === 1) continue;
+    const comment = line.slice(index);
+    if (comment.startsWith("% Sentence alt:")) return line;
+    return line.slice(0, index).replace(/[ \t]+$/, "");
+  }
+  return line;
+}
+
+function stripBodyComments(source: string): string {
+  const lines: string[] = [];
+  let verbatim = false;
+  for (const line of source.split(/\r?\n/)) {
+    if (verbatim) {
+      lines.push(line);
+      if (line.includes("\\end{verbatim}")) verbatim = false;
+      continue;
+    }
+    if (line.includes("\\begin{verbatim}") && !line.includes("\\end{verbatim}")) {
+      lines.push(line);
+      verbatim = true;
+      continue;
+    }
+    const stripped = stripBodyComment(line);
+    // A comment swallows its own newline in LaTeX, so a comment-only line must
+    // not split the paragraph around it.
+    if (!stripped.trim() && line.trim()) continue;
+    lines.push(stripped);
+  }
+  return lines.join("\n");
+}
+
 function assertBalancedEnvironments(source: string): void {
   const stack: string[] = [];
   const pattern = /\\(begin|end)\{([a-zA-Z*]+)\}/g;
@@ -912,6 +948,7 @@ function assertBalancedEnvironments(source: string): void {
       const close = line.indexOf(`\\end{${verbatim}}`);
       if (close < 0) continue;
       line = line.slice(close + verbatim.length + 6);
+      stack.pop();
       verbatim = null;
     }
     for (const match of line.matchAll(pattern)) {
@@ -1080,7 +1117,7 @@ export function latexToDocument(
   const body = documentBody(latex);
   assertBalancedEnvironments(body);
   assertBalancedBraces(body);
-  const source = body
+  const source = stripBodyComments(body)
     .replace(/\\begin\{abstract\}[\s\S]*?\\end\{abstract\}/g, "")
     .replace(/\\keywords\{[^}]*\}/g, "")
     .replace(/\\maketitle/g, "")
