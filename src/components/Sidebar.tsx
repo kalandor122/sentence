@@ -37,12 +37,21 @@ interface HeadingEntry {
   position: number;
 }
 
+function headingText(node: DocumentNode): string {
+  if (node.type === "mathInline") {
+    const latex = node.attrs?.latex;
+    return typeof latex === "string" ? latex : "";
+  }
+  if (node.type === "hardBreak") return " ";
+  return (node.text ?? "") + (node.content ?? []).map(headingText).join("");
+}
+
 function headingEntries(document: SentenceDocument): HeadingEntry[] {
   const result: HeadingEntry[] = [];
   let position = 0;
   const visit = (node: DocumentNode) => {
     if (node.type === "heading") {
-      const text = (node.content ?? []).map((child) => child.text ?? "").join("") || "Untitled heading";
+      const text = (node.content ?? []).map(headingText).join("") || "Untitled heading";
       result.push({
         level: Number(node.attrs?.level ?? 1),
         text,
