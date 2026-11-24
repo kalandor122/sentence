@@ -471,3 +471,4 @@ Aborting
 2026-11-24T23:06:44Z START qa-164 on qa/qa-164-a-hand-written-booktabs-table-turns-topr: A hand-written booktabs table turns \toprule/\midrule/\bottomrule into cells and an extra row
 2026-11-24T23:08:29Z PUSHED main
 2026-11-24T23:08:29Z DONE qa-164 (tsc -b, npm test, smoke all green)
+2026-11-24T23:09:03Z START qa-165 on qa/qa-165-starred-section-section-is-shown-as-lite: Starred section \section*{...} is shown as literal text and escaped on export

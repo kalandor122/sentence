@@ -12,7 +12,9 @@ function stringAttribute(node: { attrs?: Record<string, unknown> }, name: string
 
 // A section label (`\label{sec:intro}`) is metadata for \ref, not heading text.
 // Keeping it on the heading node means the next visual edit does not drop it
-// before the LaTeX is regenerated.
+// before the LaTeX is regenerated. The same goes for the star in
+// `\section*{...}`: it marks the heading unnumbered, so it has to survive the
+// editor's node schema or the next export silently numbers it.
 export const HeadingLabel = Extension.create({
   name: "headingLabel",
 
@@ -26,6 +28,12 @@ export const HeadingLabel = Extension.create({
             parseHTML: (element) => element.getAttribute("data-label"),
             renderHTML: (attributes) =>
               attributes.label ? { "data-label": attributes.label } : {},
+          },
+          unnumbered: {
+            default: false,
+            parseHTML: (element) => element.hasAttribute("data-unnumbered"),
+            renderHTML: (attributes) =>
+              attributes.unnumbered ? { "data-unnumbered": "" } : {},
           },
         },
       },

@@ -2,7 +2,35 @@
 import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
-import { CommentMark } from "./extensions";
+import { CommentMark, HeadingLabel } from "./extensions";
+
+describe("HeadingLabel", () => {
+  it("keeps a starred heading unnumbered through the editor", () => {
+    const editor = new Editor({
+      extensions: [StarterKit, HeadingLabel],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "heading",
+            attrs: { level: 1, unnumbered: true },
+            content: [{ type: "text", text: "ZXSTAR SECTION" }],
+          },
+          { type: "paragraph", content: [{ type: "text", text: "ZXSTAR BODY" }] },
+        ],
+      },
+    });
+    const heading = editor.getJSON().content?.[0];
+    expect(heading?.attrs?.unnumbered).toBe(true);
+    const html = editor.getHTML();
+    expect(html).toContain("data-unnumbered");
+
+    const reloaded = new Editor({ extensions: [StarterKit, HeadingLabel], content: html });
+    expect(reloaded.getJSON().content?.[0]?.attrs?.unnumbered).toBe(true);
+    editor.destroy();
+    reloaded.destroy();
+  });
+});
 
 describe("CommentMark", () => {
   it("keeps overlapping comment marks on the same text", () => {

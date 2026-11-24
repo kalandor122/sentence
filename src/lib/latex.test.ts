@@ -848,6 +848,24 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("\\textbackslash{}label");
   });
 
+  it("keeps a starred section unnumbered instead of escaping its command", () => {
+    const source = [
+      "\\begin{document}",
+      "\\section*{ZXSTAR SECTION}",
+      "",
+      "ZXSTAR BODY",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const heading = parsed.content[0];
+    expect(heading?.type).toBe("heading");
+    expect(heading?.attrs).toEqual({ level: 1, unnumbered: true });
+    expect(parsed.content[1]?.content?.map((node) => node.text).join("")).toBe("ZXSTAR BODY");
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\section*{ZXSTAR SECTION}");
+    expect(exported).not.toContain("\\textbackslash{}");
+  });
+
   it("imports a list followed by text without a blank line", () => {
     const source = [
       "\\begin{document}",
