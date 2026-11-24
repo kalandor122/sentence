@@ -1,5 +1,6 @@
 import { Mark, Node, mergeAttributes } from "@tiptap/core";
 import Image from "@tiptap/extension-image";
+import type { DOMOutputSpec } from "@tiptap/pm/model";
 import { footnoteNodeView } from "./Footnote";
 import { katexNodeView } from "./KatexMath";
 import { TOC_COMPILE_NOTE, tocEntries, tocNodeView } from "./TocBlock";
@@ -19,7 +20,27 @@ export const ProjectImage = Image.extend({
         renderHTML: (attributes) =>
           attributes.path ? { "data-path": attributes.path } : {},
       },
+      // The caption is what the PDF shows under the figure. Keeping it apart
+      // from the alt text means a dropped file name never becomes a caption.
+      caption: {
+        default: "",
+        parseHTML: (element) =>
+          element.closest("figure")?.querySelector("figcaption")?.textContent ?? "",
+        // The node renders its own <figcaption>; do not duplicate the text as
+        // an attribute on the <img>.
+        renderHTML: () => ({}),
+      },
     };
+  },
+
+  // A standalone image is a figure so the caption that will be exported as
+  // \caption is visible under it while editing.
+  renderHTML({ node, HTMLAttributes }) {
+    const caption = stringAttribute(node, "caption");
+    const image: DOMOutputSpec = ["img", HTMLAttributes];
+    return caption
+      ? ["figure", { class: "figure-block" }, image, ["figcaption", {}, caption]]
+      : ["figure", { class: "figure-block" }, image];
   },
 
   parseHTML() {

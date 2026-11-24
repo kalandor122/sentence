@@ -406,11 +406,11 @@ function serializeBlock(node: DocumentNode, mode: "html" | "markdown"): string {
     case "image": {
       const src = escapeHtml(imageSource(node));
       const alt = escapeHtml(attribute(node, "alt"));
+      const caption = attribute(node, "caption");
       if (mode === "html") {
-        const caption = attribute(node, "alt");
         return `<figure><img src="${src}" alt="${alt}">${caption ? `<figcaption>${escapeHtml(caption)}</figcaption>` : ""}</figure>`;
       }
-      return `![${attribute(node, "alt")}](${imageSource(node)})`;
+      return `![${caption || attribute(node, "alt")}](${imageSource(node)})`;
     }
     case "table":
       return mode === "html" ? tableToHtml(node) : tableToMarkdown(node);
@@ -810,11 +810,13 @@ function blocksFromHtml(children: HtmlChild[]): DocumentNode[] {
         const caption = child.children.find(
           (item): item is HtmlChildElement => item.kind === "element" && item.tag === "figcaption",
         );
+        const captionText = caption ? elementText(caption) : "";
         blocks.push({
           type: "image",
           attrs: {
             src: image.attrs.src ?? "",
-            alt: caption ? elementText(caption) : image.attrs.alt ?? "",
+            alt: image.attrs.alt ?? captionText,
+            ...(captionText ? { caption: captionText } : {}),
           },
         });
       }
