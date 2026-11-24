@@ -479,3 +479,5 @@ Aborting
 2026-11-24T23:13:03Z DONE qa-166 (tsc -b, npm test, smoke all green)
 2026-11-24T23:23:48Z EXPLORE persistence: 2 new items, agent exit 0
 2026-11-24T23:24:02Z START qa-172 on qa/qa-172-a-failed-localstorage-write-for-the-rece: A failed localStorage write for the recent-projects list unmounts the whole app to a blank page
+2026-11-24T23:26:55Z PUSHED main
+2026-11-24T23:26:55Z DONE qa-172 (tsc -b, npm test, smoke all green)
