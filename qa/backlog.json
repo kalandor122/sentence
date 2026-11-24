@@ -2328,10 +2328,11 @@
       ],
       "hint": "innerHTML unchanged",
       "source": "keyboard shortcut \"tab indent\" has no visible effect on the document",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T20:21:25Z",
-      "lastAttemptAt": "2026-11-24T20:21:25Z"
+      "lastAttemptAt": "2026-11-24T20:21:25Z",
+      "doneAt": "2026-11-24T20:24:34Z"
     },
     {
       "id": "qa-147",
@@ -2391,7 +2392,9 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click a body cell. In the Table toolbar click 'Delete column' twice to reach one column, then click it again. Then click 'Delete row' twice to reach one row, then click it again.\nActual: Both buttons remain enabled (not disabled) at the minimum. Clicking Delete column with one column left leaves the table at 3x1 and clicking Delete row with one row left leaves it at 1x1; the exported LaTeX stays a one-column, one-row tabular. The controls give no feedback that nothing happened.",
       "source": "explore:tables:delete row and delete column stay enabled at one row/column and silently do nothing",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T20:31:43Z"
     }
   ]
 }

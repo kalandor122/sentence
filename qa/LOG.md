@@ -416,3 +416,5 @@ Aborting
 2026-11-24T20:16:03Z START qa-149 on qa/qa-149-add-row-above-the-header-row-moves-the-h: Add row above the header row moves the header into row 2 and the toolbar then reports no header row
 2026-11-24T20:20:51Z DONE qa-149 (tsc -b, npm test, smoke all green)
 2026-11-24T20:21:25Z START qa-146 on qa/qa-146-keyboard-shortcut-tab-indent-has-no-visi: keyboard shortcut "Tab indent" has no visible effect on the document
+2026-11-24T20:24:34Z DONE qa-146 (tsc -b, npm test, smoke all green)
+2026-11-24T20:31:28Z EXPLORE math: 0 new items, agent exit 1
