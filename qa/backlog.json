@@ -2341,8 +2341,9 @@
       "hint": "Repro: Create a new project. Insert tab > Insert table (3x3 with header row). Click the middle cell (row 2, column 2) and type 'outer'. Click Insert tab > Insert table again. In the nested table click its first cell, type 'n1', press Tab, type 'n2', press Tab, type 'n3'. Switch to View > LaTeX and read the table block, then click Apply source and switch back to View > Visual.\nActual: The visual editor holds 2 tables (a 3x3 outer table plus a 3x3 nested table, 6 rows in the DOM), but the exported tabular has only the outer 3 rows and one cell reading 'outer\\par n1n2n3' \u2014 the nested table's rows/cells are flattened with no separators. Applying that source back removes the nested table entirely and leaves the concatenated text inside the parent cell. The Insert table button stays enabled inside a cell.",
       "source": "explore:tables:inserting a table inside a table silently flattens the nested table's cells into the parent cell",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T20:11:19Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T20:11:19Z",
+      "lastAttemptAt": "2026-11-24T20:11:19Z"
     },
     {
       "id": "qa-148",

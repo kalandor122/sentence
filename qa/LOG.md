@@ -409,3 +409,4 @@ Aborting
 2026-11-24T19:49:15Z DONE qa-145 (tsc -b, npm test, smoke all green)
 2026-11-24T19:49:49Z BACKLOG EMPTY — nothing open, idle
 2026-11-24T20:11:04Z EXPLORE tables: 4 new items, agent exit 0
+2026-11-24T20:11:19Z START qa-147 on qa/qa-147-inserting-a-table-inside-a-table-silentl: Inserting a table inside a table silently flattens the nested table's cells into the parent cell
