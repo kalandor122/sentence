@@ -2296,10 +2296,11 @@
       ],
       "hint": "Repro: Create a new document and click Source in the status bar. Replace the body between \\begin{document} and \\end{document} with exactly: '\\begin{itemize}' newline '\\item a' newline '\\item b' newline '\\end{itemize}' newline 'Following paragraph' (no blank line after \\end{itemize}). Click Apply source, click Visual, then reopen Source and click Refresh from visual.\nActual: Apply reports 'Visual document synchronized from LaTeX.' but the visual document is one plain paragraph containing the literal text '\\begin{itemize}', '\\item a', '\\item b', '\\end{itemize}' and 'Following paragraph'. The regenerated LaTeX escapes it as '\\textbackslash{}begin\\{itemize\\}', '\\textbackslash{}item a', '\\textbackslash{}item b' and '\\textbackslash{}end\\{itemize\\}' followed by the text, so the list is permanently corrupted. The same happens with an enumerate and when two itemize environments are separated by text with no blank lines. Adding a blank line after \\end{itemize} makes the same source import correctly.",
       "source": "explore:lists:a list followed by paragraph text without a blank line is imported as escaped literal text",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T19:43:18Z",
-      "lastAttemptAt": "2026-11-24T19:43:18Z"
+      "lastAttemptAt": "2026-11-24T19:43:18Z",
+      "doneAt": "2026-11-24T19:45:13Z"
     },
     {
       "id": "qa-145",
@@ -2311,7 +2312,9 @@
       ],
       "hint": "Repro: Create a new document, type 'one', click Home > Bulleted list, press Enter, type 'two'. Press Ctrl+A (the editor selection covers both items), then click Home > Bulleted list again and read the LaTeX source. Repeat with Numbered list and with Ctrl+Shift+8.\nActual: The document stays a list and gains a third empty item: the editor DOM is '<ul><li>one</li><li>two</li><li><br></li></ul>' and the LaTeX is '\\begin{itemize}\\n\\item one\\n\\item two\\n\\item \\n\\end{itemize}'. The Numbered list case produces an extra '\\item ' in an enumerate, and Ctrl+Shift+8 behaves the same. While the whole list is selected the Bulleted/Numbered list button reports aria-pressed=false. Selecting only the two list items and toggling does convert them to paragraphs.",
       "source": "explore:lists:ctrl+a then the list button does not convert a list to paragraphs; it appends an empty item",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T19:45:47Z"
     }
   ]
 }
