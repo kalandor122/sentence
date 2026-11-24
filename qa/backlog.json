@@ -2592,8 +2592,9 @@
       "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add the standalone line `\\[ ZXBRACKET E = mc^2 \\]`. 3. Click Apply source, then View tab > Visual. 4. Repeat steps 2-3 with `$$ ZXDOLLAR E = mc^2 $$` and with `\\begin{equation}ZXONELINE E = mc^2\\end{equation}` all on one line.\nActual: All three applies report `Visual document synchronized from LaTeX.` and the visual pane shows the delimiters as ordinary paragraph text with zero math blocks (probe mathBlocks: []). Refresh from visual then writes `\\textbackslash{}[ ZXBRACKET E = mc\\textasciicircum{}2 \\textbackslash{}]`, `\\$\\$ ZXDOLLAR E = mc\\textasciicircum{}2 \\$\\$`, and `\\textbackslash{}begin\\{equation\\}ZXONELINE E = mc\\textasciicircum{}2\\textbackslash{}end\\{equation\\}`. The equations survive only as escaped text, not as math.",
       "source": "explore:source-editor:display math written with \\[...\\], $$...$$ or a one-line equation environment is imported as literal text and escaped",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T22:35:08Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T22:35:08Z",
+      "lastAttemptAt": "2026-11-24T22:35:08Z"
     },
     {
       "id": "qa-164",

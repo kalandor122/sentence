@@ -669,6 +669,37 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("\\textbackslash{}begin");
   });
 
+  it("imports bracket, dollar and single-line equation display math as math blocks", () => {
+    const source = [
+      "\\begin{document}",
+      "",
+      "\\[ ZXBRACKET E = mc^2 \\]",
+      "",
+      "$$ ZXDOLLAR E = mc^2 $$",
+      "",
+      "\\begin{equation}ZXONELINE E = mc^2\\end{equation}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    expect(parsed.content.map((node) => node.type)).toEqual([
+      "mathBlock",
+      "mathBlock",
+      "mathBlock",
+    ]);
+    expect(parsed.content.map((node) => node.attrs?.latex)).toEqual([
+      "ZXBRACKET E = mc^2",
+      "ZXDOLLAR E = mc^2",
+      "ZXONELINE E = mc^2",
+    ]);
+    expect(parsed.content.map((node) => node.attrs?.numbered)).toEqual([false, false, true]);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\begin{equation*}\nZXBRACKET E = mc^2\n\\end{equation*}");
+    expect(exported).toContain("\\begin{equation*}\nZXDOLLAR E = mc^2\n\\end{equation*}");
+    expect(exported).toContain("\\begin{equation}\nZXONELINE E = mc^2\n\\end{equation}");
+    expect(exported).not.toContain("\\textbackslash{}[");
+    expect(exported).not.toContain("\\$\\$");
+  });
+
   it("keeps escaped dollar signs as literal text", () => {
     const source = "\\begin{document}\nCosts \\$5 and \\$10.\n\\end{document}";
     const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
