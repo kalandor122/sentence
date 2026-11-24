@@ -2397,6 +2397,68 @@
       "startedAt": "2026-11-24T20:31:43Z",
       "lastAttemptAt": "2026-11-24T20:31:43Z",
       "doneAt": "2026-11-24T20:33:36Z"
+    },
+    {
+      "id": "qa-151",
+      "title": "Footnote text cannot be edited in the visual editor; typing over the marker deletes the note",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected Double-clicking a footnote marker opens an editor for its text (or makes the marker editable) so the note can be corrected without being removed.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. At the end of the last paragraph press Enter, type `Footnotes `, then Insert > Footnote, enter `First note` and Insert, then repeat with `Second note`. Double-click the `2` marker on the page, then type `Z`.\nActual: Double-clicking only selects the atom: no dialog and no inline input appear, and the marker is `contenteditable=false`. Typing `Z` replaces the selected footnote with body text; the page becomes `Footnotes 1Z` and the exported LaTeX loses `\\footnote{Second note}` (`Footnotes \\footnote{First note}Z`).",
+      "source": "explore:links-cites-footnotes:footnote text cannot be edited in the visual editor; typing over the marker deletes the note",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T21:02:06Z"
+    },
+    {
+      "id": "qa-152",
+      "title": "Inserting a citation, footnote or cross-reference after a LaTeX round-trip puts it inside the title heading",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected After returning from LaTeX the last caret position is restored, or at least the new citation/footnote/reference is inserted in the body where the user was working, not in the document title.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Click the last paragraph, press Ctrl+End, Enter and type `End marker`. Open View > LaTeX, then View > Visual. Without clicking in the page, open References > Insert citation and click Cite; then Insert > Footnote with `Note after round trip`; then References > Cross-reference with `sec:after-roundtrip`. Open View > LaTeX.\nActual: All three nodes are inserted at position 0, inside the `Introduction` heading. The page begins `[sentence2026]1ref: sec:after-roundtripIntroduction` and the exported source contains `\\section{\\cite{sentence2026}\\footnote{Note after round trip}\\ref{sec:after-roundtrip}Introduction}`, while `End marker` remains unchanged at the end.",
+      "source": "explore:links-cites-footnotes:inserting a citation, footnote or cross-reference after a latex round-trip puts it inside the title heading",
+      "status": "open"
+    },
+    {
+      "id": "qa-153",
+      "title": "No way to remove a hyperlink: clearing the address disables Insert and Escape keeps the link",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected Removing the address (or a Remove/Unlink action) removes the hyperlink while keeping `alpha` as plain text.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. At the end type `LinkOne alpha`, select `alpha`, press Ctrl+K, enter `https://example.com/page` and click Insert. Click the link, press Ctrl+K, clear the Address field and press Escape.\nActual: The dialog only offers Cancel and Insert; with an empty Address, Insert is disabled. Escape closes the dialog and `alpha` still links to `https://example.com/page`. The dialog exposes no remove/unlink control.",
+      "source": "explore:links-cites-footnotes:no way to remove a hyperlink: clearing the address disables insert and escape keeps the link",
+      "status": "open"
+    },
+    {
+      "id": "qa-154",
+      "title": "BibTeX keys and cross-reference labels are written to LaTeX unescaped, so `}` breaks the command",
+      "why": "Exploratory pass on links-cites-footnotes (content): expected The dialog rejects keys/labels that would break LaTeX, or the exporter escapes them so the generated source stays syntactically valid.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. At the end, open References > Insert citation > Enter a key manually, type `bad key}` and click Insert. Open View > LaTeX. Then insert a cross-reference with the label `fig}` from References > Cross-reference and check the source again.\nActual: The exported lines are `BadCite \\cite{bad key}}` and `BadRef \\ref{fig}}` (one extra closing brace each, unmatched). The node accepts and displays `[bad key}]` / `ref: fig}` without any validation warning.",
+      "source": "explore:links-cites-footnotes:bibtex keys and cross-reference labels are written to latex unescaped, so `}` breaks the command",
+      "status": "open"
+    },
+    {
+      "id": "qa-155",
+      "title": "A citation key missing from the bibliography is inserted with no warning",
+      "why": "Exploratory pass on links-cites-footnotes (ux): expected The app flags that `ghost2026` is not in references.bib (a warning, toast, or an unknown-key marker in the References panel).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Open References > Insert citation, click `Enter a key manually`, type `ghost2026` and click Insert.\nActual: `[ghost2026]` is inserted silently: no toast or warning appears anywhere, and the References panel still reports `1 of 1` with no indication that the document cites an unknown key.",
+      "source": "explore:links-cites-footnotes:a citation key missing from the bibliography is inserted with no warning",
+      "status": "open"
     }
   ]
 }
