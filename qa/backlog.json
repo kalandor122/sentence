@@ -2373,8 +2373,9 @@
       "hint": "Repro: Create a new project. Insert tab > Insert table (3x3 with header row). Click a cell in the first (header) row, then click 'Add row above' in the Table toolbar. Inspect the first two rows, then switch to View > LaTeX, click Apply source and return to View > Visual.\nActual: A TD row is inserted above the header row, so the table's TH cells end up in row 2 while row 1 is plain TD. The Table toolbar's 'Header row' button now reports unpressed (aria-pressed=false) even though row 2 is still a header row. After Apply source the header is back in row 1, so the same document looks different before and after the round trip.",
       "source": "explore:tables:add row above the header row moves the header into row 2 and the toolbar then reports no header row",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T20:16:03Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T20:16:03Z",
+      "lastAttemptAt": "2026-11-24T20:16:03Z"
     },
     {
       "id": "qa-150",
