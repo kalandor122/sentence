@@ -7,6 +7,7 @@ import {
   documentChanges,
   nodeText,
   rejectRevisions,
+  revisionChanges,
   trackedShape,
   trackedText,
   undoDocumentChanges,
@@ -115,6 +116,67 @@ describe("tracked text comparison", () => {
     expect(trackedShape(split)).not.toBe(trackedShape(single));
     expect(trackedShape(appended)).not.toBe(trackedShape(single));
     expect(trackedShape(annotated)).toBe(trackedShape(doc("Comment on tracked text")));
+  });
+});
+
+describe("review decorations", () => {
+  const commented: SentenceDocument = {
+    type: "doc",
+    content: [
+      {
+        type: "paragraph",
+        content: [
+          { type: "text", text: "Keep " },
+          { type: "text", text: "beta", marks: [{ type: "comment", attrs: { markId: "c1" } }] },
+          { type: "text", text: " text" },
+        ],
+      },
+    ],
+  };
+
+  it("reports a replaced commented word without touching the unchanged rest of the run", () => {
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "Keep B text" }] }],
+    };
+    expect(revisionChanges(revision("r1", commented, after))).toEqual([
+      {
+        kind: "text",
+        path: ["content", 0, "content", 0, "text"],
+        prefix: "Keep ",
+        removed: "beta",
+        inserted: "B",
+        suffix: " text",
+        after: "Keep B text",
+      },
+    ]);
+  });
+
+  it("reports only the appended text when a comment mark splits the paragraph", () => {
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "Keep " },
+            { type: "text", text: "beta", marks: [{ type: "comment", attrs: { markId: "c1" } }] },
+            { type: "text", text: " text tail" },
+          ],
+        },
+      ],
+    };
+    expect(revisionChanges(revision("r1", commented, after))).toEqual([
+      {
+        kind: "text",
+        path: ["content", 0, "content", 0, "text"],
+        prefix: "Keep beta text",
+        removed: "",
+        inserted: " tail",
+        suffix: "",
+        after: "Keep beta text tail",
+      },
+    ]);
   });
 });
 
