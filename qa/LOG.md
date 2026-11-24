@@ -462,3 +462,6 @@ Aborting
 2026-11-24T22:34:34Z PUSHED main
 2026-11-24T22:34:34Z DONE qa-160 (tsc -b, npm test, smoke all green)
 2026-11-24T22:35:08Z START qa-163 on qa/qa-163-display-math-written-with-or-a-one-line: Display math written with \[...\], $$...$$ or a one-line equation environment is imported as literal text and escaped
+2026-11-24T22:36:56Z PUSHED main
+2026-11-24T22:36:56Z DONE qa-163 (tsc -b, npm test, smoke all green)
+2026-11-24T23:00:13Z EXPLORE long-document: 2 new items, agent exit 0
