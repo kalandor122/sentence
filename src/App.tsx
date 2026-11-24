@@ -61,6 +61,7 @@ import {
   documentToLatex,
   hasCitations,
   imageAssetPath,
+  isLatexReferenceTarget,
   latexToDocument,
   restoreImageSources,
 } from "./lib/latex";
@@ -1348,10 +1349,18 @@ export default function App() {
     setDialog(null);
   };
 
-  const validateDialog = (): string | null => {
-    if (dialog?.kind !== "comment") return null;
-    if (!workspace || !editor) return "Open a document before adding a comment.";
-    return editor.state.selection.empty ? "Select text before adding a comment." : null;
+  const validateDialog = (value: string): string | null => {
+    if (dialog?.kind === "comment") {
+      if (!workspace || !editor) return "Open a document before adding a comment.";
+      return editor.state.selection.empty ? "Select text before adding a comment." : null;
+    }
+    if (dialog?.kind === "citation" && !isLatexReferenceTarget(value)) {
+      return "A BibTeX key cannot contain spaces, commas, braces, parentheses or LaTeX special characters.";
+    }
+    if (dialog?.kind === "cross-reference" && !isLatexReferenceTarget(value)) {
+      return "A label cannot contain spaces, braces, parentheses or LaTeX special characters.";
+    }
+    return null;
   };
 
   const handleDialogSubmit = (value: string) => {
@@ -2073,7 +2082,7 @@ export default function App() {
         placeholder={"placeholder" in dialogProps ? dialogProps.placeholder : undefined}
         multiline={"multiline" in dialogProps ? dialogProps.multiline : false}
         confirmLabel={"confirmLabel" in dialogProps ? dialogProps.confirmLabel : "Insert"}
-        validate={dialog?.kind === "comment" ? validateDialog : undefined}
+        validate={dialog ? validateDialog : undefined}
         removeLabel={dialog?.kind === "link" && dialog.existingLink ? "Remove link" : undefined}
         onRemove={dialog?.kind === "link" && dialog.existingLink ? removeLink : undefined}
         onClose={closeDialog}

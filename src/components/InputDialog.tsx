@@ -10,7 +10,7 @@ interface InputDialogProps {
   placeholder?: string;
   confirmLabel?: string;
   multiline?: boolean;
-  validate?: () => string | null;
+  validate?: (value: string) => string | null;
   removeLabel?: string;
   onRemove?: () => void;
   onClose: () => void;
@@ -49,7 +49,7 @@ export default function InputDialog({
 
   const submit = () => {
     if (!value.trim()) return;
-    const message = validate?.() ?? null;
+    const message = validate?.(value.trim()) ?? null;
     if (message) {
       setError(message);
       return;

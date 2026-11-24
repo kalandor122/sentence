@@ -5,6 +5,7 @@ import {
   documentPlainText,
   documentToLatex,
   escapeLatex,
+  isLatexReferenceTarget,
   latexToDocument,
   restoreImageSources,
 } from "./latex";
@@ -21,6 +22,37 @@ describe("LaTeX generation", () => {
     expect(escapeLatex("50% & $5 #1 a_b {x} ~ ^")).toBe(
       "50\\% \\& \\$5 \\#1 a\\_b \\{x\\} \\textasciitilde{} \\textasciicircum{}",
     );
+  });
+
+  it("refuses citation keys and labels that would break their LaTeX command", () => {
+    expect(isLatexReferenceTarget("einstein1905")).toBe(true);
+    expect(isLatexReferenceTarget("fig:architecture")).toBe(true);
+    expect(isLatexReferenceTarget("bad key}")).toBe(false);
+    expect(isLatexReferenceTarget("fig}")).toBe(false);
+    expect(isLatexReferenceTarget("a{b")).toBe(false);
+    expect(isLatexReferenceTarget("a%b")).toBe(false);
+    expect(isLatexReferenceTarget("a,b")).toBe(false);
+  });
+
+  it("keeps exported citation keys and labels syntactically valid", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "BadCite " },
+            { type: "citation", attrs: { key: "bad key}" } },
+            { type: "text", text: " BadRef " },
+            { type: "crossReference", attrs: { label: "fig}" } },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("BadCite \\cite{badkey}");
+    expect(latex).toContain("BadRef \\ref{fig}");
+    expect(latex).not.toContain("bad key}}");
   });
 
   it("serializes rich content and custom nodes", () => {
