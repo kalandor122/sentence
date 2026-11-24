@@ -2329,8 +2329,9 @@
       "hint": "innerHTML unchanged",
       "source": "keyboard shortcut \"tab indent\" has no visible effect on the document",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T20:21:25Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T20:21:25Z",
+      "lastAttemptAt": "2026-11-24T20:21:25Z"
     },
     {
       "id": "qa-147",
