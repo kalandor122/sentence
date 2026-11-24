@@ -2201,8 +2201,9 @@
       "hint": "Repro: On the Home ribbon tab, Tab to the 'Text color' button, press Enter to open the swatch popover, then press Escape.\nActual: The .color-popover is still open after Escape and focus remains on the 'Text color' trigger; nothing else closes it except toggling the trigger or clicking the backdrop.",
       "source": "explore:keyboard:escape does not close the text color popover",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T18:28:43Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T18:28:43Z",
+      "lastAttemptAt": "2026-11-24T18:28:43Z"
     }
   ]
 }

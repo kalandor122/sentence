@@ -156,9 +156,20 @@ function ColorPalette({
   onPick,
 }: ColorPaletteProps) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   return (
-    <div className="color-menu">
+    <div
+      className="color-menu"
+      onKeyDown={(event) => {
+        if (event.key !== "Escape" || !open) return;
+        event.preventDefault();
+        event.stopPropagation();
+        setOpen(false);
+        triggerRef.current?.focus();
+      }}
+    >
       <button
+        ref={triggerRef}
         type="button"
         className={`icon-button color-button ${activeColor ? "active" : ""}`}
         disabled={disabled}
