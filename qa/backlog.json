@@ -2712,8 +2712,9 @@
       "hint": "Repro: Build the same 3,600-word / 50-heading document (Headings 16 and 50 end up with padding-top:980px). In the Outline panel click 'Heading 50 HDOC50' and wait 1.4s for the smooth scroll. The viewport shows only blank paper: the heading text line is at y=941 while the editor viewport spans y=149-776 (scrollTop 11,449). Clicking 'Heading 16 HDOC16' reproduces it (text at y=941). Screenshot: qa/shots/probe-long-outline-last-heading.png. Clicking the 48 unpadded entries (Heading 1, 10, 20, 25, 30, 40 tested) lands with the text at y=450-451, inside the viewport.\nActual: The click centers the heading element including its 980px of pagination padding, so the block box is centered but the heading text ends up 165px below the bottom of the viewport; the user is left looking at an empty page.",
       "source": "explore:long-document:outline click on a page-snapped heading scrolls to blank space instead of the heading",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T23:29:38Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T23:29:38Z",
+      "lastAttemptAt": "2026-11-24T23:29:38Z"
     },
     {
       "id": "qa-172",
