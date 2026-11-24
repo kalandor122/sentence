@@ -36,6 +36,7 @@ export default function StatusBar({
       <span className={`compile-status ${compileState}`}>
         {compileState === "compiling" ? "Typesetting" : compileState === "success" ? <><Check size={12} /> PDF up to date</> : compileState === "error" ? "Compilation error" : "PDF not built"}
       </span>
+      <span className="status-hint" title="Leaves the editing surface and moves focus to the next control">Esc leaves the page</span>
       <div className="status-spacer" />
       <div className="status-mode" role="group" aria-label="Editor mode">
         {MODES.map(({ value, label, shortcut, icon: Icon }) => (

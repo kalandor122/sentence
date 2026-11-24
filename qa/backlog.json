@@ -2153,8 +2153,9 @@
       "hint": "Repro: Open the editor, click into a paragraph, then press Tab three times. Then try Shift+Tab three times and Escape while the editor is focused.\nActual: Focus stays on the .sentence-editor contenteditable after every key. A clean run went from 1 to 4 blockquotes over three Tab presses (each press wraps the paragraph in another blockquote); the 40-stop Tab walk reached the editor at stop 35 and stops 36-40 were all the editor, never the status bar or any later control. Shift+Tab left focus in the editor for all three presses, and Escape also left focus in the editor.",
       "source": "explore:keyboard:tab is trapped in the document editor and each press nests the paragraph in another blockquote",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T18:19:05Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T18:19:05Z",
+      "lastAttemptAt": "2026-11-24T18:19:05Z"
     },
     {
       "id": "qa-136",

@@ -449,10 +449,10 @@ export default function Ribbon({
               <IconButton label="Numbered list" active={editor?.isActive("orderedList")} disabled={disabled} onClick={() => editor && toggleList(editor, "orderedList")}>
                 <ListOrdered size={18} />
               </IconButton>
-              <IconButton label="Increase indent (Tab)" aria-keyshortcuts="Tab" disabled={disabled || editor?.isActive("table") || editor?.isActive("codeBlock")} onClick={() => editor && changeIndent(editor, false)}>
+              <IconButton label="Increase indent (Ctrl+])" aria-keyshortcuts="Control+]" disabled={disabled || editor?.isActive("table") || editor?.isActive("codeBlock")} onClick={() => editor && changeIndent(editor, false)}>
                 <IndentIncrease size={18} />
               </IconButton>
-              <IconButton label="Decrease indent (Shift+Tab)" aria-keyshortcuts="Shift+Tab" disabled={disabled || editor?.isActive("table") || editor?.isActive("codeBlock")} onClick={() => editor && changeIndent(editor, true)}>
+              <IconButton label="Decrease indent (Ctrl+[)" aria-keyshortcuts="Control+[" disabled={disabled || editor?.isActive("table") || editor?.isActive("codeBlock")} onClick={() => editor && changeIndent(editor, true)}>
                 <IndentDecrease size={18} />
               </IconButton>
               <IconButton label="Block quote" active={editor?.isActive("blockquote")} disabled={disabled} onClick={() => editor?.chain().focus().toggleBlockquote().run()}>
