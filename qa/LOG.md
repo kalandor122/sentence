@@ -366,3 +366,4 @@ Aborting
 2026-11-23T21:08:21Z DONE qa-122 (tsc -b, npm test, smoke all green)
 2026-11-23T21:32:42Z EXPLORE source-editor: 5 new items, agent exit 0
 2026-11-24T16:52:46Z START qa-128 on qa/qa-128-clicking-apply-source-drops-keyboard-foc: Clicking Apply source drops keyboard focus, so subsequent typing and redo are silently ignored
+2026-11-24T16:56:47Z DONE qa-128 (tsc -b, npm test, smoke all green)

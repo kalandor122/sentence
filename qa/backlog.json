@@ -2036,10 +2036,11 @@
       ],
       "hint": "Repro: 1. View > LaTeX and click into the textarea before \\end{document}. 2. Type `ZXFOCUS` and click 'Apply source'. 3. Without clicking back into the textarea, type `ZXLOST`. 4. Press Ctrl+Z, then Ctrl+Shift+Z. 5. Click back into the textarea and press Ctrl+Shift+Z again.\nActual: After Apply, document.activeElement is BODY (the Apply button is disabled and blurred) and `ZXLOST` never reaches the source (typingAfterApplyReachedEditor=false). Ctrl+Z does undo `ZXFOCUS`, but Ctrl+Shift+Z does nothing (redoAfterApplyWorked=false) until the user clicks into the textarea, after which redo restores `ZXFOCUS` and typing works again. The same happens after a failed Apply, where the enabled button keeps focus (activeElement=BUTTON): typing is lost and Ctrl+Shift+Z does not redo the draft (redoRestoredDraft=false).",
       "source": "explore:source-editor:clicking apply source drops keyboard focus, so subsequent typing and redo are silently ignored",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T16:52:46Z",
-      "lastAttemptAt": "2026-11-24T16:52:46Z"
+      "lastAttemptAt": "2026-11-24T16:52:46Z",
+      "doneAt": "2026-11-24T16:56:47Z"
     },
     {
       "id": "qa-129",
@@ -2051,7 +2052,9 @@
       ],
       "hint": "Repro: 1. View > LaTeX and before \\end{document} add two lines: `ZXCOMMENTBLOCK text body` followed by `% ZXCOMMENTBLOCK ignored by LaTeX`, then a blank line and `ZXCOMMENTINLINE text % ZXCOMMENTINLINE note`. 2. Click 'Apply source'. 3. Click View > Visual. 4. Click View > LaTeX and read the textarea.\nActual: Apply reports success and the visual document shows the literal text `% ZXCOMMENTBLOCK ignored by LaTeX` and `% ZXCOMMENTINLINE note`. Returning to the source shows both comments rewritten with escaped percent signs (`\\% ZXCOMMENTBLOCK ignored by LaTeX`, `\\% ZXCOMMENTINLINE note`), so the comments are permanently converted into visible document content. Reproduced for both a whole-line comment and a trailing comment.",
       "source": "explore:source-editor:latex comments in the document body become visible text and are escaped on export",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T16:57:30Z"
     },
     {
       "id": "qa-130",
