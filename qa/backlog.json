@@ -2486,6 +2486,68 @@
       "source": "roadmap:word-style design foundation: typography, density and colour tokens",
       "status": "done",
       "note": "tokens swapped to Word 365 palette + Segoe UI stack, 12px tabs, accent underline, sheet shadow, ribbon group dividers; verified by screenshot and gate"
+    },
+    {
+      "id": "qa-157",
+      "title": "Turning tracking off within the revision debounce silently discards the edit that was made while tracking was on",
+      "why": "Exploratory pass on review (functional): expected The text typed while tracking was on is still recorded as a pending tracked change (or the app warns that turning tracking off will discard it).",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. In a fresh document type 'Toggle race baseline'. 2. Review tab > Track changes (the button becomes 'Tracking on'). 3. Put the caret at the end and type ' tracked-write'. 4. Within about a second, before the 1.8 s revision delay elapses, click Review tab > 'Tracking on' to turn tracking off. 5. Wait 2.5 s and open the History sidebar.\nActual: No revision card is created. The History panel shows 'Tracked changes 0' and the text 'Toggle race baseline tracked-write' stays in the document as if it had been accepted. The only feedback is the toast 'Tracked changes is off.' The probe measured 804 ms between typing and turning tracking off, well inside the 1.8 s debounce, and still saw zero revisions after waiting 2.3 s.",
+      "source": "explore:review:turning tracking off within the revision debounce silently discards the edit that was made while tracking was on",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T21:33:42Z"
+    },
+    {
+      "id": "qa-158",
+      "title": "Rejecting a tracked insertion of a new paragraph leaves an empty paragraph behind",
+      "why": "Exploratory pass on review (functional): expected Rejecting the tracked paragraph insertion restores the document to exactly the pre-edit state: one paragraph reading 'Only paragraph'.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. In a fresh document type 'Only paragraph'. 2. Review tab > Track changes. 3. Put the caret at the end, press Enter, type 'Second paragraph', and wait 2.3 s for the revision card. 4. Open History and click Reject on the card whose before text is 'Only paragraph' and after text is 'Only paragraph Second paragraph'.\nActual: The revision card disappears and 'Second paragraph' is removed, but the document keeps a second, empty paragraph with the 'Begin with a sentence...' placeholder. The probe read the editor HTML ('<p>Only paragraph</p><p ... is-empty><br></p>') and the saved workspace document, which still contains two paragraph nodes, the second with no content.",
+      "source": "explore:review:rejecting a tracked insertion of a new paragraph leaves an empty paragraph behind",
+      "status": "open"
+    },
+    {
+      "id": "qa-159",
+      "title": "Applying an edited LaTeX source drops the highlight of a comment that spans two paragraphs even when both paragraphs sti",
+      "why": "Exploratory pass on review (functional): expected The comment stays anchored to the two paragraphs it covers, since their text still exists, or at minimum the app keeps a visible anchor rather than silently losing it.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Type 'First paragraph', press Enter, then type 'Second paragraph'. 2. Select everything (Ctrl+A), Review tab > New comment, enter 'Comment across paragraphs' and click Comment; both paragraphs are highlighted by the same comment. 3. View tab > LaTeX, change 'Second paragraph' to 'Second paragraph revised', click Apply source, then click Visual and open the Review sidebar.\nActual: The toast reads 'Visual document synchronized from LaTeX. 1 comment no longer matches any text and lost its highlight.' The editor shows both paragraphs with the revised text, but zero [data-comment-id] highlight spans remain; the thread is still listed with badge 1 and can no longer locate any text.",
+      "source": "explore:review:applying an edited latex source drops the highlight of a comment that spans two paragraphs even when both paragraphs sti",
+      "status": "open"
+    },
+    {
+      "id": "qa-160",
+      "title": "Tracked-change decorations mark unchanged trailing text as both deleted and re-inserted when the paragraph contains a co",
+      "why": "Exploratory pass on review (visual): expected The inline tracked-change decoration shows only 'B' inserted and 'beta' deleted, matching the revision card's before 'Keep beta text' / after 'Keep B text'.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Type 'Keep beta text'. 2. Select 'beta' and add the comment 'Comment on replaced word'. 3. Review tab > Track changes. 4. Select 'beta' again and type 'B', then wait 2.3 s and open the History sidebar while the revision is pending.\nActual: The editor renders insertion decorations with text 'B ' and 'text' and deletion decorations with text 'beta' and ' text'. The unchanged trailing ' text' is shown as struck through as well as inserted. Deleting the commented word instead of replacing it produces the same artifact (insertions ' ' and 'text', deletions 'beta' and ' text').",
+      "source": "explore:review:tracked-change decorations mark unchanged trailing text as both deleted and re-inserted when the paragraph contains a co",
+      "status": "open"
+    },
+    {
+      "id": "qa-161",
+      "title": "Deleting the text a comment is attached to leaves the thread listed with no highlight and no way to locate it",
+      "why": "Exploratory pass on review (functional): expected Deleting the commented text either removes/closes the thread or leaves a visible anchor or an explicit 'text was deleted' state so the comment is not silently orphaned.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Type 'Keep this comment text'. 2. Select 'comment' and add the comment 'Comment on removed word'. 3. With tracking off, press Backspace to delete the selected word. 4. Open the Review sidebar and click the remaining comment thread.\nActual: The thread 'Comment on removed word' remains in the Review panel and still counts in the unresolved badge (1), but the editor contains zero comment highlights. Clicking the thread marks it active in the sidebar only; no text is highlighted and no indicator says the anchor is gone.",
+      "source": "explore:review:deleting the text a comment is attached to leaves the thread listed with no highlight and no way to locate it",
+      "status": "open"
     }
   ]
 }

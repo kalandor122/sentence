@@ -436,3 +436,4 @@ Aborting
 2026-11-24T21:15:35Z START qa-154 on qa/qa-154-bibtex-keys-and-cross-reference-labels-a: BibTeX keys and cross-reference labels are written to LaTeX unescaped, so `}` breaks the command
 2026-11-24T21:18:13Z PUSHED main
 2026-11-24T21:18:13Z DONE qa-154 (tsc -b, npm test, smoke all green)
+2026-11-24T21:33:28Z EXPLORE review: 5 new items, agent exit 0
