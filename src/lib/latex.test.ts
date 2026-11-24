@@ -799,6 +799,24 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("\\textbackslash{}");
   });
 
+  it("keeps a section label off the heading text and back in the source", () => {
+    const source = [
+      "\\begin{document}",
+      "\\section{ZXLABEL SECTION}\\label{sec:zxlabel}",
+      "",
+      "ZXLABEL BODY",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const heading = parsed.content[0];
+    expect(heading?.type).toBe("heading");
+    expect(heading?.attrs).toEqual({ level: 1, label: "sec:zxlabel" });
+    expect(heading?.content?.map((node) => node.text).join("")).toBe("ZXLABEL SECTION");
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\section{ZXLABEL SECTION}\\label{sec:zxlabel}");
+    expect(exported).not.toContain("\\textbackslash{}label");
+  });
+
   it("imports a list followed by text without a blank line", () => {
     const source = [
       "\\begin{document}",

@@ -452,3 +452,4 @@ Aborting
 2026-11-24T21:58:33Z PUSHED main
 2026-11-24T21:58:33Z DONE qa-121 (tsc -b, npm test, smoke all green)
 2026-11-24T22:20:53Z EXPLORE source-editor: 8 new items, agent exit 0
+2026-11-24T22:21:07Z START qa-162 on qa/qa-162-a-section-with-a-label-on-the-same-line: A section with a label on the same line gets its heading corrupted and loses the label

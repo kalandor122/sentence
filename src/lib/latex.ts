@@ -333,7 +333,11 @@ function blockToLatex(node: DocumentNode, enumDepth = 0): string {
     case "heading": {
       const level = Number(node.attrs?.level ?? 1);
       const command = level <= 1 ? "section" : level === 2 ? "subsection" : "subsubsection";
-      return wrapAlignment(node, `\\${command}{${inlineContent(node.content)}}`);
+      const label = latexReferenceTarget(attribute(node, "label") ?? "");
+      return wrapAlignment(
+        node,
+        `\\${command}{${inlineContent(node.content)}}${label ? `\\label{${label}}` : ""}`,
+      );
     }
     case "bulletList":
       return [
@@ -1199,6 +1203,23 @@ function documentBody(latex: string): string {
   return latex.slice(beginIndex + begin.length, endIndex);
 }
 
+// `\section{Title}\label{sec:title}` puts a reference target on the same line
+// as its heading. The label is metadata, not part of the title, so it has to be
+// split off before the braces are matched or the last `}` becomes text.
+function parseHeadingBlock(
+  block: string,
+): { level: number; title: string; label: string | null } | null {
+  const labelMatch = block.match(/\\label\{([^{}]*)\}\s*$/);
+  const body = (labelMatch ? block.slice(0, labelMatch.index ?? 0) : block).trim();
+  const heading = body.match(/^\\(section|subsection|subsubsection)\{([\s\S]*)\}$/);
+  if (!heading) return null;
+  return {
+    level: heading[1] === "section" ? 1 : heading[1] === "subsection" ? 2 : 3,
+    title: heading[2],
+    label: labelMatch ? labelMatch[1] : null,
+  };
+}
+
 export function latexToDocument(
   latex: string,
   fallbackSettings: ProjectSettings,
@@ -1308,14 +1329,16 @@ export function latexToDocument(
       const textAlign =
         aligned[1] === "center" ? "center" : aligned[1] === "flushleft" ? "left" : "right";
       const inner = aligned[2].trim();
-      const innerHeading = inner.match(/^\\(section|subsection|subsubsection)\{([\s\S]*)\}$/);
+      const innerHeading = parseHeadingBlock(inner);
       if (innerHeading) {
-        const level =
-          innerHeading[1] === "section" ? 1 : innerHeading[1] === "subsection" ? 2 : 3;
         content.push({
           type: "heading",
-          attrs: { level, textAlign },
-          content: parseInline(innerHeading[2]).content,
+          attrs: {
+            level: innerHeading.level,
+            textAlign,
+            ...(innerHeading.label ? { label: innerHeading.label } : {}),
+          },
+          content: parseInline(innerHeading.title).content,
         });
       } else {
         content.push({
@@ -1326,13 +1349,15 @@ export function latexToDocument(
       }
       continue;
     }
-    const heading = block.match(/^\\(section|subsection|subsubsection)\{([\s\S]*)\}$/);
+    const heading = parseHeadingBlock(block);
     if (heading) {
-      const level = heading[1] === "section" ? 1 : heading[1] === "subsection" ? 2 : 3;
       content.push({
         type: "heading",
-        attrs: { level },
-        content: parseInline(heading[2]).content,
+        attrs: {
+          level: heading.level,
+          ...(heading.label ? { label: heading.label } : {}),
+        },
+        content: parseInline(heading.title).content,
       });
       continue;
     }

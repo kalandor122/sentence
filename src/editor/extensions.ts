@@ -1,4 +1,4 @@
-import { Mark, Node, mergeAttributes } from "@tiptap/core";
+import { Extension, Mark, Node, mergeAttributes } from "@tiptap/core";
 import Image from "@tiptap/extension-image";
 import type { DOMOutputSpec } from "@tiptap/pm/model";
 import { footnoteNodeView } from "./Footnote";
@@ -9,6 +9,29 @@ function stringAttribute(node: { attrs?: Record<string, unknown> }, name: string
   const value = node.attrs?.[name];
   return typeof value === "string" ? value : "";
 }
+
+// A section label (`\label{sec:intro}`) is metadata for \ref, not heading text.
+// Keeping it on the heading node means the next visual edit does not drop it
+// before the LaTeX is regenerated.
+export const HeadingLabel = Extension.create({
+  name: "headingLabel",
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: ["heading"],
+        attributes: {
+          label: {
+            default: null,
+            parseHTML: (element) => element.getAttribute("data-label"),
+            renderHTML: (attributes) =>
+              attributes.label ? { "data-label": attributes.label } : {},
+          },
+        },
+      },
+    ];
+  },
+});
 
 export const ProjectImage = Image.extend({
   addAttributes() {
