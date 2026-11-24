@@ -252,7 +252,9 @@ export default function Ribbon({
   const disabled = !editor;
   // Page furniture is a page-level construct: LaTeX cannot put a \newpage or a
   // \tableofcontents inside a tabular cell, so those commands are unavailable
-  // there rather than inserting a block that would vanish from the PDF.
+  // there rather than inserting a block that would vanish from the PDF. A table
+  // cannot go in a cell either: a tabular cannot nest, and the export would
+  // silently flatten the inner rows into the parent cell's text.
   const inTable = Boolean(editor?.isActive("table"));
   const textAlign = activeTextAlign(editor);
   const activeFont = activeMarkAttribute(editor, "fontFamily", "family");
@@ -494,7 +496,7 @@ export default function Ribbon({
         {activeTab === "Insert" ? (
           <>
             <RibbonGroup label="Table">
-              <button type="button" className="ribbon-command wide" disabled={disabled} onClick={() => editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>
+              <button type="button" className="ribbon-command wide" disabled={disabled || inTable} onClick={() => editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>
                 <Table2 size={18} />
                 <span>Insert table</span>
               </button>
