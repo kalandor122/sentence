@@ -445,3 +445,4 @@ Aborting
 2026-11-24T21:42:11Z DONE qa-158 (tsc -b, npm test, smoke all green)
 2026-11-24T21:42:46Z RECOVERED qa-121 (in_progress for 1917 min)
 2026-11-24T21:42:46Z RECOVERED qa-127 (in_progress for 1449 min)
+2026-11-24T21:42:46Z START qa-127 on qa/qa-127-split-view-silently-discards-visual-pane: Split view silently discards visual-pane edits when the source pane has an unapplied draft
