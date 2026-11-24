@@ -33,6 +33,7 @@ function FootnoteNodeView({ editor, getPos, node }: NodeViewProps) {
       data-footnote=""
       data-text={text}
       title={text}
+      aria-label={`Footnote ${marker}${text ? `: ${text}` : ""}`}
       contentEditable={false}
     >
       {marker}
