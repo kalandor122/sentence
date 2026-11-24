@@ -1567,6 +1567,9 @@ export default function App() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      // A modal dialog owns the keyboard while it is open: background shortcuts
+      // must not run or move focus out of the dialog.
+      if (document.querySelector(".modal-backdrop")) return;
       const mod = event.ctrlKey || event.metaKey;
       const target = event.target;
       const inEditor = target instanceof HTMLElement && Boolean(target.closest(".sentence-editor"));
