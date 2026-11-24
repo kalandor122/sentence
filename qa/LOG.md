@@ -468,3 +468,4 @@ Aborting
 2026-11-24T23:00:27Z START qa-170 on qa/qa-170-a-heading-at-a-page-boundary-is-pushed-t: A heading at a page boundary is pushed to the bottom of a nearly blank page
 2026-11-24T23:06:10Z PUSHED main
 2026-11-24T23:06:10Z DONE qa-170 (tsc -b, npm test, smoke all green)
+2026-11-24T23:06:44Z START qa-164 on qa/qa-164-a-hand-written-booktabs-table-turns-topr: A hand-written booktabs table turns \toprule/\midrule/\bottomrule into cells and an extra row

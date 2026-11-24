@@ -925,6 +925,40 @@ describe("LaTeX generation", () => {
     expect(exported).toContain("R\\&D &  &  \\\\");
   });
 
+  it("imports a booktabs-ruled table as its rows instead of rule text", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\begin{tabular}{ll}",
+      "\\toprule",
+      "Name & Value \\\\",
+      "\\midrule",
+      "ZXBOOK & 55 \\\\",
+      "\\bottomrule",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(table?.content?.map((row) => row.content?.length)).toEqual([2, 2]);
+    expect(
+      table?.content?.map((row) =>
+        row.content?.map((cell) => cell.content?.[0]?.content?.[0]?.text),
+      ),
+    ).toEqual([
+      ["Name", "Value"],
+      ["ZXBOOK", "55"],
+    ]);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\begin{tabular}{ll}");
+    expect(exported).toContain("Name & Value \\\\\nZXBOOK & 55 \\\\");
+    expect(exported).not.toContain("\\textbackslash{}toprule");
+    expect(exported).not.toContain("\\textbackslash{}midrule");
+  });
+
   it("imports a single-column tabular as a table and re-exports the environment", () => {
     const source = [
       "\\begin{document}",
