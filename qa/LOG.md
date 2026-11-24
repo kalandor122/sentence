@@ -431,3 +431,5 @@ Aborting
 2026-11-24T21:12:52Z PUSHED main
 2026-11-24T21:12:52Z DONE qa-152 (tsc -b, npm test, smoke all green)
 2026-11-24T21:13:26Z START qa-153 on qa/qa-153-no-way-to-remove-a-hyperlink-clearing-th: No way to remove a hyperlink: clearing the address disables Insert and Escape keeps the link
+2026-11-24T21:15:01Z PUSHED main
+2026-11-24T21:15:01Z DONE qa-153 (tsc -b, npm test, smoke all green)
