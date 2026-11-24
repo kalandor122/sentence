@@ -2264,10 +2264,49 @@
       ],
       "hint": "Repro: Type a paragraph, click Insert > Image and supply a file named 'qa image #1.png' through the hidden file input. Read the visual page, then switch to View > LaTeX.\nActual: The visual page renders only img (no caption element or caption text). The exported LaTeX adds \\caption{qa image \\#1.png}, so the PDF will show the raw file name as a caption that the user never saw or edited. Probe qa/probes/insert-media.mjs scenario blockImageSourceRoundTrip.",
       "source": "explore:insert-media:exported figure captions use the file name and are invisible in the visual editor",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T19:02:00Z",
-      "lastAttemptAt": "2026-11-24T19:02:00Z"
+      "lastAttemptAt": "2026-11-24T19:02:00Z",
+      "doneAt": "2026-11-24T19:10:16Z"
+    },
+    {
+      "id": "qa-143",
+      "title": "Tab on the first item of a list moves focus out of the editor instead of nesting",
+      "why": "Exploratory pass on lists (functional): expected Tab nests the current item one level (the same way it works for a second or later item), or at minimum keeps keyboard focus in the editor.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. With the empty paragraph active, click Home > Bulleted list, then press Tab. Repeat with 'only item' typed into the list first, with the caret in the first of two list items, and with the caret in the only item of a nested list. In every case inspect document.activeElement after Tab.\nActual: The item stays at its current level and focus leaves the editor: document.activeElement becomes the 'Visual (Ctrl+Alt+1)' button in the status bar. Typing after that inserts nothing into the document. This happens for the first item of a list, the first of two items, the only item of a nested sublist, and an empty list. Only items that have a previous sibling at the same level can be nested with Tab.",
+      "source": "explore:lists:tab on the first item of a list moves focus out of the editor instead of nesting",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T19:38:21Z"
+    },
+    {
+      "id": "qa-144",
+      "title": "A list followed by paragraph text without a blank line is imported as escaped literal text",
+      "why": "Exploratory pass on lists (content): expected The visual document shows a two-item bulleted list followed by a normal paragraph 'Following paragraph', and the regenerated LaTeX keeps an itemize environment plus the paragraph.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document and click Source in the status bar. Replace the body between \\begin{document} and \\end{document} with exactly: '\\begin{itemize}' newline '\\item a' newline '\\item b' newline '\\end{itemize}' newline 'Following paragraph' (no blank line after \\end{itemize}). Click Apply source, click Visual, then reopen Source and click Refresh from visual.\nActual: Apply reports 'Visual document synchronized from LaTeX.' but the visual document is one plain paragraph containing the literal text '\\begin{itemize}', '\\item a', '\\item b', '\\end{itemize}' and 'Following paragraph'. The regenerated LaTeX escapes it as '\\textbackslash{}begin\\{itemize\\}', '\\textbackslash{}item a', '\\textbackslash{}item b' and '\\textbackslash{}end\\{itemize\\}' followed by the text, so the list is permanently corrupted. The same happens with an enumerate and when two itemize environments are separated by text with no blank lines. Adding a blank line after \\end{itemize} makes the same source import correctly.",
+      "source": "explore:lists:a list followed by paragraph text without a blank line is imported as escaped literal text",
+      "status": "open"
+    },
+    {
+      "id": "qa-145",
+      "title": "Ctrl+A then the list button does not convert a list to paragraphs; it appends an empty item",
+      "why": "Exploratory pass on lists (functional): expected Both items become ordinary paragraphs and the LaTeX contains no list environment and no empty \\item.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document, type 'one', click Home > Bulleted list, press Enter, type 'two'. Press Ctrl+A (the editor selection covers both items), then click Home > Bulleted list again and read the LaTeX source. Repeat with Numbered list and with Ctrl+Shift+8.\nActual: The document stays a list and gains a third empty item: the editor DOM is '<ul><li>one</li><li>two</li><li><br></li></ul>' and the LaTeX is '\\begin{itemize}\\n\\item one\\n\\item two\\n\\item \\n\\end{itemize}'. The Numbered list case produces an extra '\\item ' in an enumerate, and Ctrl+Shift+8 behaves the same. While the whole list is selected the Bulleted/Numbered list button reports aria-pressed=false. Selecting only the two list items and toggling does convert them to paragraphs.",
+      "source": "explore:lists:ctrl+a then the list button does not convert a list to paragraphs; it appends an empty item",
+      "status": "open"
     }
   ]
 }

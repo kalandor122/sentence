@@ -399,3 +399,5 @@ Aborting
 2026-11-24T18:55:32Z START qa-141 on qa/qa-141-applying-the-latex-source-turns-an-inser: Applying the LaTeX source turns an inserted image into a broken image
 2026-11-24T19:01:26Z DONE qa-141 (tsc -b, npm test, smoke all green)
 2026-11-24T19:02:00Z START qa-142 on qa/qa-142-exported-figure-captions-use-the-file-na: Exported figure captions use the file name and are invisible in the visual editor
+2026-11-24T19:10:16Z DONE qa-142 (tsc -b, npm test, smoke all green)
+2026-11-24T19:38:07Z EXPLORE lists: 3 new items, agent exit 0
