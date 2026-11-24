@@ -2022,8 +2022,9 @@
       "hint": "Repro: 1. Create a project and make sure the source is clean (View > LaTeX, then 'Apply source' is disabled). 2. Click View > Split. 3. In the source pane, put the caret before \\end{document} and type `ZXDRAFTPARAGRAPH unapplied` on its own line. Do not click Apply. 4. Click at the end of the visual text in the other pane and type `ZXVISUALTYPED`; the text appears at the end of the last paragraph. 5. Click View > Visual.\nActual: The mode switches with the success toast `Visual document synchronized from LaTeX.` and the freshly typed visual text is gone: the visual document shows `ZXDRAFTPARAGRAPH unapplied` and no longer contains `ZXVISUALTYPED` (probe: visualAcceptedTyping=true, visualStillHasTypedText=false, visualHasSourceDraft=true). The source pane keeps the draft and 'Apply source' remains enabled, so the same overwrite happens with no warning and no way to recover the visual typing.",
       "source": "explore:source-editor:split view silently discards visual-pane edits when the source pane has an unapplied draft",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-23T21:32:56Z"
+      "attempts": 1,
+      "startedAt": "2026-11-23T21:32:56Z",
+      "lastAttemptAt": "2026-11-23T21:32:56Z"
     },
     {
       "id": "qa-128",
@@ -2035,7 +2036,10 @@
       ],
       "hint": "Repro: 1. View > LaTeX and click into the textarea before \\end{document}. 2. Type `ZXFOCUS` and click 'Apply source'. 3. Without clicking back into the textarea, type `ZXLOST`. 4. Press Ctrl+Z, then Ctrl+Shift+Z. 5. Click back into the textarea and press Ctrl+Shift+Z again.\nActual: After Apply, document.activeElement is BODY (the Apply button is disabled and blurred) and `ZXLOST` never reaches the source (typingAfterApplyReachedEditor=false). Ctrl+Z does undo `ZXFOCUS`, but Ctrl+Shift+Z does nothing (redoAfterApplyWorked=false) until the user clicks into the textarea, after which redo restores `ZXFOCUS` and typing works again. The same happens after a failed Apply, where the enabled button keeps focus (activeElement=BUTTON): typing is lost and Ctrl+Shift+Z does not redo the draft (redoRestoredDraft=false).",
       "source": "explore:source-editor:clicking apply source drops keyboard focus, so subsequent typing and redo are silently ignored",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 1,
+      "startedAt": "2026-11-24T16:52:46Z",
+      "lastAttemptAt": "2026-11-24T16:52:46Z"
     },
     {
       "id": "qa-129",
@@ -2071,6 +2075,30 @@
       ],
       "hint": "Repro: 1. View > LaTeX and put the caret before \\end{document}. 2. Type `ZXVISIT`. 3. Click View > Visual, then View > LaTeX. 4. Press Ctrl+Z.\nActual: Ctrl+Z does nothing: the reminder of the edit stays in the source (`ZXVISIT` is still present), 'Apply source' is disabled, and there is no indication that undo history was dropped. The source editor is remounted on every view switch with a fresh history, so the normal source > visual > source check loses undo for the whole visit.",
       "source": "explore:source-editor:undo history is discarded after leaving and re-entering the latex view",
+      "status": "open"
+    },
+    {
+      "id": "qa-132",
+      "title": "Page divider lines are painted through text lines and headings",
+      "why": "Exploratory pass on long-document (visual): expected A page boundary should fall in a page margin/gap, so no body line or heading is bisected by the divider; a heading should not sit on a page boundary.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the app, create a new document, Ctrl+A and Backspace to empty it, then paste (Ctrl+V) 30 blank-line-separated paragraphs of ~95 words each (the probe uses 'PASTEP1'..'PASTEP30' plus a repeated 30-word sentence). The status bar shows 2,670 words / 5 pages. Scroll to any of the four horizontal page rules the sheet paints every 1,123 px: each one crosses the middle of a text line (first rule at 3,518 px crosses the line box 3,514-3,530 px of the 'PASTEP5' paragraph). Repeat with a 50-heading / 6,050-word document: 8 of 14 rules cross a text line and, with page breaks inserted, a rule crosses the heading 'Section 14 TOKENH14' (line box 3,747-3,770 px, rule at 3,758 px). Screenshot: qa/shots/probe-long-page-boundary.png.\nActual: The paper sheet is one continuous text flow and the page rules are painted over it every paper height. On the 5-page paste all 4 rules cross a line of text (4/4); on the 15-page document 8/14 rules cross text and the rule at 3,758 px runs through the middle of the heading 'Section 14 TOKENH14', which reads as a strikethrough.",
+      "source": "explore:long-document:page divider lines are painted through text lines and headings",
+      "status": "open"
+    },
+    {
+      "id": "qa-133",
+      "title": "Outline entry drops inline math from a heading",
+      "why": "Exploratory pass on long-document (content): expected The Outline entry mirrors the visible heading text, including the formula (e.g. 'Energy model E=mc^2').",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: New document. Type 'Energy model', set Paragraph style to 'Heading 1', press End, then Insert tab > Inline equation, enter E=mc^2 and click Insert. Compare the rendered heading with the Outline panel entry.\nActual: The heading renders 'Energy model E=mc\u00b2' but the Outline entry is only 'Energy model ' (13 characters, formula omitted), so headings whose titles differ by their formulas look identical in the outline.",
+      "source": "explore:long-document:outline entry drops inline math from a heading",
       "status": "open"
     }
   ]

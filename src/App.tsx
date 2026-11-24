@@ -1019,6 +1019,14 @@ export default function App() {
     }
   };
 
+  const applySourceFromButton = () => {
+    applySource();
+    // The Apply button disables itself once the draft is clean, which drops
+    // focus onto <body>; on failure it keeps focus. Either way the caret must
+    // stay in the editor, or the next keystrokes and Ctrl+Shift+Z are lost.
+    sourceTextarea.current?.focus();
+  };
+
   const handleModeChange = (nextMode: EditorMode) => {
     if (nextMode === mode) return;
     const current = workspaceRef.current;
@@ -1796,7 +1804,7 @@ export default function App() {
                         }}>
                           Refresh from visual
                         </button>
-                        <button className="accent-button small" type="button" onClick={applySource} disabled={!sourceDirty}>
+                        <button className="accent-button small" type="button" onClick={applySourceFromButton} disabled={!sourceDirty}>
                           Apply source
                         </button>
                       </>
