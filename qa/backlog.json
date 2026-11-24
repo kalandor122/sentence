@@ -2441,8 +2441,9 @@
       "hint": "Repro: Create a project. At the end type `LinkOne alpha`, select `alpha`, press Ctrl+K, enter `https://example.com/page` and click Insert. Click the link, press Ctrl+K, clear the Address field and press Escape.\nActual: The dialog only offers Cancel and Insert; with an empty Address, Insert is disabled. Escape closes the dialog and `alpha` still links to `https://example.com/page`. The dialog exposes no remove/unlink control.",
       "source": "explore:links-cites-footnotes:no way to remove a hyperlink: clearing the address disables insert and escape keeps the link",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T21:13:26Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T21:13:26Z",
+      "lastAttemptAt": "2026-11-24T21:13:26Z"
     },
     {
       "id": "qa-154",

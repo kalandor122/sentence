@@ -11,6 +11,8 @@ interface InputDialogProps {
   confirmLabel?: string;
   multiline?: boolean;
   validate?: () => string | null;
+  removeLabel?: string;
+  onRemove?: () => void;
   onClose: () => void;
   onSubmit: (value: string) => void;
 }
@@ -25,6 +27,8 @@ export default function InputDialog({
   confirmLabel = "Insert",
   multiline = false,
   validate,
+  removeLabel,
+  onRemove,
   onClose,
   onSubmit,
 }: InputDialogProps) {
@@ -62,6 +66,9 @@ export default function InputDialog({
       onClose={onClose}
       footer={
         <>
+          {removeLabel && onRemove ? (
+            <button className="secondary-button" type="button" onClick={onRemove}>{removeLabel}</button>
+          ) : null}
           <button className="secondary-button" type="button" onClick={onClose}>Cancel</button>
           <button className="primary-button" type="button" disabled={!value.trim()} onClick={submit}>{confirmLabel}</button>
         </>
