@@ -369,3 +369,4 @@ Aborting
 2026-11-24T16:56:47Z DONE qa-128 (tsc -b, npm test, smoke all green)
 2026-11-24T16:57:30Z START qa-129 on qa/qa-129-latex-comments-in-the-document-body-beco: LaTeX comments in the document body become visible text and are escaped on export
 2026-11-24T17:00:16Z DONE qa-129 (tsc -b, npm test, smoke all green)
+2026-11-24T17:00:59Z START qa-130 on qa/qa-130-unclosed-math-delimiters-are-accepted-as: Unclosed math delimiters are accepted as valid and escaped instead of reported

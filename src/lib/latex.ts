@@ -1014,6 +1014,82 @@ function assertBalancedBraces(source: string): void {
   }
 }
 
+// An unclosed math delimiter is not body text: LaTeX refuses to compile it, and
+// reading it as text turns the delimiter into escaped literal characters on the
+// way back out. Report it like an unbalanced brace instead.
+function assertBalancedMath(source: string): void {
+  let dollars = 0;
+  let parenOpen = false;
+  let bracketOpen = false;
+  let verbatim: string | null = null;
+
+  for (const rawLine of source.split(/\r?\n/)) {
+    let line: string = verbatim ? rawLine : stripLatexComment(rawLine);
+    if (verbatim) {
+      const close = line.indexOf(`\\end{${verbatim}}`);
+      if (close < 0) continue;
+      line = line.slice(close + verbatim.length + 6);
+      verbatim = null;
+    }
+    for (let index = 0; index < line.length; index += 1) {
+      if (line[index] === "$") {
+        if (precedingBackslashes(line, index) % 2 === 0) dollars += 1;
+        continue;
+      }
+      if (line[index] !== "\\" || precedingBackslashes(line, index) % 2 === 1) continue;
+      const command = line[index + 1];
+      if (command === "(" || command === ")") {
+        if (command === "(" && parenOpen) {
+          throw new Error('Invalid LaTeX: unclosed math delimiter "\\(".');
+        }
+        if (command === ")" && !parenOpen) {
+          throw new Error('Invalid LaTeX: unexpected closing math delimiter "\\)".');
+        }
+        parenOpen = command === "(";
+      } else if (command === "[" || command === "]") {
+        // \\[2pt] is a line-break length, so only the outer backslash counts.
+        if (command === "[" && bracketOpen) {
+          throw new Error('Invalid LaTeX: unclosed math delimiter "\\[".');
+        }
+        if (command === "]" && !bracketOpen) {
+          throw new Error('Invalid LaTeX: unexpected closing math delimiter "\\]".');
+        }
+        bracketOpen = command === "[";
+      } else {
+        continue;
+      }
+      index += 1;
+    }
+    const verbatimStart = line.match(/\\begin\{verbatim\}/);
+    if (
+      verbatimStart &&
+      !line.includes(
+        "\\end{verbatim}",
+        (verbatimStart.index ?? 0) + verbatimStart[0].length,
+      )
+    ) {
+      verbatim = "verbatim";
+    }
+    // Math mode cannot cross a paragraph break, so an odd $ count there is
+    // unbalanced rather than a formula continuing on the next line.
+    if (!line.trim()) {
+      if (dollars % 2 === 1) {
+        throw new Error('Invalid LaTeX: unclosed math delimiter "$".');
+      }
+      dollars = 0;
+    }
+  }
+  if (dollars % 2 === 1) {
+    throw new Error('Invalid LaTeX: unclosed math delimiter "$".');
+  }
+  if (parenOpen) {
+    throw new Error('Invalid LaTeX: unclosed math delimiter "\\(".');
+  }
+  if (bracketOpen) {
+    throw new Error('Invalid LaTeX: unclosed math delimiter "\\[".');
+  }
+}
+
 function documentBody(latex: string): string {
   const begin = "\\begin{document}";
   const end = "\\end{document}";
@@ -1117,6 +1193,7 @@ export function latexToDocument(
   const body = documentBody(latex);
   assertBalancedEnvironments(body);
   assertBalancedBraces(body);
+  assertBalancedMath(body);
   const source = stripBodyComments(body)
     .replace(/\\begin\{abstract\}[\s\S]*?\\end\{abstract\}/g, "")
     .replace(/\\keywords\{[^}]*\}/g, "")
