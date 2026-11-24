@@ -2313,8 +2313,9 @@
       "hint": "Repro: Create a new document, type 'one', click Home > Bulleted list, press Enter, type 'two'. Press Ctrl+A (the editor selection covers both items), then click Home > Bulleted list again and read the LaTeX source. Repeat with Numbered list and with Ctrl+Shift+8.\nActual: The document stays a list and gains a third empty item: the editor DOM is '<ul><li>one</li><li>two</li><li><br></li></ul>' and the LaTeX is '\\begin{itemize}\\n\\item one\\n\\item two\\n\\item \\n\\end{itemize}'. The Numbered list case produces an extra '\\item ' in an enumerate, and Ctrl+Shift+8 behaves the same. While the whole list is selected the Bulleted/Numbered list button reports aria-pressed=false. Selecting only the two list items and toggling does convert them to paragraphs.",
       "source": "explore:lists:ctrl+a then the list button does not convert a list to paragraphs; it appends an empty item",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T19:45:47Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T19:45:47Z",
+      "lastAttemptAt": "2026-11-24T19:45:47Z"
     }
   ]
 }

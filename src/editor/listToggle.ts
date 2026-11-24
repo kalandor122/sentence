@@ -1,6 +1,6 @@
+import type { Editor } from "@tiptap/core";
 import { AllSelection } from "@tiptap/pm/state";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
-import type { Editor } from "@tiptap/react";
 
 function isAllSelected(editor: Editor): boolean {
   const { state } = editor;
@@ -8,6 +8,26 @@ function isAllSelected(editor: Editor): boolean {
     state.selection instanceof AllSelection ||
     (state.selection.from <= 0 && state.selection.to >= state.doc.content.size)
   );
+}
+
+// editor.isActive() only looks around the selection head, which sits at the
+// document start for an AllSelection, so a fully selected list reads as
+// inactive. Check the document itself instead.
+function documentHasList(editor: Editor, listType: "bulletList" | "orderedList"): boolean {
+  let found = false;
+  editor.state.doc.nodesBetween(0, editor.state.doc.content.size, (node) => {
+    if (found) return false;
+    if (node.type.name === listType) {
+      found = true;
+      return false;
+    }
+    return true;
+  });
+  return found;
+}
+
+export function isListActive(editor: Editor, listType: "bulletList" | "orderedList"): boolean {
+  return editor.isActive(listType) || (isAllSelected(editor) && documentHasList(editor, listType));
 }
 
 function unwrapList(node: ProseMirrorNode, listType: "bulletList" | "orderedList"): ProseMirrorNode[] {
@@ -28,7 +48,7 @@ function unwrapList(node: ProseMirrorNode, listType: "bulletList" | "orderedList
  * nodes directly so content becomes plain blocks.
  */
 export function toggleList(editor: Editor, listType: "bulletList" | "orderedList"): boolean {
-  if (isAllSelected(editor) && editor.isActive(listType)) {
+  if (isAllSelected(editor) && documentHasList(editor, listType)) {
     const { state, view } = editor;
     const blocks: ProseMirrorNode[] = [];
     let hasTarget = false;
