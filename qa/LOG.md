@@ -395,3 +395,4 @@ Aborting
 2026-11-24T18:43:56Z START qa-139 on qa/qa-139-page-furniture-and-block-images-inserted: Page furniture and block images inserted in a table cell disappear from the exported LaTeX
 2026-11-24T18:51:50Z DONE qa-139 (tsc -b, npm test, smoke all green)
 2026-11-24T18:52:24Z START qa-140 on qa/qa-140-typing-after-inserting-an-image-page-bre: Typing after inserting an image, page break or table of contents replaces the just-inserted block
+2026-11-24T18:54:57Z DONE qa-140 (tsc -b, npm test, smoke all green)

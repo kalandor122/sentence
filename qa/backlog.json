@@ -2232,10 +2232,11 @@
       ],
       "hint": "Repro: Type 'Alpha.' at the end of a paragraph. Click Insert > Page break, then type 'Bravo.' without clicking back into the page. Repeat with Insert > Image (supply a PNG through the hidden file input) then typing, and with References > Table of contents then typing. Also click Insert > Page break followed immediately by Insert > Image, and Insert > Image followed immediately by Insert > Page break.\nActual: The inserted atom keeps a ProseMirror node selection (probe selectedAtoms=1). Typing one character replaces it: the page break count goes 1 -> 0, \\newpage 1 -> 0 and the page count 2 -> 1; the image count goes 1 -> 0 and \\includegraphics 1 -> 0; the contents block count goes 1 -> 0 and \\tableofcontents 1 -> 0. Inserting an image after a page break leaves only the image (\\newpage 0), and inserting a page break after an image leaves only the break (\\includegraphics 0). Probe qa/probes/insert-media.mjs scenario insertThenTypeOrInsert.",
       "source": "explore:insert-media:typing after inserting an image, page break or table of contents replaces the just-inserted block",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T18:52:24Z",
-      "lastAttemptAt": "2026-11-24T18:52:24Z"
+      "lastAttemptAt": "2026-11-24T18:52:24Z",
+      "doneAt": "2026-11-24T18:54:57Z"
     },
     {
       "id": "qa-141",
@@ -2247,7 +2248,9 @@
       ],
       "hint": "Repro: Type 'Caption target paragraph.', click Insert > Image and supply a PNG through the hidden file input. Switch to View > LaTeX, press Ctrl+End, type a space and press Backspace so Apply source becomes enabled, click Apply source, then View > Visual.\nActual: Before Apply the img has a data: src and naturalWidth/Height 1x1. After Apply its src is the relative path 'assets/images/qa-image--1.png' with naturalWidth/Height 0x0, so the page shows the browser's broken-image box with the alt text, while the toast says 'Visual document synchronized from LaTeX.' No warning is shown. Probe qa/probes/insert-media.mjs scenario blockImageSourceRoundTrip (screenshot qa/shots/probe-insert-media-image-after-apply.png).",
       "source": "explore:insert-media:applying the latex source turns an inserted image into a broken image",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T18:55:32Z"
     },
     {
       "id": "qa-142",
