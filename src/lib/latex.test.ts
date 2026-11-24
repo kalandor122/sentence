@@ -281,6 +281,43 @@ describe("LaTeX generation", () => {
     expect(() => latexToDocument(source, DEFAULT_SETTINGS)).not.toThrow();
   });
 
+  it("rejects unclosed math delimiters instead of storing them as text", () => {
+    const paren = [
+      "\\begin{document}",
+      "ZXUNCLOSEDPAREN \\(a^2 + b^2",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(paren, DEFAULT_SETTINGS)).toThrow(
+      'Invalid LaTeX: unclosed math delimiter "\\(".',
+    );
+    const dollar = [
+      "\\begin{document}",
+      "ZXUNCLOSEDDOLLAR $a^2 + b^2",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(dollar, DEFAULT_SETTINGS)).toThrow(
+      'Invalid LaTeX: unclosed math delimiter "$".',
+    );
+    const bracket = [
+      "\\begin{document}",
+      "\\[a^2 + b^2",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(bracket, DEFAULT_SETTINGS)).toThrow(
+      'Invalid LaTeX: unclosed math delimiter "\\[".',
+    );
+  });
+
+  it("accepts balanced and escaped math delimiters", () => {
+    const source = [
+      "\\begin{document}",
+      "Inline \\(a^2 + b^2\\) and $c^2 + d^2$ and a literal \\$ sign.",
+      "Display \\[e^2 + f^2\\].",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(source, DEFAULT_SETTINGS)).not.toThrow();
+  });
+
   it("imports hand-authored \\href as an editable link and re-exports it", () => {
     const source = [
       "\\begin{document}",

@@ -2069,8 +2069,9 @@
       "hint": "Repro: 1. View > LaTeX and before \\end{document} add a line `ZXUNCLOSEDPAREN \\(a^2 + b^2` (no closing `\\)`). 2. Click 'Apply source' and read the toast. 3. Click View > Visual, then View > LaTeX. 4. Repeat with `ZXUNCLOSEDDOLLAR $a^2 + b^2` (no closing `$`).\nActual: Both applies report success (`Visual document synchronized from LaTeX.`) and 'Apply source' becomes disabled, so the broken input is committed. The visual document contains the delimiter as literal text, and the regenerated source escapes it: `\\textbackslash{}(a\\textasciicircum{}2 + b\\textasciicircum{}2` for the unclosed `\\(` and `\\$a\\textasciicircum{}2 + b\\textasciicircum{}2` for the unclosed `$`. No error is shown at any point.",
       "source": "explore:source-editor:unclosed math delimiters are accepted as valid and escaped instead of reported",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T17:00:59Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T17:00:59Z",
+      "lastAttemptAt": "2026-11-24T17:00:59Z"
     },
     {
       "id": "qa-131",
