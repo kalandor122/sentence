@@ -2088,10 +2088,11 @@
       ],
       "hint": "Repro: 1. View > LaTeX and put the caret before \\end{document}. 2. Type `ZXVISIT`. 3. Click View > Visual, then View > LaTeX. 4. Press Ctrl+Z.\nActual: Ctrl+Z does nothing: the reminder of the edit stays in the source (`ZXVISIT` is still present), 'Apply source' is disabled, and there is no indication that undo history was dropped. The source editor is remounted on every view switch with a fresh history, so the normal source > visual > source check loses undo for the whole visit.",
       "source": "explore:source-editor:undo history is discarded after leaving and re-entering the latex view",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T17:51:59Z",
-      "lastAttemptAt": "2026-11-24T17:51:59Z"
+      "lastAttemptAt": "2026-11-24T17:51:59Z",
+      "doneAt": "2026-11-24T18:08:32Z"
     },
     {
       "id": "qa-132",
@@ -2140,6 +2141,56 @@
       "startedAt": "2026-11-24T17:40:20Z",
       "lastAttemptAt": "2026-11-24T17:40:20Z",
       "doneAt": "2026-11-24T17:44:45Z"
+    },
+    {
+      "id": "qa-135",
+      "title": "Tab is trapped in the document editor and each press nests the paragraph in another blockquote",
+      "why": "Exploratory pass on keyboard (functional): expected Tab moves keyboard focus to the next focusable control (or there is a documented escape from the editing surface), and a focus-navigation key does not modify the document.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the editor, click into a paragraph, then press Tab three times. Then try Shift+Tab three times and Escape while the editor is focused.\nActual: Focus stays on the .sentence-editor contenteditable after every key. A clean run went from 1 to 4 blockquotes over three Tab presses (each press wraps the paragraph in another blockquote); the 40-stop Tab walk reached the editor at stop 35 and stops 36-40 were all the editor, never the status bar or any later control. Shift+Tab left focus in the editor for all three presses, and Escape also left focus in the editor.",
+      "source": "explore:keyboard:tab is trapped in the document editor and each press nests the paragraph in another blockquote",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T18:19:05Z"
+    },
+    {
+      "id": "qa-136",
+      "title": "Ctrl+F opens the find bar behind an open modal and moves focus out of the dialog",
+      "why": "Exploratory pass on keyboard (functional): expected While a modal dialog is open, focus stays inside the dialog and global shortcuts for background UI do not run.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Focus the editor, press Ctrl+K to open the Add link dialog, then with the dialog still open press Ctrl+F (and separately Ctrl+Enter).\nActual: Ctrl+F opens .find-bar (computed z-index 12) behind the modal backdrop (z-index 100), moves focus to the Find input outside the dialog, and leaves the Add link dialog open. In the same state Ctrl+Enter fires compilation and shows the 'Compilation is available in the desktop application.' toast while the dialog is still open.",
+      "source": "explore:keyboard:ctrl+f opens the find bar behind an open modal and moves focus out of the dialog",
+      "status": "open"
+    },
+    {
+      "id": "qa-137",
+      "title": "arXiv dialog opens with focus still on the ribbon button and loses focus to <body> when closed",
+      "why": "Exploratory pass on keyboard (ux): expected Focus moves into the dialog when it opens and returns to the 'Create arXiv ZIP' button when it closes.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the editor, select the Paper ribbon tab, Tab to the 'Create arXiv ZIP' button, press Enter, then press Tab once and Escape.\nActual: On open, document.activeElement is the 'Create arXiv ZIP' ribbon button behind the aria-modal dialog (not inside it); the first Tab moves focus to the dialog's Close button. Escape closes the dialog but leaves document.activeElement on <body>, so the next Tab restarts at the top of the page instead of the invoking button.",
+      "source": "explore:keyboard:arxiv dialog opens with focus still on the ribbon button and loses focus to <body> when closed",
+      "status": "open"
+    },
+    {
+      "id": "qa-138",
+      "title": "Escape does not close the Text color popover",
+      "why": "Exploratory pass on keyboard (functional): expected Escape dismisses the open popover.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: On the Home ribbon tab, Tab to the 'Text color' button, press Enter to open the swatch popover, then press Escape.\nActual: The .color-popover is still open after Escape and focus remains on the 'Text color' trigger; nothing else closes it except toggling the trigger or clicking the backdrop.",
+      "source": "explore:keyboard:escape does not close the text color popover",
+      "status": "open"
     }
   ]
 }

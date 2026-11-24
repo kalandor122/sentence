@@ -381,3 +381,5 @@ Aborting
 2026-11-24T17:47:04Z START qa-126 on qa/qa-126-stale-retry-save-error-remains-after-the: Stale 'Retry save' error remains after the failed source draft has been discarded
 2026-11-24T17:51:25Z DONE qa-126 (tsc -b, npm test, smoke all green)
 2026-11-24T17:51:59Z START qa-131 on qa/qa-131-undo-history-is-discarded-after-leaving: Undo history is discarded after leaving and re-entering the LaTeX view
+2026-11-24T18:08:32Z DONE qa-131 (tsc -b, npm test, smoke all green)
+2026-11-24T18:18:50Z EXPLORE keyboard: 4 new items, agent exit 0
