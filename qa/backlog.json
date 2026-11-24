@@ -2497,10 +2497,11 @@
       ],
       "hint": "Repro: 1. In a fresh document type 'Toggle race baseline'. 2. Review tab > Track changes (the button becomes 'Tracking on'). 3. Put the caret at the end and type ' tracked-write'. 4. Within about a second, before the 1.8 s revision delay elapses, click Review tab > 'Tracking on' to turn tracking off. 5. Wait 2.5 s and open the History sidebar.\nActual: No revision card is created. The History panel shows 'Tracked changes 0' and the text 'Toggle race baseline tracked-write' stays in the document as if it had been accepted. The only feedback is the toast 'Tracked changes is off.' The probe measured 804 ms between typing and turning tracking off, well inside the 1.8 s debounce, and still saw zero revisions after waiting 2.3 s.",
       "source": "explore:review:turning tracking off within the revision debounce silently discards the edit that was made while tracking was on",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T21:33:42Z",
-      "lastAttemptAt": "2026-11-24T21:33:42Z"
+      "lastAttemptAt": "2026-11-24T21:33:42Z",
+      "doneAt": "2026-11-24T21:37:01Z"
     },
     {
       "id": "qa-158",
@@ -2512,7 +2513,9 @@
       ],
       "hint": "Repro: 1. In a fresh document type 'Only paragraph'. 2. Review tab > Track changes. 3. Put the caret at the end, press Enter, type 'Second paragraph', and wait 2.3 s for the revision card. 4. Open History and click Reject on the card whose before text is 'Only paragraph' and after text is 'Only paragraph Second paragraph'.\nActual: The revision card disappears and 'Second paragraph' is removed, but the document keeps a second, empty paragraph with the 'Begin with a sentence...' placeholder. The probe read the editor HTML ('<p>Only paragraph</p><p ... is-empty><br></p>') and the saved workspace document, which still contains two paragraph nodes, the second with no content.",
       "source": "explore:review:rejecting a tracked insertion of a new paragraph leaves an empty paragraph behind",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T21:37:37Z"
     },
     {
       "id": "qa-159",
