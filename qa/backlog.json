@@ -2097,8 +2097,9 @@
       "hint": "Repro: Open the app, create a new document, Ctrl+A and Backspace to empty it, then paste (Ctrl+V) 30 blank-line-separated paragraphs of ~95 words each (the probe uses 'PASTEP1'..'PASTEP30' plus a repeated 30-word sentence). The status bar shows 2,670 words / 5 pages. Scroll to any of the four horizontal page rules the sheet paints every 1,123 px: each one crosses the middle of a text line (first rule at 3,518 px crosses the line box 3,514-3,530 px of the 'PASTEP5' paragraph). Repeat with a 50-heading / 6,050-word document: 8 of 14 rules cross a text line and, with page breaks inserted, a rule crosses the heading 'Section 14 TOKENH14' (line box 3,747-3,770 px, rule at 3,758 px). Screenshot: qa/shots/probe-long-page-boundary.png.\nActual: The paper sheet is one continuous text flow and the page rules are painted over it every paper height. On the 5-page paste all 4 rules cross a line of text (4/4); on the 15-page document 8/14 rules cross text and the rule at 3,758 px runs through the middle of the heading 'Section 14 TOKENH14', which reads as a strikethrough.",
       "source": "explore:long-document:page divider lines are painted through text lines and headings",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T17:09:02Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T17:09:02Z",
+      "lastAttemptAt": "2026-11-24T17:09:02Z"
     },
     {
       "id": "qa-133",

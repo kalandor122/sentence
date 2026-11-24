@@ -47,6 +47,17 @@ export function pageCountFromBottom(bottom: number, geometry: PageGeometry): num
   return Math.floor(Math.max(0, bottom - 1) / geometry.height) + 1;
 }
 
+// The first page boundary that falls strictly inside a block, measured in
+// unbounded sheet coordinates. Returns null when the block stays on one page.
+export function pageBoundaryWithin(
+  top: number,
+  bottom: number,
+  geometry: PageGeometry,
+): number | null {
+  const boundary = (Math.floor(Math.max(0, top) / geometry.height) + 1) * geometry.height;
+  return boundary < bottom ? boundary : null;
+}
+
 // An explicit break fills the rest of its page so the following block starts at
 // the top margin of the next one. `top` and `height` are unscaled layout pixels.
 export function pageBreakFill(top: number, height: number, geometry: PageGeometry): number {

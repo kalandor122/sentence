@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_SETTINGS } from "../lib/defaults";
-import { pageBreakFill, pageCountFromBottom, pageGeometry } from "./pagination";
+import {
+  pageBoundaryWithin,
+  pageBreakFill,
+  pageCountFromBottom,
+  pageGeometry,
+} from "./pagination";
 
 describe("pageGeometry", () => {
   it("reads paper size, margins and font size from settings", () => {
@@ -32,6 +37,18 @@ describe("pageCountFromBottom", () => {
     expect(pageCountFromBottom(geometry.height, geometry)).toBe(1);
     expect(pageCountFromBottom(geometry.height + 1, geometry)).toBe(2);
     expect(pageCountFromBottom(geometry.height * 2 + 50, geometry)).toBe(3);
+  });
+});
+
+describe("pageBoundaryWithin", () => {
+  it("finds only a boundary that cuts through the block", () => {
+    const geometry = pageGeometry(DEFAULT_SETTINGS);
+    expect(pageBoundaryWithin(100, geometry.height, geometry)).toBeNull();
+    expect(pageBoundaryWithin(100, geometry.height + 1, geometry)).toBe(geometry.height);
+    expect(pageBoundaryWithin(geometry.height + 40, geometry.height * 2 - 10, geometry)).toBeNull();
+    expect(
+      pageBoundaryWithin(geometry.height + 40, geometry.height * 2 + 40, geometry),
+    ).toBe(geometry.height * 2);
   });
 });
 
