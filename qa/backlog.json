@@ -2312,10 +2312,73 @@
       ],
       "hint": "Repro: Create a new document, type 'one', click Home > Bulleted list, press Enter, type 'two'. Press Ctrl+A (the editor selection covers both items), then click Home > Bulleted list again and read the LaTeX source. Repeat with Numbered list and with Ctrl+Shift+8.\nActual: The document stays a list and gains a third empty item: the editor DOM is '<ul><li>one</li><li>two</li><li><br></li></ul>' and the LaTeX is '\\begin{itemize}\\n\\item one\\n\\item two\\n\\item \\n\\end{itemize}'. The Numbered list case produces an extra '\\item ' in an enumerate, and Ctrl+Shift+8 behaves the same. While the whole list is selected the Bulleted/Numbered list button reports aria-pressed=false. Selecting only the two list items and toggling does convert them to paragraphs.",
       "source": "explore:lists:ctrl+a then the list button does not convert a list to paragraphs; it appends an empty item",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T19:45:47Z",
-      "lastAttemptAt": "2026-11-24T19:45:47Z"
+      "lastAttemptAt": "2026-11-24T19:45:47Z",
+      "doneAt": "2026-11-24T19:49:15Z"
+    },
+    {
+      "id": "qa-146",
+      "title": "keyboard shortcut \"Tab indent\" has no visible effect on the document",
+      "why": "Found by the automated pass (low/ux).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "innerHTML unchanged",
+      "source": "keyboard shortcut \"tab indent\" has no visible effect on the document",
+      "status": "open"
+    },
+    {
+      "id": "qa-147",
+      "title": "Inserting a table inside a table silently flattens the nested table's cells into the parent cell",
+      "why": "Exploratory pass on tables (functional): expected Either the nested table keeps its own rows and columns in the exported tabular (so n1, n2 and n3 stay in separate cells), or Insert table is disabled while the caret is inside an existing table.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new project. Insert tab > Insert table (3x3 with header row). Click the middle cell (row 2, column 2) and type 'outer'. Click Insert tab > Insert table again. In the nested table click its first cell, type 'n1', press Tab, type 'n2', press Tab, type 'n3'. Switch to View > LaTeX and read the table block, then click Apply source and switch back to View > Visual.\nActual: The visual editor holds 2 tables (a 3x3 outer table plus a 3x3 nested table, 6 rows in the DOM), but the exported tabular has only the outer 3 rows and one cell reading 'outer\\par n1n2n3' \u2014 the nested table's rows/cells are flattened with no separators. Applying that source back removes the nested table entirely and leaves the concatenated text inside the parent cell. The Insert table button stays enabled inside a cell.",
+      "source": "explore:tables:inserting a table inside a table silently flattens the nested table's cells into the parent cell",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T20:11:19Z"
+    },
+    {
+      "id": "qa-148",
+      "title": "Turning the header row off is not exported and is silently re-enabled by a source round trip",
+      "why": "Exploratory pass on tables (content): expected A table whose header row was turned off stays header-less after the LaTeX round trip, or the header-row state is represented in the exported tabular so it can be restored.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new project. Insert tab > Insert table (3x3 with header row). Type 'Head' in the top-left cell, click a body cell, then click 'Header row' in the Table toolbar so the first row changes from TH to TD. Switch to View > LaTeX and read the table block. Click Apply source, then View > Visual and inspect the first row.\nActual: The exported LaTeX is identical to the header-row-on export (only \\hline above and below the body; no bold text and no header rule), so the header state has no representation. After Apply source the first row is rebuilt as TH and the Table toolbar's Header row button reports pressed: the header the user disabled has come back.",
+      "source": "explore:tables:turning the header row off is not exported and is silently re-enabled by a source round trip",
+      "status": "open"
+    },
+    {
+      "id": "qa-149",
+      "title": "Add row above the header row moves the header into row 2 and the toolbar then reports no header row",
+      "why": "Exploratory pass on tables (functional): expected A new row is added above the table and the header row stays the top row (or the new row is itself a header row).",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new project. Insert tab > Insert table (3x3 with header row). Click a cell in the first (header) row, then click 'Add row above' in the Table toolbar. Inspect the first two rows, then switch to View > LaTeX, click Apply source and return to View > Visual.\nActual: A TD row is inserted above the header row, so the table's TH cells end up in row 2 while row 1 is plain TD. The Table toolbar's 'Header row' button now reports unpressed (aria-pressed=false) even though row 2 is still a header row. After Apply source the header is back in row 1, so the same document looks different before and after the round trip.",
+      "source": "explore:tables:add row above the header row moves the header into row 2 and the toolbar then reports no header row",
+      "status": "open"
+    },
+    {
+      "id": "qa-150",
+      "title": "Delete row and Delete column stay enabled at one row/column and silently do nothing",
+      "why": "Exploratory pass on tables (ux): expected Delete column is disabled when the table has a single column and Delete row is disabled when it has a single row.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new project. Insert tab > Insert table. Click a body cell. In the Table toolbar click 'Delete column' twice to reach one column, then click it again. Then click 'Delete row' twice to reach one row, then click it again.\nActual: Both buttons remain enabled (not disabled) at the minimum. Clicking Delete column with one column left leaves the table at 3x1 and clicking Delete row with one row left leaves it at 1x1; the exported LaTeX stays a one-column, one-row tabular. The controls give no feedback that nothing happened.",
+      "source": "explore:tables:delete row and delete column stay enabled at one row/column and silently do nothing",
+      "status": "open"
     }
   ]
 }

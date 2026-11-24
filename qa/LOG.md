@@ -406,3 +406,6 @@ Aborting
 2026-11-24T19:43:18Z START qa-144 on qa/qa-144-a-list-followed-by-paragraph-text-withou: A list followed by paragraph text without a blank line is imported as escaped literal text
 2026-11-24T19:45:13Z DONE qa-144 (tsc -b, npm test, smoke all green)
 2026-11-24T19:45:47Z START qa-145 on qa/qa-145-ctrl-a-then-the-list-button-does-not-con: Ctrl+A then the list button does not convert a list to paragraphs; it appends an empty item
+2026-11-24T19:49:15Z DONE qa-145 (tsc -b, npm test, smoke all green)
+2026-11-24T19:49:49Z BACKLOG EMPTY — nothing open, idle
+2026-11-24T20:11:04Z EXPLORE tables: 4 new items, agent exit 0
