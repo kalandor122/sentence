@@ -475,3 +475,6 @@ Aborting
 2026-11-24T23:11:23Z PUSHED main
 2026-11-24T23:11:23Z DONE qa-165 (tsc -b, npm test, smoke all green)
 2026-11-24T23:11:57Z START qa-166 on qa/qa-166-emph-is-not-recognised-italics-are-show: \emph{...} is not recognised: italics are shown as the raw command and escaped on export
+2026-11-24T23:13:03Z PUSHED main
+2026-11-24T23:13:03Z DONE qa-166 (tsc -b, npm test, smoke all green)
+2026-11-24T23:23:48Z EXPLORE persistence: 2 new items, agent exit 0

@@ -2639,10 +2639,11 @@
       ],
       "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add `ZXEMPH before \\emph{important word} after.`. 3. Click Apply source, then View tab > Visual. 4. View tab > LaTeX and click Refresh from visual.\nActual: Apply reports success and the visual paragraph contains the literal command `\\emph{important word}` with no italic markup. Refresh from visual exports `\\textbackslash{}emph\\{important word\\}`, so the emphasis is destroyed in the saved LaTeX.",
       "source": "explore:source-editor:\\emph{...} is not recognised: italics are shown as the raw command and escaped on export",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T23:11:57Z",
-      "lastAttemptAt": "2026-11-24T23:11:57Z"
+      "lastAttemptAt": "2026-11-24T23:11:57Z",
+      "doneAt": "2026-11-24T23:13:00Z"
     },
     {
       "id": "qa-167",
@@ -2706,6 +2707,32 @@
       ],
       "hint": "Repro: Build the same 3,600-word / 50-heading document (Headings 16 and 50 end up with padding-top:980px). In the Outline panel click 'Heading 50 HDOC50' and wait 1.4s for the smooth scroll. The viewport shows only blank paper: the heading text line is at y=941 while the editor viewport spans y=149-776 (scrollTop 11,449). Clicking 'Heading 16 HDOC16' reproduces it (text at y=941). Screenshot: qa/shots/probe-long-outline-last-heading.png. Clicking the 48 unpadded entries (Heading 1, 10, 20, 25, 30, 40 tested) lands with the text at y=450-451, inside the viewport.\nActual: The click centers the heading element including its 980px of pagination padding, so the block box is centered but the heading text ends up 165px below the bottom of the viewport; the user is left looking at an empty page.",
       "source": "explore:long-document:outline click on a page-snapped heading scrolls to blank space instead of the heading",
+      "status": "open"
+    },
+    {
+      "id": "qa-172",
+      "title": "A failed localStorage write for the recent-projects list unmounts the whole app to a blank page",
+      "why": "Exploratory pass on persistence (functional): expected A failed localStorage write is surfaced in the existing 'Retry save' error UI (as happens when the workspace write itself fails) and the editor stays on screen, so the user can keep writing or retry.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1) Open http://localhost:1420 in a fresh browser profile so the start screen with 'New document' is shown. 2) In the devtools console run: const orig = Storage.prototype.setItem; Storage.prototype.setItem = function () { throw new DOMException('The quota has been exceeded.', 'QuotaExceededError'); }; (simulates private mode, blocked storage, or a zero quota). 3) Click the 'New document' button in the masthead. 4) Wait 1.5 s: document.body.innerText is empty (length 0), there is no .start-screen and no editor surface, and the console shows an uncaught 'pageerror: The quota has been exceeded.' Variant with a saved document: with an editor open and 'Saved locally', run const orig = Storage.prototype.setItem; Storage.prototype.setItem = function (k, v) { if (k === 'sentence.recent') throw new DOMException('The quota has been exceeded.', 'QuotaExceededError'); return orig.call(this, k, v); }, type ' persist-recent-1' at the end of the document and wait 1.6 s: localStorage['sentence.workspace'] contains the typed text but the editor is gone and the body is empty.\nActual: The app renders nothing at all. persistBrowser catches the failed workspace write, but rememberProject (src/App.tsx) then calls localStorage.setItem('sentence.recent', ...) inside the setRecent state updater with no try/catch. The exception is thrown during React render, there is no error boundary, and the whole tree is unmounted: body innerText length 0, editor count 0, start-screen count 0, and one 'pageerror: The quota has been exceeded.' In the recent-only variant the workspace was written successfully (workspaceSaved true) while the UI still went blank. Probe evidence: qa/probes/persistence.mjs phases 'storage-unavailable-on-create' and 'storage-unavailable-recent-only'.",
+      "source": "explore:persistence:a failed localstorage write for the recent-projects list unmounts the whole app to a blank page",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T23:24:02Z"
+    },
+    {
+      "id": "qa-173",
+      "title": "An unapplied, unparsable LaTeX draft is discarded on navigation away or reload with no warning",
+      "why": "Exploratory pass on persistence (functional): expected The hand-written draft stays available so the user can fix it (the app already keeps invalid drafts across in-app Visual/Source switches), or the app warns before the page unloads.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1) Open http://localhost:1420, click 'New document', wait until the top bar reads 'Saved locally'. 2) Click 'Source' in the status bar. 3) In the LaTeX textarea replace the final \\end{document} line with 'Plan persist-nav-1' (the draft now has no \\end{document}). 4) Within 400 ms, before the 1100 ms autosave, navigate to about:blank and then back to http://localhost:1420. 5) Read the top bar, the editor, and localStorage['sentence.workspace']. Variant: instead wait 1.5 s (the top bar shows 'Editing' and 'Retry save: Invalid LaTeX: missing \\end{document}.'), then reload the page and open 'Source' to read the textarea.\nActual: No warning is shown (0 beforeunload dialogs in either variant), and the draft text is gone from the editor, the textarea and localStorage['sentence.workspace'] after returning; the top bar then reads 'Saved locally'. In the 400 ms variant no parse error was ever displayed before leaving (saveError null, toast null) because the debounce had not fired. In the awaited variant the draft is likewise absent after reload (draftMarkerInSource false, draftMarkerInStorage false, dialogsSeen 0). The pagehide flush in persist() re-parses the draft, catches the failure, and writes only the last good visual document, so the unapplied source text is lost silently. Probe evidence: qa/probes/persistence.mjs phases 'invalid-draft-navigation' and 'invalid-source-draft-after-reload'.",
+      "source": "explore:persistence:an unapplied, unparsable latex draft is discarded on navigation away or reload with no warning",
       "status": "open"
     }
   ]
