@@ -484,3 +484,4 @@ Aborting
 2026-11-24T23:27:29Z START qa-167 on qa/qa-167-table-rows-ending-with-4pt-make-the-enti: Table rows ending with \\[4pt] make the entire table fall back to escaped literal text
 2026-11-24T23:29:04Z PUSHED main
 2026-11-24T23:29:04Z DONE qa-167 (tsc -b, npm test, smoke all green)
+2026-11-24T23:29:38Z START qa-171 on qa/qa-171-outline-click-on-a-page-snapped-heading: Outline click on a page-snapped heading scrolls to blank space instead of the heading

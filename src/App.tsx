@@ -1940,7 +1940,23 @@ export default function App() {
           onEditBibliographyEntry={(entry) => setBibliographyEntry(entry)}
           onHeadingClick={(position) => {
             const heading = document.querySelectorAll<HTMLElement>(".sentence-editor h1, .sentence-editor h2, .sentence-editor h3")[position];
-            heading?.scrollIntoView({ behavior: "smooth", block: "center" });
+            if (!heading) return;
+            // Pagination pads a heading that starts on a page rule, so its box
+            // centre can sit a page below the text. Centre the text line itself.
+            const range = window.document.createRange();
+            range.selectNodeContents(heading);
+            const textBounds = range.getBoundingClientRect();
+            const textTop = textBounds.height > 0 ? textBounds.top : heading.getBoundingClientRect().top;
+            const scroller = heading.closest<HTMLElement>(".visual-editor-scroll");
+            if (!scroller) {
+              heading.scrollIntoView({ behavior: "smooth", block: "center" });
+              return;
+            }
+            const bounds = scroller.getBoundingClientRect();
+            scroller.scrollTo({
+              top: Math.max(0, scroller.scrollTop + textTop - (bounds.top + scroller.clientHeight / 2)),
+              behavior: "smooth",
+            });
           }}
           onCommentSelected={(id) => {
             setActiveCommentId(id);
