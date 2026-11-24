@@ -440,3 +440,4 @@ Aborting
 2026-11-24T21:33:42Z START qa-157 on qa/qa-157-turning-tracking-off-within-the-revision: Turning tracking off within the revision debounce silently discards the edit that was made while tracking was on
 2026-11-24T21:37:03Z PUSHED main
 2026-11-24T21:37:03Z DONE qa-157 (tsc -b, npm test, smoke all green)
+2026-11-24T21:37:37Z START qa-158 on qa/qa-158-rejecting-a-tracked-insertion-of-a-new-p: Rejecting a tracked insertion of a new paragraph leaves an empty paragraph behind

@@ -1,121 +1,104 @@
 # Sentence
 
-Sentence is a desktop document editor (Windows and Linux) that combines a Word-like writing surface with readable LaTeX and visual Git. It is built with Tauri 2, Rust, React, TypeScript, Tectonic, and libgit2.
+A desktop LaTeX editor with a Word-style ribbon. You write on a page, not in
+markup — Sentence keeps a readable, compilable `.tex` in sync and builds papers,
+books and notes through a bundled Tectonic engine.
+
+![The Sentence editor](docs/screenshots/editor.png)
+
+## Why
+
+Word is comfortable and cannot typeset maths. LaTeX typesets anything and is
+miserable to write. Sentence keeps the Word-shaped surface (ribbon, page,
+navigation pane, review marks) and the LaTeX substance (a real `.tex` file you
+can hand to a journal).
+
+The project on disk is a plain folder:
+
+```
+document.tex      the source of truth — readable, compilable outside the app
+sentence.json     the visual model and settings
+references.bib    bibliography
+.sentence/        review state, build output, TeX cache
+.git/             real git, with a visual history and GitHub sync
+```
 
 ## What works
 
-- Visual rich-text editing with headings, lists, quotations, links, tables, images, equations, citations, footnotes, cross-references, and page breaks.
-- LaTeX source mode and synchronized visual editing for the supported Sentence document subset.
-- PDF compilation through the bundled Tectonic engine. No TeX Live or MiKTeX installation is required.
-- arXiv submission workflow with paper metadata, validation, source packaging, BibTeX, figures, and compiled PDF.
-- Project autosave, crash recovery ready project metadata, comments, and tracked-edit review.
-- Local Git commits, branches, history, fetch, pull, push, merge, and conflict status.
-- GitHub device-flow authorization through the system browser, secure token storage in Windows Credential Manager, repository publishing, and cloning Sentence projects.
-- Local-only operation with no telemetry or application cloud service.
+- **Editing** — Tiptap page with headings, lists, tables (contextual toolbar:
+  rows, columns, merge, caption), links, images, footnotes, citations,
+  cross-references, maths (KaTeX), comments and tracked changes.
+- **Two-way source sync** — Visual ⇄ LaTeX ⇄ Split. Edits survive the round trip,
+  including nested lists, tables, `\href`, `\ref`, `\cite`, `equation` vs
+  `equation*`, and footnotes with braces in their text.
+- **Find & replace**, Word keyboard shortcuts (`Ctrl+F/H/K`, `Ctrl+Shift+7/8`,
+  `Ctrl+1/2/5`, Tab indent), zoom, print, focus view.
+- **Review** — comments with replies and resolve, tracked edits with accept /
+  reject, per-change history.
+- **Compile** — Tectonic sidecar, PDF preview, diagnostics with file/line,
+  PDF and arXiv source-package export (plus HTML and Markdown).
+- **Git** — libgit2 history, diff, branches, commits; GitHub device-flow login and
+  repository publishing.
+- **Themes** — Classic / Modern / Compact style galleries that set the LaTeX
+  preamble, not just the CSS.
 
-## Project format
+## Document types
 
-Projects are folders rather than opaque archives:
+| Class | Structure | Notes |
+|---|---|---|
+| `article` | section → subsection → … | arXiv papers, notes, one-pagers |
+| `report` | chapter → section → … | reports, theses |
+| `book` | part → chapter → section → … | books, with front matter and appendices |
+| `letter` | unnumbered body | letters |
 
-```text
-Paper/
-  document.tex
-  sentence.json
-  references.bib
-  assets/images/
-  .sentence/
-    review.json
-    build/
-    tex-cache/
-  .git/
-```
+Two-column layout, paper size, margins, font size, line spacing and paragraph
+style are settings that flow into the preamble and back.
 
-`document.tex` is readable outside Sentence. The visual document model and review state are stored separately so visual-only comments and tracked edits never leak into exported LaTeX.
+## Build and run
 
-## Writing for arXiv
+Requirements: Node 20+, Rust (stable), and the Tauri 2 system dependencies.
 
-1. Open **Paper properties** from the **Paper** ribbon tab.
-2. Add the paper title, one author per line, abstract, keywords, primary arXiv category, optional cross-list categories, and submission comments.
-3. Use **Insert** for equations, citations, tables, and figures. Use PNG or JPEG for visual figures; source-mode users can also reference PDF and EPS figures already in the project.
-4. Edit `references.bib` from the **View > LaTeX** source workspace. Citation entries must match the BibTeX keys inserted with the Citation command.
-5. Compile the paper, then choose **Paper > Create arXiv ZIP**.
-
-The exported archive contains the portable `document.tex`, `references.bib`, generated `document.bbl` when applicable, arXiv-compatible figure assets, and the compiled `document.pdf`. It excludes Sentence-only project metadata, comments, revisions, Git state, and build caches.
-
-The package checks for unresolved merge markers, missing metadata, missing bibliography files, absolute or missing figure paths, unsupported image formats, and oversized archives. The final submission, category choice, endorsements, and any arXiv moderation requirements are completed on arXiv's submission site.
-
-## Development
-
-Prerequisites:
-
-- Node.js 20 or newer
-- Rust stable with the MSVC toolchain
-- Visual Studio C++ build tools
-- Microsoft Edge WebView2 runtime
-
-Install dependencies:
-
-```powershell
+```bash
 npm install
+bash scripts/fetch-tectonic.sh          # Linux/macOS sidecar
+npm run dev                              # UI in a browser (desktop actions stubbed)
+npm run desktop:linux                    # full desktop app (Linux)
 ```
 
-The Tauri build requires the Tectonic engine as a sidecar at
-`src-tauri/binaries/tectonic-x86_64-pc-windows-msvc.exe`. Builds fail without it.
-The engine (Tectonic 0.17.0, SHA-256 `99ffcfdb…1c8bf08d`) is not tracked in Git
-because it is a 50 MB Windows binary. Fetch the pinned release with:
+On Windows use `npm run desktop` / `npm run desktop:build` (PowerShell scripts in
+`.tools/`, WebView2). On Linux the scripts set `WEBKIT_DISABLE_DMABUF_RENDERER=1`
+— WebKitGTK aborts on Wayland without it. Release build: `npm run
+desktop:linux:build`, binary at `src-tauri/target/release/sentence`.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/fetch-tectonic.ps1
-```
+Tests:
 
-The script downloads the official Tectonic release, verifies the checksum, and
-places the executable at the path Tauri expects.
-
-Run the app in development mode:
-
-```powershell
-npm run desktop        # or: npm run tauri dev, if cargo is on PATH globally
-npm run dev            # browser-only UI, desktop actions stubbed
-```
-
-Build the Windows executable:
-
-```powershell
-npm run desktop:build  # or: npm run tauri build
-```
-
-The release executable is written to `src-tauri/target/release/sentence.exe`. The bundled Tectonic sidecar is placed beside it. Installer bundles are written under `src-tauri/target/release/bundle/`.
-
-
-## GitHub setup
-
-Sentence uses the GitHub OAuth device flow, so no client secret is embedded in the application. Create a GitHub OAuth App, enable device flow, and enter its Client ID in Sentence when connecting GitHub. The requested scopes are `repo` and `read:user`.
-
-Tokens are stored through Windows Credential Manager. Repository content is sent to GitHub only after an explicit push or publish action.
-
-## Tests
-
-```powershell
-npm test
-npx tsc -b                              # real typecheck (npm run check is a no-op)
-npm run build
+```bash
+npx tsc -b        # real typecheck (`npm run check` is a no-op, see AGENTS.md)
+npm test          # Vitest, LaTeX round trips and pure logic
 cargo test --manifest-path src-tauri/Cargo.toml
 ```
 
-Run the Tectonic integration check with:
+## Architecture
 
-```powershell
-$env:SENTENCE_TECTONIC_TEST = "1"
-npm test
-```
+Tauri 2 shell, React 19 + Tiptap 3 frontend, Rust backend.
 
-The first Tectonic build downloads missing LaTeX packages and caches them under the project's `.sentence/tex-cache/` directory.
+- `src/lib/latex.ts` — `documentToLatex` / `latexToDocument`, the two-way
+  translation that everything else depends on. Every document-model change keeps
+  both directions and its round-trip tests in sync.
+- `src/lib/tauri.ts` — the whole backend surface, typed; stubbed in the browser.
+- `src-tauri/src/{project,latex,git,github,arxiv}.rs` — one module per domain;
+  `latex.rs` runs the Tectonic sidecar with `--untrusted`.
+- `src/editor/` — Tiptap extensions and the paginated surface.
 
-## Current scope
+## How it is built
 
-Version 1 targets Windows and GitHub. A Linux build runs for development (see AGENTS.md); real-time multi-author editing is planned for version 2. Arbitrary external LaTeX projects and Microsoft `.docx` interoperability are intentionally outside the current visual-editing boundary.
+Most of the bug fixing and feature work in this repository was produced by an
+autonomous loop, supervised by a human: a Playwright gate drives the app in
+Chromium, an explorer agent writes its own probes for untested areas, work orders
+live in `qa/roadmap.json`, and a coding agent implements each item on a branch.
+Nothing merges unless `tsc -b`, the unit tests and the gate pass. See
+`qa/README.md` and `docs/PRODUCT.md`.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Third-party components are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
+MIT — see [LICENSE](LICENSE).

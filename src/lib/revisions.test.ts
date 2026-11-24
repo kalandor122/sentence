@@ -7,6 +7,7 @@ import {
   documentChanges,
   nodeText,
   rejectRevisions,
+  trackedShape,
   trackedText,
   undoDocumentChanges,
 } from "./revisions";
@@ -100,6 +101,21 @@ describe("tracked text comparison", () => {
   it("treats a typed trailing space as an edit", () => {
     expect(trackedText(doc("alpha "))).not.toBe(trackedText(doc("alpha")));
   });
+
+  it("treats a paragraph break as an edit even when the joined text is unchanged", () => {
+    const single = doc("Only paragraph");
+    const split: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Only" }] },
+        { type: "paragraph", content: [{ type: "text", text: " paragraph" }] },
+      ],
+    };
+    const appended: SentenceDocument = { type: "doc", content: [...single.content, { type: "paragraph" }] };
+    expect(trackedShape(split)).not.toBe(trackedShape(single));
+    expect(trackedShape(appended)).not.toBe(trackedShape(single));
+    expect(trackedShape(annotated)).toBe(trackedShape(doc("Comment on tracked text")));
+  });
 });
 
 describe("reviewing tracked changes", () => {
@@ -112,6 +128,17 @@ describe("reviewing tracked changes", () => {
     const changes = documentChanges(before, after);
     expect(changes.some((change) => change.kind === "text" && /paragraph/.test(change.after))).toBe(false);
     expect(changes.some((change) => change.kind === "value" && nodeText(change.after) === "two")).toBe(true);
+  });
+
+  it("restores the original document when a paragraph insertion is rejected", () => {
+    const before = doc("Only paragraph");
+    const withText: SentenceDocument = {
+      type: "doc",
+      content: [...before.content, doc("Second paragraph").content[0]],
+    };
+    const withEmpty: SentenceDocument = { type: "doc", content: [...before.content, { type: "paragraph" }] };
+    expect(rejectRevisions(withText, [revision("r1", before, withText)], ["r1"]).document).toEqual(before);
+    expect(rejectRevisions(withEmpty, [revision("r2", before, withEmpty)], ["r2"]).document).toEqual(before);
   });
 
   it("rejects several changes newest first without leaving review state in the document", () => {

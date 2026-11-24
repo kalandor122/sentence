@@ -1930,7 +1930,7 @@
       ],
       "hint": "Repro: 1. Type 'Comment on tracked text'. 2. Turn on Review > Track changes. 3. Select the first word 'Comment' and add the comment 'Comment before tracked edit'. 4. Put the caret at the end and type ' tail', wait ~2 s, and open the History sidebar while the revision is pending.\nActual: The editor renders an insertion decoration with text ' on tracked text tail' and a deletion decoration with text ' on tracked text', so most of the unchanged sentence is shown as both deleted and inserted. The revision card text is correct; only the inline decorations are wrong.",
       "source": "explore:review:tracked-change decorations misreport existing text as deleted and re-inserted when the paragraph contains a comment mark",
-      "status": "in_progress",
+      "status": "open",
       "attempts": 1,
       "startedAt": "2026-11-23T13:44:51Z",
       "lastAttemptAt": "2026-11-23T13:44:51Z"
@@ -2025,7 +2025,7 @@
       ],
       "hint": "Repro: 1. Create a project and make sure the source is clean (View > LaTeX, then 'Apply source' is disabled). 2. Click View > Split. 3. In the source pane, put the caret before \\end{document} and type `ZXDRAFTPARAGRAPH unapplied` on its own line. Do not click Apply. 4. Click at the end of the visual text in the other pane and type `ZXVISUALTYPED`; the text appears at the end of the last paragraph. 5. Click View > Visual.\nActual: The mode switches with the success toast `Visual document synchronized from LaTeX.` and the freshly typed visual text is gone: the visual document shows `ZXDRAFTPARAGRAPH unapplied` and no longer contains `ZXVISUALTYPED` (probe: visualAcceptedTyping=true, visualStillHasTypedText=false, visualHasSourceDraft=true). The source pane keeps the draft and 'Apply source' remains enabled, so the same overwrite happens with no warning and no way to recover the visual typing.",
       "source": "explore:source-editor:split view silently discards visual-pane edits when the source pane has an unapplied draft",
-      "status": "in_progress",
+      "status": "open",
       "attempts": 1,
       "startedAt": "2026-11-23T21:32:56Z",
       "lastAttemptAt": "2026-11-23T21:32:56Z"
@@ -2514,8 +2514,9 @@
       "hint": "Repro: 1. In a fresh document type 'Only paragraph'. 2. Review tab > Track changes. 3. Put the caret at the end, press Enter, type 'Second paragraph', and wait 2.3 s for the revision card. 4. Open History and click Reject on the card whose before text is 'Only paragraph' and after text is 'Only paragraph Second paragraph'.\nActual: The revision card disappears and 'Second paragraph' is removed, but the document keeps a second, empty paragraph with the 'Begin with a sentence...' placeholder. The probe read the editor HTML ('<p>Only paragraph</p><p ... is-empty><br></p>') and the saved workspace document, which still contains two paragraph nodes, the second with no content.",
       "source": "explore:review:rejecting a tracked insertion of a new paragraph leaves an empty paragraph behind",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T21:37:37Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T21:37:37Z",
+      "lastAttemptAt": "2026-11-24T21:37:37Z"
     },
     {
       "id": "qa-159",

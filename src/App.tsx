@@ -69,7 +69,7 @@ import {
   acceptRevisions,
   pendingRevisions,
   rejectRevisions,
-  trackedText,
+  trackedShape,
 } from "./lib/revisions";
 import {
   assetUrl,
@@ -973,7 +973,10 @@ export default function App() {
     if (!latest || !baseline) return;
     const beforeText = documentPlainText(baseline);
     const afterText = documentPlainText(latest.document);
-    if (beforeText === afterText) {
+    // Compare shape, not just text: a paragraph break with no words is still an
+    // edit. Saving it only in the baseline would make a rejection leave the
+    // empty paragraph behind.
+    if (trackedShape(baseline) === trackedShape(latest.document)) {
       revisionBaseline.current = latest.document;
       return;
     }
@@ -1012,7 +1015,9 @@ export default function App() {
       // A comment (or other annotation) changes the document but not its plain
       // text, so it must move the baseline forward instead of being folded into
       // the next tracked revision — rejecting that revision would undo it too.
-      if (trackedText(pendingBaseline) === trackedText(document)) {
+      // Structural edits count: an added paragraph is a real change even when it
+      // adds no words yet.
+      if (trackedShape(pendingBaseline) === trackedShape(document)) {
         revisionBaseline.current = document;
       } else {
         revisionBaseline.current = pendingBaseline;
