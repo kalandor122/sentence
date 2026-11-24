@@ -427,3 +427,4 @@ Aborting
 2026-11-24T21:02:06Z START qa-151 on qa/qa-151-footnote-text-cannot-be-edited-in-the-vi: Footnote text cannot be edited in the visual editor; typing over the marker deletes the note
 2026-11-24T21:05:51Z PUSHED main
 2026-11-24T21:05:51Z DONE qa-151 (tsc -b, npm test, smoke all green)
+2026-11-24T21:06:25Z START qa-152 on qa/qa-152-inserting-a-citation-footnote-or-cross-r: Inserting a citation, footnote or cross-reference after a LaTeX round-trip puts it inside the title heading

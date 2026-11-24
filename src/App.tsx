@@ -457,6 +457,10 @@ export default function App() {
   // source view regenerates LaTeX from the document, which would rewrite a
   // hand-written draft (and drop its undo history) even though nothing changed.
   const appliedSourceDocument = useRef<string | null>(null);
+  // The visual editor unmounts in the LaTeX view. Keep the caret it had so a
+  // citation or footnote inserted after coming back lands where the user was
+  // working instead of at the top of the document.
+  const visualSelection = useRef<{ from: number; to: number } | null>(null);
   const linkSubmitted = useRef(false);
   const changeVersion = useRef(0);
   const revisionBaseline = useRef<SentenceDocument | null>(null);
@@ -480,6 +484,17 @@ export default function App() {
     // focus the source view owns) must be handed back explicitly.
     sourceTextarea.current?.focus();
   }, [mode]);
+
+  useEffect(() => {
+    if (!editor || mode === "source") return;
+    const saved = visualSelection.current;
+    if (!saved) return;
+    visualSelection.current = null;
+    const size = editor.state.doc.content.size;
+    const from = Math.max(0, Math.min(saved.from, size));
+    const to = Math.max(from, Math.min(saved.to, size));
+    editor.chain().setTextSelection({ from, to }).run();
+  }, [editor, mode]);
 
   useEffect(() => {
     dirtyRef.current = dirty;
@@ -571,6 +586,7 @@ export default function App() {
     setVisualPages(null);
     setActiveCommentId(null);
     revisionBaseline.current = null;
+    visualSelection.current = null;
     rememberProject(tab.workspace);
   };
 
@@ -597,6 +613,7 @@ export default function App() {
     setInspectorOpen(false);
     setActiveCommentId(null);
     revisionBaseline.current = null;
+    visualSelection.current = null;
   };
 
   const rememberProject = (project: Workspace) => {
@@ -654,6 +671,7 @@ export default function App() {
     setVisualPages(null);
     setActiveCommentId(null);
     revisionBaseline.current = null;
+    visualSelection.current = null;
     if (!isDesktop) persistBrowser(project);
     rememberProject(project);
   };
@@ -1105,6 +1123,11 @@ export default function App() {
 
   const handleModeChange = (nextMode: EditorMode) => {
     if (nextMode === mode) return;
+    // Leaving the visual editor unmounts it; remember the caret so the next
+    // insertion after returning is not placed at the start of the document.
+    if (nextMode === "source" && editor) {
+      visualSelection.current = { from: editor.state.selection.from, to: editor.state.selection.to };
+    }
     const current = workspaceRef.current;
     if (current && nextMode !== "source" && mode !== "visual" && sourceDirtyRef.current) {
       applySource();
