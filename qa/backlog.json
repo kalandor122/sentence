@@ -2009,10 +2009,11 @@
       ],
       "hint": "Repro: 1. Create a project, switch to View > LaTeX, add `ZXFAIL persistent paragraph` plus an unclosed `\\begin{itemize}` before \\end{document}. 2. Click 'Apply source' (error toast appears). 3. Wait about 1.5 seconds so autosave attempts the same parse; a 'Retry save' button appears in the status bar. 4. Click View > Visual, then View > LaTeX. The broken draft is gone and the source has been regenerated from the visual document ('Apply source' is disabled). Look at the status bar.\nActual: The status bar still shows the 'Retry save' button after returning to the regenerated, clean source (saveErrorAfterReturn='Retry save' while 'Apply source' is disabled), suggesting unsaved or invalid work remains when there is none.",
       "source": "explore:source-editor:stale 'retry save' error remains after the failed source draft has been discarded",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T17:47:04Z",
-      "lastAttemptAt": "2026-11-24T17:47:04Z"
+      "lastAttemptAt": "2026-11-24T17:47:04Z",
+      "doneAt": "2026-11-24T17:51:25Z"
     },
     {
       "id": "qa-127",
@@ -2087,7 +2088,9 @@
       ],
       "hint": "Repro: 1. View > LaTeX and put the caret before \\end{document}. 2. Type `ZXVISIT`. 3. Click View > Visual, then View > LaTeX. 4. Press Ctrl+Z.\nActual: Ctrl+Z does nothing: the reminder of the edit stays in the source (`ZXVISIT` is still present), 'Apply source' is disabled, and there is no indication that undo history was dropped. The source editor is remounted on every view switch with a fresh history, so the normal source > visual > source check loses undo for the whole visit.",
       "source": "explore:source-editor:undo history is discarded after leaving and re-entering the latex view",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T17:51:59Z"
     },
     {
       "id": "qa-132",
