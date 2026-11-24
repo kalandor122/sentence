@@ -2184,10 +2184,11 @@
       ],
       "hint": "Repro: Open the editor, select the Paper ribbon tab, Tab to the 'Create arXiv ZIP' button, press Enter, then press Tab once and Escape.\nActual: On open, document.activeElement is the 'Create arXiv ZIP' ribbon button behind the aria-modal dialog (not inside it); the first Tab moves focus to the dialog's Close button. Escape closes the dialog but leaves document.activeElement on <body>, so the next Tab restarts at the top of the page instead of the invoking button.",
       "source": "explore:keyboard:arxiv dialog opens with focus still on the ribbon button and loses focus to <body> when closed",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T18:26:17Z",
-      "lastAttemptAt": "2026-11-24T18:26:17Z"
+      "lastAttemptAt": "2026-11-24T18:26:17Z",
+      "doneAt": "2026-11-24T18:28:09Z"
     },
     {
       "id": "qa-138",
@@ -2199,7 +2200,9 @@
       ],
       "hint": "Repro: On the Home ribbon tab, Tab to the 'Text color' button, press Enter to open the swatch popover, then press Escape.\nActual: The .color-popover is still open after Escape and focus remains on the 'Text color' trigger; nothing else closes it except toggling the trigger or clicking the backdrop.",
       "source": "explore:keyboard:escape does not close the text color popover",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T18:28:43Z"
     }
   ]
 }
