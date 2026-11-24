@@ -3,7 +3,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
-import { Table, TableKit } from "@tiptap/extension-table";
+import { TableKit } from "@tiptap/extension-table";
 import TextAlign from "@tiptap/extension-text-align";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
@@ -35,6 +35,7 @@ import {
   FontSizeMark,
   HighlightMark,
 } from "./textStyleMarks";
+import { CaptionTable } from "./table";
 import type {
   CommentThread,
   ProjectSettings,
@@ -118,21 +119,6 @@ function focusAfterEditor(editor: Editor): boolean {
   next.focus();
   return true;
 }
-
-// Tables carry their caption as a node attribute so it survives the visual/LaTeX
-// round trip without becoming a paragraph inside the table.
-const CaptionTable = Table.extend({
-  addAttributes() {
-    return {
-      ...this.parent?.(),
-      caption: {
-        default: "",
-        parseHTML: (element) => element.getAttribute("data-caption") ?? "",
-        renderHTML: (attributes) => (attributes.caption ? { "data-caption": attributes.caption } : {}),
-      },
-    };
-  },
-});
 
 // The WebView's native spellchecker uses lang to pick a dictionary; keeping
 // these in one place avoids drift between editor creation and later toggles.
