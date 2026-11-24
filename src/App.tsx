@@ -960,6 +960,39 @@ export default function App() {
     }
   };
 
+  // Record everything edited since the baseline as one pending revision. Called
+  // by the debounce timer and, so nothing is lost, when tracking is turned off
+  // mid-debounce.
+  const commitTrackedRevision = () => {
+    if (revisionTimer.current) {
+      window.clearTimeout(revisionTimer.current);
+      revisionTimer.current = null;
+    }
+    const latest = workspaceRef.current;
+    const baseline = revisionBaseline.current;
+    if (!latest || !baseline) return;
+    const beforeText = documentPlainText(baseline);
+    const afterText = documentPlainText(latest.document);
+    if (beforeText === afterText) {
+      revisionBaseline.current = latest.document;
+      return;
+    }
+    const revision: Revision = {
+      id: crypto.randomUUID(),
+      author: gitAuthor.name || latest.settings.author || "You",
+      createdAt: new Date().toISOString(),
+      summary: "Tracked edit",
+      before: beforeText,
+      after: afterText,
+      beforeDocument: baseline,
+      afterDocument: latest.document,
+      accepted: false,
+    };
+    setWorkspace((current) => current ? { ...current, revisions: [revision, ...current.revisions] } : current);
+    revisionBaseline.current = latest.document;
+    markDirty();
+  };
+
   const handleDocumentUpdate = (document: SentenceDocument) => {
     const before = workspaceRef.current?.document;
     if (!isDesktop && before && JSON.stringify(before) === JSON.stringify(document)) return;
@@ -984,31 +1017,7 @@ export default function App() {
       } else {
         revisionBaseline.current = pendingBaseline;
         if (revisionTimer.current) window.clearTimeout(revisionTimer.current);
-        revisionTimer.current = window.setTimeout(() => {
-          const latest = workspaceRef.current;
-          const baseline = revisionBaseline.current;
-          if (!latest || !baseline) return;
-          const beforeText = documentPlainText(baseline);
-          const afterText = documentPlainText(latest.document);
-          if (beforeText === afterText) {
-            revisionBaseline.current = latest.document;
-            return;
-          }
-          const revision: Revision = {
-            id: crypto.randomUUID(),
-            author: gitAuthor.name || latest.settings.author || "You",
-            createdAt: new Date().toISOString(),
-            summary: "Tracked edit",
-            before: beforeText,
-            after: afterText,
-            beforeDocument: baseline,
-            afterDocument: latest.document,
-            accepted: false,
-          };
-          setWorkspace((current) => current ? { ...current, revisions: [revision, ...current.revisions] } : current);
-          revisionBaseline.current = latest.document;
-          markDirty();
-        }, 1800);
+        revisionTimer.current = window.setTimeout(commitTrackedRevision, 1800);
       }
     }
   };
@@ -1802,6 +1811,7 @@ export default function App() {
         onInsertPageBreak={() => insertPageFurniture(editor, "pageBreak")}
         onToggleTracking={() => {
           const next = !tracking;
+          if (!next) commitTrackedRevision();
           setTracking(next);
           revisionBaseline.current = next ? workspaceRef.current?.document ?? null : null;
           setToast(next ? "Tracked changes is on." : "Tracked changes is off.");

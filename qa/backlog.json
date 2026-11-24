@@ -2498,8 +2498,9 @@
       "hint": "Repro: 1. In a fresh document type 'Toggle race baseline'. 2. Review tab > Track changes (the button becomes 'Tracking on'). 3. Put the caret at the end and type ' tracked-write'. 4. Within about a second, before the 1.8 s revision delay elapses, click Review tab > 'Tracking on' to turn tracking off. 5. Wait 2.5 s and open the History sidebar.\nActual: No revision card is created. The History panel shows 'Tracked changes 0' and the text 'Toggle race baseline tracked-write' stays in the document as if it had been accepted. The only feedback is the toast 'Tracked changes is off.' The probe measured 804 ms between typing and turning tracking off, well inside the 1.8 s debounce, and still saw zero revisions after waiting 2.3 s.",
       "source": "explore:review:turning tracking off within the revision debounce silently discards the edit that was made while tracking was on",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T21:33:42Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T21:33:42Z",
+      "lastAttemptAt": "2026-11-24T21:33:42Z"
     },
     {
       "id": "qa-158",
