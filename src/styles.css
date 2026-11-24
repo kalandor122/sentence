@@ -1,25 +1,28 @@
 :root {
-  font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif;
-  color: #282a25;
-  background: #e7e4dd;
+  /* Word 365 chrome: Segoe UI, light grey surfaces, blue accent, white paper. */
+  font-family: "Segoe UI Variable Text", "Segoe UI Web (West European)", "Segoe UI", system-ui, sans-serif;
+  font-size: 13px;
+  color: #201f1e;
+  background: #f3f2f1;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --chrome: #f7f6f2;
-  --chrome-strong: #efede7;
-  --paper: #fffefb;
-  --canvas: #e7e4dd;
-  --line: #d9d5cc;
-  --line-strong: #c8c3b8;
-  --ink: #282a25;
-  --muted: #6c7067;
-  --faint: #969a91;
-  --accent: #2d5a47;
-  --accent-hover: #224737;
-  --accent-soft: #e2ebe4;
-  --ochre: #bb7047;
-  --ochre-soft: #f4e7de;
-  --danger: #ac4f45;
-  --radius: 7px;
+  --chrome: #f3f2f1;
+  --chrome-strong: #edebe9;
+  --paper: #ffffff;
+  --canvas: #e6e6e6;
+  --line: #e1dfdd;
+  --line-strong: #d2d0ce;
+  --ink: #201f1e;
+  --muted: #605e5c;
+  --faint: #8a8886;
+  --accent: #2b579a;
+  --accent-hover: #1f4278;
+  --accent-soft: #deecf9;
+  --ochre: #a4262c;
+  --ochre-soft: #fde7e9;
+  --danger: #a4262c;
+  --radius: 4px;
+  --shadow-sheet: 0 1px 2px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.10);
 }
 
 * {
@@ -646,21 +649,21 @@ button:disabled {
   position: relative;
   min-width: 57px;
   padding: 0 12px;
-  color: #565b54;
+  color: var(--ink);
   background: none;
   border: 0;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .ribbon-tabs button:hover {
-  color: var(--ink);
-  background: #efede7;
+  color: var(--accent);
+  background: var(--chrome-strong);
 }
 
 .ribbon-tabs button.active {
   color: var(--accent);
-  font-weight: 620;
+  font-weight: 600;
 }
 
 .ribbon-tabs button.active::after {
@@ -767,6 +770,7 @@ button:disabled {
 
 .ribbon-group {
   display: grid;
+  border-right: 1px solid var(--line);
   grid-template-rows: minmax(0, 1fr) 13px;
   min-width: max-content;
   padding: 0 6px;
@@ -826,7 +830,7 @@ button:disabled {
   gap: 6px;
   min-height: 29px;
   padding: 0 8px;
-  color: #3e443d;
+  color: var(--ink);
   background: transparent;
   border: 1px solid transparent;
   border-radius: 4px;
@@ -1079,12 +1083,13 @@ button:disabled {
 
 .paper-sheet {
   position: relative;
+  box-shadow: var(--shadow-sheet);
   width: min(var(--paper-width, 794px), calc(100% - 52px));
   min-height: calc(var(--paper-height, 1053px) * var(--sentence-page-count, 1));
   margin: 0 auto;
   transform: scale(var(--editor-zoom));
   transform-origin: top center;
-  background-color: #fffefb;
+  background-color: var(--paper);
   background-image: repeating-linear-gradient(
     to bottom,
     transparent 0,
