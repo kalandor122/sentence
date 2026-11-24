@@ -2185,8 +2185,9 @@
       "hint": "Repro: Open the editor, select the Paper ribbon tab, Tab to the 'Create arXiv ZIP' button, press Enter, then press Tab once and Escape.\nActual: On open, document.activeElement is the 'Create arXiv ZIP' ribbon button behind the aria-modal dialog (not inside it); the first Tab moves focus to the dialog's Close button. Escape closes the dialog but leaves document.activeElement on <body>, so the next Tab restarts at the top of the page instead of the invoking button.",
       "source": "explore:keyboard:arxiv dialog opens with focus still on the ribbon button and loses focus to <body> when closed",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T18:26:17Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T18:26:17Z",
+      "lastAttemptAt": "2026-11-24T18:26:17Z"
     },
     {
       "id": "qa-138",

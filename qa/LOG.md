@@ -387,3 +387,4 @@ Aborting
 2026-11-24T18:23:23Z DONE qa-135 (tsc -b, npm test, smoke all green)
 2026-11-24T18:23:57Z START qa-136 on qa/qa-136-ctrl-f-opens-the-find-bar-behind-an-open: Ctrl+F opens the find bar behind an open modal and moves focus out of the dialog
 2026-11-24T18:25:43Z DONE qa-136 (tsc -b, npm test, smoke all green)
+2026-11-24T18:26:17Z START qa-137 on qa/qa-137-arxiv-dialog-opens-with-focus-still-on-t: arXiv dialog opens with focus still on the ribbon button and loses focus to <body> when closed
