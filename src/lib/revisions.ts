@@ -96,6 +96,30 @@ function changesBetween(before: unknown, after: unknown, path: Path): Change[] {
   return [{ kind: "value", path, before, after }];
 }
 
+// Comments and formatting split a run of text into several nodes. The review
+// decorations compare runs as one string: diffing raw nodes would align them by
+// node, so the unchanged remainder of a split run looks deleted and re-inserted.
+// Marks are dropped because a mark-only update is not a tracked change.
+function mergeTextRuns(document: SentenceDocument): SentenceDocument {
+  const visit = (nodes: DocumentNode[]): DocumentNode[] => {
+    const result: DocumentNode[] = [];
+    for (const node of nodes) {
+      if (node.type === "text") {
+        const previous = result[result.length - 1];
+        if (previous?.type === "text") {
+          result[result.length - 1] = { type: "text", text: `${previous.text ?? ""}${node.text ?? ""}` };
+        } else {
+          result.push({ type: "text", text: node.text ?? "" });
+        }
+        continue;
+      }
+      result.push(node.content ? { ...node, content: visit(node.content) } : node);
+    }
+    return result;
+  };
+  return { ...document, content: visit(document.content ?? []) };
+}
+
 function getAt(root: unknown, path: Path): unknown {
   let current: unknown = root;
   for (const part of path) {
@@ -245,7 +269,7 @@ export function applyRejection(document: SentenceDocument, revision: Revision): 
 
 export function revisionChanges(revision: Revision): Change[] {
   if (!revision.beforeDocument || !revision.afterDocument) return [];
-  return documentChanges(revision.beforeDocument, revision.afterDocument);
+  return documentChanges(mergeTextRuns(revision.beforeDocument), mergeTextRuns(revision.afterDocument));
 }
 
 export function pendingRevisions(revisions: Revision[]): Revision[] {
@@ -316,7 +340,7 @@ export function deletionAnchor(revision: Revision, change: Change): { text: stri
   if (change.kind !== "value" || change.before === undefined || change.after !== undefined || !revision.beforeDocument) return null;
   const text = nodeText(change.before);
   if (!text) return null;
-  const parent = getAt(revision.beforeDocument, change.path.slice(0, -1));
+  const parent = getAt(mergeTextRuns(revision.beforeDocument), change.path.slice(0, -1));
   const key = change.path[change.path.length - 1];
   if (!Array.isArray(parent) || typeof key !== "number") return null;
   return {
