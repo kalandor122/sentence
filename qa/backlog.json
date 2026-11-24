@@ -2424,10 +2424,11 @@
       ],
       "hint": "Repro: Create a project. Click the last paragraph, press Ctrl+End, Enter and type `End marker`. Open View > LaTeX, then View > Visual. Without clicking in the page, open References > Insert citation and click Cite; then Insert > Footnote with `Note after round trip`; then References > Cross-reference with `sec:after-roundtrip`. Open View > LaTeX.\nActual: All three nodes are inserted at position 0, inside the `Introduction` heading. The page begins `[sentence2026]1ref: sec:after-roundtripIntroduction` and the exported source contains `\\section{\\cite{sentence2026}\\footnote{Note after round trip}\\ref{sec:after-roundtrip}Introduction}`, while `End marker` remains unchanged at the end.",
       "source": "explore:links-cites-footnotes:inserting a citation, footnote or cross-reference after a latex round-trip puts it inside the title heading",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T21:06:25Z",
-      "lastAttemptAt": "2026-11-24T21:06:25Z"
+      "lastAttemptAt": "2026-11-24T21:06:25Z",
+      "doneAt": "2026-11-24T21:12:50Z"
     },
     {
       "id": "qa-153",
@@ -2439,7 +2440,9 @@
       ],
       "hint": "Repro: Create a project. At the end type `LinkOne alpha`, select `alpha`, press Ctrl+K, enter `https://example.com/page` and click Insert. Click the link, press Ctrl+K, clear the Address field and press Escape.\nActual: The dialog only offers Cancel and Insert; with an empty Address, Insert is disabled. Escape closes the dialog and `alpha` still links to `https://example.com/page`. The dialog exposes no remove/unlink control.",
       "source": "explore:links-cites-footnotes:no way to remove a hyperlink: clearing the address disables insert and escape keeps the link",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T21:13:26Z"
     },
     {
       "id": "qa-154",

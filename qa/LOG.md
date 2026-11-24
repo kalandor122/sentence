@@ -428,3 +428,5 @@ Aborting
 2026-11-24T21:05:51Z PUSHED main
 2026-11-24T21:05:51Z DONE qa-151 (tsc -b, npm test, smoke all green)
 2026-11-24T21:06:25Z START qa-152 on qa/qa-152-inserting-a-citation-footnote-or-cross-r: Inserting a citation, footnote or cross-reference after a LaTeX round-trip puts it inside the title heading
+2026-11-24T21:12:52Z PUSHED main
+2026-11-24T21:12:52Z DONE qa-152 (tsc -b, npm test, smoke all green)
