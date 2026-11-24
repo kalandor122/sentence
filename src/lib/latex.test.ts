@@ -685,6 +685,60 @@ describe("LaTeX generation", () => {
     }
   });
 
+  it("keeps a table without a header row through a source round trip", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "One" }] }],
+                },
+                {
+                  type: "tableCell",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "Two" }] }],
+                },
+              ],
+            },
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "a" }] }],
+                },
+                {
+                  type: "tableCell",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "b" }] }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("% Sentence table header: none");
+    const parsed = latexToDocument(latex, settings).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(table?.content?.[0]?.content?.map((cell) => cell.type)).toEqual([
+      "tableCell",
+      "tableCell",
+    ]);
+    expect(table?.content?.[1]?.content?.map((cell) => cell.type)).toEqual([
+      "tableCell",
+      "tableCell",
+    ]);
+    expect(documentToLatex(parsed, settings)).toContain("% Sentence table header: none");
+    expect(documentToLatex(parsed, settings)).not.toContain("\\textbackslash{}% Sentence");
+  });
+
   it("recognizes block commands placed directly after text without a blank line", () => {
     const source = [
       "\\begin{document}",
