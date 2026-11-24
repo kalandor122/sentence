@@ -2052,10 +2052,11 @@
       ],
       "hint": "Repro: 1. View > LaTeX and before \\end{document} add two lines: `ZXCOMMENTBLOCK text body` followed by `% ZXCOMMENTBLOCK ignored by LaTeX`, then a blank line and `ZXCOMMENTINLINE text % ZXCOMMENTINLINE note`. 2. Click 'Apply source'. 3. Click View > Visual. 4. Click View > LaTeX and read the textarea.\nActual: Apply reports success and the visual document shows the literal text `% ZXCOMMENTBLOCK ignored by LaTeX` and `% ZXCOMMENTINLINE note`. Returning to the source shows both comments rewritten with escaped percent signs (`\\% ZXCOMMENTBLOCK ignored by LaTeX`, `\\% ZXCOMMENTINLINE note`), so the comments are permanently converted into visible document content. Reproduced for both a whole-line comment and a trailing comment.",
       "source": "explore:source-editor:latex comments in the document body become visible text and are escaped on export",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T16:57:30Z",
-      "lastAttemptAt": "2026-11-24T16:57:30Z"
+      "lastAttemptAt": "2026-11-24T16:57:30Z",
+      "doneAt": "2026-11-24T17:00:16Z"
     },
     {
       "id": "qa-130",
@@ -2067,7 +2068,9 @@
       ],
       "hint": "Repro: 1. View > LaTeX and before \\end{document} add a line `ZXUNCLOSEDPAREN \\(a^2 + b^2` (no closing `\\)`). 2. Click 'Apply source' and read the toast. 3. Click View > Visual, then View > LaTeX. 4. Repeat with `ZXUNCLOSEDDOLLAR $a^2 + b^2` (no closing `$`).\nActual: Both applies report success (`Visual document synchronized from LaTeX.`) and 'Apply source' becomes disabled, so the broken input is committed. The visual document contains the delimiter as literal text, and the regenerated source escapes it: `\\textbackslash{}(a\\textasciicircum{}2 + b\\textasciicircum{}2` for the unclosed `\\(` and `\\$a\\textasciicircum{}2 + b\\textasciicircum{}2` for the unclosed `$`. No error is shown at any point.",
       "source": "explore:source-editor:unclosed math delimiters are accepted as valid and escaped instead of reported",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T17:00:59Z"
     },
     {
       "id": "qa-131",
