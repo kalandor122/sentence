@@ -1204,6 +1204,33 @@ describe("LaTeX generation", () => {
     expect(latex).not.toContain("data:");
   });
 
+  it("writes only a caption the user wrote, never the image file name", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "image",
+          attrs: { path: "assets/images/qa-image--1.png", alt: "qa image #1.png" },
+        },
+        {
+          type: "image",
+          attrs: {
+            path: "assets/images/qa-image--1.png",
+            alt: "qa image #1.png",
+            caption: "Architecture & flow",
+          },
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).not.toContain("\\caption{qa image");
+    expect(latex).toContain("\\caption{Architecture \\& flow}");
+
+    const parsed = latexToDocument(latex, DEFAULT_SETTINGS);
+    expect(parsed.document.content[1].attrs?.caption).toBe("Architecture & flow");
+    expect(documentToLatex(parsed.document, settings)).toBe(latex);
+  });
+
   it("keeps an inline image inside its paragraph", () => {
     const document: SentenceDocument = {
       type: "doc",

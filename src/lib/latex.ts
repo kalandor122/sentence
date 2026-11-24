@@ -380,12 +380,15 @@ function imageWidthArgument(node: DocumentNode): string {
 function imageToLatex(node: DocumentNode): string {
   const src = attribute(node, "path") ?? attribute(node, "src") ?? "";
   const alt = attribute(node, "alt") ?? "";
+  // Only an explicit caption becomes \caption. Alt text names the image but is
+  // not a caption the user ever wrote, so it must not reach the PDF.
+  const caption = attribute(node, "caption") ?? "";
   const filename = imageSourcePath(src, alt);
   return [
     "\\begin{figure}[htbp]",
     "\\centering",
     `\\includegraphics[${imageWidthArgument(node)}]{${escapeLatex(filename)}}`,
-    alt ? `\\caption{${escapeLatex(alt)}}` : "",
+    caption ? `\\caption{${escapeLatex(caption)}}` : "",
     "\\end{figure}",
   ]
     .filter(Boolean)
@@ -1334,9 +1337,16 @@ export function latexToDocument(
       ) ?? block.match(/^\\includegraphics(?:\[[^\]]*\])?\{([^}]*)\}$/);
     if (image) {
       const caption = block.match(/\\caption\{([^}]*)\}/);
+      const captionText = caption ? decodeLatexText(caption[1]) : "";
       content.push({
         type: "image",
-        attrs: { src: decodeLatexText(image[1]), alt: caption ? decodeLatexText(caption[1]) : "" },
+        attrs: {
+          src: decodeLatexText(image[1]),
+          // LaTeX has one text for a figure: the caption. Show it in the
+          // editor and keep it as the alt text for the HTML and Markdown exports.
+          alt: captionText,
+          caption: captionText,
+        },
       });
       continue;
     }

@@ -2265,8 +2265,9 @@
       "hint": "Repro: Type a paragraph, click Insert > Image and supply a file named 'qa image #1.png' through the hidden file input. Read the visual page, then switch to View > LaTeX.\nActual: The visual page renders only img (no caption element or caption text). The exported LaTeX adds \\caption{qa image \\#1.png}, so the PDF will show the raw file name as a caption that the user never saw or edited. Probe qa/probes/insert-media.mjs scenario blockImageSourceRoundTrip.",
       "source": "explore:insert-media:exported figure captions use the file name and are invisible in the visual editor",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T19:02:00Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T19:02:00Z",
+      "lastAttemptAt": "2026-11-24T19:02:00Z"
     }
   ]
 }

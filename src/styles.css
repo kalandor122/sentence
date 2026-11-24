@@ -1297,6 +1297,18 @@ button:disabled {
   border: 1px solid #e0dcd3;
 }
 
+.sentence-editor figure.figure-block {
+  margin: 0;
+}
+
+.sentence-editor figure.figure-block figcaption {
+  margin: -0.6em 0 1.4em;
+  color: #4e5f53;
+  font-size: 0.9em;
+  line-height: 1.5;
+  text-align: center;
+}
+
 .sentence-editor img.inline-image {
   display: inline-block;
   max-height: 1.5em;
