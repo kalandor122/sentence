@@ -152,6 +152,24 @@ describe("review decorations", () => {
     ]);
   });
 
+  it("reports a deleted commented word without marking the unchanged rest of the run", () => {
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "Keep  text" }] }],
+    };
+    expect(revisionChanges(revision("r1", commented, after))).toEqual([
+      {
+        kind: "text",
+        path: ["content", 0, "content", 0, "text"],
+        prefix: "Keep ",
+        removed: "beta",
+        inserted: "",
+        suffix: " text",
+        after: "Keep  text",
+      },
+    ]);
+  });
+
   it("reports only the appended text when a comment mark splits the paragraph", () => {
     const after: SentenceDocument = {
       type: "doc",
