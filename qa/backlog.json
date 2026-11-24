@@ -2547,10 +2547,11 @@
       ],
       "hint": "Repro: 1. Type 'Keep beta text'. 2. Select 'beta' and add the comment 'Comment on replaced word'. 3. Review tab > Track changes. 4. Select 'beta' again and type 'B', then wait 2.3 s and open the History sidebar while the revision is pending.\nActual: The editor renders insertion decorations with text 'B ' and 'text' and deletion decorations with text 'beta' and ' text'. The unchanged trailing ' text' is shown as struck through as well as inserted. Deleting the commented word instead of replacing it produces the same artifact (insertions ' ' and 'text', deletions 'beta' and ' text').",
       "source": "explore:review:tracked-change decorations mark unchanged trailing text as both deleted and re-inserted when the paragraph contains a co",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T22:29:11Z",
-      "lastAttemptAt": "2026-11-24T22:29:11Z"
+      "lastAttemptAt": "2026-11-24T22:29:11Z",
+      "doneAt": "2026-11-24T22:34:32Z"
     },
     {
       "id": "qa-161",
@@ -2590,7 +2591,9 @@
       ],
       "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add the standalone line `\\[ ZXBRACKET E = mc^2 \\]`. 3. Click Apply source, then View tab > Visual. 4. Repeat steps 2-3 with `$$ ZXDOLLAR E = mc^2 $$` and with `\\begin{equation}ZXONELINE E = mc^2\\end{equation}` all on one line.\nActual: All three applies report `Visual document synchronized from LaTeX.` and the visual pane shows the delimiters as ordinary paragraph text with zero math blocks (probe mathBlocks: []). Refresh from visual then writes `\\textbackslash{}[ ZXBRACKET E = mc\\textasciicircum{}2 \\textbackslash{}]`, `\\$\\$ ZXDOLLAR E = mc\\textasciicircum{}2 \\$\\$`, and `\\textbackslash{}begin\\{equation\\}ZXONELINE E = mc\\textasciicircum{}2\\textbackslash{}end\\{equation\\}`. The equations survive only as escaped text, not as math.",
       "source": "explore:source-editor:display math written with \\[...\\], $$...$$ or a one-line equation environment is imported as literal text and escaped",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T22:35:08Z"
     },
     {
       "id": "qa-164",
