@@ -414,3 +414,4 @@ Aborting
 2026-11-24T20:13:48Z START qa-148 on qa/qa-148-turning-the-header-row-off-is-not-export: Turning the header row off is not exported and is silently re-enabled by a source round trip
 2026-11-24T20:15:29Z DONE qa-148 (tsc -b, npm test, smoke all green)
 2026-11-24T20:16:03Z START qa-149 on qa/qa-149-add-row-above-the-header-row-moves-the-h: Add row above the header row moves the header into row 2 and the toolbar then reports no header row
+2026-11-24T20:20:51Z DONE qa-149 (tsc -b, npm test, smoke all green)
