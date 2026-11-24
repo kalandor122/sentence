@@ -33,6 +33,17 @@ function createEditor(withHeaderRow: boolean): Editor {
   });
 }
 
+function createSizedEditor(rows: number, columns: number): Editor {
+  const row = { type: "tableRow", content: Array.from({ length: columns }, () => cell(false)) };
+  return new Editor({
+    extensions: [StarterKit, TableKit.configure({ table: false }), CaptionTable],
+    content: {
+      type: "doc",
+      content: [{ type: "table", content: Array.from({ length: rows }, () => row) }],
+    },
+  });
+}
+
 function tableRowTypes(document: SentenceDocument): string[][] {
   const table = document.content.find((node) => node.type === "table");
   return (table?.content ?? []).map((row) => (row.content ?? []).map((cell) => cell.type));
@@ -93,6 +104,28 @@ describe("CaptionTable", () => {
       ["tableCell", "tableCell"],
       ["tableCell", "tableCell"],
     ]);
+    editor.destroy();
+  });
+
+  it("reports deleting the last column as unavailable", () => {
+    const editor = createSizedEditor(3, 2);
+    editor.commands.setTextSelection(cellPositions(editor)[0]);
+    expect(editor.can().deleteColumn()).toBe(true);
+    expect(editor.commands.deleteColumn()).toBe(true);
+    expect(tableRowTypes(editor.getJSON() as SentenceDocument)[0]).toHaveLength(1);
+    expect(editor.can().deleteColumn()).toBe(false);
+    expect(editor.commands.deleteColumn()).toBe(false);
+    editor.destroy();
+  });
+
+  it("reports deleting the last row as unavailable", () => {
+    const editor = createSizedEditor(2, 3);
+    editor.commands.setTextSelection(cellPositions(editor)[0]);
+    expect(editor.can().deleteRow()).toBe(true);
+    expect(editor.commands.deleteRow()).toBe(true);
+    expect(rowTypes(editor)).toHaveLength(1);
+    expect(editor.can().deleteRow()).toBe(false);
+    expect(editor.commands.deleteRow()).toBe(false);
     editor.destroy();
   });
 });

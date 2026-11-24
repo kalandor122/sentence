@@ -418,3 +418,4 @@ Aborting
 2026-11-24T20:21:25Z START qa-146 on qa/qa-146-keyboard-shortcut-tab-indent-has-no-visi: keyboard shortcut "Tab indent" has no visible effect on the document
 2026-11-24T20:24:34Z DONE qa-146 (tsc -b, npm test, smoke all green)
 2026-11-24T20:31:28Z EXPLORE math: 0 new items, agent exit 1
+2026-11-24T20:31:43Z START qa-150 on qa/qa-150-delete-row-and-delete-column-stay-enable: Delete row and Delete column stay enabled at one row/column and silently do nothing

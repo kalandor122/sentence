@@ -1,5 +1,5 @@
 import { Table } from "@tiptap/extension-table";
-import { addRow, isInTable, selectedRect } from "@tiptap/pm/tables";
+import { addRow, deleteColumn, deleteRow, isInTable, selectedRect } from "@tiptap/pm/tables";
 
 // Tables carry their caption as a node attribute so it survives the visual/LaTeX
 // round trip without becoming a paragraph inside the table.
@@ -31,6 +31,23 @@ export const CaptionTable = Table.extend({
           dispatch(addRow(state.tr, rect, rect.top === 0 && headerRow ? 1 : rect.top));
         }
         return true;
+      },
+
+      // prosemirror-tables reports these as available even when the selection
+      // spans every row or column, and then leaves the table untouched. Report
+      // them as unavailable instead so the toolbar can disable them at 1x1.
+      deleteRow: () => ({ state, dispatch }) => {
+        if (!isInTable(state)) return false;
+        const rect = selectedRect(state);
+        if (rect.top === 0 && rect.bottom === rect.map.height) return false;
+        return deleteRow(state, dispatch);
+      },
+
+      deleteColumn: () => ({ state, dispatch }) => {
+        if (!isInTable(state)) return false;
+        const rect = selectedRect(state);
+        if (rect.left === 0 && rect.right === rect.map.width) return false;
+        return deleteColumn(state, dispatch);
       },
     };
   },
