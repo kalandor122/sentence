@@ -2233,8 +2233,9 @@
       "hint": "Repro: Type 'Alpha.' at the end of a paragraph. Click Insert > Page break, then type 'Bravo.' without clicking back into the page. Repeat with Insert > Image (supply a PNG through the hidden file input) then typing, and with References > Table of contents then typing. Also click Insert > Page break followed immediately by Insert > Image, and Insert > Image followed immediately by Insert > Page break.\nActual: The inserted atom keeps a ProseMirror node selection (probe selectedAtoms=1). Typing one character replaces it: the page break count goes 1 -> 0, \\newpage 1 -> 0 and the page count 2 -> 1; the image count goes 1 -> 0 and \\includegraphics 1 -> 0; the contents block count goes 1 -> 0 and \\tableofcontents 1 -> 0. Inserting an image after a page break leaves only the image (\\newpage 0), and inserting a page break after an image leaves only the break (\\includegraphics 0). Probe qa/probes/insert-media.mjs scenario insertThenTypeOrInsert.",
       "source": "explore:insert-media:typing after inserting an image, page break or table of contents replaces the just-inserted block",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T18:52:24Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T18:52:24Z",
+      "lastAttemptAt": "2026-11-24T18:52:24Z"
     },
     {
       "id": "qa-141",

@@ -331,19 +331,34 @@ function wordRangeAtCursor(editor: Editor): { from: number; to: number } | null 
   return { from: $from.pos - start, to: $from.pos + end };
 }
 
-function insertPageFurniture(editor: Editor | null, type: "pageBreak" | "toc") {
+// A block atom inserted at the end of the document leaves ProseMirror with a
+// node selection, so the next keystroke would replace the block just added.
+// Give the caret an empty paragraph after the atom instead.
+function caretAfterBlockAtom(editor: Editor) {
+  const { selection } = editor.state;
+  if (!(selection instanceof NodeSelection) || !selection.node.isBlock) return;
+  const position = selection.to;
+  editor.chain().focus().insertContentAt(position, { type: "paragraph" }).setTextSelection(position + 1).run();
+}
+
+function insertBlockContent(
+  editor: Editor | null,
+  content: { type: string; attrs?: Record<string, string> },
+) {
   if (!editor) return;
   const { selection } = editor.state;
   // Tiptap leaves an inserted block atom node-selected. A following ribbon
   // click would replace that node, so insert at the boundary after it instead.
-  if (
-    selection instanceof NodeSelection &&
-    (selection.node.type.name === "pageBreak" || selection.node.type.name === "toc")
-  ) {
-    editor.chain().focus().insertContentAt(selection.to, { type }).run();
-    return;
+  if (selection instanceof NodeSelection && selection.node.isBlock) {
+    editor.chain().focus().insertContentAt(selection.to, content).run();
+  } else {
+    editor.chain().focus().insertContent(content).run();
   }
-  editor.chain().focus().insertContent({ type }).run();
+  caretAfterBlockAtom(editor);
+}
+
+function insertPageFurniture(editor: Editor | null, type: "pageBreak" | "toc") {
+  insertBlockContent(editor, { type });
 }
 
 // A block image inserts at a mid-text caret by splitting the paragraph. Use
@@ -357,7 +372,11 @@ function insertImage(editor: Editor | null, attrs: Record<string, string>) {
     $from.parent.isTextblock &&
     $from.parentOffset > 0 &&
     $from.parentOffset < $from.parent.content.size;
-  editor.chain().focus().insertContent({ type: insideText ? "inlineImage" : "image", attrs }).run();
+  if (insideText) {
+    editor.chain().focus().insertContent({ type: "inlineImage", attrs }).run();
+    return;
+  }
+  insertBlockContent(editor, { type: "image", attrs });
 }
 
 export default function App() {
