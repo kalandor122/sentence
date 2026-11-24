@@ -2720,8 +2720,9 @@
       "hint": "Repro: 1) Open http://localhost:1420 in a fresh browser profile so the start screen with 'New document' is shown. 2) In the devtools console run: const orig = Storage.prototype.setItem; Storage.prototype.setItem = function () { throw new DOMException('The quota has been exceeded.', 'QuotaExceededError'); }; (simulates private mode, blocked storage, or a zero quota). 3) Click the 'New document' button in the masthead. 4) Wait 1.5 s: document.body.innerText is empty (length 0), there is no .start-screen and no editor surface, and the console shows an uncaught 'pageerror: The quota has been exceeded.' Variant with a saved document: with an editor open and 'Saved locally', run const orig = Storage.prototype.setItem; Storage.prototype.setItem = function (k, v) { if (k === 'sentence.recent') throw new DOMException('The quota has been exceeded.', 'QuotaExceededError'); return orig.call(this, k, v); }, type ' persist-recent-1' at the end of the document and wait 1.6 s: localStorage['sentence.workspace'] contains the typed text but the editor is gone and the body is empty.\nActual: The app renders nothing at all. persistBrowser catches the failed workspace write, but rememberProject (src/App.tsx) then calls localStorage.setItem('sentence.recent', ...) inside the setRecent state updater with no try/catch. The exception is thrown during React render, there is no error boundary, and the whole tree is unmounted: body innerText length 0, editor count 0, start-screen count 0, and one 'pageerror: The quota has been exceeded.' In the recent-only variant the workspace was written successfully (workspaceSaved true) while the UI still went blank. Probe evidence: qa/probes/persistence.mjs phases 'storage-unavailable-on-create' and 'storage-unavailable-recent-only'.",
       "source": "explore:persistence:a failed localstorage write for the recent-projects list unmounts the whole app to a blank page",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T23:24:02Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T23:24:02Z",
+      "lastAttemptAt": "2026-11-24T23:24:02Z"
     },
     {
       "id": "qa-173",

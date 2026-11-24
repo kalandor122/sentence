@@ -447,6 +447,9 @@ export default function App() {
   const [mathEditor, setMathEditor] = useState<MathEditorState | null>(null);
   const [newProjectOpen, setNewProjectOpen] = useState(false);
   const [recent, setRecent] = useState<RecentProject[]>(loadRecent);
+  // Mirrors `recent` so the list can be written outside the state updater: a
+  // storage failure inside the updater would throw while React renders.
+  const recentRef = useRef<RecentProject[]>(recent);
   const [toast, setToast] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   // The message that autosave reported for an unapplied source draft, so
@@ -636,17 +639,27 @@ export default function App() {
     visualSelection.current = null;
   };
 
-  const rememberProject = (project: Workspace) => {
+  const rememberProject = (project: Workspace): string | null => {
     const path = project.path || (isDesktop ? "" : BROWSER_WORKSPACE_PATH);
-    if (!path) return;
-    setRecent((current) => {
-      const next = [
-        { path, name: project.name, openedAt: new Date().toISOString() },
-        ...current.filter((item) => item.path !== path),
-      ].slice(0, 8);
+    if (!path) return null;
+    const next = [
+      { path, name: project.name, openedAt: new Date().toISOString() },
+      ...recentRef.current.filter((item) => item.path !== path),
+    ].slice(0, 8);
+    recentRef.current = next;
+    setRecent(next);
+    try {
       localStorage.setItem("sentence.recent", JSON.stringify(next));
-      return next;
-    });
+      return null;
+    } catch (error) {
+      // Blocked or full storage must not take the editor down with it. Report
+      // it like a failed save so the existing Retry save control can recover.
+      const message = error instanceof Error ? error.message : String(error);
+      setSaveError(message);
+      setSaveState("error");
+      setToast(message);
+      return message;
+    }
   };
 
   const persistBrowser = (project: Workspace): boolean => {
@@ -744,10 +757,10 @@ export default function App() {
       : documentSource(current.document, current.settings);
     if (!isDesktop) {
       if (!persistBrowser(current)) return null;
-      rememberProject(current);
-      setSaveError(draftError);
-      if (draftError || draftConflict) {
-        setSaveState(draftError ? "error" : "dirty");
+      const recentError = rememberProject(current);
+      setSaveError(recentError ?? draftError);
+      if (draftError || draftConflict || recentError) {
+        setSaveState(draftError || recentError ? "error" : "dirty");
       } else {
         setDirtyState(false);
         setSaveState("saved");
