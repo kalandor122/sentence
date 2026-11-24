@@ -2548,8 +2548,9 @@
       "hint": "Repro: 1. Type 'Keep beta text'. 2. Select 'beta' and add the comment 'Comment on replaced word'. 3. Review tab > Track changes. 4. Select 'beta' again and type 'B', then wait 2.3 s and open the History sidebar while the revision is pending.\nActual: The editor renders insertion decorations with text 'B ' and 'text' and deletion decorations with text 'beta' and ' text'. The unchanged trailing ' text' is shown as struck through as well as inserted. Deleting the commented word instead of replacing it produces the same artifact (insertions ' ' and 'text', deletions 'beta' and ' text').",
       "source": "explore:review:tracked-change decorations mark unchanged trailing text as both deleted and re-inserted when the paragraph contains a co",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T22:29:11Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T22:29:11Z",
+      "lastAttemptAt": "2026-11-24T22:29:11Z"
     },
     {
       "id": "qa-161",
