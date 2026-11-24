@@ -25,6 +25,18 @@ describe("commentAnchors", () => {
 
     expect(commentAnchors(document)).toEqual([{ markId: "c1", text: "text", offset: 19 }]);
   });
+
+  it("keeps the block boundary in the anchor of a comment spanning paragraphs", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        paragraph({ type: "text", text: "First", marks: [comment("c1")] }),
+        paragraph({ type: "text", text: "Second", marks: [comment("c1")] }),
+      ],
+    };
+
+    expect(commentAnchors(document)).toEqual([{ markId: "c1", text: "First\u0000Second", offset: 0 }]);
+  });
 });
 
 describe("restoreCommentMarks", () => {
@@ -107,5 +119,45 @@ describe("restoreCommentMarks", () => {
     };
 
     expect(restoreCommentMarks(after, commentAnchors(before)).detached).toEqual(["c1"]);
+  });
+
+  it("restores a highlight on both paragraphs of an unchanged multi-paragraph comment", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [
+        paragraph({ type: "text", text: "First paragraph", marks: [comment("c1")] }),
+        paragraph({ type: "text", text: "Second paragraph", marks: [comment("c1")] }),
+      ],
+    };
+
+    const restored = restoreCommentMarks(before, commentAnchors(before));
+
+    expect(restored.detached).toEqual([]);
+    const [first, second] = restored.document.content;
+    expect(commentMarks(first.content?.[0] ?? first)).toEqual(["c1"]);
+    expect(commentMarks(second.content?.[0] ?? second)).toEqual(["c1"]);
+  });
+
+  it("keeps the highlight when one paragraph of a multi-paragraph comment is edited", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [
+        paragraph({ type: "text", text: "First paragraph", marks: [comment("c1")] }),
+        paragraph({ type: "text", text: "Second paragraph", marks: [comment("c1")] }),
+      ],
+    };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        paragraph({ type: "text", text: "First paragraph" }),
+        paragraph({ type: "text", text: "Second paragraph revised" }),
+      ],
+    };
+
+    const restored = restoreCommentMarks(after, commentAnchors(before));
+
+    expect(restored.detached).toEqual([]);
+    const [first] = restored.document.content;
+    expect(commentMarks(first.content?.[0] ?? first)).toEqual(["c1"]);
   });
 });

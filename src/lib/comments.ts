@@ -45,37 +45,58 @@ function flattenText(document: SentenceDocument): { text: string; slices: TextSl
   return { text, slices };
 }
 
-function closestIndex(text: string, needle: string, expected: number): number {
+function closestIndex(text: string, needle: string, expected: number, minimum = 0): number {
   let best = -1;
   let bestDistance = Infinity;
   let from = 0;
   while (from <= text.length - needle.length) {
     const index = text.indexOf(needle, from);
     if (index < 0) break;
-    const distance = Math.abs(index - expected);
-    if (distance < bestDistance) {
-      best = index;
-      bestDistance = distance;
+    if (index >= minimum) {
+      const distance = Math.abs(index - expected);
+      if (distance < bestDistance) {
+        best = index;
+        bestDistance = distance;
+      }
     }
     from = index + 1;
   }
   return best;
 }
 
+// Splits a multi-block anchor into the text it covers in each block, with the
+// flattened position each piece had before the source changed.
+function anchorSegments(anchor: CommentAnchor): Array<{ needle: string; expected: number }> {
+  const segments: Array<{ needle: string; expected: number }> = [];
+  let start = 0;
+  for (const part of anchor.text.split(BLOCK_BOUNDARY)) {
+    const needle = part.trim();
+    if (needle) segments.push({ needle, expected: anchor.offset + start + part.indexOf(needle) });
+    start += part.length + BLOCK_BOUNDARY.length;
+  }
+  return segments;
+}
+
 export function commentAnchors(document: SentenceDocument): CommentAnchor[] {
-  const found = new Map<string, CommentAnchor>();
-  for (const slice of flattenText(document).slices) {
+  const { text, slices } = flattenText(document);
+  const found = new Map<string, { markId: string; start: number; end: number }>();
+  for (const slice of slices) {
     for (const mark of slice.node.marks ?? []) {
       if (mark.type !== "comment") continue;
       const markId = typeof mark.attrs?.markId === "string" ? mark.attrs.markId : "";
       if (!markId) continue;
-      const text = slice.node.text ?? "";
       const existing = found.get(markId);
-      if (existing) existing.text += text;
-      else found.set(markId, { markId, text, offset: slice.start });
+      if (existing) existing.end = Math.max(existing.end, slice.end);
+      else found.set(markId, { markId, start: slice.start, end: slice.end });
     }
   }
-  return [...found.values()];
+  return [...found.values()].map(({ markId, start, end }) => ({
+    markId,
+    // Taken from the flattened text so block boundaries inside the anchor are
+    // kept, exactly as the matcher sees them.
+    text: text.slice(start, end),
+    offset: start,
+  }));
 }
 
 export function restoreCommentMarks(
@@ -83,30 +104,45 @@ export function restoreCommentMarks(
   anchors: CommentAnchor[],
 ): { document: SentenceDocument; detached: string[] } {
   if (anchors.length === 0) return { document, detached: [] };
-  const { text } = flattenText(document);
+  const { text, slices } = flattenText(document);
   const ranges: TextRange[] = [];
   const detached: string[] = [];
   for (const anchor of anchors) {
     const needle = anchor.text.trim();
     const start = needle ? closestIndex(text, needle, anchor.offset) : -1;
-    if (start < 0) {
+    if (start >= 0) {
+      ranges.push({ start, end: start + needle.length, markId: anchor.markId });
+      continue;
+    }
+    // The anchor covers several blocks and one of them changed. Re-anchor each
+    // block on its own, in document order, so the comment keeps a highlight on
+    // the parts that still exist instead of losing the whole selection.
+    let cursor = 0;
+    let matched = 0;
+    for (const segment of anchorSegments(anchor)) {
+      const index = closestIndex(text, segment.needle, Math.max(segment.expected, cursor), cursor);
+      if (index < 0) continue;
+      ranges.push({ start: index, end: index + segment.needle.length, markId: anchor.markId });
+      cursor = index + segment.needle.length;
+      matched += 1;
+    }
+    if (matched === 0) {
       // A comment that no longer matches any text keeps its thread but is no
       // longer highlighted, so the caller can warn about it.
       detached.push(anchor.markId);
-      continue;
     }
-    ranges.push({ start, end: start + needle.length, markId: anchor.markId });
   }
 
-  let offset = 0;
+  let sliceIndex = 0;
   const visit = (nodes: DocumentNode[]): DocumentNode[] => {
     const result: DocumentNode[] = [];
     for (const node of nodes) {
       if (node.type === "text") {
+        const slice = slices[sliceIndex];
+        sliceIndex += 1;
         const value = node.text ?? "";
-        const start = offset;
+        const start = slice?.start ?? 0;
         const end = start + value.length;
-        offset = end;
         const hits = ranges.filter((range) => range.start < end && range.end > start);
         if (hits.length === 0) {
           result.push(node);
@@ -139,7 +175,6 @@ export function restoreCommentMarks(
         continue;
       }
       if (node.content?.length) {
-        if (offset > 0) offset += BLOCK_BOUNDARY.length;
         result.push({ ...node, content: visit(node.content) });
       } else {
         result.push(node);

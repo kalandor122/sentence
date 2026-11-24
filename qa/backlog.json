@@ -2532,8 +2532,9 @@
       "hint": "Repro: 1. Type 'First paragraph', press Enter, then type 'Second paragraph'. 2. Select everything (Ctrl+A), Review tab > New comment, enter 'Comment across paragraphs' and click Comment; both paragraphs are highlighted by the same comment. 3. View tab > LaTeX, change 'Second paragraph' to 'Second paragraph revised', click Apply source, then click Visual and open the Review sidebar.\nActual: The toast reads 'Visual document synchronized from LaTeX. 1 comment no longer matches any text and lost its highlight.' The editor shows both paragraphs with the revised text, but zero [data-comment-id] highlight spans remain; the thread is still listed with badge 1 and can no longer locate any text.",
       "source": "explore:review:applying an edited latex source drops the highlight of a comment that spans two paragraphs even when both paragraphs sti",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T22:24:57Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T22:24:57Z",
+      "lastAttemptAt": "2026-11-24T22:24:57Z"
     },
     {
       "id": "qa-160",
