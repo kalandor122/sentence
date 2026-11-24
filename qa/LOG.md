@@ -384,3 +384,4 @@ Aborting
 2026-11-24T18:08:32Z DONE qa-131 (tsc -b, npm test, smoke all green)
 2026-11-24T18:18:50Z EXPLORE keyboard: 4 new items, agent exit 0
 2026-11-24T18:19:05Z START qa-135 on qa/qa-135-tab-is-trapped-in-the-document-editor-an: Tab is trapped in the document editor and each press nests the paragraph in another blockquote
+2026-11-24T18:23:23Z DONE qa-135 (tsc -b, npm test, smoke all green)
