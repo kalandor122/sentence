@@ -61,18 +61,47 @@ const FONT_STACKS: Record<ProjectSettings["fontFamily"], string> = {
   palatino: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
 };
 
-// Tab keeps keyboard focus in the page: it nests list items or indents a block,
-// and Shift+Tab reverses the last step. Tables keep their own cell navigation.
+// Tab is focus navigation, so outside lists and tables it leaves the page
+// instead of editing the manuscript. Lists still nest (tables keep their cell
+// walk) and Escape leaves from either, so the page can never trap the keyboard.
+// Paragraph indentation has its own shortcuts because Tab must not modify text.
 const TabIndent = Extension.create({
   name: "sentenceTabIndent",
   priority: 200,
   addKeyboardShortcuts() {
     return {
-      Tab: () => changeIndent(this.editor, false),
-      "Shift-Tab": () => changeIndent(this.editor, true),
+      Tab: () => this.editor.isActive("listItem") && changeIndent(this.editor, false),
+      "Shift-Tab": () => this.editor.isActive("listItem") && changeIndent(this.editor, true),
+      "Mod-]": () => changeIndent(this.editor, false),
+      "Mod-[": () => changeIndent(this.editor, true),
+      Escape: () => focusAfterEditor(this.editor),
     };
   },
 });
+
+// Hand focus to the next control after the page, wrapping to the first one, so
+// Escape from the editing surface always lands on something the keyboard can use.
+function focusAfterEditor(editor: Editor): boolean {
+  const dom = editor.view.dom;
+  const focusable = Array.from(
+    document.querySelectorAll<HTMLElement>(
+      'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    ),
+  ).filter(
+    (element) =>
+      !element.hasAttribute("disabled") &&
+      element.tabIndex >= 0 &&
+      element.getClientRects().length > 0 &&
+      !dom.contains(element),
+  );
+  const next =
+    focusable.find(
+      (element) => dom.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ) ?? focusable[0];
+  if (!next) return false;
+  next.focus();
+  return true;
+}
 
 // Tables carry their caption as a node attribute so it survives the visual/LaTeX
 // round trip without becoming a paragraph inside the table.

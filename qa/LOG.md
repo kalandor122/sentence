@@ -383,3 +383,4 @@ Aborting
 2026-11-24T17:51:59Z START qa-131 on qa/qa-131-undo-history-is-discarded-after-leaving: Undo history is discarded after leaving and re-entering the LaTeX view
 2026-11-24T18:08:32Z DONE qa-131 (tsc -b, npm test, smoke all green)
 2026-11-24T18:18:50Z EXPLORE keyboard: 4 new items, agent exit 0
+2026-11-24T18:19:05Z START qa-135 on qa/qa-135-tab-is-trapped-in-the-document-editor-an: Tab is trapped in the document editor and each press nests the paragraph in another blockquote
