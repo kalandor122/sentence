@@ -2607,10 +2607,11 @@
       ],
       "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add a table with `\\begin{tabular}{ll}`, `\\toprule`, `Name & Value \\\\`, `\\midrule`, `ZXBOOK & 55 \\\\`, `\\bottomrule`, `\\end{tabular}` inside a table environment. 3. Click Apply source, then View tab > Visual.\nActual: Apply reports success, but the visual table has three rows: `[\\toprule Name | Value]`, `[\\midrule ZXBOOK | 55]`, `[\\bottomrule | ]`. Refresh from visual emits `\\textbackslash{}toprule`, `\\textbackslash{}midrule` and `\\textbackslash{}bottomrule \\\\` inside the tabular, so the rules become document text and a spurious third row.",
       "source": "explore:source-editor:a hand-written booktabs table turns \\toprule/\\midrule/\\bottomrule into cells and an extra row",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T23:06:44Z",
-      "lastAttemptAt": "2026-11-24T23:06:44Z"
+      "lastAttemptAt": "2026-11-24T23:06:44Z",
+      "doneAt": "2026-11-24T23:08:27Z"
     },
     {
       "id": "qa-165",
@@ -2622,7 +2623,9 @@
       ],
       "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add `\\section*{ZXSTAR SECTION}`, a blank line, and `ZXSTAR BODY`. 3. Click Apply source, then View tab > Visual. 4. View tab > LaTeX and click Refresh from visual.\nActual: Apply reports success, but the visual headings remain only the two demo headings and the body shows the raw command `\\section*{ZXSTAR SECTION}` as a paragraph. Refresh from visual rewrites it as `\\textbackslash{}section*\\{ZXSTAR SECTION\\}`, so the section heading is permanently converted to literal text.",
       "source": "explore:source-editor:starred section \\section*{...} is shown as literal text and escaped on export",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T23:09:03Z"
     },
     {
       "id": "qa-166",
