@@ -2113,8 +2113,9 @@
       "hint": "Repro: New document. Type 'Energy model', set Paragraph style to 'Heading 1', press End, then Insert tab > Inline equation, enter E=mc^2 and click Insert. Compare the rendered heading with the Outline panel entry.\nActual: The heading renders 'Energy model E=mc\u00b2' but the Outline entry is only 'Energy model ' (13 characters, formula omitted), so headings whose titles differ by their formulas look identical in the outline.",
       "source": "explore:long-document:outline entry drops inline math from a heading",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T17:45:20Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T17:45:20Z",
+      "lastAttemptAt": "2026-11-24T17:45:20Z"
     },
     {
       "id": "qa-134",
