@@ -21,7 +21,12 @@ import {
 import { FindHighlight } from "./find";
 import { changeIndent } from "./indent";
 import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
-import { pageBreakFill, pageCountFromBottom, pageGeometry } from "./pagination";
+import {
+  pageBoundaryWithin,
+  pageBreakFill,
+  pageCountFromBottom,
+  pageGeometry,
+} from "./pagination";
 import { RevisionMarks, setRevisionMarks } from "./revisions";
 import {
   ColorMark,
@@ -104,6 +109,28 @@ function offsetWithin(element: HTMLElement, ancestor: HTMLElement): number {
     node = node.offsetParent as HTMLElement | null;
   }
   return top;
+}
+
+// Text line boxes inside a block, relative to its border box in unscaled layout
+// pixels. The sheet and its contents are CSS-scaled by the editor zoom.
+function lineBoxes(block: HTMLElement, zoom: number): Array<{ top: number; bottom: number }> {
+  const blockTop = block.getBoundingClientRect().top;
+  const boxes: Array<{ top: number; bottom: number }> = [];
+  const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    if (!node.nodeValue?.trim()) continue;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    for (const rect of Array.from(range.getClientRects())) {
+      if (rect.width < 1 || rect.height < 1) continue;
+      boxes.push({
+        top: (rect.top - blockTop) / zoom,
+        bottom: (rect.bottom - blockTop) / zoom,
+      });
+    }
+  }
+  return boxes.sort((a, b) => a.top - b.top);
 }
 
 export default function EditorSurface({
@@ -266,6 +293,78 @@ export default function EditorSurface({
       return;
     }
     let frame = 0;
+    // Blocks nudged away from a rule so the divider falls between two lines
+    // instead of across one. Body text shifts by less than a line; a heading or
+    // a first line starts on the next page. The rules live in a style element
+    // because ProseMirror re-renders text nodes and would drop inline padding,
+    // and padding is used because sibling margins collapse.
+    const snapStyle = window.document.createElement("style");
+    window.document.head.appendChild(snapStyle);
+    const snapScope = `data-page-snap-${Math.random().toString(36).slice(2)}`;
+    dom.setAttribute(snapScope, "");
+    const snapSelector = `.sentence-editor[${snapScope}]`;
+    const basePadding = new Map<number, number>();
+    const snapShifts = new Map<number, number>();
+    const applySnap = () => {
+      snapStyle.textContent = Array.from(snapShifts)
+        .map(
+          ([index, shift]) =>
+            `${snapSelector} > :nth-child(${index + 1}) { padding-top: ${(basePadding.get(index) ?? 0) + shift}px; }`,
+        )
+        .join("\n");
+    };
+    const resetSnap = () => {
+      basePadding.clear();
+      snapShifts.clear();
+      snapStyle.textContent = "";
+    };
+    const snapBlock = (block: HTMLElement, index: number, shift: number) => {
+      if (!basePadding.has(index)) {
+        basePadding.set(index, parseFloat(getComputedStyle(block).paddingTop) || 0);
+      }
+      snapShifts.set(index, (snapShifts.get(index) ?? 0) + shift);
+      applySnap();
+    };
+    const snapToPages = () => {
+      resetSnap();
+      // Keep the child index so the generated :nth-child rules keep pointing at
+      // the same block when page-break wrappers sit among them.
+      const blocks = Array.from(dom.children) as HTMLElement[];
+      const sheetRect = sheet.getBoundingClientRect();
+      const zoom = sheet.offsetHeight ? sheetRect.height / sheet.offsetHeight : 1;
+      for (let pass = 0; pass <= blocks.length * 2 + 8; pass += 1) {
+        let moved = false;
+        for (let index = 0; index < blocks.length; index += 1) {
+          const block = blocks[index];
+          if (!(block instanceof HTMLElement) || block.hasAttribute("data-page-break")) continue;
+          const top = offsetWithin(block, sheet);
+          const boundary = pageBoundaryWithin(top, top + block.offsetHeight, geometry);
+          if (boundary === null || block.offsetHeight > geometry.contentHeight) continue;
+          let shift: number;
+          if (/^H[1-3]$/.test(block.tagName)) {
+            // A heading on a rule reads as a strikethrough; start it on the next page.
+            shift = boundary + geometry.margin - top;
+          } else {
+            const boxes = lineBoxes(block, zoom);
+            const line = boxes.findIndex(
+              (box) => top + box.top < boundary && top + box.bottom > boundary,
+            );
+            if (line < 0) continue;
+            // A few pixels of clearance absorb the fractional sheet scale the
+            // rules are painted with; the line gap is wider than this.
+            shift =
+              line === 0
+                ? boundary + geometry.margin - top
+                : boundary + 4 - top - boxes[line].top;
+          }
+          if (shift <= 0) continue;
+          snapBlock(block, index, shift);
+          moved = true;
+          break;
+        }
+        if (!moved) break;
+      }
+    };
 
     const paginate = () => {
       frame = 0;
@@ -280,6 +379,7 @@ export default function EditorSurface({
         wrapper.style.paddingTop = `${fill}px`;
         shift += fill;
       });
+      snapToPages();
       // The sheet's min-height is derived from the count, so measure the last
       // block rather than the editor box. Explicit breaks always claim a page.
       const lastBlock = dom.lastElementChild as HTMLElement | null;
@@ -311,6 +411,9 @@ export default function EditorSurface({
       editor.off("update", schedule);
       window.removeEventListener("resize", schedule);
       observer.disconnect();
+      resetSnap();
+      snapStyle.remove();
+      dom.removeAttribute(snapScope);
       for (const wrapper of dom.querySelectorAll<HTMLElement>("[data-page-break]")) {
         wrapper.style.paddingTop = "";
       }
