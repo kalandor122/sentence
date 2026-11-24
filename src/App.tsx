@@ -135,6 +135,9 @@ interface WorkspaceTab extends WorkspaceTabInfo {
   workspace: Workspace;
   source: string;
   sourceDirty: boolean;
+  // The visual document the unapplied source draft started from. A visual edit
+  // after this point means the draft is older than the visible text.
+  sourceDraftDocument: string | null;
 }
 
 type DialogState =
@@ -459,6 +462,11 @@ export default function App() {
   // source view regenerates LaTeX from the document, which would rewrite a
   // hand-written draft (and drop its undo history) even though nothing changed.
   const appliedSourceDocument = useRef<string | null>(null);
+  // The visual document as it was when the current LaTeX draft started. If the
+  // visual pane is edited before the draft is applied, the draft is older than
+  // what the user sees and applying it would silently delete those edits.
+  const sourceDraftDocument = useRef<string | null>(null);
+  const sourceDraftWarning = useRef(false);
   // The visual editor unmounts in the LaTeX view. Keep the caret it had so a
   // citation or footnote inserted after coming back lands where the user was
   // working instead of at the top of the document.
@@ -558,6 +566,7 @@ export default function App() {
       workspace: current,
       source: sourceRef.current,
       sourceDirty: sourceDirtyRef.current,
+      sourceDraftDocument: sourceDraftDocument.current,
       dirty: dirtyRef.current,
     });
   };
@@ -572,6 +581,11 @@ export default function App() {
     }
   };
 
+  // A visual edit made after the draft started makes the draft older than the
+  // visible text; applying it would silently delete the visual work.
+  const sourceDraftConflicts = (document: SentenceDocument, draftDocument: string | null) =>
+    draftDocument !== null && draftDocument !== JSON.stringify(document);
+
   const activateTab = (tab: WorkspaceTab, stashCurrent = true) => {
     if (stashCurrent) stashActive();
     setWorkspace(tab.workspace);
@@ -582,6 +596,8 @@ export default function App() {
     setSourceFile("document.tex");
     setSourceDirty(tab.sourceDirty);
     sourceDirtyRef.current = tab.sourceDirty;
+    sourceDraftDocument.current = tab.sourceDraftDocument;
+    sourceDraftWarning.current = false;
     setDirtyState(tab.dirty);
     setSaveState(tab.dirty ? "dirty" : "saved");
     setCompileResult(null);
@@ -606,6 +622,8 @@ export default function App() {
     sourceHistory.current = null;
     sourceDirtyRef.current = false;
     setSourceDirty(false);
+    sourceDraftDocument.current = null;
+    sourceDraftWarning.current = false;
     setDirtyState(false);
     setSaveState("saved");
     setCompileResult(null);
@@ -654,6 +672,7 @@ export default function App() {
         workspace: project,
         source: latex,
         sourceDirty: false,
+        sourceDraftDocument: null,
         dirty: false,
       });
     }
@@ -665,6 +684,8 @@ export default function App() {
     setSourceFile("document.tex");
     setSourceDirty(false);
     sourceDirtyRef.current = false;
+    sourceDraftDocument.current = null;
+    sourceDraftWarning.current = false;
     setDirtyState(false);
     setSaveState("saved");
     setSaveError(null);
@@ -684,7 +705,11 @@ export default function App() {
     const pathAtStart = current.path;
     const stillActive = () => workspaceRef.current?.path === pathAtStart;
     let draftError: string | null = null;
-    if (sourceDirtyRef.current && !sourceRef.current.includes("<<<<<<<")) {
+    // A visual edit made after the draft started is newer than the draft.
+    // Applying the draft here would drop the visible text on the next autosave,
+    // so the draft waits for the explicit Apply source.
+    const draftConflict = sourceDraftConflicts(current.document, sourceDraftDocument.current);
+    if (sourceDirtyRef.current && !draftConflict && !sourceRef.current.includes("<<<<<<<")) {
       try {
         const parsed = parseSourceDocument(current.document, sourceRef.current, current.settings);
         current = { ...current, document: parsed.document, settings: parsed.settings };
@@ -694,6 +719,8 @@ export default function App() {
         }
         setSourceDirty(false);
         sourceDirtyRef.current = false;
+        sourceDraftDocument.current = null;
+        sourceDraftWarning.current = false;
         setSaveError(null);
       } catch (error) {
         // An unapplied draft can be hidden behind the visual editor. Letting
@@ -708,17 +735,19 @@ export default function App() {
     }
     draftSaveError.current = draftError;
     const versionAtStart = changeVersion.current;
-    // An invalid draft is never written; fall back to LaTeX generated from
-    // the document that is actually on screen.
-    const latex = sourceDirtyRef.current && !draftError
+    const sourceDraftAtStart = sourceDraftDocument.current;
+    // An invalid or outdated draft is never written; fall back to LaTeX
+    // generated from the document that is actually on screen, and keep the
+    // draft so the user can still choose Apply source.
+    const latex = sourceDirtyRef.current && !draftError && !draftConflict
       ? sourceRef.current
       : documentSource(current.document, current.settings);
     if (!isDesktop) {
       if (!persistBrowser(current)) return null;
       rememberProject(current);
       setSaveError(draftError);
-      if (draftError) {
-        setSaveState("error");
+      if (draftError || draftConflict) {
+        setSaveState(draftError ? "error" : "dirty");
       } else {
         setDirtyState(false);
         setSaveState("saved");
@@ -727,8 +756,8 @@ export default function App() {
     }
     if (!current.path) {
       setSaveError(draftError);
-      if (draftError) {
-        setSaveState("error");
+      if (draftError || draftConflict) {
+        setSaveState(draftError ? "error" : "dirty");
       } else {
         setDirtyState(false);
         setSaveState("saved");
@@ -768,9 +797,10 @@ export default function App() {
           path: pathAtStart,
           name: merged.name,
           workspace: merged,
-          source: draftError ? sourceRef.current : latex,
-          sourceDirty: Boolean(draftError),
-          dirty: Boolean(draftError) || (stillActive() && changedDuringSave && dirtyRef.current),
+          source: draftError || draftConflict ? sourceRef.current : latex,
+          sourceDirty: Boolean(draftError) || draftConflict,
+          sourceDraftDocument: draftError || draftConflict ? sourceDraftAtStart : null,
+          dirty: Boolean(draftError) || draftConflict || (stillActive() && changedDuringSave && dirtyRef.current),
         });
       }
       if (stillActive()) {
@@ -784,8 +814,8 @@ export default function App() {
         } else {
           workspaceRef.current = merged;
           setWorkspace(merged);
-          if (!draftError) setDirtyState(false);
-          setSaveState(draftError ? "error" : "saved");
+          if (!draftError && !draftConflict) setDirtyState(false);
+          setSaveState(draftError ? "error" : draftConflict ? "dirty" : "saved");
         }
         rememberProject(merged);
       }
@@ -803,6 +833,12 @@ export default function App() {
   // is not the one currently on screen.
   const persistTab = async (tab: WorkspaceTab): Promise<boolean> => {
     if (!isDesktop || !tab.workspace.path) return true;
+    // An inactive tab can hold a draft older than its visual text. Applying it
+    // on close would delete that text, so the draft needs an explicit choice.
+    if (tab.sourceDirty && sourceDraftConflicts(tab.workspace.document, tab.sourceDraftDocument)) {
+      setToast("This tab has newer visual edits than its LaTeX draft. Apply source or refresh from visual before closing.");
+      return false;
+    }
     let workspace = tab.workspace;
     let latex = tab.source;
     if (tab.sourceDirty) {
@@ -838,6 +874,7 @@ export default function App() {
         workspace: { ...workspace, path: updated.path, name: updated.name, git: updated.git },
         source: latex,
         sourceDirty: false,
+        sourceDraftDocument: null,
         dirty: false,
       });
       return true;
@@ -1008,6 +1045,15 @@ export default function App() {
       const latex = documentToLatex(document, currentSettings);
       setSource(latex);
       sourceRef.current = latex;
+    } else if (sourceDirtyRef.current && mode === "split") {
+      if (sourceDraftConflicts(document, sourceDraftDocument.current)) {
+        if (!sourceDraftWarning.current) {
+          sourceDraftWarning.current = true;
+          setToast("Visual edit kept. It is not in the LaTeX draft, and Apply source would replace it.");
+        }
+      } else {
+        sourceDraftWarning.current = false;
+      }
     }
     markDirty();
     if (tracking && before) {
@@ -1056,6 +1102,13 @@ export default function App() {
   const activeRevisionIds = () => pendingRevisions(workspaceRef.current?.revisions ?? []).map((revision) => revision.id);
 
   const handleSourceChange = (value: string) => {
+    if (!sourceDirtyRef.current) {
+      // Remember the visual text this draft started from, so an edit in the
+      // other pane of the split view is not mistaken for the draft's content.
+      const current = workspaceRef.current;
+      sourceDraftDocument.current = current ? JSON.stringify(current.document) : null;
+      sourceDraftWarning.current = false;
+    }
     setSource(value);
     sourceRef.current = value;
     setSourceDirty(true);
@@ -1105,6 +1158,8 @@ export default function App() {
       appliedSourceDocument.current = JSON.stringify(parsed.document);
       setSourceDirty(false);
       sourceDirtyRef.current = false;
+      sourceDraftDocument.current = null;
+      sourceDraftWarning.current = false;
       draftSaveError.current = null;
       setSaveError(null);
       markDirty();
@@ -1146,7 +1201,14 @@ export default function App() {
     }
     const current = workspaceRef.current;
     if (current && nextMode !== "source" && mode !== "visual" && sourceDirtyRef.current) {
-      applySource();
+      if (sourceDraftConflicts(current.document, sourceDraftDocument.current)) {
+        // The draft predates the visual edit, so applying it would erase what
+        // the user just typed. Keep the visible text and leave the draft
+        // unapplied (Apply source is still an explicit choice).
+        setToast("Visual edits kept. The unapplied LaTeX draft stays in the source pane.");
+      } else {
+        applySource();
+      }
     }
     // Re-entering source from split keeps the already-visible source text; only
     // a transition from the visual-only view needs a fresh LaTeX snapshot.
@@ -1163,6 +1225,8 @@ export default function App() {
       }
       setSourceDirty(false);
       sourceDirtyRef.current = false;
+      sourceDraftDocument.current = null;
+      sourceDraftWarning.current = false;
     }
     setMode(nextMode);
   };
@@ -1956,6 +2020,8 @@ export default function App() {
                           setSource(latex);
                           setSourceDirty(false);
                           sourceDirtyRef.current = false;
+                          sourceDraftDocument.current = null;
+                          sourceDraftWarning.current = false;
                           discardSourceDraft();
                         }}>
                           Refresh from visual
