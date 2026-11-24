@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { DEFAULT_SETTINGS } from "./defaults";
 import {
   countWords,
+  documentPlainText,
   documentToLatex,
   escapeLatex,
   latexToDocument,
@@ -92,6 +93,34 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(parsed, settings)).toContain(
       "\\footnote{Note with \\} and \\&}",
     );
+  });
+
+  it("ignores LaTeX comments in the body instead of importing them as text", () => {
+    const latex = [
+      "\\documentclass{article}",
+      "\\begin{document}",
+      "Body text % trailing comment",
+      "% whole-line comment",
+      "",
+      "Second paragraph with a literal \\% sign",
+      "",
+      "Joined first",
+      "% inner comment",
+      "joined second",
+      "",
+      "\\begin{verbatim}",
+      "keep % inside verbatim",
+      "\\end{verbatim}",
+      "\\end{document}",
+    ].join("\n");
+    const { document } = latexToDocument(latex, DEFAULT_SETTINGS);
+    expect(documentPlainText(document)).toBe(
+      "Body text\n\nSecond paragraph with a literal % sign\n\nJoined first\njoined second\n\nkeep % inside verbatim",
+    );
+    const exported = documentToLatex(document, DEFAULT_SETTINGS);
+    expect(exported).not.toContain("trailing comment");
+    expect(exported).not.toContain("whole-line comment");
+    expect(exported).toContain("Second paragraph with a literal \\% sign");
   });
 
   it("round-trips the Sentence subset", () => {
