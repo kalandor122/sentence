@@ -456,3 +456,5 @@ Aborting
 2026-11-24T22:24:23Z PUSHED main
 2026-11-24T22:24:23Z DONE qa-162 (tsc -b, npm test, smoke all green)
 2026-11-24T22:24:57Z START qa-159 on qa/qa-159-applying-an-edited-latex-source-drops-th: Applying an edited LaTeX source drops the highlight of a comment that spans two paragraphs even when both paragraphs sti
+2026-11-24T22:28:37Z PUSHED main
+2026-11-24T22:28:37Z DONE qa-159 (tsc -b, npm test, smoke all green)
