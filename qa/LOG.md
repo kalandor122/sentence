@@ -461,3 +461,4 @@ Aborting
 2026-11-24T22:29:11Z START qa-160 on qa/qa-160-tracked-change-decorations-mark-unchange: Tracked-change decorations mark unchanged trailing text as both deleted and re-inserted when the paragraph contains a co
 2026-11-24T22:34:34Z PUSHED main
 2026-11-24T22:34:34Z DONE qa-160 (tsc -b, npm test, smoke all green)
+2026-11-24T22:35:08Z START qa-163 on qa/qa-163-display-math-written-with-or-a-one-line: Display math written with \[...\], $$...$$ or a one-line equation environment is imported as literal text and escaped

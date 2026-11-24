@@ -1377,7 +1377,19 @@ export function latexToDocument(
       });
       continue;
     }
-    const equation = block.match(/^\\begin\{equation(\*?)\}[\s\S]*?\n([\s\S]*)\n\\end\{equation\1\}$/);
+    // Display math also comes in delimiter form. Both are unnumbered, so they
+    // round-trip through the same mathBlock node as an equation* environment.
+    const displayMath =
+      block.match(/^\\\[\s*([\s\S]*?)\s*\\\]$/) ??
+      block.match(/^\$\$\s*([\s\S]*?)\s*\$\$$/);
+    if (displayMath) {
+      content.push({ type: "mathBlock", attrs: { latex: displayMath[1].trim(), numbered: false } });
+      continue;
+    }
+    // The body may be on its own lines or inline with the environment tags.
+    const equation = block.match(
+      /^\\begin\{equation(\*?)\}\s*([\s\S]*?)\s*\\end\{equation\1\}$/,
+    );
     if (equation) {
       content.push({
         type: "mathBlock",
