@@ -767,6 +767,38 @@ describe("LaTeX generation", () => {
     }
   });
 
+  it("imports rows that end with row-spacing arguments like \\\\[4pt]", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\begin{tabular}{ll}",
+      "\\hline",
+      "Name & Value \\\\[4pt]",
+      "ZXSPACED & 77 \\\\[4pt]",
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(table?.content).toHaveLength(2);
+    expect(
+      table?.content?.map((row) =>
+        row.content?.map((cell) => cell.content?.[0]?.content?.[0]?.text),
+      ),
+    ).toEqual([
+      ["Name", "Value"],
+      ["ZXSPACED", "77"],
+    ]);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("Name & Value \\\\\n");
+    expect(exported).toContain("ZXSPACED & 77 \\\\\n");
+    expect(exported).not.toContain("textbackslash");
+  });
+
   it("keeps a table without a header row through a source round trip", () => {
     const document: SentenceDocument = {
       type: "doc",
