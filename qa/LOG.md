@@ -455,3 +455,4 @@ Aborting
 2026-11-24T22:21:07Z START qa-162 on qa/qa-162-a-section-with-a-label-on-the-same-line: A section with a label on the same line gets its heading corrupted and loses the label
 2026-11-24T22:24:23Z PUSHED main
 2026-11-24T22:24:23Z DONE qa-162 (tsc -b, npm test, smoke all green)
+2026-11-24T22:24:57Z START qa-159 on qa/qa-159-applying-an-edited-latex-source-drops-th: Applying an edited LaTeX source drops the highlight of a comment that spans two paragraphs even when both paragraphs sti
