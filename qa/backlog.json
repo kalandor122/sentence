@@ -2096,10 +2096,11 @@
       ],
       "hint": "Repro: Open the app, create a new document, Ctrl+A and Backspace to empty it, then paste (Ctrl+V) 30 blank-line-separated paragraphs of ~95 words each (the probe uses 'PASTEP1'..'PASTEP30' plus a repeated 30-word sentence). The status bar shows 2,670 words / 5 pages. Scroll to any of the four horizontal page rules the sheet paints every 1,123 px: each one crosses the middle of a text line (first rule at 3,518 px crosses the line box 3,514-3,530 px of the 'PASTEP5' paragraph). Repeat with a 50-heading / 6,050-word document: 8 of 14 rules cross a text line and, with page breaks inserted, a rule crosses the heading 'Section 14 TOKENH14' (line box 3,747-3,770 px, rule at 3,758 px). Screenshot: qa/shots/probe-long-page-boundary.png.\nActual: The paper sheet is one continuous text flow and the page rules are painted over it every paper height. On the 5-page paste all 4 rules cross a line of text (4/4); on the 15-page document 8/14 rules cross text and the rule at 3,758 px runs through the middle of the heading 'Section 14 TOKENH14', which reads as a strikethrough.",
       "source": "explore:long-document:page divider lines are painted through text lines and headings",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T17:09:02Z",
-      "lastAttemptAt": "2026-11-24T17:09:02Z"
+      "lastAttemptAt": "2026-11-24T17:09:02Z",
+      "doneAt": "2026-11-24T17:24:52Z"
     },
     {
       "id": "qa-133",
@@ -2112,6 +2113,20 @@
       "hint": "Repro: New document. Type 'Energy model', set Paragraph style to 'Heading 1', press End, then Insert tab > Inline equation, enter E=mc^2 and click Insert. Compare the rendered heading with the Outline panel entry.\nActual: The heading renders 'Energy model E=mc\u00b2' but the Outline entry is only 'Energy model ' (13 characters, formula omitted), so headings whose titles differ by their formulas look identical in the outline.",
       "source": "explore:long-document:outline entry drops inline math from a heading",
       "status": "open"
+    },
+    {
+      "id": "qa-134",
+      "title": "Visual edits are never saved while an invalid LaTeX draft is left in the hidden source pane, and are lost on reload",
+      "why": "Exploratory pass on persistence (functional): expected Visual edits continue to autosave, or the app blocks/surfaces the pending invalid source draft instead of silently accepting visual typing that can never be stored. Reloading must not drop text the editor displayed as part of the document without warning.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1) Open the browser app, click New document, wait 1.5 s until the heading says 'Saved locally'. 2) Click 'Source' in the status bar. 3) In the LaTeX textarea delete the final \\end{document} line. 4) Wait 1.5 s: the heading reads 'Editing', a toast says 'Invalid LaTeX: missing \\end{document}.', and a 'Retry save' button appears. 5) Click 'Visual' in the status bar; the source textarea disappears (0 visible). 6) Put the caret at the end of the document and type ' persist-lost-X'. 7) Wait 1.5 s and read localStorage['sentence.workspace']: the typed text is absent, the heading still reads 'Editing', and 'Retry save' stays visible. 8) Reload the page: 'persist-lost-X' is gone from both the editor and localStorage, the document is the last version saved before the invalid draft, and the heading now reads 'Saved locally'.\nActual: The invalid draft is kept in memory but hidden when the user switches to Visual. Every autosave attempt re-parses that hidden draft, fails with 'Invalid LaTeX: missing \\end{document}.' and writes nothing, so the visual text typed afterwards is never persisted. After 1.5 s the marker is in the editor but not in localStorage; after reload it is in neither, while the top bar reports 'Saved locally' for the restored older document. The only cue is the transient error toast and the 'Retry save' button, which retries the same failing parse.",
+      "source": "explore:persistence:visual edits are never saved while an invalid latex draft is left in the hidden source pane, and are lost on reload",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T17:40:20Z"
     }
   ]
 }

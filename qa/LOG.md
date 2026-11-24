@@ -372,3 +372,5 @@ Aborting
 2026-11-24T17:00:59Z START qa-130 on qa/qa-130-unclosed-math-delimiters-are-accepted-as: Unclosed math delimiters are accepted as valid and escaped instead of reported
 2026-11-24T17:08:28Z DONE qa-130 (tsc -b, npm test, smoke all green)
 2026-11-24T17:09:02Z START qa-132 on qa/qa-132-page-divider-lines-are-painted-through-t: Page divider lines are painted through text lines and headings
+2026-11-24T17:24:52Z DONE qa-132 (tsc -b, npm test, smoke all green)
+2026-11-24T17:40:05Z EXPLORE persistence: 1 new items, agent exit 0
