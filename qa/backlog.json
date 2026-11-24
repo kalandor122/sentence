@@ -2568,8 +2568,9 @@
       "hint": "Repro: 1. Create a project and open the editor. 2. View tab > LaTeX. 3. Before \\end{document}, add the line `\\section{ZXLABEL SECTION}\\label{sec:zxlabel}`, then a blank line and `ZXLABEL BODY`. 4. Click Apply source. 5. View tab > Visual. 6. View tab > LaTeX, click Refresh from visual, and read the section line.\nActual: Apply reports `Visual document synchronized from LaTeX.` but the visual heading is read as `ZXLABEL SECTION}\\label{sec:zxlabel` (probe heading: `H1:ZXLABEL SECTION}\\label{sec:zxlabel`). After Refresh from visual the line is `\\section{ZXLABEL SECTION\\}\\textbackslash{}label\\{sec:zxlabel}`: the label is gone and its backslash/braces are escaped into the heading text, so the section is no longer referenceable.",
       "source": "explore:source-editor:a section with a label on the same line gets its heading corrupted and loses the label",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T22:21:07Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T22:21:07Z",
+      "lastAttemptAt": "2026-11-24T22:21:07Z"
     },
     {
       "id": "qa-163",
