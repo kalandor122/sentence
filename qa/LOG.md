@@ -449,3 +449,6 @@ Aborting
 2026-11-24T21:50:52Z PUSHED main
 2026-11-24T21:50:52Z DONE qa-127 (tsc -b, npm test, smoke all green)
 2026-11-24T21:51:27Z START qa-121 on qa/qa-121-tracked-change-decorations-misreport-exi: Tracked-change decorations misreport existing text as deleted and re-inserted when the paragraph contains a comment mark
+2026-11-24T21:58:33Z PUSHED main
+2026-11-24T21:58:33Z DONE qa-121 (tsc -b, npm test, smoke all green)
+2026-11-24T22:20:53Z EXPLORE source-editor: 8 new items, agent exit 0

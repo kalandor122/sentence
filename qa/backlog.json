@@ -1930,10 +1930,11 @@
       ],
       "hint": "Repro: 1. Type 'Comment on tracked text'. 2. Turn on Review > Track changes. 3. Select the first word 'Comment' and add the comment 'Comment before tracked edit'. 4. Put the caret at the end and type ' tail', wait ~2 s, and open the History sidebar while the revision is pending.\nActual: The editor renders an insertion decoration with text ' on tracked text tail' and a deletion decoration with text ' on tracked text', so most of the unchanged sentence is shown as both deleted and inserted. The revision card text is correct; only the inline decorations are wrong.",
       "source": "explore:review:tracked-change decorations misreport existing text as deleted and re-inserted when the paragraph contains a comment mark",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T21:51:27Z",
-      "lastAttemptAt": "2026-11-24T21:51:27Z"
+      "lastAttemptAt": "2026-11-24T21:51:27Z",
+      "doneAt": "2026-11-24T21:58:31Z"
     },
     {
       "id": "qa-122",
@@ -2554,6 +2555,104 @@
       ],
       "hint": "Repro: 1. Type 'Keep this comment text'. 2. Select 'comment' and add the comment 'Comment on removed word'. 3. With tracking off, press Backspace to delete the selected word. 4. Open the Review sidebar and click the remaining comment thread.\nActual: The thread 'Comment on removed word' remains in the Review panel and still counts in the unresolved badge (1), but the editor contains zero comment highlights. Clicking the thread marks it active in the sidebar only; no text is highlighted and no indicator says the anchor is gone.",
       "source": "explore:review:deleting the text a comment is attached to leaves the thread listed with no highlight and no way to locate it",
+      "status": "open"
+    },
+    {
+      "id": "qa-162",
+      "title": "A section with a label on the same line gets its heading corrupted and loses the label",
+      "why": "Exploratory pass on source-editor (content): expected The visual document shows a level-1 heading `ZXLABEL SECTION`, and the re-exported source keeps `\\label{sec:zxlabel}` attached to the section so \\ref can resolve it.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and open the editor. 2. View tab > LaTeX. 3. Before \\end{document}, add the line `\\section{ZXLABEL SECTION}\\label{sec:zxlabel}`, then a blank line and `ZXLABEL BODY`. 4. Click Apply source. 5. View tab > Visual. 6. View tab > LaTeX, click Refresh from visual, and read the section line.\nActual: Apply reports `Visual document synchronized from LaTeX.` but the visual heading is read as `ZXLABEL SECTION}\\label{sec:zxlabel` (probe heading: `H1:ZXLABEL SECTION}\\label{sec:zxlabel`). After Refresh from visual the line is `\\section{ZXLABEL SECTION\\}\\textbackslash{}label\\{sec:zxlabel}`: the label is gone and its backslash/braces are escaped into the heading text, so the section is no longer referenceable.",
+      "source": "explore:source-editor:a section with a label on the same line gets its heading corrupted and loses the label",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-24T22:21:07Z"
+    },
+    {
+      "id": "qa-163",
+      "title": "Display math written with \\[...\\], $$...$$ or a one-line equation environment is imported as literal text and escaped",
+      "why": "Exploratory pass on source-editor (functional): expected Each form is a valid display equation, so it should become an editable display-math node (as the multi-line equation environment already does) and re-export as display math.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add the standalone line `\\[ ZXBRACKET E = mc^2 \\]`. 3. Click Apply source, then View tab > Visual. 4. Repeat steps 2-3 with `$$ ZXDOLLAR E = mc^2 $$` and with `\\begin{equation}ZXONELINE E = mc^2\\end{equation}` all on one line.\nActual: All three applies report `Visual document synchronized from LaTeX.` and the visual pane shows the delimiters as ordinary paragraph text with zero math blocks (probe mathBlocks: []). Refresh from visual then writes `\\textbackslash{}[ ZXBRACKET E = mc\\textasciicircum{}2 \\textbackslash{}]`, `\\$\\$ ZXDOLLAR E = mc\\textasciicircum{}2 \\$\\$`, and `\\textbackslash{}begin\\{equation\\}ZXONELINE E = mc\\textasciicircum{}2\\textbackslash{}end\\{equation\\}`. The equations survive only as escaped text, not as math.",
+      "source": "explore:source-editor:display math written with \\[...\\], $$...$$ or a one-line equation environment is imported as literal text and escaped",
+      "status": "open"
+    },
+    {
+      "id": "qa-164",
+      "title": "A hand-written booktabs table turns \\toprule/\\midrule/\\bottomrule into cells and an extra row",
+      "why": "Exploratory pass on source-editor (content): expected A two-row table with the booktabs rules rendered as rules (Sentence's own preamble loads booktabs), no rule command names as text.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add a table with `\\begin{tabular}{ll}`, `\\toprule`, `Name & Value \\\\`, `\\midrule`, `ZXBOOK & 55 \\\\`, `\\bottomrule`, `\\end{tabular}` inside a table environment. 3. Click Apply source, then View tab > Visual.\nActual: Apply reports success, but the visual table has three rows: `[\\toprule Name | Value]`, `[\\midrule ZXBOOK | 55]`, `[\\bottomrule | ]`. Refresh from visual emits `\\textbackslash{}toprule`, `\\textbackslash{}midrule` and `\\textbackslash{}bottomrule \\\\` inside the tabular, so the rules become document text and a spurious third row.",
+      "source": "explore:source-editor:a hand-written booktabs table turns \\toprule/\\midrule/\\bottomrule into cells and an extra row",
+      "status": "open"
+    },
+    {
+      "id": "qa-165",
+      "title": "Starred section \\section*{...} is shown as literal text and escaped on export",
+      "why": "Exploratory pass on source-editor (content): expected An unnumbered level-1 heading `ZXSTAR SECTION` in the visual document, re-exported as a starred section.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add `\\section*{ZXSTAR SECTION}`, a blank line, and `ZXSTAR BODY`. 3. Click Apply source, then View tab > Visual. 4. View tab > LaTeX and click Refresh from visual.\nActual: Apply reports success, but the visual headings remain only the two demo headings and the body shows the raw command `\\section*{ZXSTAR SECTION}` as a paragraph. Refresh from visual rewrites it as `\\textbackslash{}section*\\{ZXSTAR SECTION\\}`, so the section heading is permanently converted to literal text.",
+      "source": "explore:source-editor:starred section \\section*{...} is shown as literal text and escaped on export",
+      "status": "open"
+    },
+    {
+      "id": "qa-166",
+      "title": "\\emph{...} is not recognised: italics are shown as the raw command and escaped on export",
+      "why": "Exploratory pass on source-editor (content): expected The visual paragraph reads `ZXEMPH before important word after.` with `important word` in italics, the same result the supported `\\textit{...}` gives.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add `ZXEMPH before \\emph{important word} after.`. 3. Click Apply source, then View tab > Visual. 4. View tab > LaTeX and click Refresh from visual.\nActual: Apply reports success and the visual paragraph contains the literal command `\\emph{important word}` with no italic markup. Refresh from visual exports `\\textbackslash{}emph\\{important word\\}`, so the emphasis is destroyed in the saved LaTeX.",
+      "source": "explore:source-editor:\\emph{...} is not recognised: italics are shown as the raw command and escaped on export",
+      "status": "open"
+    },
+    {
+      "id": "qa-167",
+      "title": "Table rows ending with \\\\[4pt] make the entire table fall back to escaped literal text",
+      "why": "Exploratory pass on source-editor (content): expected An editable two-row table; the optional `[4pt]` only controls vertical row spacing.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add a table whose rows are `Name & Value \\\\[4pt]` and `ZXSPACED & 77 \\\\[4pt]` (valid LaTeX row spacing) inside a tabular{ll}. 3. Click Apply source, then View tab > Visual.\nActual: Apply reports success, but no table node is created: the visual pane shows the whole raw `\\begin{table}...\\end{table}` block as paragraph text, with `[4pt]` split onto its own lines. Refresh from visual escapes every command (`\\textbackslash{}begin\\{tabular\\}`, `\\textbackslash{}hline`, `\\&`, `\\textbackslash{}end\\{table\\}`), so the table is lost.",
+      "source": "explore:source-editor:table rows ending with \\\\[4pt] make the entire table fall back to escaped literal text",
+      "status": "open"
+    },
+    {
+      "id": "qa-168",
+      "title": "A table's last row without a trailing \\\\ swallows the following \\hline into a cell",
+      "why": "Exploratory pass on source-editor (content): expected A two-row, two-column table; the final `\\hline` stays a rule and the trailing `\\\\` is optional in LaTeX.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add a tabular with header `Name & Value \\\\` and last row `ZXLASTROW & 99` with no trailing `\\\\`, followed by `\\hline` and `\\end{tabular}`. 3. Click Apply source, then View tab > Visual.\nActual: Apply reports success, but the last visual cell is `99 \\hline` (probe cells: `[\"ZXLASTROW\", \"99 \\\\hline\"]`). Refresh from visual writes `ZXLASTROW & 99\\n\\textbackslash{}hline \\\\`, adding a row whose second cell is the literal text `\\hline`; the rule becomes table content.",
+      "source": "explore:source-editor:a table's last row without a trailing \\\\ swallows the following \\hline into a cell",
+      "status": "open"
+    },
+    {
+      "id": "qa-169",
+      "title": "Undoing every source edit leaves Apply source enabled and reports a synchronisation that changed nothing",
+      "why": "Exploratory pass on source-editor (ux): expected Apply source is disabled because the draft is byte-identical to the applied source; clicking it should not claim the visual document was synchronised again.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View tab > LaTeX. 2. Put the caret before \\end{document} and type `ZXUNDO one two.`. 3. Press Ctrl+Z once; the textarea returns exactly to the applied text. 4. Look at the Apply source button, then click it.\nActual: Apply source remains enabled after the undo (probe applyEnabledAfterUndoAll=true) even though the text equals the applied source. Clicking it reports `Visual document synchronized from LaTeX.` while the textarea stays byte-identical (probe sourceUnchangedAfterNoopApply=true), so the dirty state is not cleared when undo returns to the applied text.",
+      "source": "explore:source-editor:undoing every source edit leaves apply source enabled and reports a synchronisation that changed nothing",
       "status": "open"
     }
   ]
