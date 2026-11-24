@@ -243,6 +243,22 @@ def cycle(dry_run: bool = False) -> str:
         except Exception as exc:
             log(f"REQUEUE FAIL {exc}")
 
+    # Stuck-item recovery: a killed cycle leaves its item in_progress forever and
+    # pick() only looks at open items, so those bugs would never be worked again.
+    for i in data["items"]:
+        if i["status"] != "in_progress":
+            continue
+        stamp = i.get("startedAt") or i.get("lastAttemptAt") or ""
+        try:
+            started = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+        except ValueError:
+            started = None
+        age = (datetime.now(timezone.utc) - started).total_seconds() / 60 if started else 999
+        if age > 60:
+            i["status"] = "open"
+            log(f"RECOVERED {i['id']} (in_progress for {int(age)} min)")
+            save_backlog(data)
+
     item = pick(data)
     if not item:
         item = promote_from_roadmap(data)
