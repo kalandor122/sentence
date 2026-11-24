@@ -313,6 +313,9 @@ def cycle(dry_run: bool = False) -> str:
             item["status"] = "done" if post_ok else "regressed"
             item["doneAt"] = now()
             save_backlog(data)
+            # Everything lands on GitHub, not just on this machine.
+            push_code, push_out = git("push", "origin", "main", timeout=300)
+            log("PUSHED main" if push_code == 0 else f"PUSH FAILED: {push_out.strip()[-200:]}")
             log(f"DONE {item['id']} ({detail if post_ok else 'post-merge verify failed'})")
             return "done" if post_ok else "regressed"
 

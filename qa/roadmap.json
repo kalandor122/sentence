@@ -1,53 +1,185 @@
 {
-  "notes": "Word-parity work for when the defect backlog runs dry. cycle.py promotes the first item that is not already in the backlog, then works it like any other item. One at a time, in order: each of these is a real feature someone has to design, not a checklist entry.",
+  "notes": "Work orders for the QA loop, in order. cycle.py promotes the first item that is not already in the backlog whenever the queue is empty, then the loop builds it under qa/cycle.py's usual branch -> verify -> merge flow. Product definition: docs/PRODUCT.md. Keep items small enough for one cycle; split anything bigger instead of widening an item.",
   "items": [
     {
-      "title": "Table editing: a contextual table toolbar",
-      "why": "Word users edit tables constantly. Tiptap ships table commands; the app exposes only 'insert 3x3', so a table cannot be reshaped after creation.",
+      "title": "Two-column documents: settings, preamble and round trip",
+      "why": "A two-column arXiv paper is the single most common LaTeX target the app cannot produce.",
       "severity": "high",
-      "hint": "When the cursor is inside a table, show a small toolbar above it (or in the ribbon) with: add row above/below, delete row, add column left/right, delete column, toggle header row, merge/split cells, cell alignment, delete table. Use the existing Tiptap table extension commands through the editor. Add a caption field that emits \\caption{...} in LaTeX."
+      "hint": "Add `columns: \"one\" | \"two\"` to ProjectSettings in src/lib/types.ts (default \"one\"). Emit the `twocolumn` class option in documentToLatex (src/lib/latex.ts, the \\documentclass line around 512) and parse it back in latexToDocument. Add a Columns control to the Layout ribbon group in src/components/Ribbon.tsx. Acceptance: unit tests in src/lib/latex.test.ts prove article+two emits \\documentclass[11pt,a4paper,twocolumn]{article} and that latexToDocument reads it back; gate green."
     },
     {
-      "title": "Spell check that respects the LaTeX source",
-      "why": "Every word processor has it. A manuscript editor without spell check sends people to another app to proofread.",
+      "title": "Chapter and part structure for report and book",
+      "why": "Books and theses are chapters, not sections. Today every document is section-based.",
       "severity": "high",
-      "hint": "Use the WebView's native spellchecker on the ProseMirror surface (spellcheck attribute + lang) rather than shipping a dictionary; verify it does not underline LaTeX commands in source mode (turn spellcheck off in the .tex textarea). Add a Review-tab 'Spelling' toggle that persists in settings."
+      "hint": "Extend the heading node to levels 0-5 (part, chapter, section, subsection, subsubsection, paragraph) in src/editor/extensions.ts and the style select in src/components/Ribbon.tsx. In src/lib/latex.ts map level 0 -> \\part, 1 -> \\chapter (report/book) or \\section (article), and parse \\part/\\chapter back. The outline/navigation pane must show them hierarchically. Acceptance: round-trip tests for book with \\part+\\chapter+\\section, and article where level 1 must still be \\section."
     },
     {
-      "title": "Real pagination in the visual editor",
-      "why": "The visual page is a single long sheet and the status bar guesses page count. Without page breaks WYSIWYG means nothing for a print-first tool.",
+      "title": "Front matter: title page, abstract page, TOC, lists of figures and tables",
+      "why": "A book or thesis opens with front matter, and the current preamble only emits a bare \\maketitle.",
       "severity": "high",
-      "hint": "Measure the rendered block positions against the configured page height and draw page-break rules (a repeating background or absolutely positioned separators) so the user sees where pages split; derive the page count from the same measurement instead of word count. Use the settings' paperSize/margins/fontSize to compute the content height. Keep it CSS/measurement only — no full layout engine."
+      "hint": "Add `frontMatter: { titlePage, abstract, toc, listOfFigures, listOfTables }` to settings (booleans). In documentToLatex emit \\frontmatter / \\maketitle / abstract / \\tableofcontents / \\listoffigures / \\listoftables for report and book (article keeps the current behaviour), followed by \\mainmatter. Parse the flags back. Add checkboxes to the Paper tab. Acceptance: two snapshot tests (book with all flags, article unchanged) plus a parse test."
     },
     {
-      "title": "Bibliography manager",
-      "why": "Citations exist but the .bib file can only be edited by hand. Word's citation manager is a core reason people stay.",
-      "severity": "high",
-      "hint": "A References-tab panel listing entries parsed from references.bib (key, author, year, title) with search, add, edit and delete; inserting a citation opens this list. Keep the .bib text the source of truth and parse/write it in src/lib (add round-trip tests next to latex.test.ts)."
-    },
-    {
-      "title": "Track changes UI",
-      "why": "Revision data exists in the model but a reviewer cannot see, accept or reject individual changes.",
-      "severity": "high",
-      "hint": "Show insertions and deletions inline in the visual editor (marks with author colours), a Review-tab toggle for tracking, and per-change accept/reject plus accept-all/reject-all in the History panel. Review state must never leak into the exported LaTeX."
-    },
-    {
-      "title": "Document themes and style gallery",
-      "why": "Word's style gallery is how normal people get a consistent document without knowing LaTeX.",
+      "title": "Appendices",
+      "why": "Papers and books end with appendices that must be lettered and appear in the TOC.",
       "severity": "medium",
-      "hint": "A small gallery of named themes (e.g. Classic, Modern, Compact) that set documentClass/fontFamily/fontSize/lineSpacing/paragraphSpacing/margins at once, previewed as a styled thumbnail. Apply through the existing settings object so the LaTeX preamble follows."
+      "hint": "Add an `appendix` block node (an empty marker node with no content) to src/editor/extensions.ts, insertable from the Insert tab. Serialize as \\appendix and parse it back; chapters after it letter themselves automatically in LaTeX. The outline should mark the appendix boundary. Acceptance: round-trip test book -> tex -> book keeps the marker and does not renumber sections."
     },
     {
-      "title": "Multi-document workspace tabs",
-      "why": "One document per window forces people to juggle windows for a paper plus its notes.",
-      "severity": "medium",
-      "hint": "Tabs above the page area holding multiple open projects, with dirty indicators and per-tab close. Keep one editor instance and swap the workspace snapshot to avoid memory blowup. Desktop only for real projects; browser mode keeps the single demo workspace."
+      "title": "Theorem-like environments (amsthm)",
+      "why": "Any maths paper needs theorem, lemma, definition, proof with shared numbering.",
+      "severity": "high",
+      "hint": "New node `environment` with attrs {kind: theorem|lemma|definition|corollary|example|proof, title?: string}. Emit \\begin{theorem}[Title]...\\end{theorem} (proof unnumbered). Add \\usepackage{amsthm} + \\newtheorem declarations to the preamble only when used, and parse the environments back. Insert them from the Insert tab. Acceptance: round-trip test with one of each, and the preamble must not include amsthm when no environment exists."
     },
     {
-      "title": "Export to HTML and Markdown alongside LaTeX",
-      "why": "People need to publish the same text as a blog post or a web page, and currently the only portable output is .tex.",
+      "title": "Code listings with language and caption",
+      "why": "Technical documents contain code; the current code block exports to verbatim with no language or caption.",
       "severity": "medium",
-      "hint": "Add exporters next to documentToLatex in src/lib, driven by the same document model, with round-trip tests for the supported subset. Wire them into a File/Export menu that is honest about which subset is supported."
+      "hint": "Extend the codeBlock node with attrs {language, caption} and emit lstlisting (\\usepackage{listings} only when used) with language/caption options; keep verbatim for blocks without them so existing documents do not change. Parse both back. Add a small language select in the block's node view. Acceptance: round-trip test for a python listing with a caption and for a plain code block."
+    },
+    {
+      "title": "Full-width floats in two-column documents",
+      "why": "A figure inside a two-column paper must span both columns; today every float is column width.",
+      "severity": "medium",
+      "hint": "Add a `fullWidth` attr to figure and table nodes, shown as an unchecked toggle in the figure/table toolbar only when settings.columns === 'two'. Emit figure*/table* when set, figure/table otherwise, and parse both forms back. Acceptance: round-trip test proving figure* survives and that figure stays figure in a one-column document."
+    },
+    {
+      "title": "Document classes: add letter and keep class-specific defaults",
+      "why": "Letters are a normal LaTeX document type and a good test that the model is not hard-coded to paper-like documents.",
+      "severity": "medium",
+      "hint": "Extend documentClass to include \"letter\" in src/lib/types.ts. Preamble: \\documentclass{letter}, no numbered headings, no abstract/TOC even if the flags are set (strip or ignore them with a note in the UI). Parse it back and make the ribbon hide paper-only groups (abstract, TOC, theorem) for letters. Acceptance: round-trip test for a letter with a signature and an address block; article/report/book output must be byte-identical to before."
+    },
+    {
+      "title": "Section numbering depth control",
+      "why": "Books often number only chapters and sections; papers number everything. LaTeX needs \\setcounter{secnumdepth}.",
+      "severity": "low",
+      "hint": "Add `numberDepth: 0|1|2|3` to settings, emit \\setcounter{secnumdepth}{n} when it differs from the class default, parse it back, and add a select to the Layout tab. Acceptance: round-trip test and a test that the default omits the counter entirely."
+    },
+    {
+      "title": "Headers and footers that follow the document class",
+      "why": "fancyhdr is already loaded but the header/footer fields are a single static string, so chapter books cannot show chapter marks.",
+      "severity": "medium",
+      "hint": "Extend header/footer settings to accept the tokens {page}, {title}, {chapter}, {section} and convert them to \\thepage, \\leftmark, \\rightmark, \\thesection at emit time; parse the reverse. Document the tokens in the field's placeholder. Acceptance: round-trip test with a chapter-mark header in a book and a page-number footer in an article."
+    },
+    {
+      "title": "Real pagination tied to document structure",
+      "why": "Page count is still estimated; with parts and chapters the estimate is wrong and the visual page breaks lie.",
+      "severity": "medium",
+      "hint": "src/editor/pagination.ts measures block heights already. Make it account for the heading size of part/chapter (larger vertical space, page break before chapter in book/report), so the drawn breaks and the page count follow the class rules. Acceptance: unit test for the break calculation given a chapter heading, plus the status bar page count matching the drawn pages in the smoke gate."
+    },
+    {
+      "title": "WYSIWYG math editing with MathLive",
+      "why": "Typing LaTeX in a dialog is the biggest remaining gap between this and a modern editor.",
+      "severity": "high",
+      "hint": "Add the `mathlive` package. Replace the KaTeX-only node view for inlineMath and mathBlock with a MathLive `math-field` that shows KaTeX output when unfocused and the math-field when focused, committing back to the node's latex attr on blur. Keep the existing dialog as a fallback. Do not change the stored model (still a LaTeX string). Acceptance: gate stays green, the equation round trip test still passes, and clicking an equation lets you edit it in place."
+    },
+    {
+      "title": "Symbol palette for math and text",
+      "why": "Nobody remembers every command; every modern editor ships a palette.",
+      "severity": "medium",
+      "hint": "A small popover in the Insert tab with categories (greek, operators, arrows, sets, logic) that inserts the command into the focused math node or the caret position. Pure data + a grid; no new dependency. Acceptance: clicking a symbol inside a math node inserts into its latex and the node re-renders."
+    },
+    {
+      "title": "LaTeX command autocomplete in the source view",
+      "why": "The source editor is plain text; autocomplete is what makes it a LaTeX editor rather than a textarea.",
+      "severity": "medium",
+      "hint": "A small completion list driven by a static index of ~200 common commands and environments plus the document's own \\label keys and bib keys, triggered on backslash and on ctrl+space in src/components/SourceEditor.tsx. Arrow keys + Enter to accept, Escape to dismiss. No new dependency. Acceptance: gate adds a check that typing \\sec offers \\section and that accepting inserts it."
+    },
+    {
+      "title": "Compiler diagnostics mapped onto the source",
+      "why": "Tectonic already returns diagnostics but they only appear in a toast; the user cannot see where the error is.",
+      "severity": "high",
+      "hint": "Show result.diagnostics as a list in a problems panel (bottom, collapsible) and mark the matching line in the source textarea when file/line are present. Clicking a diagnostic jumps to the line and focuses the textarea. Acceptance: a smoke check that a deliberately broken document produces a visible problems entry with its message."
+    },
+    {
+      "title": "Source view syntax highlighting",
+      "why": "A 300-line .tex file in a mono textarea is hard to read.",
+      "severity": "medium",
+      "hint": "Wrap the textarea in a highlighted overlay (a pre element behind a transparent textarea) with a small hand-written tokenizer for comments, commands, braces, math delimiters and environments — do not add CodeMirror unless the overlay proves unworkable. Keep selection, scroll sync and IME behaviour intact. Acceptance: gate stays green and typing still reaches state; a unit test covers the tokenizer."
+    },
+    {
+      "title": "File backstage",
+      "why": "Word's File tab is where new/open/recent/save/export/print live; today those are scattered.",
+      "severity": "high",
+      "hint": "The File ribbon tab should open a full-height panel (not a small dialog) with: New (template list), Open, Recent, Save, Save as, Export (PDF/LaTeX/HTML/Markdown), Print, and project info. Reuse the existing handlers; do not duplicate logic in the panel. Escape closes it. Acceptance: smoke opens File, sees the sections, escapes out, and the editor is unchanged."
+    },
+    {
+      "title": "Ribbon: labelled buttons, group dividers and collapsible mode",
+      "why": "The ribbon is icon-only and cannot collapse, which is what makes it feel like a demo rather than Word.",
+      "severity": "medium",
+      "hint": "Give ribbon commands a visible label under the icon, keep group captions, add Ctrl+F1 to collapse the ribbon to its tab strip, and add a quick-access row (Save, Undo, Redo, Compile) left of the tabs. Pure CSS + existing buttons. Acceptance: gate checks the ribbon fits at 1280 in both expanded and collapsed states."
+    },
+    {
+      "title": "Navigation pane driven by the heading tree",
+      "why": "Long documents need a jump list that reflects parts/chapters/sections.",
+      "severity": "medium",
+      "hint": "The sidebar Outline already lists headings; make it a proper pane: nested indentation by level, current heading highlighted on scroll, click to jump, and a search filter over headings. Acceptance: smoke inserts a chapter and asserts it appears in the pane; clicking it moves the caret."
+    },
+    {
+      "title": "Status bar: page x of y, words, zoom slider, mode",
+      "why": "Word's status bar is the model for at-a-glance document state.",
+      "severity": "low",
+      "hint": "Extend src/components/StatusBar.tsx: page X of Y from pagination, word and character count, language, click-to-toggle view mode, and a real zoom slider (70-150) replacing the two buttons. Acceptance: gate asserts the page text matches the drawn page count and that the slider changes zoom."
+    },
+    {
+      "title": "Dark mode on shared tokens",
+      "why": "A writing app gets used at night; the CSS already centralises colours.",
+      "severity": "medium",
+      "hint": "Convert the palette in src/styles.css to custom properties in :root and add a [data-theme=\"dark\"] override that flips canvas, chrome, ink, border and accent. Add a View-tab toggle that persists in settings. Acceptance: gate screenshots both themes and asserts no element keeps a hard-coded light background (a unit check over the stylesheet is acceptable)."
+    },
+    {
+      "title": "Focus mode",
+      "why": "Word's Focus view (and every modern writing app) hides the chrome to leave just the page.",
+      "severity": "low",
+      "hint": "A View-tab toggle that hides ribbon, sidebar and status bar and centres the page; Escape exits, and only when the editor has no open dialog. Restore state on exit. Acceptance: gate toggles it and asserts the ribbon is hidden and the page still renders."
+    },
+    {
+      "title": "Templates gallery",
+      "why": "The fastest way into a book, a paper or a note is a template, not a blank page.",
+      "severity": "medium",
+      "hint": "A templates module (src/lib/templates.ts) returning {name, description, settings, document} for at least: arXiv paper (two-column, abstract), report, book (parts/chapters/front matter), letter, note (no title page). The File backstage and the start screen both list them; choosing one creates the project with that skeleton. Acceptance: unit test that every template round-trips through documentToLatex/latexToDocument without loss."
+    },
+    {
+      "title": "Print preview with paper-accurate pages",
+      "why": "The print stylesheet exists but there is no preview and no page-accurate output.",
+      "severity": "low",
+      "hint": "A View-tab Print preview that renders the paginated page stack as pages with margins, hiding chrome, and a Print button calling window.print(). Reuse the pagination measurements. Acceptance: gate opens preview and asserts the ribbon is hidden and N page elements match the page count."
+    },
+    {
+      "title": "Project files: chapters as separate .tex files",
+      "why": "A 200-page book in one .tex file is unmanageable; LaTeX has \\include for this.",
+      "severity": "medium",
+      "hint": "Settings get `splitByChapter: boolean`. When on, save_project writes each chapter's body to chapters/NN-slug.tex and document.tex becomes \\include lines; open_project reassembles. Round trip must be lossless and git must show per-chapter diffs. This touches src-tauri/src/project.rs and src/lib/tauri.ts. Acceptance: Rust test writes then reopens a two-chapter book and asserts identical documents plus two chapter files."
+    },
+    {
+      "title": "Bibliography: search, insert and format from the app",
+      "why": "The bibliography manager exists; make it the citation workflow (search, preview formatted entry, insert).",
+      "severity": "medium",
+      "hint": "Extend BibliographyDialog with a filter box, entry preview (author, year, title, venue) and an Insert citation action that writes \\cite{key} at the caret. No new dependency. Acceptance: smoke filters a bib entry and inserts its citation."
+    },
+    {
+      "title": "Inline LaTeX diagnostics while typing",
+      "why": "Waiting for a compile to find a broken command is slow; autocomplete plus validation covers the common errors.",
+      "severity": "low",
+      "hint": "In the source view, validate unknown \\commands against the completion index and unknown environments against a known list, and mark them with a squiggle plus a tooltip. Do not flag commands defined in the preamble. Acceptance: unit test for the validator; gate types \\bogus and asserts a diagnostic appears."
+    },
+    {
+      "title": "Export a project as a portable .tex bundle",
+      "why": "People need to hand the source to a journal or a colleague without the Sentence project format.",
+      "severity": "low",
+      "hint": "Export zip containing document.tex, references.bib and assets/ with rewritten image paths, reusing the arXiv packaging code in src-tauri/src/arxiv.rs where possible. Acceptance: Rust test packages a project with an image and asserts paths in the zip are relative."
+    },
+    {
+      "title": "Word count, reading time and selection statistics",
+      "why": "Writers track length; Word shows words/pages and selection counts.",
+      "severity": "low",
+      "hint": "Status bar shows words and characters for the whole document, and for the selection when one exists; add reading time at 200 wpm in the tooltip. Front matter counts as document text. Acceptance: unit test for the counter with front-matter blocks included."
+    },
+    {
+      "title": "Start screen: recent projects and templates",
+      "why": "The start screen is the first thing a user sees; it should offer templates, not just an empty state.",
+      "severity": "low",
+      "hint": "Add the template list from src/lib/templates.ts to the start screen next to New document, and keep Recent documents working for real project paths. Acceptance: gate asserts the template cards render and that clicking one opens the editor with that skeleton."
     }
   ]
 }
