@@ -14,3 +14,13 @@ export function changeIndent(editor: Editor, outdent: boolean): boolean {
   if (editor.isActive("blockquote")) return false;
   return chain.wrapIn("blockquote").run();
 }
+
+// Tab is the list key, so a caret inside a list item always consumes it. The
+// first item has no previous sibling to nest under: sinking then fails, and
+// letting the key through would move focus off the page mid-edit instead of
+// leaving the item where it is.
+export function nestListItem(editor: Editor, outdent: boolean): boolean {
+  if (!editor.isEditable || !editor.isActive("listItem")) return false;
+  changeIndent(editor, outdent);
+  return true;
+}

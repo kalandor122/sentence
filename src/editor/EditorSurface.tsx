@@ -19,7 +19,7 @@ import {
   TableOfContents,
 } from "./extensions";
 import { FindHighlight } from "./find";
-import { changeIndent } from "./indent";
+import { changeIndent, nestListItem } from "./indent";
 import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
 import {
   pageBoundaryWithin,
@@ -70,8 +70,8 @@ const TabIndent = Extension.create({
   priority: 200,
   addKeyboardShortcuts() {
     return {
-      Tab: () => this.editor.isActive("listItem") && changeIndent(this.editor, false),
-      "Shift-Tab": () => this.editor.isActive("listItem") && changeIndent(this.editor, true),
+      Tab: () => nestListItem(this.editor, false),
+      "Shift-Tab": () => nestListItem(this.editor, true),
       "Mod-]": () => changeIndent(this.editor, false),
       "Mod-[": () => changeIndent(this.editor, true),
       Escape: () => focusAfterEditor(this.editor),

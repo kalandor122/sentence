@@ -2281,8 +2281,9 @@
       "hint": "Repro: Create a new document. With the empty paragraph active, click Home > Bulleted list, then press Tab. Repeat with 'only item' typed into the list first, with the caret in the first of two list items, and with the caret in the only item of a nested list. In every case inspect document.activeElement after Tab.\nActual: The item stays at its current level and focus leaves the editor: document.activeElement becomes the 'Visual (Ctrl+Alt+1)' button in the status bar. Typing after that inserts nothing into the document. This happens for the first item of a list, the first of two items, the only item of a nested sublist, and an empty list. Only items that have a previous sibling at the same level can be nested with Tab.",
       "source": "explore:lists:tab on the first item of a list moves focus out of the editor instead of nesting",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T19:38:21Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T19:38:21Z",
+      "lastAttemptAt": "2026-11-24T19:38:21Z"
     },
     {
       "id": "qa-144",

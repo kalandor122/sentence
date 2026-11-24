@@ -401,3 +401,4 @@ Aborting
 2026-11-24T19:02:00Z START qa-142 on qa/qa-142-exported-figure-captions-use-the-file-na: Exported figure captions use the file name and are invisible in the visual editor
 2026-11-24T19:10:16Z DONE qa-142 (tsc -b, npm test, smoke all green)
 2026-11-24T19:38:07Z EXPLORE lists: 3 new items, agent exit 0
+2026-11-24T19:38:21Z START qa-143 on qa/qa-143-tab-on-the-first-item-of-a-list-moves-fo: Tab on the first item of a list moves focus out of the editor instead of nesting
