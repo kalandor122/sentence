@@ -333,10 +333,13 @@ function blockToLatex(node: DocumentNode, enumDepth = 0): string {
     case "heading": {
       const level = Number(node.attrs?.level ?? 1);
       const command = level <= 1 ? "section" : level === 2 ? "subsection" : "subsubsection";
+      // A starred command is the user's unnumbered heading: keep the star or a
+      // round trip would silently number a section they deliberately left out.
+      const star = node.attrs?.unnumbered === true ? "*" : "";
       const label = latexReferenceTarget(attribute(node, "label") ?? "");
       return wrapAlignment(
         node,
-        `\\${command}{${inlineContent(node.content)}}${label ? `\\label{${label}}` : ""}`,
+        `\\${command}${star}{${inlineContent(node.content)}}${label ? `\\label{${label}}` : ""}`,
       );
     }
     case "bulletList":
@@ -1208,15 +1211,16 @@ function documentBody(latex: string): string {
 // split off before the braces are matched or the last `}` becomes text.
 function parseHeadingBlock(
   block: string,
-): { level: number; title: string; label: string | null } | null {
+): { level: number; title: string; label: string | null; unnumbered: boolean } | null {
   const labelMatch = block.match(/\\label\{([^{}]*)\}\s*$/);
   const body = (labelMatch ? block.slice(0, labelMatch.index ?? 0) : block).trim();
-  const heading = body.match(/^\\(section|subsection|subsubsection)\{([\s\S]*)\}$/);
+  const heading = body.match(/^\\(section|subsection|subsubsection)(\*?)\{([\s\S]*)\}$/);
   if (!heading) return null;
   return {
     level: heading[1] === "section" ? 1 : heading[1] === "subsection" ? 2 : 3,
-    title: heading[2],
+    title: heading[3],
     label: labelMatch ? labelMatch[1] : null,
+    unnumbered: heading[2] === "*",
   };
 }
 
@@ -1337,6 +1341,7 @@ export function latexToDocument(
             level: innerHeading.level,
             textAlign,
             ...(innerHeading.label ? { label: innerHeading.label } : {}),
+            ...(innerHeading.unnumbered ? { unnumbered: true } : {}),
           },
           content: parseInline(innerHeading.title).content,
         });
@@ -1356,6 +1361,7 @@ export function latexToDocument(
         attrs: {
           level: heading.level,
           ...(heading.label ? { label: heading.label } : {}),
+          ...(heading.unnumbered ? { unnumbered: true } : {}),
         },
         content: parseInline(heading.title).content,
       });
