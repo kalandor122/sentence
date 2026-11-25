@@ -624,3 +624,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T07:05:06Z PUSHED main
 2026-11-25T07:05:06Z DONE qa-211 (tsc -b, npm test, smoke all green)
 2026-11-25T07:57:13Z EXPLORE keyboard: 6 new items, agent exit 0
+2026-11-25T07:57:31Z START qa-212 on qa/qa-212-ctrl-alt-1-2-3-change-the-current-block: Ctrl+Alt+1/2/3 change the current block's heading level on their way to switching views

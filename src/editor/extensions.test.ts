@@ -2,7 +2,7 @@
 import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
-import { CommentMark, HeadingLabel, MathBlock } from "./extensions";
+import { CommentMark, HeadingLabel, MathBlock, ViewModeShortcuts } from "./extensions";
 
 describe("HeadingLabel", () => {
   it("keeps a starred heading unnumbered through the editor", () => {
@@ -53,6 +53,30 @@ describe("HeadingLabel", () => {
     expect(reloaded.getJSON().content?.[0]?.attrs?.shortTitle).toBe("ZXSHORT");
     editor.destroy();
     reloaded.destroy();
+  });
+});
+
+describe("ViewModeShortcuts", () => {
+  it("leaves the block alone when a view shortcut is pressed", () => {
+    const editor = new Editor({
+      extensions: [StarterKit, ViewModeShortcuts],
+      content: "<p>ZXMODE PARAGRAPH</p>",
+    });
+    editor.commands.setTextSelection(1);
+    for (const digit of ["1", "2", "3"]) {
+      const event = new KeyboardEvent("keydown", {
+        key: digit,
+        code: `Digit${digit}`,
+        ctrlKey: true,
+        altKey: true,
+      });
+      const handled = editor.view.someProp("handleKeyDown", (handler) =>
+        handler(editor.view, event),
+      );
+      expect(handled).toBe(true);
+      expect(editor.getJSON().content?.[0]?.type).toBe("paragraph");
+    }
+    editor.destroy();
   });
 });
 

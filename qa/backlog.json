@@ -3376,8 +3376,9 @@
       "hint": "Repro: Open a project, click into a plain paragraph reading \"mode probe paragraph\" and press Ctrl+Alt+2 \u2014 the shortcut the View ribbon advertises on its \"LaTeX (Ctrl+Alt+2)\" button and the status bar repeats as \"Source (Ctrl+Alt+2)\". The app switches to the source view and the LaTeX for that line reads \\subsection{mode probe paragraph}. Switching back with the status-bar Visual button shows <h2>mode probe paragraph</h2> plus an extra empty paragraph. The same collision happens for Ctrl+Alt+1 while already in Visual (the paragraph becomes <h1> and is exported as \\section{mode probe two}; the view stays Visual) and for Ctrl+Alt+3 (<h3>, \\subsubsection). Ctrl+Alt+2 pressed with the caret in the third of three paragraphs turns only that paragraph into \\subsection and leaves the other two alone.\nActual: Tiptap also binds Mod-Alt-1/2/3 to setHeading(level 1/2/3), so one key press does both: the mode switch runs and the block under the caret is rewritten as a heading. The rewritten heading is saved and exported (\\section / \\subsection / \\subsubsection). Probe evidence: before {\"<p data-line-spacing=\\\"single\\\">mode probe paragraph</p>\", mode Visual} -> after Ctrl+Alt+2 {mode Source, visual <h2>mode probe paragraph</h2>, source line \\subsection{mode probe paragraph}}; after Ctrl+Alt+1 in Visual: <h1>mode probe two</h1>, source line \\section{mode probe two}.",
       "source": "explore:keyboard:ctrl+alt+1/2/3 change the current block's heading level on their way to switching views",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T07:57:31Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T07:57:31Z",
+      "lastAttemptAt": "2026-11-25T07:57:31Z"
     },
     {
       "id": "qa-213",
