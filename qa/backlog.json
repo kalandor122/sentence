@@ -3927,9 +3927,9 @@
       ],
       "hint": "Repro: 1. Click View, then LaTeX. 2. Put the caret before \\end{document} and type `ZXTABHISTORY`. 3. Click references.bib, then click document.tex. 4. Click in the textarea and press Ctrl+Z three times.\nActual: All three Ctrl+Z presses leave `ZXTABHISTORY` in the textarea. Typing `ZXTABNEW` after returning and pressing Ctrl+Z removes only `ZXTABNEW`, so undo still works for post-switch edits but the history from before the tab switch is gone. Probe: undoafterFileTabSwitch.markerStillPresentAfterThreeUndos=[true,true,true], undoRemovedPreSwitchTyping=false, newTypingAfterSwitchUndoable=true.",
       "source": "explore:source-editor:undo history is lost when switching to references.bib and back",
-      "status": "open",
+      "status": "in_progress",
       "attempts": 0,
-      "startedAt": "2026-11-25T15:57:31Z",
+      "startedAt": "2026-11-25T17:04:18Z",
       "note": "WIP kept on its branch; retry"
     },
     {
@@ -4162,10 +4162,11 @@
       ],
       "hint": "Repro: Open the demo, press Ctrl+End, press Enter, click Insert > Insert table, click the first cell, then click Insert > Image and choose a 120x60 PNG. Click the picture in the cell: the Image toolbar offers the 'Figure caption' field. Type 'CELL CAPTION' and press Tab. The cell shows the caption under the picture (figcaption 'CELL CAPTION', 1 figure in the td), but View > LaTeX contains only '\\includegraphics[width=90.00bp]{assets/images/cell\\_caption.png}% Sentence alt: cell_caption.png' inside the tabular: 0 \\caption commands and no 'CELL CAPTION' in the tabular.\nActual: The caption is visible in the editor but absent from the generated LaTeX (captionCount 0, captionInTabular false); the image exports as an inline \\includegraphics inside the tabular with only the alt-text comment. The caption disappears from the PDF with no warning. Probe qa/probes/insert-media.mjs scenario 'image-caption-in-cell'.",
       "source": "explore:insert-media:a caption typed on an image inside a table cell is silently dropped from the latex",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T16:56:06Z",
-      "lastAttemptAt": "2026-11-25T16:56:06Z"
+      "lastAttemptAt": "2026-11-25T16:56:06Z",
+      "doneAt": "2026-11-25T17:03:37Z"
     },
     {
       "id": "qa-264",
