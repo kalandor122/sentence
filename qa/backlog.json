@@ -3463,10 +3463,11 @@
       ],
       "hint": "Repro: In the demo document click the H2 heading 'Drafting with constraints', press Home, then ArrowRight four times so the caret sits after 'Draf' inside the heading. Click References > Table of contents (or Insert > Page break instead).\nActual: The heading is split into two headings, 'Draf' and 'ting with constraints', and the table of contents / page break is inserted between them. The TOC preview lists two entries ('1.1 Draf', '1.2 ting with constraints') and the exported LaTeX contains two \\subsection commands. With a page break the LaTeX is \\subsection{Draf}, \\newpage, \\subsection{ting with constraints}. Probe qa/probes/insert-media.mjs scenarios 'caret-in-heading-toc' and 'caret-in-heading-break'.",
       "source": "explore:insert-media:inserting a table of contents or a page break with the caret inside a heading splits the heading into two headings",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T09:18:14Z",
-      "lastAttemptAt": "2026-11-25T09:18:14Z"
+      "lastAttemptAt": "2026-11-25T09:18:14Z",
+      "doneAt": "2026-11-25T09:20:39Z"
     },
     {
       "id": "qa-219",
@@ -3478,7 +3479,9 @@
       ],
       "hint": "Repro: In the demo document press Ctrl+End, click Insert > Image and supply a 200x3000 px PNG.\nActual: The editor renders the image 202x3002 px, crossing three page boundaries and changing the status bar from 1 page to 4 pages. The exported LaTeX is \\includegraphics[width=\\linewidth,height=\\textheight,keepaspectratio], which scales the same image to one text block in the PDF, so the visual page and the PDF disagree. Probe qa/probes/insert-media.mjs scenario 'image-tall'.",
       "source": "explore:insert-media:a tall image is rendered at full natural height across several pages while the exported pdf scales it to fit one page",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T09:21:18Z"
     },
     {
       "id": "qa-220",
