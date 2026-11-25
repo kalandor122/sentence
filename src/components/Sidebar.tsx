@@ -21,6 +21,7 @@ import {
   removeBibliographyEntry,
   type BibliographyEntry,
 } from "../lib/bibliography";
+import { commentAnchors } from "../lib/comments";
 import { pendingRevisions, revisionAuthorClass } from "../lib/revisions";
 import type {
   CommentThread,
@@ -70,6 +71,7 @@ function headingEntries(document: SentenceDocument): HeadingEntry[] {
 interface CommentThreadCardProps {
   thread: CommentThread;
   active: boolean;
+  anchored: boolean;
   onSelected: (markId: string) => void;
   onResolve: (id: string, resolved: boolean) => void;
   onDelete: (id: string) => void;
@@ -79,6 +81,7 @@ interface CommentThreadCardProps {
 function CommentThreadCard({
   thread,
   active,
+  anchored,
   onSelected,
   onResolve,
   onDelete,
@@ -111,7 +114,7 @@ function CommentThreadCard({
 
   return (
     <article
-      className={`comment-thread ${thread.resolved ? "resolved" : ""} ${active ? "active" : ""}`}
+      className={`comment-thread ${thread.resolved ? "resolved" : ""} ${active ? "active" : ""} ${anchored ? "" : "detached"}`}
       onClick={() => onSelected(thread.markId)}
     >
       <header>
@@ -144,6 +147,12 @@ function CommentThreadCard({
         </button>
       </header>
       <p>{thread.body}</p>
+      {anchored ? null : (
+        <div className="comment-detached" role="note">
+          <TriangleAlert size={12} aria-hidden="true" />
+          <span>The text this comment was attached to was deleted, so it has no highlight in the document.</span>
+        </div>
+      )}
       {thread.replies.map((item) => (
         <div className="comment-reply" key={item.id}>
           <strong>{item.author}</strong>
@@ -443,6 +452,10 @@ export default function Sidebar({
   onRejectAllRevisions,
 }: SidebarProps) {
   const headings = headingEntries(document);
+  const anchoredCommentIds = useMemo(
+    () => new Set(commentAnchors(document).map((anchor) => anchor.markId)),
+    [document],
+  );
   const unresolved = comments.filter((thread) => !thread.resolved);
   const pending = pendingRevisions(revisions);
   const bibliographyCount = useMemo(() => parseBibliography(bibliography).length, [bibliography]);
@@ -515,6 +528,7 @@ export default function Sidebar({
                   key={thread.id}
                   thread={thread}
                   active={activeCommentId === thread.markId}
+                  anchored={anchoredCommentIds.has(thread.markId)}
                   onSelected={onCommentSelected}
                   onResolve={onResolveComment}
                   onDelete={onDeleteComment}
