@@ -505,3 +505,8 @@ Aborting
 2026-11-25T00:28:10Z DONE qa-161 (tsc -b, npm test, smoke all green)
 2026-11-25T00:52:10Z EXPLORE insert-media: 3 new items, agent exit 0
 2026-11-25T00:52:24Z START qa-178 on qa/qa-178-every-inserted-image-exports-at-80-of-th: Every inserted image exports at 80% of the line width regardless of its natural size, so the PDF does not match the page
+2026-11-25T01:00:21Z PUSH FAILED: 1-25T01:00:21Z
+To https://github.com/kalandor122/sentence.git
+ ! [remote rejected] main -> main (Internal Server Error)
+error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
+2026-11-25T01:00:21Z DONE qa-178 (tsc -b, npm test, smoke all green)
