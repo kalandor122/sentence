@@ -553,3 +553,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T02:55:37Z PUSHED main
 2026-11-25T02:55:37Z DONE qa-187 (tsc -b, npm test, smoke all green)
 2026-11-25T02:56:11Z START qa-188 on qa/qa-188-display-equations-inside-blockquotes-or: Display equations inside blockquotes or list items are imported as literal text and escaped on export
+2026-11-25T02:58:06Z PUSHED main
+2026-11-25T02:58:06Z DONE qa-188 (tsc -b, npm test, smoke all green)
+2026-11-25T02:58:41Z PROMOTED from roadmap: qa-189 Two-column documents: settings, preamble and round trip

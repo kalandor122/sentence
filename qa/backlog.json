@@ -2999,10 +2999,25 @@
       ],
       "hint": "Repro: 1. Choose 'New document', open View > 'LaTeX', and insert this valid LaTeX before `\\end{document}`:\n\\begin{quote}\n\\begin{equation*}\nq=1\n\\end{equation*}\n\\end{quote}\n2. Click 'Apply source' and switch to View > 'Visual'.\n3. Open View > 'LaTeX' and click 'Refresh from visual', then read document.tex.\n4. Repeat steps 1-3 with this list version instead: `\\begin{itemize}`, `\\item Before`, `\\begin{equation*}`, `L=1`, `\\end{equation*}`, `\\end{itemize}` (one per line).\nExpected: as with a top-level equation, the display equation is imported as an editable `mathBlock` and re-exported unchanged inside the quote/list (top-level `\\begin{equation}...\\end{equation}` does exactly this).\nActual: the quote shows the literal text `\\begin{equation*} q=1 \\end{equation*}` with no math node (`math: 0`), and the list item shows `Before \\begin{equation*} L=1 \\end{equation*}`; the canonical export escapes them to `\\textbackslash{}begin\\{equation*\\}` ... `\\textbackslash{}end\\{equation*\\}`, so the PDF would print the environment as text and the equation is lost from the document.\nActual: None",
       "source": "explore:math:display equations inside blockquotes or list items are imported as literal text and escaped on export",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T02:56:11Z",
-      "lastAttemptAt": "2026-11-25T02:56:11Z"
+      "lastAttemptAt": "2026-11-25T02:56:11Z",
+      "doneAt": "2026-11-25T02:58:04Z"
+    },
+    {
+      "id": "qa-189",
+      "title": "Two-column documents: settings, preamble and round trip",
+      "why": "A two-column arXiv paper is the single most common LaTeX target the app cannot produce.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Add `columns: \"one\" | \"two\"` to ProjectSettings in src/lib/types.ts (default \"one\"). Emit the `twocolumn` class option in documentToLatex (src/lib/latex.ts, the \\documentclass line around 512) and parse it back in latexToDocument. Add a Columns control to the Layout ribbon group in src/components/Ribbon.tsx. Acceptance: unit tests in src/lib/latex.test.ts prove article+two emits \\documentclass[11pt,a4paper,twocolumn]{article} and that latexToDocument reads it back; gate green.",
+      "source": "roadmap:two-column documents: settings, preamble and round trip",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T02:58:41Z"
     }
   ]
 }
