@@ -3623,10 +3623,11 @@
       ],
       "hint": "Repro: Create a new document. Type 'parent', click Home > Bulleted list, press Enter, type 'child one', press Tab, click Home > Numbered list, press Enter, type 'child two'. With the caret inside the numbered child list, look at and read the Home > Bulleted list and Home > Numbered list buttons. Reverse the list types (numbered parent, bullet child) for the same result.\nActual: Both buttons are highlighted: both report aria-pressed=\"true\" (bullets=true, numbers=true) for a numbered child inside a bullet parent, and the same pair is reported for a bullet child inside a numbered parent.",
       "source": "explore:lists:both bulleted and numbered list buttons show as active in a mixed nested list",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T14:13:30Z",
-      "lastAttemptAt": "2026-11-25T14:13:30Z"
+      "lastAttemptAt": "2026-11-25T14:13:30Z",
+      "doneAt": "2026-11-25T14:15:32Z"
     },
     {
       "id": "qa-228",
@@ -3922,6 +3923,56 @@
       ],
       "hint": "Repro: 1. Click View, then LaTeX. 2. Before the real \\end{document}, insert `\\begin{verbatim}`, `ZXCODE \\end{document}`, `ZXCODE still code`, and `\\end{verbatim}`. 3. Click Apply source.\nActual: Apply reports `Invalid LaTeX: text after \\end{document} is not part of the document (\"ZXCODE still code\"). Move it before \\end{document}.` Valid LaTeX is rejected; the draft is preserved and Apply stays enabled. Probe: verbatimEndDocument.rejected=true, draftKept=true.",
       "source": "explore:source-editor:a verbatim block containing \\end{document} is rejected as trailing text",
+      "status": "open"
+    },
+    {
+      "id": "qa-248",
+      "title": "Lists and blockquotes are never paginated: page rules cut through their lines and text sits in the margins",
+      "why": "Exploratory pass on long-document (visual): expected Lines inside a list or a blockquote stay within the 96px top and bottom margins of each page, and page rules fall in the blank space between lines, exactly as the probe's 3,600-word paragraph/heading document behaves (0 margin lines, 0 rule crossings).",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.longList` / `stages.longBlockquote`, or reproduce by hand at 1280x800: open http://localhost:1420, click 'New document', press Ctrl+A then Backspace, and paste an 80-item bulleted list through the clipboard. Each item is `List item N List item with enough words to wrap onto a second line so the list grows well past one page.` (the probe pastes `<ul><li>...</li></ul>` with exactly that text; the status bar then reads 1,760 words / 6 pages). The probe's page audit measures 160 line boxes: 15 sit above a page's 96px top margin, 17 sit below the 96px bottom margin, and 2 line boxes cross a straight page rule (page 4: 4,478-4,494 crosses the rule at 4,492; page 5: 5,610-5,626 crosses the rule at 5,615). Pasting 40 copies of `Quoted paragraph N with several words so the blockquote grows past a page boundary in a long document.` inside one `<blockquote>` instead gives 720 words / 4 pages, 6 top-margin lines, 10 bottom-margin lines and 3 rule crossings (page 1: 1,117-1,136 crosses 1,123; page 2: 2,246-2,265 crosses 2,246; page 3: 3,355-3,374 crosses 3,369). Screenshots: qa/shots/probe-long-document-list.png and qa/shots/probe-long-document-blockquote.png.\nActual: The editor only paginates top-level paragraphs and H1-H3 blocks; a UL/OL or BLOCKQUOTE that is taller than a page is left untouched. In the 6-page list, 15 lines land in top margins and 17 in bottom margins, and the rule at 4,492px and 5,615px is drawn through the line boxes of items 62 and 79 (visible in the screenshot: item 62's second line sits on the page edge and item 63 starts about 30px below it, inside the 96px margin). The blockquote behaves the same way: 16 lines in the margins and a rule through 'Quoted paragraph 10', '25' and '39'.",
+      "source": "explore:long-document:lists and blockquotes are never paginated: page rules cut through their lines and text sits in the margins",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T14:29:24Z"
+    },
+    {
+      "id": "qa-249",
+      "title": "A page break inserted inside a word permanently splits the word and inflates the word count",
+      "why": "Exploratory pass on long-document (content): expected Inserting a page break pushes the following text to the next page without dividing the word: the document still reads `The quick brown fox jumps over the lazy dog.`, the word count stays 9, and removing the break restores the single paragraph.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.pageBreakMidWord`, or reproduce by hand: open http://localhost:1420, click 'New document', Ctrl+A then Backspace, type `The quick brown fox jumps over the lazy dog.`, press Home, press ArrowRight 12 times (the caret now sits between `br` and `own`), open the Insert tab and click 'Page break'. The status bar goes from 9 words to 10 words and the editor becomes `The quick br` / page break / `own fox jumps over the lazy dog.`. Open View > LaTeX: the source contains `The quick br`, a blank line, `\\newpage`, then `own fox jumps over the lazy dog.` Switch back to Visual, click the page break and press Backspace: the break is gone but the document remains two paragraphs (`The quick br` and `own fox jumps over the lazy dog.`) and still reports 10 words. A source-to-visual round trip also keeps the split.\nActual: The page break splits the paragraph at the caret and the word `brown` is divided into `br` and `own`, which then export as two separate words around `\\newpage` (word count 9 -> 10). Deleting the break leaves two paragraphs and does not reunite the word, so the typo persists in the document and in the LaTeX source.",
+      "source": "explore:long-document:a page break inserted inside a word permanently splits the word and inflates the word count",
+      "status": "open"
+    },
+    {
+      "id": "qa-250",
+      "title": "After pasting a long document the view stops short of the caret at the end, and Ctrl+End does not scroll it into view",
+      "why": "Exploratory pass on long-document (ux): expected After a paste the editor either follows the caret to the end of the pasted content or Ctrl+End brings the end of the document into view, so the cursor is visible and the user can keep typing where the paste left off.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.paste.caretAfterPaste` and `stages.pasteScroll`, or reproduce by hand at 1280x800: open http://localhost:1420, click 'New document', press Ctrl+A then Backspace, and paste the probe's 50-heading/3,600-word document (50 blocks of `<h1|h2|h3>Heading N HDOCN</h1><p>[69-word body] BODYN</p>`, 3,600 words / 13 pages). After the paste and after waiting 2s, the editor's scrollTop is 13,220 of a maximum 14,082; the last paragraph (BODY50) occupies 843-969px inside the 627px-tall editor viewport and the caret at the end of the document is at 948px, i.e. 321px below the visible area. Pressing Ctrl+End leaves scrollTop at 13,220 and the caret still off-screen. Pasting one 3,100-word paragraph instead leaves scrollTop at 4,836 of 6,221 with the caret 1,561px down (934px below the viewport); Ctrl+End again does not move the view.\nActual: The paste scrolls only partway (13,220 of 14,082; 4,836 of 6,221) and the caret and last block stay below the viewport. Because the caret is already at the document end, Ctrl+End produces no selection change and therefore no scroll, so the view remains on the middle of the document and the end can only be reached by wheeling.",
+      "source": "explore:long-document:after pasting a long document the view stops short of the caret at the end, and ctrl+end does not scroll it into view",
+      "status": "open"
+    },
+    {
+      "id": "qa-251",
+      "title": "A long heading in the outline does not wrap; it is clipped and forces a 1,000px horizontal scroll inside the sidebar",
+      "why": "Exploratory pass on long-document (visual): expected An outline entry wraps (or is truncated with an ellipsis) inside the sidebar, without adding horizontal scrolling to the panel, and its level badge stays visible.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.longHeadingOutline`, or reproduce by hand: open http://localhost:1420, click 'New document', Ctrl+A then Backspace, and paste 10 headings where the first is `Long heading ` + 40 copies of `word ` + `LONGEND` (220 characters) and the other nine are `Heading N LHN`, each followed by a body paragraph. In the Outline panel the first entry is a single 12px-tall line that is 1,238px wide inside a 246px-wide panel: `.sidebar-panel` reports scrollWidth 1,245 against clientWidth 246, the entry's right edge is at x=1,313 while the 314px-wide sidebar ends at x=314, and the `H1` level badge is off-screen. The heading itself wraps normally inside the 794px sheet, with no horizontal overflow of the page. Screenshot: qa/shots/probe-long-document-outline-heading.png.\nActual: The heading text is rendered on one unbroken line, extends past the sidebar's right edge and is clipped there; the panel gains a ~999px horizontal scroll range and the `H1` badge is pushed off-screen, so the outline cannot be read at a glance and the panel scrolls sideways.",
+      "source": "explore:long-document:a long heading in the outline does not wrap; it is clipped and forces a 1,000px horizontal scroll inside the sidebar",
       "status": "open"
     }
   ]

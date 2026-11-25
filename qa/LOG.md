@@ -725,3 +725,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T14:12:52Z PUSHED main
 2026-11-25T14:12:52Z DONE qa-245 (tsc -b, npm test, smoke all green)
 2026-11-25T14:13:30Z START qa-227 on qa/qa-227-both-bulleted-and-numbered-list-buttons: Both Bulleted and Numbered list buttons show as active in a mixed nested list
+2026-11-25T14:15:34Z PUSHED main
+2026-11-25T14:15:34Z DONE qa-227 (tsc -b, npm test, smoke all green)
+2026-11-25T14:29:06Z EXPLORE long-document: 4 new items, agent exit 0
