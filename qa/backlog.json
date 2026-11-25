@@ -3688,8 +3688,9 @@
       "hint": "Repro: Create a new project. Insert tab > Insert table. Type 'HEAD' in the first-row middle cell and 'BODY' in the second-row middle cell. Click the HEAD cell and press the Table toolbar's 'Add row above' button. Then click the BODY row and press 'Add row above' again.\nActual: The first press leaves HEAD in row 1 and adds the blank row at row 2, directly below the header: cells become HEAD, blank, BODY, blank. The second press inserts correctly above BODY, giving HEAD, blank, blank, BODY, blank. The same button therefore does not do what its label says while the caret is in the header row.",
       "source": "explore:tables:'add row above' in the header row inserts the new row below the header instead",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T15:20:32Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T15:20:32Z",
+      "lastAttemptAt": "2026-11-25T15:20:32Z"
     },
     {
       "id": "qa-232",

@@ -744,3 +744,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T15:15:06Z START qa-252 on qa/qa-252-a-tracked-edit-saved-just-before-a-reloa: A tracked edit saved just before a reload loses its tracked revision
 2026-11-25T15:19:54Z PUSHED main
 2026-11-25T15:19:54Z DONE qa-252 (tsc -b, npm test, smoke all green)
+2026-11-25T15:20:32Z START qa-231 on qa/qa-231-add-row-above-in-the-header-row-inserts: 'Add row above' in the header row inserts the new row below the header instead

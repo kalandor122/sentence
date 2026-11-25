@@ -77,17 +77,26 @@ function cellPositions(editor: Editor): number[] {
 }
 
 describe("CaptionTable", () => {
-  it("keeps the header in row 1 when a row is added above it", () => {
+  it("reports adding a row above the header row as unavailable", () => {
     const editor = createEditor(true);
     editor.commands.setTextSelection(cellPositions(editor)[0]);
-    expect(editor.commands.addRowBefore()).toBe(true);
+    expect(editor.can().addRowBefore()).toBe(false);
+    expect(editor.commands.addRowBefore()).toBe(false);
+    expect(rowTypes(editor)).toEqual([
+      ["tableHeader", "tableHeader"],
+      ["tableCell", "tableCell"],
+      ["tableCell", "tableCell"],
+    ]);
+    expect(editor.isActive("tableHeader")).toBe(true);
+    // The row below the header is the first body row, so that is the add
+    // control the header row still offers.
+    expect(editor.commands.addRowAfter()).toBe(true);
     expect(rowTypes(editor)).toEqual([
       ["tableHeader", "tableHeader"],
       ["tableCell", "tableCell"],
       ["tableCell", "tableCell"],
       ["tableCell", "tableCell"],
     ]);
-    expect(editor.isActive("tableHeader")).toBe(true);
     const latex = documentToLatex(editor.getJSON() as SentenceDocument, DEFAULT_SETTINGS);
     const restored = latexToDocument(latex, DEFAULT_SETTINGS).document;
     expect(tableRowTypes(restored)).toEqual(rowTypes(editor));

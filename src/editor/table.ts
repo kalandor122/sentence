@@ -146,17 +146,17 @@ export const CaptionTable = Table.extend({
     return {
       ...this.parent?.(),
       // A header row only counts in row 1: the LaTeX export and import keep the
-      // header position there, and only there. Tiptap inserts a plain row above
-      // row 1, which pushes the header into row 2 until the next source round
-      // trip moves it back. Add the row just below the header instead so the
-      // document model and its exported form stay the same.
+      // header position there, and only there. That leaves nothing above the
+      // header, so adding a row "above" it can only push the header down to row
+      // 2 and then get moved back by the next source round trip. Report the
+      // command as unavailable there so the toolbar disables it instead of
+      // inserting the row somewhere the button does not say.
       addRowBefore: () => ({ state, dispatch }) => {
         if (!isInTable(state)) return false;
-        if (dispatch) {
-          const rect = selectedRect(state);
-          const headerRow = rect.table.firstChild?.firstChild?.type.name === "tableHeader";
-          dispatch(addRow(state.tr, rect, rect.top === 0 && headerRow ? 1 : rect.top));
-        }
+        const rect = selectedRect(state);
+        const headerRow = rect.table.firstChild?.firstChild?.type.name === "tableHeader";
+        if (rect.top === 0 && headerRow) return false;
+        if (dispatch) dispatch(addRow(state.tr, rect, rect.top));
         return true;
       },
 
