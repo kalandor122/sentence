@@ -2760,8 +2760,9 @@
       "hint": "Repro: Open a project, click into a plain paragraph and press Tab once. Clean-document version: click the editor, press Ctrl+A then Backspace, type \"TABPROBE paragraph\", press Tab once, then open source view with Ctrl+Alt+2 and look at the paragraph.\nActual: Focus stays in the .sentence-editor and the paragraph is rewritten: <p>TABPROBE paragraph</p> becomes <blockquote><p>TABPROBE paragraph</p></blockquote><p><br></p> (blockquote count 0 -> 1, plus an appended empty paragraph). The generated LaTeX contains \\begin{quote} followed by TABPROBE paragraph. Only the second Tab press reaches the \"Visual\" status-bar button. The 40-stop Tab walk started from the quick-access button also changed the demo document from 1 to 2 blockquotes.",
       "source": "explore:keyboard:tab in the document wraps the paragraph in a block quote instead of moving focus",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T00:14:09Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T00:14:09Z",
+      "lastAttemptAt": "2026-11-25T00:14:09Z"
     },
     {
       "id": "qa-175",
