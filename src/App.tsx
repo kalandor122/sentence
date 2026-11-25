@@ -816,7 +816,15 @@ export default function App() {
     if (sourceDirtyRef.current && !draftConflict && !sourceRef.current.includes("<<<<<<<")) {
       try {
         const parsed = parseSourceDocument(current.document, sourceRef.current, current.settings);
-        current = { ...current, document: parsed.document, settings: parsed.settings };
+        let applied: Workspace = { ...current, document: parsed.document, settings: parsed.settings };
+        if (tracking) {
+          // Autosave applies the draft without the Apply button, so the edit
+          // still has to reach review from here.
+          const revision = trackedRevisionFor(revisionBaseline.current ?? current.document, applied.document);
+          revisionBaseline.current = applied.document;
+          if (revision) applied = { ...applied, revisions: [revision, ...applied.revisions] };
+        }
+        current = applied;
         if (stillActive()) {
           workspaceRef.current = current;
           setWorkspace(current);
@@ -1118,6 +1126,28 @@ export default function App() {
     }
   };
 
+  // The pending revision for everything edited since the baseline, or null when
+  // the document only differs in ways review does not track (marks, attributes).
+  // Both the visual editor and the LaTeX source pane stage their edits through
+  // this, so a source edit cannot slip past review.
+  const trackedRevisionFor = (baseline: SentenceDocument, after: SentenceDocument): Revision | null => {
+    // Compare shape, not just text: a paragraph break with no words is still an
+    // edit. Saving it only in the baseline would make a rejection leave the
+    // empty paragraph behind.
+    if (trackedShape(baseline) === trackedShape(after)) return null;
+    return {
+      id: crypto.randomUUID(),
+      author: gitAuthor.name || workspaceRef.current?.settings.author || "You",
+      createdAt: new Date().toISOString(),
+      summary: "Tracked edit",
+      before: documentPlainText(baseline),
+      after: documentPlainText(after),
+      beforeDocument: baseline,
+      afterDocument: after,
+      accepted: false,
+    };
+  };
+
   // Record everything edited since the baseline as one pending revision. Called
   // by the debounce timer and, so nothing is lost, when tracking is turned off
   // mid-debounce.
@@ -1129,28 +1159,10 @@ export default function App() {
     const latest = workspaceRef.current;
     const baseline = revisionBaseline.current;
     if (!latest || !baseline) return;
-    const beforeText = documentPlainText(baseline);
-    const afterText = documentPlainText(latest.document);
-    // Compare shape, not just text: a paragraph break with no words is still an
-    // edit. Saving it only in the baseline would make a rejection leave the
-    // empty paragraph behind.
-    if (trackedShape(baseline) === trackedShape(latest.document)) {
-      revisionBaseline.current = latest.document;
-      return;
-    }
-    const revision: Revision = {
-      id: crypto.randomUUID(),
-      author: gitAuthor.name || latest.settings.author || "You",
-      createdAt: new Date().toISOString(),
-      summary: "Tracked edit",
-      before: beforeText,
-      after: afterText,
-      beforeDocument: baseline,
-      afterDocument: latest.document,
-      accepted: false,
-    };
-    setWorkspace((current) => current ? { ...current, revisions: [revision, ...current.revisions] } : current);
+    const revision = trackedRevisionFor(baseline, latest.document);
     revisionBaseline.current = latest.document;
+    if (!revision) return;
+    setWorkspace((current) => current ? { ...current, revisions: [revision, ...current.revisions] } : current);
     markDirty();
   };
 
@@ -1299,7 +1311,16 @@ export default function App() {
     if (!current) return;
     try {
       const parsed = parseSourceDocument(current.document, sourceRef.current, current.settings);
-      setWorkspace({ ...current, document: parsed.document, settings: parsed.settings });
+      const next: Workspace = { ...current, document: parsed.document, settings: parsed.settings };
+      workspaceRef.current = next;
+      setWorkspace(next);
+      if (tracking) {
+        // Applying the source draft is another way to edit the document, so it
+        // goes through review like a visual edit. Anything already pending is
+        // folded into the same revision so the reviewer sees one change.
+        revisionBaseline.current = revisionBaseline.current ?? current.document;
+        commitTrackedRevision();
+      }
       appliedSourceDocument.current = JSON.stringify(parsed.document);
       setSourceDirty(false);
       sourceDirtyRef.current = false;

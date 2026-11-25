@@ -3112,8 +3112,9 @@
       "hint": "Repro: 1. In a fresh document type 'Source track base' and let it settle. 2. Review tab > Track changes; the button now reads 'Tracking on'. 3. View tab > LaTeX, change the body text to 'Source track base revised', and click Apply source. 4. Wait 2.5 s and open the History sidebar.\nActual: History lists 0 tracked changes. The edited text is applied immediately (editor reads 'Source track base revised') while the Review tab still reports 'Tracking on', so the change silently bypasses review. Probe: revisions [], text 'Source track base revised', trackingButtonLabel 'Tracking on'.",
       "source": "explore:review:edits applied from the latex source pane while tracking is on are never recorded as revisions",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T04:08:45Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T04:08:45Z",
+      "lastAttemptAt": "2026-11-25T04:08:45Z"
     },
     {
       "id": "qa-196",
