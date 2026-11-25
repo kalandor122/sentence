@@ -3544,8 +3544,9 @@
       "hint": "Repro: Click Layout > Document properties, check 'Generate table of contents', close Properties, and compare the page with View > LaTeX. Then place the caret at the end of the document and click References > Table of contents and compare again.\nActual: With the switch on, the visual document has 0 [data-toc] blocks and the status bar still reports 1 page, while the LaTeX contains \\tableofcontents\\newpage (an extra PDF page). Inserting a TOC from the ribbon then shows 1 TOC block but the LaTeX contains 2 \\tableofcontents commands. Probe qa/probes/insert-media.mjs scenario 'toc-setting'.",
       "source": "explore:insert-media:the properties 'generate table of contents' switch adds a contents page the visual editor never shows; adding a ribbon t",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T10:27:07Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T10:27:07Z",
+      "lastAttemptAt": "2026-11-25T10:27:07Z"
     },
     {
       "id": "qa-224",

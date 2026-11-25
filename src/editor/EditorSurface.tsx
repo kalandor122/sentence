@@ -41,7 +41,7 @@ import {
   HighlightMark,
 } from "./textStyleMarks";
 import { CaptionTable } from "./table";
-import { setTocTitle } from "./TocBlock";
+import { setGeneratedToc, setTocTitle } from "./TocBlock";
 import { commentAnchors } from "../lib/comments";
 import type {
   CommentThread,
@@ -444,6 +444,11 @@ export default function EditorSurface({
     if (!editor) return;
     setTocTitle(editor, settings.title);
   }, [editor, settings.title]);
+
+  useEffect(() => {
+    if (!editor) return;
+    setGeneratedToc(editor, settings.includeToc);
+  }, [editor, settings.includeToc]);
 
   useEffect(() => {
     if (!editor) return;

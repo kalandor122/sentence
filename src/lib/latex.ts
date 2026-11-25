@@ -609,6 +609,13 @@ function marginGeometry(settings: ProjectSettings): string {
   }
 }
 
+// A document-level \tableofcontents prints one contents page. Projects keep
+// the generated one in settings and a placed one as a block, so export has to
+// refuse to print both.
+export function documentHasToc(document: SentenceDocument): boolean {
+  return (document.content ?? []).some((node) => node.type === "toc");
+}
+
 export function documentToLatex(
   document: SentenceDocument,
   settings: ProjectSettings,
@@ -705,7 +712,7 @@ ${title ? "\\maketitle" : ""}
 ${subtitle}
 ${abstract}
 ${keywords}
-${settings.includeToc ? "\\tableofcontents\\newpage" : ""}
+${settings.includeToc && !documentHasToc(document) ? "\\tableofcontents\\newpage" : ""}
 
 ${body}
 

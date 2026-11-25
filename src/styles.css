@@ -1576,6 +1576,14 @@ button:disabled {
   font-size: 11px;
 }
 
+/* The generated contents ends with the export's \newpage; pagination pads this
+   marker to the next page, so it needs no visible band of its own. */
+.generated-toc-break {
+  height: 0;
+  margin: 0;
+  font-size: 0;
+}
+
 .comment-highlight {
   background: #f4e8ce;
   border-bottom: 1px solid #ce9a52;

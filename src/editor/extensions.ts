@@ -1,9 +1,13 @@
 import { Extension, Mark, Node, mergeAttributes } from "@tiptap/core";
 import Image from "@tiptap/extension-image";
-import type { DOMOutputSpec } from "@tiptap/pm/model";
+import type { DOMOutputSpec, Node as ProseMirrorNode } from "@tiptap/pm/model";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import { footnoteNodeView } from "./Footnote";
 import { katexNodeView } from "./KatexMath";
-import { TOC_COMPILE_NOTE, tocEntries, tocNodeView, tocTitle } from "./TocBlock";
+import { TOC_COMPILE_NOTE, tocEntries, tocNodeView, tocPageBreakElement, tocPreviewElement, tocTitle } from "./TocBlock";
+
+const generatedTocKey = new PluginKey("sentenceGeneratedToc");
 
 function stringAttribute(node: { attrs?: Record<string, unknown> }, name: string): string {
   const value = node.attrs?.[name];
@@ -390,7 +394,44 @@ export const TableOfContents = Node.create({
   selectable: true,
 
   addStorage() {
-    return { title: "" };
+    return { title: "", generated: false };
+  },
+
+  // The Properties switch asks for a generated contents page. Draw it at the
+  // same place the export prints it: after a title heading that repeats the
+  // project title, otherwise at the top of the body.
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: generatedTocKey,
+        props: {
+          decorations: (state) => {
+            if (!this.storage.generated) return null;
+            // A placed contents block already represents the TOC, and the
+            // export only prints one of the two.
+            for (const child of state.doc.content.content) {
+              if (child.type.name === "toc") return null;
+            }
+            const title = this.storage.title;
+            const first = state.doc.firstChild;
+            const repeatsTitle = Boolean(
+              first &&
+                title.trim() &&
+                first.type.name === "heading" &&
+                Number(first.attrs.level ?? 1) === 1 &&
+                first.textContent.trim().toLocaleLowerCase() === title.trim().toLocaleLowerCase(),
+            );
+            const position = repeatsTitle && first ? first.nodeSize : 0;
+            return DecorationSet.create(state.doc, [
+              Decoration.widget(position, () => tocPreviewElement(state.doc, title), {
+                side: position === 0 ? -1 : 1,
+              }),
+              Decoration.widget(position, tocPageBreakElement, { side: 1 }),
+            ]);
+          },
+        },
+      }),
+    ];
   },
 
   addNodeView() {
