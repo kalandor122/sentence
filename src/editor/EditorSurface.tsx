@@ -25,10 +25,12 @@ import { focusAfterEditor } from "./focus";
 import { changeIndent, nestListItem } from "./indent";
 import { splitListItemKeepingSublist, splitOrderedListOnEmptyItem, toggleList } from "./listToggle";
 import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
+import { PageGaps, setPageGaps } from "./pageGaps";
 import {
   pageBreakFill,
   pageCountFromBottom,
   pageGeometry,
+  pageLineGaps,
 } from "./pagination";
 import { RevisionMarks, setRevisionMarks } from "./revisions";
 import {
@@ -147,6 +149,83 @@ function offsetWithin(element: HTMLElement, ancestor: HTMLElement): number {
   return top;
 }
 
+interface TextLine {
+  top: number;
+  bottom: number;
+  left: number;
+  viewportTop: number;
+  viewportHeight: number;
+  node: Text;
+  fragment: DOMRect;
+}
+
+// Text line boxes inside a block, relative to its border box in unscaled layout
+// pixels. Each line remembers the text node and DOM rect it starts with, so the
+// start can be mapped back to a document position even when it is scrolled out
+// of the viewport.
+function textLines(block: HTMLElement, zoom: number): TextLine[] {
+  const blockRect = block.getBoundingClientRect();
+  const fragments: Array<{ rect: DOMRect; node: Text }> = [];
+  const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+  while (walker.nextNode()) {
+    const node = walker.currentNode as Text;
+    if (!node.nodeValue?.trim()) continue;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    for (const rect of Array.from(range.getClientRects())) {
+      if (rect.width < 1 || rect.height < 1) continue;
+      fragments.push({ rect, node });
+    }
+  }
+  fragments.sort((a, b) => a.rect.top - b.rect.top || a.rect.left - b.rect.left);
+  const lines: TextLine[] = [];
+  for (const { rect, node } of fragments) {
+    const line = lines[lines.length - 1];
+    if (line && Math.abs(rect.top - line.viewportTop) < Math.max(2, line.viewportHeight / 2)) {
+      line.bottom = (Math.max(rect.bottom, line.viewportTop + line.viewportHeight) - blockRect.top) / zoom;
+      line.viewportHeight = Math.max(rect.bottom - line.viewportTop, line.viewportHeight);
+      if (rect.left < line.left) {
+        line.left = rect.left;
+        line.node = node;
+        line.fragment = rect;
+      }
+      continue;
+    }
+    lines.push({
+      top: (rect.top - blockRect.top) / zoom,
+      bottom: (rect.bottom - blockRect.top) / zoom,
+      left: rect.left,
+      viewportTop: rect.top,
+      viewportHeight: rect.height,
+      node,
+      fragment: rect,
+    });
+  }
+  return lines;
+}
+
+// The document position at the start of a line, used to put a page gap before
+// the first character that belongs on the next page.
+function lineStartPosition(view: Editor["view"], line: TextLine): number | null {
+  const node = line.node;
+  let low = 0;
+  let high = node.length;
+  while (low < high) {
+    const middle = (low + high) >> 1;
+    const range = document.createRange();
+    range.setStart(node, middle);
+    range.setEnd(node, middle + 1);
+    const rect = range.getBoundingClientRect();
+    if (rect.top < line.fragment.top - 1) low = middle + 1;
+    else high = middle;
+  }
+  try {
+    return view.posAtDOM(node, low);
+  } catch {
+    return null;
+  }
+}
+
 export default function EditorSurface({
   document,
   settings,
@@ -216,6 +295,7 @@ export default function EditorSurface({
       CrossReference,
       HeadingLabel,
       PageBreak,
+      PageGaps,
       TableOfContents,
       CommentMark,
       FindHighlight,
@@ -363,6 +443,7 @@ export default function EditorSurface({
       return;
     }
     let frame = 0;
+    let gapsApplied = false;
     // Blocks nudged down when they do not fit inside a page's text area, so no
     // line or heading is left in the top or bottom margin. The rules live in a
     // style element because ProseMirror re-renders text nodes and would drop
@@ -415,14 +496,56 @@ export default function EditorSurface({
       // Top of the text area on the page after the one that holds `top`.
       const nextPageTopMargin = (top: number) =>
         (Math.floor(Math.max(0, top) / geometry.height) + 1) * geometry.height + geometry.margin;
+      // A block taller than one page is split at the page edges. Inserting a
+      // gap between two lines keeps the model as one paragraph while moving the
+      // rest of the text to the next page's top margin.
+      const planGaps = () => {
+        const sheetRect = sheet.getBoundingClientRect();
+        const zoom = sheet.offsetHeight ? sheetRect.height / sheet.offsetHeight : 1;
+        const gaps: Array<{ pos: number; height: number }> = [];
+        let gapShift = 0;
+        for (const block of blocks) {
+          if (!(block instanceof HTMLElement) || block.hasAttribute("data-page-break")) continue;
+          if (!/^(P|H[1-3])$/.test(block.tagName)) continue;
+          if (block.offsetHeight <= geometry.contentHeight) continue;
+          const lines = textLines(block, zoom);
+          const top = offsetWithin(block, sheet);
+          const planned = pageLineGaps(
+            lines.map((line) => ({
+              top: line.top + top + gapShift,
+              bottom: line.bottom + top + gapShift,
+            })),
+            top + gapShift,
+            top + block.offsetHeight + gapShift,
+            geometry,
+          );
+          for (const gap of planned) {
+            const pos = lineStartPosition(editor.view, lines[gap.line]);
+            if (pos === null) continue;
+            gaps.push({ pos, height: gap.height });
+          }
+          gapShift += planned.reduce((total, gap) => total + gap.height, 0);
+        }
+        return gaps;
+      };
       for (let pass = 0; pass <= blocks.length * 2 + 8; pass += 1) {
+        // Plan from the unsplit layout, then apply the gaps before checking the
+        // blocks that still move as a whole.
+        if (gapsApplied) {
+          setPageGaps(editor.view, []);
+          gapsApplied = false;
+        }
+        const gaps = planGaps();
+        if (gaps.length > 0) {
+          setPageGaps(editor.view, gaps);
+          gapsApplied = true;
+        }
         let moved = false;
         for (let index = 0; index < blocks.length; index += 1) {
           const block = blocks[index];
           if (!(block instanceof HTMLElement) || block.hasAttribute("data-page-break")) continue;
           const box = contentBox(block);
-          // A block taller than a whole text area cannot be moved without
-          // splitting the document, so it is left alone.
+          // Tall blocks are handled by their line gaps, not by moving them.
           if (box.height > geometry.contentHeight) continue;
           // Blocks move whole: a block either fits inside the current page's
           // text area or starts at the top margin of the next page, so no line
