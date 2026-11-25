@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { isDesktop } from "./tauri";
 import type { BibliographyDraft, BibliographyField } from "./bibliography";
 
 /** One row from Zotero's local API, already flattened in Rust. */
@@ -83,13 +84,12 @@ export function zoteroItemToDraft(item: ZoteroItem, taken: string[] = []): Bibli
 }
 
 export async function zoteroSearch(query: string, limit = 25): Promise<ZoteroItem[]> {
+  if (!isDesktop) {
+    throw new Error("Zotero search talks to your local Zotero, which needs the desktop app.");
+  }
   try {
     return await invoke<ZoteroItem[]>("zotero_search", { query, limit });
   } catch (error) {
-    const message = typeof error === "string" ? error : (error as Error)?.message;
-    if (/not allowed|__TAURI/i.test(String(message))) {
-      throw new Error("Zotero search only works in the desktop app.");
-    }
-    throw new Error(String(message));
+    throw new Error(typeof error === "string" ? error : String((error as Error)?.message ?? error));
   }
 }
