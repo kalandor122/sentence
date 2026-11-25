@@ -26,6 +26,41 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("writes a non-breaking space as ~ and keeps a typed tilde visible", () => {
+    expect(escapeLatex("Eq.\u00a01")).toBe("Eq.~1");
+    expect(escapeLatex("Eq.\u00a01 ~")).toBe("Eq.~1 \\textasciitilde{}");
+  });
+
+  it("keeps LaTeX's non-breaking space through a source round trip", () => {
+    const latex = [
+      "\\documentclass{article}",
+      "\\begin{document}",
+      "ZXTILDE see Eq.~1 and Fig.~2.",
+      "\\end{document}",
+    ].join("\n");
+    const { document } = latexToDocument(latex, DEFAULT_SETTINGS);
+    expect(documentPlainText(document)).toBe("ZXTILDE see Eq.\u00a01 and Fig.\u00a02.");
+    const exported = documentToLatex(document, DEFAULT_SETTINGS);
+    expect(exported).toContain("ZXTILDE see Eq.~1 and Fig.~2.");
+    expect(exported).not.toContain("\\textasciitilde{}");
+  });
+
+  it("keeps a tilde in a link URL part of the address", () => {
+    const { document } = latexToDocument(
+      [
+        "\\documentclass{article}",
+        "\\begin{document}",
+        "\\href{https://example.org/~user}{profile}",
+        "\\end{document}",
+      ].join("\n"),
+      DEFAULT_SETTINGS,
+    );
+    expect(document.content[0]?.content?.[0]?.marks).toContainEqual({
+      type: "link",
+      attrs: { href: "https://example.org/~user" },
+    });
+  });
+
   it("refuses citation keys and labels that would break their LaTeX command", () => {
     expect(isLatexReferenceTarget("einstein1905")).toBe(true);
     expect(isLatexReferenceTarget("fig:architecture")).toBe(true);

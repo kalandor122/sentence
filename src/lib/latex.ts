@@ -28,8 +28,13 @@ const SPECIAL_CHARACTERS: Record<string, string> = {
   "^": "\\textasciicircum{}",
 };
 
+// A non-breaking space is a typed `~` in LaTeX; a visible tilde stays the
+// escaped `\textasciitilde{}`. The escape pass runs first so the `~` it inserts
+// for a non-breaking space is not escaped again.
 export function escapeLatex(value: string): string {
-  return value.replace(/[\\&%$#_{}~^]/g, (character) => SPECIAL_CHARACTERS[character]);
+  return value
+    .replace(/[\\&%$#_{}~^]/g, (character) => SPECIAL_CHARACTERS[character])
+    .replace(/\u00a0/g, "~");
 }
 
 // Citation keys and cross-reference labels are written verbatim into a `{...}`
@@ -860,12 +865,19 @@ function expandPreambleMacros(source: string, macros: Map<string, string>): stri
     .join("");
 }
 
-function decodeLatexText(value: string): string {
+function decodeLatexVerbatim(value: string): string {
   return value
     .replace(/\\textbackslash\{\}/g, "\\")
     .replace(/\\textasciitilde\{\}/g, "~")
     .replace(/\\textasciicircum\{\}/g, "^")
     .replace(/\\([&%$#_{}])/g, "$1");
+}
+
+// Running text keeps LaTeX's `~`, which is a non-breaking space and must not be
+// shown as a tilde. URLs and file names are different: a `~` there is part of
+// the address, so those arguments are decoded verbatim instead.
+function decodeLatexText(value: string): string {
+  return decodeLatexVerbatim(value.replace(/~/g, "\u00a0"));
 }
 
 function commandArgument(source: string, command: string): string | null {
@@ -1021,7 +1033,7 @@ function parseInline(source: string): InlineParseResult {
         flush();
         const linkMark: DocumentMark = {
           type: "link",
-          attrs: { href: decodeLatexText(source.slice(urlOpen + 1, urlClose)) },
+          attrs: { href: decodeLatexVerbatim(source.slice(urlOpen + 1, urlClose)) },
         };
         for (const node of parseInline(source.slice(textOpen + 1, textClose)).content) {
           node.marks = [...(node.marks ?? []), linkMark];
@@ -1088,7 +1100,7 @@ function parseInline(source: string): InlineParseResult {
     const inlineImageMatch = remainder.match(/^\\includegraphics(?:\[([^\]]*)\])?\{([^}]*)\}/);
     if (inlineImageMatch) {
       flush();
-      const fileName = decodeLatexText(inlineImageMatch[2]);
+      const fileName = decodeLatexVerbatim(inlineImageMatch[2]);
       let cursor = index + inlineImageMatch[0].length;
       let alt = "";
       const altComment = source.slice(cursor).match(/^[ \t]*% Sentence alt: ([^\r\n]*)\r?\n?/);
@@ -1878,7 +1890,7 @@ export function latexToDocument(
       content.push({
         type: "image",
         attrs: {
-          src: decodeLatexText(image[1]),
+          src: decodeLatexVerbatim(image[1]),
           // LaTeX has one text for a figure: the caption. Show it in the
           // editor and keep it as the alt text for the HTML and Markdown exports.
           alt: altText || captionText,
