@@ -2031,6 +2031,44 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("keeps packages and macros typed into the preamble through a sync", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "Before." }] }],
+    };
+    const base = documentToLatex(document, settings);
+    const edited = base
+      .replace(
+        "\\begin{document}",
+        "\\usepackage{amsthm}\n\\newcommand{\\ZXMACRO}{ZXMACRO EXPANDS}\n\\begin{document}",
+      )
+      .replace(
+        "\\end{document}",
+        "\nZXPREAMBLE use \\ZXMACRO{} here.\n\\end{document}",
+      );
+
+    const parsed = latexToDocument(edited, settings);
+    // The macro call becomes the text it prints instead of an escaped literal.
+    expect(documentPlainText(parsed.document)).toContain(
+      "ZXPREAMBLE use ZXMACRO EXPANDS here.",
+    );
+    expect(parsed.settings.preamble).toContain("\\usepackage{amsthm}");
+    expect(parsed.settings.preamble).toContain(
+      "\\newcommand{\\ZXMACRO}{ZXMACRO EXPANDS}",
+    );
+
+    const regenerated = documentToLatex(parsed.document, parsed.settings);
+    const preamble = regenerated.split("\\begin{document}")[0];
+    expect(preamble).toContain("\\usepackage{amsthm}");
+    expect(preamble).toContain("\\newcommand{\\ZXMACRO}{ZXMACRO EXPANDS}");
+    expect(regenerated).not.toContain("\\textbackslash{}ZXMACRO");
+
+    // A second round trip neither drops the lines nor duplicates them.
+    const again = latexToDocument(regenerated, parsed.settings);
+    expect(again.settings.preamble).toBe(parsed.settings.preamble);
+    expect(documentToLatex(again.document, again.settings)).toBe(regenerated);
+  });
+
   it("keeps a renderable source when a document is synchronized from LaTeX", () => {
     const previous: SentenceDocument = {
       type: "doc",

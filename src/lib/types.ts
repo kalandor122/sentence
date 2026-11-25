@@ -49,6 +49,10 @@ export interface ProjectSettings {
   footer: string;
   lineNumbers: boolean;
   spellcheck: boolean;
+  // Preamble lines the visual model does not own (packages, macro and
+  // environment definitions typed in the LaTeX source). Kept verbatim so a
+  // source round trip neither drops them nor has to understand them.
+  preamble: string;
 }
 
 export interface CommentThread {
