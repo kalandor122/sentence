@@ -98,7 +98,12 @@ export default function InputDialog({
             aria-describedby={error ? "input-dialog-error" : undefined}
             onChange={(event) => change(event.target.value)}
             onKeyDown={(event) => {
-              if (event.key === "Enter") submit();
+              if (event.key === "Enter") {
+                // Keep the keypress from reaching the editor once the dialog
+                // closes and focus returns; it would split the block there.
+                event.preventDefault();
+                submit();
+              }
             }}
           />
         )}
