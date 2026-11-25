@@ -50,6 +50,10 @@ import type {
   SentenceDocument,
 } from "../lib/types";
 
+// Inline atoms that have no in-place text: clicking one selects the whole node,
+// so typing must land beside it instead of replacing it.
+const PRESERVED_ON_TYPING = new Set(["footnote", "citation", "crossReference"]);
+
 interface EditorSurfaceProps {
   document: SentenceDocument;
   settings: ProjectSettings;
@@ -344,13 +348,13 @@ export default function EditorSurface({
         editFootnoteRef.current(typeof node.attrs.text === "string" ? node.attrs.text : "", position);
         return true;
       },
-      // A footnote marker is an atom, so clicking it selects the whole node and
-      // the next keystroke would replace the note with body text. Typing while
-      // the marker is selected lands beside it instead; removing the note stays
-      // an explicit Backspace/Delete.
+      // A citation, cross-reference or footnote marker is an atom, so clicking
+      // it selects the whole node and the next keystroke would replace it with
+      // body text. Typing while the atom is selected lands beside it instead;
+      // removing the reference stays an explicit Backspace/Delete.
       handleTextInput(view, _from, _to, text) {
         const { selection } = view.state;
-        if (!(selection instanceof NodeSelection) || selection.node.type.name !== "footnote") return false;
+        if (!(selection instanceof NodeSelection) || !PRESERVED_ON_TYPING.has(selection.node.type.name)) return false;
         const position = selection.to;
         const transaction = view.state.tr.insertText(text, position).scrollIntoView();
         transaction.setSelection(TextSelection.create(transaction.doc, position + text.length));
