@@ -724,3 +724,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T14:08:08Z START qa-245 on qa/qa-245-valid-latex-environments-outside-the-sup: Valid LaTeX environments outside the supported subset are shown literally and then escaped
 2026-11-25T14:12:52Z PUSHED main
 2026-11-25T14:12:52Z DONE qa-245 (tsc -b, npm test, smoke all green)
+2026-11-25T14:13:30Z START qa-227 on qa/qa-227-both-bulleted-and-numbered-list-buttons: Both Bulleted and Numbered list buttons show as active in a mixed nested list
