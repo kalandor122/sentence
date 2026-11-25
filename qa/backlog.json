@@ -2824,8 +2824,9 @@
       "hint": "Repro: Open the demo document and press Ctrl+End. Click Insert > Image and supply a 40x80 px portrait PNG (the browser build feeds the hidden file input; cancelling the picker is clean). The figure renders 42x82 px on the page. Click View > LaTeX: the source contains \\includegraphics[width=0.8\\linewidth]{assets/images/<name>.png}. For the inline case, type 'SPLITLEFT SPLITRIGHT', place the caret after 'SPLITLEFT' and insert the same PNG: the image renders 12x22 px inside the sentence, yet the source again uses width=0.8\\linewidth. An image inserted into a table cell (cell 303 px wide) is exported with the same width=0.8\\linewidth inside the tabular.\nActual: The generated LaTeX always requests width=0.8\\linewidth (src/lib/latex.ts imageWidthArgument falls back to 0.8 when attrs.width is 0) and the editor exposes no width control. A 40x80 image shown at 42x82 px is exported ~361 pt wide and ~722 pt tall; compiling that exported source with the bundled Tectonic prints 'LaTeX Warning: Float too large for page by 24.69325pt', pushes the figure to its own page, and the image fills the whole text block and reaches into the footer. The mid-sentence image (12x22 px, max-height 1.5em in the editor) becomes the same 0.8\\linewidth graphic and the compiled document reports 'Overfull \\hbox (56.59232pt too wide)' on that line. Probe: qa/probes/insert-media.mjs scenarios 'image', 'image-inline-and-heading', 'table-cell'.",
       "source": "explore:insert-media:every inserted image exports at 80% of the line width regardless of its natural size, so the pdf does not match the page",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T00:52:24Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T00:52:24Z",
+      "lastAttemptAt": "2026-11-25T00:52:24Z"
     },
     {
       "id": "qa-179",

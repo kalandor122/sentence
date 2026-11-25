@@ -1139,8 +1139,42 @@ describe("LaTeX generation", () => {
     const latex = documentToLatex(document, settings);
     expect(latex).not.toContain("\\begin{figure}");
     expect(latex).toContain(
-      "Cell\\par \\includegraphics[width=0.8\\linewidth]{assets/images/cell.png}% Sentence alt: cell image",
+      "Cell\\par \\includegraphics{assets/images/cell.png}% Sentence alt: cell image",
     );
+  });
+
+  it("sizes a measured image inside a table cell like the block it is in the page", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [
+                    {
+                      type: "image",
+                      attrs: {
+                        path: "assets/images/cell.png",
+                        naturalWidth: 120,
+                        naturalHeight: 60,
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("\\includegraphics[width=90.00bp]{assets/images/cell.png}");
+    expect(latex).not.toContain("width=0.8\\linewidth");
   });
 
   it("round-trips a table caption through LaTeX", () => {
@@ -1519,6 +1553,45 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(parsed.document, settings)).toBe(latex);
   });
 
+  it("exports an inserted image at the size the page shows", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "image",
+          attrs: {
+            path: "assets/images/tiny.png",
+            naturalWidth: 40,
+            naturalHeight: 80,
+          },
+        },
+      ],
+    };
+    // 40 CSS pixels at 96 dpi are 30bp: the size the editor renders.
+    expect(documentToLatex(document, settings)).toContain(
+      "\\includegraphics[width=30.00bp]{assets/images/tiny.png}",
+    );
+  });
+
+  it("caps an oversized image to the text block and the page height", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "image",
+          attrs: {
+            path: "assets/images/wide.png",
+            naturalWidth: 2400,
+            naturalHeight: 1600,
+          },
+        },
+      ],
+    };
+    expect(documentToLatex(document, settings)).toContain(
+      "\\includegraphics[width=\\linewidth,height=\\textheight,keepaspectratio]{assets/images/wide.png}",
+    );
+  });
+
   it("keeps an inline image inside its paragraph", () => {
     const document: SentenceDocument = {
       type: "doc",
@@ -1543,7 +1616,7 @@ describe("LaTeX generation", () => {
     const latex = documentToLatex(document, settings);
     expect(latex).not.toContain("\\begin{figure}");
     expect(latex).toContain(
-      "SPLIT BEFORE.\\includegraphics[width=0.8\\linewidth]{assets/images/mid-paragraph.png}% Sentence alt: mid paragraph.png\n SPLIT AFTER.",
+      "SPLIT BEFORE.\\includegraphics[height=1.5em]{assets/images/mid-paragraph.png}% Sentence alt: mid paragraph.png\n SPLIT AFTER.",
     );
 
     const parsed = latexToDocument(latex, DEFAULT_SETTINGS);
@@ -1556,6 +1629,52 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(parsed.document, settings)).toBe(latex);
   });
 
+  it("sizes an inline image to the 1.5em line height it is drawn at", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "MID " },
+            {
+              type: "inlineImage",
+              attrs: {
+                path: "assets/images/mid.png",
+                alt: "mid.png",
+                naturalWidth: 40,
+                naturalHeight: 80,
+              },
+            },
+            { type: "text", text: " MID" },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain(
+      "MID \\includegraphics[width=\\linewidth,height=1.5em,keepaspectratio]{assets/images/mid.png}% Sentence alt: mid.png\n MID",
+    );
+
+    const small: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "inlineImage",
+              attrs: { path: "assets/images/icon.png", naturalWidth: 10, naturalHeight: 10 },
+            },
+          ],
+        },
+      ],
+    };
+    expect(documentToLatex(small, settings)).toContain(
+      "\\includegraphics[width=7.50bp]{assets/images/icon.png}",
+    );
+  });
+
   it("keeps a renderable source when a document is synchronized from LaTeX", () => {
     const previous: SentenceDocument = {
       type: "doc",
@@ -1566,6 +1685,8 @@ describe("LaTeX generation", () => {
             src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==",
             path: "assets/images/qa-image--1.png",
             alt: "qa image #1.png",
+            naturalWidth: 120,
+            naturalHeight: 60,
           },
         },
         {
@@ -1591,6 +1712,10 @@ describe("LaTeX generation", () => {
 
     const restored = restoreImageSources(parsed.document, previous);
     expect(restored.content[0].attrs?.src).toBe("data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==");
+    // The measure is not in the LaTeX, so the sync has to carry it over or the
+    // figure would print at a different size after an apply.
+    expect(restored.content[0].attrs?.naturalWidth).toBe(120);
+    expect(restored.content[0].attrs?.naturalHeight).toBe(60);
     expect(restored.content[1].content?.[1].attrs?.src).toBe(
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==",
     );
