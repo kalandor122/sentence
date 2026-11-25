@@ -611,3 +611,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T06:20:07Z PUSHED main
 2026-11-25T06:20:07Z DONE qa-205 (tsc -b, npm test, smoke all green)
 2026-11-25T06:33:06Z EXPLORE persistence: 2 new items, agent exit 0
+2026-11-25T06:33:24Z START qa-210 on qa/qa-210-text-typed-after-end-document-in-the-lat: Text typed after \end{document} in the LaTeX pane is silently discarded while the app reports it saved

@@ -341,6 +341,35 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("rejects text after \\end{document} instead of discarding it", () => {
+    const source = [
+      "\\begin{document}",
+      "Body text.",
+      "\\end{document}",
+      "",
+      "trailing paragraph tail-1",
+    ].join("\n");
+    expect(() => latexToDocument(source, DEFAULT_SETTINGS)).toThrow(
+      'Invalid LaTeX: text after \\end{document} is not part of the document ("trailing paragraph tail-1"). Move it before \\end{document}.',
+    );
+    const sameLine = "\\begin{document}\nBody.\n\\end{document} ZXTRAILINGTAIL";
+    expect(() => latexToDocument(sameLine, DEFAULT_SETTINGS)).toThrow(
+      'text after \\end{document}',
+    );
+  });
+
+  it("accepts blank lines and comments after \\end{document}", () => {
+    const source = [
+      "\\begin{document}",
+      "Body text.",
+      "\\end{document}",
+      "",
+      "% End of document",
+      "",
+    ].join("\n");
+    expect(() => latexToDocument(source, DEFAULT_SETTINGS)).not.toThrow();
+  });
+
   it("rejects an unbalanced table environment instead of storing it as text", () => {
     const source = [
       "\\begin{document}",
