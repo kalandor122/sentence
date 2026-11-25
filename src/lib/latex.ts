@@ -1,3 +1,4 @@
+import { pageGeometry } from "../editor/pagination";
 import type {
   DocumentMark,
   DocumentNode,
@@ -88,15 +89,26 @@ export function restoreImageSources(
   document: SentenceDocument,
   previous: SentenceDocument,
 ): SentenceDocument {
-  const sources = new Map<string, { src: string; path: string | null }>();
+  const sources = new Map<
+    string,
+    { src: string; path: string | null; naturalWidth: number; naturalHeight: number }
+  >();
   const collect = (nodes: DocumentNode[] | undefined) => {
     for (const node of nodes ?? []) {
       if (node.type === "image" || node.type === "inlineImage") {
         const src = attribute(node, "src");
         const path = attribute(node, "path");
         if (src) {
+          const size = naturalImageSize(node);
           for (const key of [path, src]) {
-            if (key) sources.set(key, { src, path });
+            if (key) {
+              sources.set(key, {
+                src,
+                path,
+                naturalWidth: size?.width ?? 0,
+                naturalHeight: size?.height ?? 0,
+              });
+            }
           }
         }
       }
@@ -118,6 +130,12 @@ export function restoreImageSources(
           ...node.attrs,
           src: source.src,
           ...(source.path ? { path: source.path } : {}),
+          // The size measured when the file was inserted is not in the LaTeX,
+          // so a source sync has to carry it over or the figure would be
+          // re-exported at a different size than the page shows.
+          ...(source.naturalWidth > 0 && source.naturalHeight > 0
+            ? { naturalWidth: source.naturalWidth, naturalHeight: source.naturalHeight }
+            : {}),
         },
       };
     });
@@ -221,7 +239,7 @@ function applyMarks(text: string, marks: DocumentMark[] | undefined): string {
   return rendered;
 }
 
-function inlineContent(nodes: DocumentNode[] | undefined): string {
+function inlineContent(nodes: DocumentNode[] | undefined, settings: ProjectSettings): string {
   return (nodes ?? [])
     .map((node) => {
       if (node.type === "text") {
@@ -243,20 +261,24 @@ function inlineContent(nodes: DocumentNode[] | undefined): string {
         return `\\ref{${latexReferenceTarget(attribute(node, "label") ?? "")}}`;
       }
       if (node.type === "inlineImage") {
-        return inlineImageToLatex(node);
+        return inlineImageToLatex(node, settings, true);
       }
-      return inlineContent(node.content);
+      return inlineContent(node.content, settings);
     })
     .join("");
 }
 
 // Inline images have no caption and no float, so they also work inside a
 // tabular cell where a figure environment would either break or escape it.
-function inlineImageToLatex(node: DocumentNode): string {
+// A block image moved into a cell keeps the figure's own sizing (`inline` off).
+function inlineImageToLatex(node: DocumentNode, settings: ProjectSettings, inline: boolean): string {
   const src = attribute(node, "path") ?? attribute(node, "src") ?? "";
   const alt = attribute(node, "alt") ?? "";
   const filename = imageSourcePath(src, alt);
-  const image = `\\includegraphics[${imageWidthArgument(node)}]{${escapeLatex(filename)}}`;
+  const options = imageOptions(node, settings, inline) ?? (inline ? "height=1.5em" : null);
+  const image = options
+    ? `\\includegraphics[${options}]{${escapeLatex(filename)}}`
+    : `\\includegraphics{${escapeLatex(filename)}}`;
   // The alt text is a comment so it survives source round trips without
   // adding a caption or a paragraph break to the surrounding text.
   return alt ? `${image}% Sentence alt: ${metadataComment(alt)}\n` : image;
@@ -269,19 +291,27 @@ function cellAlign(cell: DocumentNode): LatexColumnAlign {
   return align === "center" ? "c" : align === "right" ? "r" : "l";
 }
 
-function tableCellToLatex(cell: DocumentNode, columnAlign: LatexColumnAlign): string {
+function tableCellToLatex(
+  cell: DocumentNode,
+  columnAlign: LatexColumnAlign,
+  settings: ProjectSettings,
+): string {
   const children = cell.content ?? [];
   // A figure cannot float inside a tabular cell, so a block image is written as
   // an inline graphic that stays in its own cell.
   const body = children
-    .map((child) => (child.type === "image" ? inlineImageToLatex(child) : inlineContent([child])))
+    .map((child) =>
+      child.type === "image"
+        ? inlineImageToLatex(child, settings, false)
+        : inlineContent([child], settings),
+    )
     .filter(Boolean)
     .join("\\par ");
   const align = cellAlign(cell);
   return align === columnAlign ? body : `\\multicolumn{1}{${align}}{${body}}`;
 }
 
-function tableToLatex(node: DocumentNode): string {
+function tableToLatex(node: DocumentNode, settings: ProjectSettings): string {
   const rows = (node.content ?? [])
     .filter((row) => row.type === "tableRow")
     .map((row) => (row.content ?? []).filter((cell) => cell.type === "tableCell" || cell.type === "tableHeader"));
@@ -290,7 +320,7 @@ function tableToLatex(node: DocumentNode): string {
     rows[0]?.[index] ? cellAlign(rows[0][index]) : "l",
   );
   const body = rows
-    .map((row) => `${row.map((cell, index) => tableCellToLatex(cell, columnAligns[index] ?? "l")).join(" & ")} \\\\`)
+    .map((row) => `${row.map((cell, index) => tableCellToLatex(cell, columnAligns[index] ?? "l", settings)).join(" & ")} \\\\`)
     .join("\n");
   const caption = attribute(node, "caption");
   // A header row changes the first row's cell type, which LaTeX itself cannot
@@ -326,10 +356,10 @@ function orderedListStart(node: DocumentNode): number | null {
   return Number.isSafeInteger(start) && start > 1 ? start : null;
 }
 
-function blockToLatex(node: DocumentNode, enumDepth = 0): string {
+function blockToLatex(node: DocumentNode, settings: ProjectSettings, enumDepth = 0): string {
   switch (node.type) {
     case "paragraph":
-      return wrapAlignment(node, inlineContent(node.content));
+      return wrapAlignment(node, inlineContent(node.content, settings));
     case "heading": {
       const level = Number(node.attrs?.level ?? 1);
       const command = level <= 1 ? "section" : level === 2 ? "subsection" : "subsubsection";
@@ -339,13 +369,13 @@ function blockToLatex(node: DocumentNode, enumDepth = 0): string {
       const label = latexReferenceTarget(attribute(node, "label") ?? "");
       return wrapAlignment(
         node,
-        `\\${command}${star}{${inlineContent(node.content)}}${label ? `\\label{${label}}` : ""}`,
+        `\\${command}${star}{${inlineContent(node.content, settings)}}${label ? `\\label{${label}}` : ""}`,
       );
     }
     case "bulletList":
       return [
         "\\begin{itemize}",
-        ...(node.content ?? []).map((item) => listItemToLatex(item, enumDepth)),
+        ...(node.content ?? []).map((item) => listItemToLatex(item, settings, enumDepth)),
         "\\end{itemize}",
       ].join("\n");
     case "orderedList": {
@@ -354,24 +384,24 @@ function blockToLatex(node: DocumentNode, enumDepth = 0): string {
       return [
         "\\begin{enumerate}",
         ...(start === null ? [] : [`\\setcounter{${counter}}{${start - 1}}`]),
-        ...(node.content ?? []).map((item) => listItemToLatex(item, enumDepth + 1)),
+        ...(node.content ?? []).map((item) => listItemToLatex(item, settings, enumDepth + 1)),
         "\\end{enumerate}",
       ].join("\n");
     }
     case "blockquote":
       return [
         "\\begin{quote}",
-        ...(node.content ?? []).map((child) => blockToLatex(child, enumDepth)),
+        ...(node.content ?? []).map((child) => blockToLatex(child, settings, enumDepth)),
         "\\end{quote}",
       ].join("\n");
     case "codeBlock":
-      return `\\begin{verbatim}\n${inlineContent(node.content)}\n\\end{verbatim}`;
+      return `\\begin{verbatim}\n${inlineContent(node.content, settings)}\n\\end{verbatim}`;
     case "horizontalRule":
       return "\\noindent\\rule{\\linewidth}{0.4pt}";
     case "image":
-      return imageToLatex(node);
+      return imageToLatex(node, settings);
     case "table":
-      return tableToLatex(node);
+      return tableToLatex(node, settings);
     case "mathBlock": {
       const environment = node.attrs?.numbered === true ? "equation" : "equation*";
       return `\\begin{${environment}}\n${attribute(node, "latex") ?? ""}\n\\end{${environment}}`;
@@ -384,36 +414,66 @@ function blockToLatex(node: DocumentNode, enumDepth = 0): string {
       return applyMarks(node.text ?? "", node.marks);
     default:
       return (node.content ?? [])
-        .map((child) => blockToLatex(child, enumDepth))
+        .map((child) => blockToLatex(child, settings, enumDepth))
         .filter(Boolean)
         .join("\n\n");
   }
 }
 
-function listItemToLatex(node: DocumentNode, enumDepth: number): string {
+function listItemToLatex(node: DocumentNode, settings: ProjectSettings, enumDepth: number): string {
   const content = (node.content ?? [])
-    .map((child) => blockToLatex(child, enumDepth))
+    .map((child) => blockToLatex(child, settings, enumDepth))
     .filter(Boolean)
     .join("\n");
   return `\\item ${content}`;
 }
 
-function imageWidthArgument(node: DocumentNode): string {
-  const width = Number(node.attrs?.width ?? 0);
-  return width > 0 ? `width=${(width / 100).toFixed(2)}\\linewidth` : "width=0.8\\linewidth";
+function naturalImageSize(node: DocumentNode): { width: number; height: number } | null {
+  const width = Number(node.attrs?.naturalWidth ?? 0);
+  const height = Number(node.attrs?.naturalHeight ?? 0);
+  return width > 0 && height > 0 ? { width, height } : null;
 }
 
-function imageToLatex(node: DocumentNode): string {
+// The editor draws images at their own size, caps a figure at the text block and
+// an inline image at 1.5em (styles.css). A graphic that already fits is written
+// in `bp`, which is this app's CSS pixel at 96 dpi, so the PDF prints it at the
+// size the page shows. A graphic that does not fit is pinned to the matching
+// LaTeX length instead, which also keeps a figure from growing past the page.
+const BP_PER_CSS_PX = 0.75;
+
+function imageOptions(
+  node: DocumentNode,
+  settings: ProjectSettings,
+  inline: boolean,
+): string | null {
+  const size = naturalImageSize(node);
+  if (!size) return null;
+  const geometry = pageGeometry(settings);
+  const maxWidth = geometry.width - 2 * geometry.margin;
+  const maxHeight = inline ? 1.5 * geometry.fontSize : geometry.contentHeight;
+  if (size.width <= maxWidth && size.height <= maxHeight) {
+    return `width=${(size.width * BP_PER_CSS_PX).toFixed(2)}bp`;
+  }
+  return inline
+    ? "width=\\linewidth,height=1.5em,keepaspectratio"
+    : "width=\\linewidth,height=\\textheight,keepaspectratio";
+}
+
+function imageToLatex(node: DocumentNode, settings: ProjectSettings): string {
   const src = attribute(node, "path") ?? attribute(node, "src") ?? "";
   const alt = attribute(node, "alt") ?? "";
   // Only an explicit caption becomes \caption. Alt text names the image but is
   // not a caption the user ever wrote, so it must not reach the PDF.
   const caption = attribute(node, "caption") ?? "";
   const filename = imageSourcePath(src, alt);
+  const options = imageOptions(node, settings, false);
+  const graphics = options
+    ? `\\includegraphics[${options}]{${escapeLatex(filename)}}`
+    : `\\includegraphics{${escapeLatex(filename)}}`;
   return [
     "\\begin{figure}[htbp]",
     "\\centering",
-    `\\includegraphics[${imageWidthArgument(node)}]{${escapeLatex(filename)}}`,
+    graphics,
     caption ? `\\caption{${escapeLatex(caption)}}` : "",
     "\\end{figure}",
   ]
@@ -475,7 +535,7 @@ export function documentToLatex(
     plainText(firstNode.content).toLocaleLowerCase() ===
       settings.title.trim().toLocaleLowerCase();
   const body = (repeatsTitle ? content.slice(1) : content)
-    .map((node) => blockToLatex(node))
+    .map((node) => blockToLatex(node, settings))
     .filter((part) => part.trim().length > 0)
     .join("\n\n");
   const header = settings.header.trim()

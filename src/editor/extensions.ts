@@ -61,6 +61,20 @@ export const ProjectImage = Image.extend({
         // an attribute on the <img>.
         renderHTML: () => ({}),
       },
+      // The file's own pixel size, measured when it is inserted. The LaTeX
+      // export prints the image at that size instead of guessing a width.
+      naturalWidth: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("data-natural-width"),
+        renderHTML: (attributes) =>
+          attributes.naturalWidth ? { "data-natural-width": attributes.naturalWidth } : {},
+      },
+      naturalHeight: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("data-natural-height"),
+        renderHTML: (attributes) =>
+          attributes.naturalHeight ? { "data-natural-height": attributes.naturalHeight } : {},
+      },
     };
   },
 

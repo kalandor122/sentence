@@ -424,6 +424,22 @@ function insertImage(editor: Editor | null, attrs: Record<string, string>) {
   insertBlockContent(editor, { type: "image", attrs });
 }
 
+// The image export writes a graphic at its own size, so the inserted node has
+// to carry the pixel size the source file actually has.
+function measureImage(src: string): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    const image = new window.Image();
+    image.onload = () =>
+      resolve(
+        image.naturalWidth > 0 && image.naturalHeight > 0
+          ? { width: image.naturalWidth, height: image.naturalHeight }
+          : null,
+      );
+    image.onerror = () => resolve(null);
+    image.src = src;
+  });
+}
+
 export default function App() {
   const [workspace, setWorkspace] = useState<Workspace | null>(loadBrowserWorkspace);
   // A draft left unapplied when the page went away is restored before the first
@@ -1607,6 +1623,10 @@ export default function App() {
       reader.readAsDataURL(file);
     });
     const base64 = dataUrl.split(",")[1] ?? "";
+    const size = await measureImage(dataUrl);
+    const dimensions: Record<string, string> = size
+      ? { naturalWidth: String(size.width), naturalHeight: String(size.height) }
+      : {};
     if (isDesktop && current.path) {
       try {
         const relative = await importImage(current.path, file.name, base64);
@@ -1616,6 +1636,7 @@ export default function App() {
           src: assetUrl(current.path, relative),
           alt: file.name,
           path: relative,
+          ...dimensions,
         });
         markDirty();
         return;
@@ -1627,6 +1648,7 @@ export default function App() {
       src: dataUrl,
       alt: file.name,
       path: imageAssetPath(file.name),
+      ...dimensions,
     });
   };
 

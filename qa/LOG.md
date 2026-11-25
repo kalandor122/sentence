@@ -504,3 +504,4 @@ Aborting
 2026-11-25T00:28:10Z PUSHED main
 2026-11-25T00:28:10Z DONE qa-161 (tsc -b, npm test, smoke all green)
 2026-11-25T00:52:10Z EXPLORE insert-media: 3 new items, agent exit 0
+2026-11-25T00:52:24Z START qa-178 on qa/qa-178-every-inserted-image-exports-at-80-of-th: Every inserted image exports at 80% of the line width regardless of its natural size, so the PDF does not match the page
