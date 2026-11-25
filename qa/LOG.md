@@ -641,3 +641,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T09:20:40Z PUSHED main
 2026-11-25T09:20:40Z DONE qa-218 (tsc -b, npm test, smoke all green)
 2026-11-25T09:21:18Z START qa-219 on qa/qa-219-a-tall-image-is-rendered-at-full-natural: A tall image is rendered at full natural height across several pages while the exported PDF scales it to fit one page
+2026-11-25T09:33:14Z PUSHED main
+2026-11-25T09:33:14Z DONE qa-219 (tsc -b, npm test, smoke all green)
