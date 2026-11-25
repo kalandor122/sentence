@@ -3448,8 +3448,9 @@
       "hint": "Repro: Load the app, press New document, then press Tab repeatedly without clicking: Save, branch pill, Settings, the selected Home ribbon tab, roughly two dozen ribbon controls, Compile, the four sidebar panel tabs, the three outline entries, and only then the Document editor. With the caret nowhere else, focus reaches .sentence-editor on the 34th Tab press. No F6-style pane key, skip link, or Ctrl+Alt shortcut moves focus to the document.\nActual: Reaching the editor requires 34 sequential Tab presses from the top of the page; the probe measured tabsToEditor = {count: 34, reached: true} and the status bar only documents \"Esc leaves the page\" (the opposite direction).",
       "source": "explore:keyboard:the writing surface is 34 tab presses from the top of the page, with no skip link or focus shortcut",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T12:55:56Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T12:55:56Z",
+      "lastAttemptAt": "2026-11-25T12:55:56Z"
     },
     {
       "id": "qa-217",

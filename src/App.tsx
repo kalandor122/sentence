@@ -1964,6 +1964,15 @@ export default function App() {
     });
   };
 
+  const focusWritingSurface = () => {
+    if (mode === "source") {
+      sourceTextarea.current?.focus();
+      return;
+    }
+    if (editor) editor.commands.focus();
+    else document.querySelector<HTMLElement>(".sentence-editor")?.focus();
+  };
+
   const closeFind = () => {
     setFind((current) => ({ ...current, open: false }));
     window.requestAnimationFrame(() => {
@@ -2040,6 +2049,12 @@ export default function App() {
       if (isDesktop && mod && !event.altKey && event.key === "Tab") {
         event.preventDefault();
         cycleTab(event.shiftKey ? -1 : 1);
+      }
+      // F6 returns the keyboard to the page from anywhere in the chrome, the
+      // mirror of Escape leaving it. Plain F6 so it matches Word's pane key.
+      if (event.key === "F6" && !mod && !event.altKey && !event.shiftKey) {
+        event.preventDefault();
+        focusWritingSurface();
       }
       if (mod && event.altKey && !event.shiftKey) {
         const nextMode: EditorMode | null = pressedDigit("1") ? "visual" : pressedDigit("2") ? "source" : pressedDigit("3") ? "split" : null;
@@ -2153,6 +2168,16 @@ export default function App() {
 
   return (
     <div className={`app-shell ${showTabs ? "with-document-tabs" : ""}`} style={{ "--editor-zoom": zoom / 100 } as React.CSSProperties}>
+      <a
+        className="skip-link"
+        href="#document-stage"
+        onClick={(event) => {
+          event.preventDefault();
+          focusWritingSurface();
+        }}
+      >
+        Skip to writing surface
+      </a>
       <TopBar
         projectName={workspace.name}
         saveState={saveState}
@@ -2292,7 +2317,7 @@ export default function App() {
           onAcceptAllRevisions={() => acceptTrackedChanges(activeRevisionIds())}
           onRejectAllRevisions={() => rejectTrackedChanges(activeRevisionIds())}
         />
-        <main className="document-stage">
+        <main className="document-stage" id="document-stage">
           <div className={`editor-workspace layout-${mode} ${previewOpen ? "with-preview" : ""}`}>
             {mode === "visual" || mode === "split" ? (
               <section className="editor-column">

@@ -401,6 +401,29 @@ button:disabled {
   grid-template-rows: 40px auto auto minmax(0, 1fr) 24px;
 }
 
+/* First Tab stop: jumps the keyboard straight to the writing surface instead
+   of walking the ribbon and sidebar. Hidden until it takes focus. */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 10px;
+  z-index: 70;
+  padding: 6px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--shadow-sheet);
+  transform: translateY(calc(-100% - 16px));
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
 .workspace-tabs {
   display: flex;
   align-items: stretch;
