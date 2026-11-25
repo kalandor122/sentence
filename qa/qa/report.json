@@ -1,0 +1,164 @@
+{
+  "startedAt": "2026-11-25T10:24:58.150Z",
+  "base": "http://localhost:1420",
+  "failures": [],
+  "observations": [
+    {
+      "category": "ux",
+      "severity": "low",
+      "note": "keyboard shortcut \"Tab indent\" has no visible effect on the document",
+      "evidence": "innerHTML unchanged"
+    },
+    {
+      "category": "functional",
+      "severity": "medium",
+      "note": "source view toggle did not reveal an editable LaTeX surface",
+      "evidence": null
+    }
+  ],
+  "consoleErrors": [],
+  "steps": [
+    {
+      "name": "start screen renders",
+      "ok": true
+    },
+    {
+      "name": "create button present",
+      "ok": true
+    },
+    {
+      "name": "editor opens",
+      "ok": true
+    },
+    {
+      "name": "ribbon tab Home opens",
+      "ok": true
+    },
+    {
+      "name": "ribbon fits at 1280px on Home",
+      "ok": true
+    },
+    {
+      "name": "ribbon tab Insert opens",
+      "ok": true
+    },
+    {
+      "name": "ribbon fits at 1280px on Insert",
+      "ok": true
+    },
+    {
+      "name": "ribbon tab Layout opens",
+      "ok": true
+    },
+    {
+      "name": "ribbon fits at 1280px on Layout",
+      "ok": true
+    },
+    {
+      "name": "ribbon tab References opens",
+      "ok": true
+    },
+    {
+      "name": "ribbon fits at 1280px on References",
+      "ok": true
+    },
+    {
+      "name": "ribbon tab Review opens",
+      "ok": true
+    },
+    {
+      "name": "ribbon fits at 1280px on Review",
+      "ok": true
+    },
+    {
+      "name": "ribbon tab Paper opens",
+      "ok": true
+    },
+    {
+      "name": "ribbon fits at 1280px on Paper",
+      "ok": true
+    },
+    {
+      "name": "ribbon tab View opens",
+      "ok": true
+    },
+    {
+      "name": "ribbon fits at 1280px on View",
+      "ok": true
+    },
+    {
+      "name": "ribbon tab Git opens",
+      "ok": true
+    },
+    {
+      "name": "ribbon fits at 1280px on Git",
+      "ok": true
+    },
+    {
+      "name": "editor surface present",
+      "ok": true
+    },
+    {
+      "name": "typing reaches the document",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+B bolds text",
+      "ok": true
+    },
+    {
+      "name": "compile degrades gracefully in browser",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+F opens the find bar",
+      "ok": true
+    },
+    {
+      "name": "find reports a match count",
+      "ok": true
+    },
+    {
+      "name": "Escape closes the find bar",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+K opens the link dialog",
+      "ok": true
+    },
+    {
+      "name": "View tab exposes a LaTeX button",
+      "ok": true
+    },
+    {
+      "name": "source view shows the LaTeX textarea",
+      "ok": true
+    },
+    {
+      "name": "nested lists survive the source round trip",
+      "ok": true
+    },
+    {
+      "name": "editing the LaTeX source keeps the document",
+      "ok": true
+    },
+    {
+      "name": "Layout tab exposes a Columns control",
+      "ok": true
+    },
+    {
+      "name": "two columns reach the LaTeX",
+      "ok": true
+    },
+    {
+      "name": "switching back to one column removes it",
+      "ok": true
+    },
+    {
+      "name": "no console errors",
+      "ok": true
+    }
+  ],
+  "finishedAt": "2026-11-25T10:25:15.780Z",
+  "ok": true
+}
