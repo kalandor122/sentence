@@ -352,12 +352,26 @@ export default function EditorSurface({
         view.dispatch(transaction);
         return true;
       },
-      // Keyboard access to the same editor: select the marker with the arrow
+      // Keyboard access to the same editors: select the atom with the arrow
       // keys and press Enter.
       handleKeyDown(view, event) {
         if (event.key !== "Enter" || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return false;
         const { selection } = view.state;
-        if (!(selection instanceof NodeSelection) || selection.node.type.name !== "footnote") return false;
+        if (!(selection instanceof NodeSelection)) return false;
+        const { attrs } = selection.node;
+        const name = selection.node.type.name;
+        if (name === "mathInline" || name === "mathBlock") {
+          event.preventDefault();
+          const latex = attrs.latex;
+          const environment = attrs.environment;
+          onEditMath(
+            typeof latex === "string" ? latex : "",
+            name === "mathBlock",
+            typeof environment === "string" ? environment : "",
+          );
+          return true;
+        }
+        if (name !== "footnote") return false;
         event.preventDefault();
         const text = selection.node.attrs.text;
         editFootnoteRef.current(typeof text === "string" ? text : "", selection.from);
