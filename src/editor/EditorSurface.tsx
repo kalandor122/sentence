@@ -122,6 +122,7 @@ function editorAttributes(spellcheck: boolean) {
     lang: "en",
     autocorrect: "on",
     "aria-label": "Document editor",
+    "aria-multiline": "true",
   };
 }
 
