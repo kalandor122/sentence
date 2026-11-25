@@ -11,10 +11,12 @@ import {
   Plus,
   Search,
   Trash2,
+  TriangleAlert,
   Undo2,
   XCircle,
 } from "lucide-react";
 import {
+  missingCitationKeys,
   parseBibliography,
   removeBibliographyEntry,
   type BibliographyEntry,
@@ -267,6 +269,7 @@ function RevisionList({
 }
 
 interface ReferencesPanelProps {
+  document: SentenceDocument;
   bibliography: string;
   onChange: (value: string) => void;
   onInsertCitation: (key: string) => void;
@@ -276,6 +279,7 @@ interface ReferencesPanelProps {
 }
 
 function ReferencesPanel({
+  document,
   bibliography,
   onChange,
   onInsertCitation,
@@ -284,6 +288,10 @@ function ReferencesPanel({
   onEditEntry,
 }: ReferencesPanelProps) {
   const entries = useMemo(() => parseBibliography(bibliography), [bibliography]);
+  const missing = useMemo(
+    () => missingCitationKeys(document, bibliography),
+    [document, bibliography],
+  );
   const [query, setQuery] = useState("");
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
   const needle = query.trim().toLowerCase();
@@ -308,6 +316,20 @@ function ReferencesPanel({
           <Plus size={12} /> Add
         </button>
       </header>
+      {missing.length > 0 ? (
+        <div className="bib-warning" role="status">
+          <TriangleAlert size={12} aria-hidden="true" />
+          <span>
+            {missing.length === 1
+              ? "1 citation key is missing from the bibliography: "
+              : `${missing.length} citation keys are missing from the bibliography: `}
+            <code>{missing.join(", ")}</code>.{" "}
+            {missing.length === 1
+              ? "Add an entry for it to resolve the reference."
+              : "Add entries for them to resolve the references."}
+          </span>
+        </div>
+      ) : null}
       <div className="bib-tools">
         <form className="bib-search" role="search" aria-label="Search references" onSubmit={(event) => {
           event.preventDefault();
@@ -505,6 +527,7 @@ export default function Sidebar({
 
         {panel === "references" ? (
           <ReferencesPanel
+            document={document}
             bibliography={bibliography}
             onChange={onBibliographyChange}
             onInsertCitation={onInsertCitationKey}
