@@ -731,3 +731,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T14:29:24Z START qa-248 on qa/qa-248-lists-and-blockquotes-are-never-paginate: Lists and blockquotes are never paginated: page rules cut through their lines and text sits in the margins
 2026-11-25T14:37:10Z PUSHED main
 2026-11-25T14:37:10Z DONE qa-248 (tsc -b, npm test, smoke all green)
+2026-11-25T14:37:48Z START qa-249 on qa/qa-249-a-page-break-inserted-inside-a-word-perm: A page break inserted inside a word permanently splits the word and inflates the word count
