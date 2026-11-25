@@ -2695,10 +2695,11 @@
       ],
       "hint": "Repro: 1. View tab > LaTeX. 2. Put the caret before \\end{document} and type `ZXUNDO one two.`. 3. Press Ctrl+Z once; the textarea returns exactly to the applied text. 4. Look at the Apply source button, then click it.\nActual: Apply source remains enabled after the undo (probe applyEnabledAfterUndoAll=true) even though the text equals the applied source. Clicking it reports `Visual document synchronized from LaTeX.` while the textarea stays byte-identical (probe sourceUnchangedAfterNoopApply=true), so the dirty state is not cleared when undo returns to the applied text.",
       "source": "explore:source-editor:undoing every source edit leaves apply source enabled and reports a synchronisation that changed nothing",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T01:09:09Z",
-      "lastAttemptAt": "2026-11-25T01:09:09Z"
+      "lastAttemptAt": "2026-11-25T01:09:09Z",
+      "doneAt": "2026-11-25T01:13:00Z"
     },
     {
       "id": "qa-170",
@@ -2862,6 +2863,44 @@
       ],
       "hint": "Repro: Insert an image named 'qa image #1.png' at the end of the document. Click View > LaTeX, press Ctrl+End, type a space and Backspace so Apply source becomes enabled, click Apply source, then View > Visual and read the img alt attribute.\nActual: Before Apply the img has alt='qa image #1.png'; after Apply it has alt=''. Block images emit no '% Sentence alt' comment in the generated LaTeX (only inline images do) and the parser fills alt from the empty figure caption, so the alt text disappears from the document and from the HTML/Markdown exports. Probe: qa/probes/insert-media.mjs scenario 'image' (once.info vs apply.info).",
       "source": "explore:insert-media:block images lose their alt text when the document is synchronized from latex",
+      "status": "open"
+    },
+    {
+      "id": "qa-181",
+      "title": "Ctrl+A then switching list type wraps the whole document and nests the existing list",
+      "why": "Exploratory pass on lists (functional): expected The existing bullet list becomes a numbered list and 'intro' and 'outro' stay ordinary paragraphs, which is what happens when the same conversion is applied to a selection that covers only the list items.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Type 'intro', press Enter, type 'one', click Home > Bulleted list, press Enter, type 'two', press Enter twice, type 'outro'. Press Ctrl+A (all four blocks are selected) and click Home > Numbered list. Repeat the same conversion with only the two list items selected (click 'one', press Home, then Shift+Down and Shift+End).\nActual: With the whole document selected, clicking Numbered list turns every selected block into one ordered list: the editor DOM is '<ol><li><p>intro</p><ul><li>one</li><li>two</li></ul></li><li><p>outro</p></li><li><p><br></p></li></ol>' and the LaTeX is '\\begin{enumerate}\\n\\item intro\\n\\begin{itemize}...\\end{itemize}\\n\\item outro\\n\\item \\n\\end{enumerate}'. The existing bullet list is moved under 'intro' as a sublist and an empty item is appended. With only a two-item bullet list in the document, Ctrl+A then Numbered list (ribbon button or Ctrl+Shift+7) also produces a third empty item and exports a trailing '\\item '; selecting only the list items produces two items with no empty item.",
+      "source": "explore:lists:ctrl+a then switching list type wraps the whole document and nests the existing list",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T01:44:51Z"
+    },
+    {
+      "id": "qa-182",
+      "title": "Enter at the end of a parent item moves its nested sublist to the new item",
+      "why": "Exploratory pass on lists (functional): expected 'sibling' is added as a new top-level item after the sublist and 'child' stays nested under 'parent'.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Type 'parent', click Home > Bulleted list, press Enter, type 'child', press Tab. Click at the end of the 'parent' line, press Enter and type 'sibling'.\nActual: The existing sublist is transferred to the new item: the DOM is '<ul><li><p>parent</p></li><li><p>sibling</p><ul><li><p>child</p></li></ul></li></ul>', exported as '\\item parent\\n\\item sibling\\n\\begin{itemize}\\n\\item child\\n\\end{itemize}'. The child item silently changes parent from 'parent' to 'sibling'.",
+      "source": "explore:lists:enter at the end of a parent item moves its nested sublist to the new item",
+      "status": "open"
+    },
+    {
+      "id": "qa-183",
+      "title": "Leaving a numbered list from the middle restarts the remaining items at 1",
+      "why": "Exploratory pass on lists (content): expected The remaining items keep their place in the sequence, so 'two' is number 2 and 'three' is number 3 and the resumed ordered list starts at 2.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Type 'one', click Home > Numbered list, press Enter, type 'two', press Enter, type 'three'. Click at the end of 'one', press Enter (an empty item appears as number 2), then press Enter again on that empty item. Read the editor and then the LaTeX source.\nActual: The list is split in two and the second list restarts at 1: the DOM is '<ol><li><p>one</p></li></ol><p><br></p><ol><li><p>two</p></li><li><p>three</p></li></ol>', the second '<ol>' has no start attribute, and the LaTeX is two separate '\\begin{enumerate}' blocks, '\\item one' then '\\item two'/'\\item three', with no '\\setcounter'. The PDF therefore numbers 'two' as 1 and 'three' as 2, and the document shows two items numbered 1.",
+      "source": "explore:lists:leaving a numbered list from the middle restarts the remaining items at 1",
       "status": "open"
     }
   ]
