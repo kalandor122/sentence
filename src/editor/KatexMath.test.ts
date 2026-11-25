@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { latexHasError, renderLatex } from "./KatexMath";
+import { latexHasBlankLine, latexHasError, renderLatex } from "./KatexMath";
 
 describe("latexHasError", () => {
   it("flags commands KaTeX renders in its error colour", () => {
@@ -16,6 +16,13 @@ describe("latexHasError", () => {
     expect(latexHasError("a\n\nb", false)).toBe(true);
     expect(latexHasError("a\r\n  \r\nb", true)).toBe(true);
     expect(latexHasError("a\nb", false)).toBe(false);
+  });
+
+  it("reports a blank line separately from other parse errors", () => {
+    expect(latexHasBlankLine("a\n\nb")).toBe(true);
+    expect(latexHasBlankLine("a\r\n  \r\nb", "align")).toBe(true);
+    expect(latexHasBlankLine("a\nb")).toBe(false);
+    expect(latexHasBlankLine("\\frac{")).toBe(false);
   });
 
   it("accepts valid LaTeX", () => {

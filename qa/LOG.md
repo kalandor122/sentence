@@ -682,3 +682,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T11:57:36Z START qa-233 on qa/qa-233-a-blank-line-inside-a-display-equation-i: A blank line inside a display equation is accepted from the source and re-exported as uncompilable LaTeX
 2026-11-25T11:59:51Z PUSHED main
 2026-11-25T11:59:51Z DONE qa-233 (tsc -b, npm test, smoke all green)
+2026-11-25T12:00:29Z START qa-234 on qa/qa-234-invalid-blank-line-math-disables-insert: Invalid blank-line math disables Insert with no visible error message
