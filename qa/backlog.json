@@ -3015,10 +3015,61 @@
       ],
       "hint": "Add `columns: \"one\" | \"two\"` to ProjectSettings in src/lib/types.ts (default \"one\"). Emit the `twocolumn` class option in documentToLatex (src/lib/latex.ts, the \\documentclass line around 512) and parse it back in latexToDocument. Add a Columns control to the Layout ribbon group in src/components/Ribbon.tsx. Acceptance: unit tests in src/lib/latex.test.ts prove article+two emits \\documentclass[11pt,a4paper,twocolumn]{article} and that latexToDocument reads it back; gate green.",
       "source": "roadmap:two-column documents: settings, preamble and round trip",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T02:58:41Z",
-      "lastAttemptAt": "2026-11-25T02:58:41Z"
+      "lastAttemptAt": "2026-11-25T02:58:41Z",
+      "doneAt": "2026-11-25T03:00:39Z"
+    },
+    {
+      "id": "qa-190",
+      "title": "Multi-key citations are merged into one invalid key by the LaTeX round trip",
+      "why": "Exploratory pass on links-cites-footnotes (content): expected The two cited keys stay separate in the document and in the export: `\\cite{sentence2026,ghost2026}` (a citation with two keys).",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Open View > LaTeX and insert the line `MultiCite \\cite{sentence2026,ghost2026} done.` before `\\end{document}`, then click Visual. Type `ZZ` at the end of the document and open View > LaTeX again.\nActual: The visual editor turns the pair into one citation labelled `[sentence2026,ghost2026]`, the References panel reports `sentence2026,ghost2026` as a single key missing from the bibliography, and the regenerated source reads `\\cite{sentence2026ghost2026}`: the comma is stripped and both keys become one nonexistent key. The manual citation dialog also rejects commas, so a multi-key citation cannot be created or preserved through the UI.",
+      "source": "explore:links-cites-footnotes:multi-key citations are merged into one invalid key by the latex round trip",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T03:20:53Z"
+    },
+    {
+      "id": "qa-191",
+      "title": "Typing after applying or removing a hyperlink replaces the link text",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected Applying or removing a link leaves the document text intact and puts the caret after it, so continuing the sentence appends the typed characters.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. At the end type `LinkTypeAdd `, then `wordone`, select `wordone`, press Ctrl+K, enter `https://type.example.org/add`, click Insert, and immediately type `AFTER` without clicking in the page. Then at the end type `RemoveType linkedword`, select `linkedword`, press Ctrl+K, enter `https://remove.example.org`, click Insert, click the new link, press Ctrl+K, click `Remove link`, and type `KEEP`.\nActual: The link text stays selected when the dialog closes. Typing `AFTER` replaces `wordone`, so the paragraph reads `LinkTypeAdd AFTER` and the link now has the text `AFTER`. Likewise, after Remove link, typing `KEEP` replaces `linkedword` and the paragraph reads `RemoveType KEEP`: the linked word is silently destroyed by the next keystroke.",
+      "source": "explore:links-cites-footnotes:typing after applying or removing a hyperlink replaces the link text",
+      "status": "open"
+    },
+    {
+      "id": "qa-192",
+      "title": "Clicking a footnote marker and typing deletes the footnote",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected Typing after clicking the footnote reference should not discard the note; text may be inserted next to the marker, or the marker should require an explicit delete.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. At the end type `MarkerType `, open Insert > Footnote, enter `MT note`, click Insert. Click the superscript marker once, then type `Q`.\nActual: The click selects the footnote atom (`.ProseMirror-selectednode` is set); the next keystroke replaces it with body text. The paragraph becomes `MarkerType Q`, `MT note` disappears from the page, and the note is removed from the exported LaTeX instead of only the marker being edited.",
+      "source": "explore:links-cites-footnotes:clicking a footnote marker and typing deletes the footnote",
+      "status": "open"
+    },
+    {
+      "id": "qa-193",
+      "title": "After updating a footnote the caret is placed before the marker",
+      "why": "Exploratory pass on links-cites-footnotes (ux): expected After Update the caret stays after the footnote reference, so the line reads `EditFocus \u00b9NEXT` with the note attached after `EditFocus`.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. At the end type `EditFocus `, open Insert > Footnote, enter `EF note`, click Insert, double-click the marker, change the note to `EF edited`, click Update, then type `NEXT`.\nActual: The caret is left before the marker, so typing `NEXT` inserts ahead of it: the line becomes `EditFocus NEXT\u00b9`. The continuing text is written on the wrong side of the note reference.",
+      "source": "explore:links-cites-footnotes:after updating a footnote the caret is placed before the marker",
+      "status": "open"
     }
   ]
 }
