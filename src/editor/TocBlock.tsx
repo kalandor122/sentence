@@ -12,14 +12,52 @@ interface TocEntry {
   text: string;
 }
 
-export function tocEntries(editor: Editor): TocEntry[] {
+interface TocStorage {
+  title: string;
+}
+
+function tocStorage(editor: Editor | null): TocStorage | undefined {
+  return (editor?.storage as unknown as Record<string, TocStorage | undefined> | undefined)?.toc;
+}
+
+// The document title is a project setting, not part of the editor document, so
+// it travels to the preview through the extension's storage.
+export function tocTitle(editor: Editor | null): string {
+  const title = tocStorage(editor)?.title;
+  return typeof title === "string" ? title : "";
+}
+
+export function setTocTitle(editor: Editor, title: string): void {
+  if (editor.isDestroyed) return;
+  const storage = tocStorage(editor);
+  if (!storage || storage.title === title) return;
+  storage.title = title;
+  // The preview refreshes on transactions; an empty one redraws the entries
+  // with the new title without touching the document or its history.
+  editor.view.dispatch(editor.state.tr.setMeta("addToHistory", false));
+}
+
+export function tocEntries(editor: Editor, title = ""): TocEntry[] {
   const counters = [0, 0, 0];
   const entries: TocEntry[] = [];
+  const normalizedTitle = title.trim().toLocaleLowerCase();
+  const firstNode = editor.state.doc.firstChild;
   editor.state.doc.descendants((node: ProseMirrorNode) => {
     if (node.type.name !== "heading") return;
     // \section*{...} is left out of the contents and does not step the section
     // counter, so the next numbered heading keeps the number it would have had.
     if (node.attrs.unnumbered === true) return;
+    // The exporter turns a first H1 that repeats the document title into
+    // \maketitle and drops it from the body, so it is not a contents entry and
+    // does not step the section counter either.
+    if (
+      node === firstNode &&
+      normalizedTitle &&
+      Number(node.attrs.level ?? 1) === 1 &&
+      node.textContent.toLocaleLowerCase() === normalizedTitle
+    ) {
+      return;
+    }
     const level = Math.min(3, Math.max(1, Number(node.attrs.level ?? 1)));
     counters[level - 1] += 1;
     for (let deeper = level; deeper < counters.length; deeper += 1) counters[deeper] = 0;
@@ -48,11 +86,11 @@ function sameEntries(left: TocEntry[], right: TocEntry[]): boolean {
 }
 
 function TocNodeView({ editor }: NodeViewProps) {
-  const [entries, setEntries] = useState(() => tocEntries(editor));
+  const [entries, setEntries] = useState(() => tocEntries(editor, tocTitle(editor)));
 
   useEffect(() => {
     const refresh = () => {
-      const next = tocEntries(editor);
+      const next = tocEntries(editor, tocTitle(editor));
       setEntries((current) => (sameEntries(current, next) ? current : next));
     };
     refresh();

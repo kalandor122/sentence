@@ -3,7 +3,7 @@ import Image from "@tiptap/extension-image";
 import type { DOMOutputSpec } from "@tiptap/pm/model";
 import { footnoteNodeView } from "./Footnote";
 import { katexNodeView } from "./KatexMath";
-import { TOC_COMPILE_NOTE, tocEntries, tocNodeView } from "./TocBlock";
+import { TOC_COMPILE_NOTE, tocEntries, tocNodeView, tocTitle } from "./TocBlock";
 
 function stringAttribute(node: { attrs?: Record<string, unknown> }, name: string): string {
   const value = node.attrs?.[name];
@@ -389,6 +389,10 @@ export const TableOfContents = Node.create({
   atom: true,
   selectable: true,
 
+  addStorage() {
+    return { title: "" };
+  },
+
   addNodeView() {
     return tocNodeView();
   },
@@ -398,7 +402,7 @@ export const TableOfContents = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    const entries = this.editor ? tocEntries(this.editor) : [];
+    const entries = this.editor ? tocEntries(this.editor, tocTitle(this.editor)) : [];
     return [
       "div",
       mergeAttributes(HTMLAttributes, {
