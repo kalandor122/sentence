@@ -3447,10 +3447,11 @@
       ],
       "hint": "Repro: Load the app, press New document, then press Tab repeatedly without clicking: Save, branch pill, Settings, the selected Home ribbon tab, roughly two dozen ribbon controls, Compile, the four sidebar panel tabs, the three outline entries, and only then the Document editor. With the caret nowhere else, focus reaches .sentence-editor on the 34th Tab press. No F6-style pane key, skip link, or Ctrl+Alt shortcut moves focus to the document.\nActual: Reaching the editor requires 34 sequential Tab presses from the top of the page; the probe measured tabsToEditor = {count: 34, reached: true} and the status bar only documents \"Esc leaves the page\" (the opposite direction).",
       "source": "explore:keyboard:the writing surface is 34 tab presses from the top of the page, with no skip link or focus shortcut",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T12:55:56Z",
-      "lastAttemptAt": "2026-11-25T12:55:56Z"
+      "lastAttemptAt": "2026-11-25T12:55:56Z",
+      "doneAt": "2026-11-25T12:59:59Z"
     },
     {
       "id": "qa-217",
@@ -3782,6 +3783,56 @@
       ],
       "hint": "Repro: Create a project. Type `CancelFoot ` (with a trailing space), open Insert > Footnote, enter `Will cancel`, press Escape, then type `F`. Repeat with References > Insert citation > `Enter a key manually` (press Escape, then type `C`) and References > Cross-reference (press Escape, then type `R`).\nActual: Focus returns to the control that opened the dialog (`BUTTON:Footnote`, `BUTTON:Enter a key manually`, `BUTTON:Cross-reference`), so the typed characters are discarded; the paragraphs remain `CancelFoot `, `CancelCite ` and `CancelRef ` with no `F`, `C` or `R`.",
       "source": "explore:links-cites-footnotes:cancelling the insert dialogs drops the next typed characters",
+      "status": "open"
+    },
+    {
+      "id": "qa-239",
+      "title": "Splitting a paragraph with Track changes on marks unchanged blocks as inserted and deleted",
+      "why": "Exploratory pass on review (functional): expected Only the edited paragraph pair is marked: a deletion of the moved tail in the first half and an insertion of the same text in the new paragraph. The unchanged blockquote and final paragraph show no review decorations.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open http://localhost:1420 in a fresh browser profile and click New document. 2. Review tab > Track changes (the button now reads Tracking on). 3. Click inside the paragraph 'Good tools stay close to the work...', press Home, press ArrowRight 12 times, press Enter to split the paragraph. 4. Wait 2.5 s and open History in the sidebar rail.\nActual: The split pair is marked correctly, but the unchanged blockquote gets an insertion widget with its own text ('Clarity arrives when the mechanics disappear and only the thought remains.') and a deletion widget with the final paragraph's text ('The central model can be expressed compactly: meaning = structure + language.'); the final paragraph then gets the blockquote's text as a deletion plus its own text as insertions. Measured on a fresh document: BLOCKQUOTE ins ['Clarity arrives when the mechanics disappear and only the thought remains.'] del ['The central model can be expressed compactly: meaning = structure + language.']; P ins ['The central model can be expressed compactly: ','meaning = structure + language','.'] del ['Clarity arrives when the mechanics disappear and only the thought remains.']. The page therefore renders the blockquote and the last paragraph twice (real text plus widget text), showing changes that were never made. The underlying document is intact and rejecting the revision restores the original text.",
+      "source": "explore:review:splitting a paragraph with track changes on marks unchanged blocks as inserted and deleted",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T13:25:19Z"
+    },
+    {
+      "id": "qa-240",
+      "title": "Deleting all text of a paragraph leaves no inline tracked-deletion marker",
+      "why": "Exploratory pass on review (functional): expected The deleted sentence is rendered struck through in the document (as happens when only part of a paragraph is deleted), attributed to the reviewer.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. New document; Review tab > Track changes. 2. Triple-click the last paragraph ('The central model can be expressed compactly: meaning = structure + language.') so the whole paragraph is selected. 3. Press Backspace. 4. Wait 2.5 s and open History in the sidebar rail.\nActual: The paragraph simply becomes empty: there is 1 revision card but 0 .sentence-revision-deletion and 0 .sentence-revision-insertion elements in the page, so the document gives no indication that anything was deleted. Only the History card records the change.",
+      "source": "explore:review:deleting all text of a paragraph leaves no inline tracked-deletion marker",
+      "status": "open"
+    },
+    {
+      "id": "qa-241",
+      "title": "Tracked-change card clips its preview so the changed words are invisible",
+      "why": "Exploratory pass on review (visual): expected The revision card's after preview shows the inserted words so the reviewer can see what changed.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. New document; Review tab > Track changes. 2. Click at the end of the document, press Enter and type 'TRACKEDALPHA inserted sentence.'. 3. Wait 2.5 s and open History in the sidebar rail.\nActual: The inserted words are present in the card DOM but clipped: .revision-after has clientHeight 55px and scrollHeight 78px because of the .revision-card > p { max-height: 55px; overflow: hidden } rule, and the inserted text's bounding box ends at 600px while the preview box ends at 579px. There is no scroll, expand control or tooltip, so the visible before and after snippets both end at '...only the thought remains.' and look identical, hiding the change entirely.",
+      "source": "explore:review:tracked-change card clips its preview so the changed words are invisible",
+      "status": "open"
+    },
+    {
+      "id": "qa-242",
+      "title": "Demo document seeds a comment that is not anchored, so Review opens with a deleted-text warning",
+      "why": "Exploratory pass on review (content): expected The demo comment is attached to a sentence and highlighted in the document.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open http://localhost:1420 in a fresh browser profile. 2. Click New document. 3. Click Review in the sidebar rail to open the Comments panel.\nActual: The only thread ('This is the kind of paragraph that benefits from a quieter interface.', by Editor) is detached: the card shows 'The text this comment was attached to was deleted, so it has no highlight in the document.' and the editor contains no .comment-highlight for it. The demo document has no text carrying the demo comment mark, so a brand-new project opens with a false deleted-text warning.",
+      "source": "explore:review:demo document seeds a comment that is not anchored, so review opens with a deleted-text warning",
       "status": "open"
     }
   ]
