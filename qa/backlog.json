@@ -4216,8 +4216,9 @@
       "hint": "Repro: Create a new document and type '[draft] note'. Click Home > Bulleted list, open Source in the status bar, click Refresh from visual and read the LaTeX textarea. Clear the document, type '[appendix] item', click Home > Numbered list and read the LaTeX again.\nActual: The LaTeX is '\\begin{itemize}\\n\\item [draft] note\\n\\end{itemize}', and the numbered variant is '\\begin{enumerate}\\n\\item [appendix] item\\n\\end{enumerate}'. Text in brackets directly after \\item is LaTeX's optional label argument, so it replaces the bullet/number and the literal brackets are dropped; the PDF prints 'draft note' with 'draft' as the label instead of '[draft] note'.",
       "source": "explore:lists:list item text that starts with a square bracket is written as an \\item optional label and loses its brackets",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T18:33:36Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T18:33:36Z",
+      "lastAttemptAt": "2026-11-25T18:33:36Z"
     },
     {
       "id": "qa-267",

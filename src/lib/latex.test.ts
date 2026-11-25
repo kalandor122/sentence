@@ -682,6 +682,32 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(parsed, settings)).toContain(expected);
   });
 
+  it("keeps a bracket that starts a list item as printed text", () => {
+    const item = (text: string, listType: "bulletList" | "orderedList"): DocumentNode => ({
+      type: listType,
+      content: [
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text }] }],
+        },
+      ],
+    });
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [item("[draft] note", "bulletList"), item("[appendix] item", "orderedList")],
+    };
+    const latex = documentToLatex(document, settings);
+    // Without the guard LaTeX reads `[draft]` as \item's optional label, which
+    // replaces the bullet and drops the brackets from the printed text.
+    expect(latex).toContain("\\item {[}draft] note");
+    expect(latex).toContain("\\item {[}appendix] item");
+
+    const parsed = latexToDocument(latex, settings).document;
+    expect(parsed.content[0]?.content?.[0]?.content?.[0]?.content?.[0]?.text).toBe("[draft] note");
+    expect(parsed.content[1]?.content?.[0]?.content?.[0]?.content?.[0]?.text).toBe("[appendix] item");
+    expect(documentToLatex(parsed, settings)).toContain("\\item {[}draft] note");
+  });
+
   it("round-trips nested lists through LaTeX source", () => {
     const document: SentenceDocument = {
       type: "doc",

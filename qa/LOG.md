@@ -778,3 +778,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T17:57:44Z STASHED as 'qa-loop-autostash-2026-11-25T17:57:44Z' (recover with git stash list)
 2026-11-25T17:57:44Z START qa-265 on qa/qa-265-removing-the-bullet-from-a-nested-item-c: Removing the bullet from a nested item creates a second paragraph that the LaTeX merges into the parent item
 2026-11-25T18:33:15Z EXPLORE tables: 3 new items, agent exit 0
+2026-11-25T18:33:36Z START qa-266 on qa/qa-266-list-item-text-that-starts-with-a-square: List item text that starts with a square bracket is written as an \item optional label and loses its brackets
