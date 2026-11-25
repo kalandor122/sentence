@@ -777,3 +777,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T17:15:02Z START qa-251 on qa/qa-251-a-long-heading-in-the-outline-does-not-w: A long heading in the outline does not wrap; it is clipped and forces a 1,000px horizontal scroll inside the sidebar
 2026-11-25T17:57:44Z STASHED as 'qa-loop-autostash-2026-11-25T17:57:44Z' (recover with git stash list)
 2026-11-25T17:57:44Z START qa-265 on qa/qa-265-removing-the-bullet-from-a-nested-item-c: Removing the bullet from a nested item creates a second paragraph that the LaTeX merges into the parent item
+2026-11-25T18:33:15Z EXPLORE tables: 3 new items, agent exit 0
