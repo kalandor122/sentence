@@ -1,5 +1,5 @@
 import type { Editor } from "@tiptap/react";
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   AlignCenter,
   AlignJustify,
@@ -158,6 +158,24 @@ function ColorPalette({
 }: ColorPaletteProps) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const pendingFocus = useRef<number | null>(null);
+
+  const swatches = () =>
+    Array.from(popoverRef.current?.querySelectorAll<HTMLButtonElement>(".color-swatch") ?? []);
+
+  const focusSwatch = (index: number) => {
+    const items = swatches();
+    if (items.length === 0) return;
+    items[(index + items.length) % items.length].focus();
+  };
+
+  useEffect(() => {
+    if (!open || pendingFocus.current === null) return;
+    focusSwatch(pendingFocus.current);
+    pendingFocus.current = null;
+  }, [open]);
+
   return (
     <div
       className="color-menu"
@@ -175,8 +193,18 @@ function ColorPalette({
         className={`icon-button color-button ${activeColor ? "active" : ""}`}
         disabled={disabled}
         onClick={() => setOpen((value) => !value)}
+        onKeyDown={(event) => {
+          if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+          event.preventDefault();
+          if (!open) {
+            pendingFocus.current = event.key === "ArrowDown" ? 0 : -1;
+            setOpen(true);
+            return;
+          }
+          focusSwatch(event.key === "ArrowDown" ? 0 : -1);
+        }}
         aria-label={label}
-        aria-haspopup="true"
+        aria-haspopup="menu"
         aria-expanded={open}
       >
         {icon}
@@ -185,9 +213,25 @@ function ColorPalette({
       {open ? (
         <>
           <div className="color-backdrop" onClick={() => setOpen(false)} />
-          <div className="color-popover" role="menu" aria-label={label}>
+          <div
+            ref={popoverRef}
+            className="color-popover"
+            role="menu"
+            aria-label={label}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                event.preventDefault();
+                const index = swatches().indexOf(document.activeElement as HTMLButtonElement);
+                focusSwatch(index + (event.key === "ArrowDown" ? 1 : -1));
+              } else if (event.key === "Home" || event.key === "End") {
+                event.preventDefault();
+                focusSwatch(event.key === "Home" ? 0 : -1);
+              }
+            }}
+          >
             <button
               type="button"
+              role="menuitem"
               className="color-swatch none"
               onClick={() => {
                 onPick(null);
@@ -200,6 +244,7 @@ function ColorPalette({
               <button
                 key={color.key}
                 type="button"
+                role="menuitem"
                 className="color-swatch"
                 style={{ background: color.key }}
                 title={color.label}
