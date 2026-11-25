@@ -771,3 +771,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T17:04:18Z START qa-246 on qa/qa-246-undo-history-is-lost-when-switching-to-r: Undo history is lost when switching to references.bib and back
 2026-11-25T17:10:56Z PUSHED main
 2026-11-25T17:10:56Z DONE qa-246 (tsc -b, npm test, smoke all green)
+2026-11-25T17:11:34Z START qa-247 on qa/qa-247-a-verbatim-block-containing-end-document: A verbatim block containing \end{document} is rejected as trailing text

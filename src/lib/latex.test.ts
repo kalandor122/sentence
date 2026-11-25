@@ -412,6 +412,27 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("ignores \\end{document} inside a verbatim block", () => {
+    const source = [
+      "\\begin{document}",
+      "Before.",
+      "\\begin{verbatim}",
+      "ZXCODE \\end{document}",
+      "ZXCODE still code",
+      "\\end{verbatim}",
+      "After.",
+      "\\end{document}",
+    ].join("\n");
+    const { document } = latexToDocument(source, DEFAULT_SETTINGS);
+    const code = document.content.find((node) => node.type === "codeBlock");
+    expect(code?.content?.[0]?.text).toBe(
+      "ZXCODE \\end{document}\nZXCODE still code",
+    );
+    const exported = documentToLatex(document, DEFAULT_SETTINGS);
+    expect(exported).toContain("ZXCODE \\end{document}");
+    expect(exported).toContain("\\end{verbatim}");
+  });
+
   it("accepts blank lines and comments after \\end{document}", () => {
     const source = [
       "\\begin{document}",
