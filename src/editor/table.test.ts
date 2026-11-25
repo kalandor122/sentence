@@ -142,6 +142,34 @@ describe("CaptionTable", () => {
     editor.destroy();
   });
 
+  it("keeps the caret in the table when the last row is deleted", () => {
+    const editor = createSizedEditor(3, 3);
+    editor.commands.setTextSelection(cellPositions(editor)[7]);
+    expect(editor.commands.deleteRow()).toBe(true);
+    expect(rowTypes(editor)).toHaveLength(2);
+    expect(editor.isActive("table")).toBe(true);
+    editor.commands.insertContent("tail");
+    expect(editor.isActive("table")).toBe(true);
+    expect(editor.state.selection.$from.parent.textContent).toContain("tail");
+    const latex = documentToLatex(editor.getJSON() as SentenceDocument, DEFAULT_SETTINGS);
+    expect(latex).not.toMatch(/\\end\{table\}\s+tail/);
+    editor.destroy();
+  });
+
+  it("keeps the caret in the table when the last column is deleted", () => {
+    const editor = createSizedEditor(3, 3);
+    editor.commands.setTextSelection(cellPositions(editor)[8]);
+    expect(editor.commands.deleteColumn()).toBe(true);
+    expect(rowTypes(editor)[0]).toHaveLength(2);
+    expect(editor.isActive("table")).toBe(true);
+    editor.commands.insertContent("aftercol");
+    expect(editor.isActive("table")).toBe(true);
+    expect(editor.state.selection.$from.parent.textContent).toContain("aftercol");
+    const latex = documentToLatex(editor.getJSON() as SentenceDocument, DEFAULT_SETTINGS);
+    expect(latex).not.toMatch(/\\end\{table\}\s+aftercol/);
+    editor.destroy();
+  });
+
   it("walks the cells with Tab and releases the last one without adding a row", () => {
     const editor = createSizedEditor(2, 2);
     const positions = cellPositions(editor);
