@@ -1652,6 +1652,89 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("exports a caption on an image inside a table cell with its graphic", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [
+                    {
+                      type: "image",
+                      attrs: {
+                        path: "assets/images/cell.png",
+                        alt: "cell image",
+                        caption: "CELL CAPTION",
+                        naturalWidth: 120,
+                        naturalHeight: 60,
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("\\usepackage{caption}");
+    expect(latex).not.toContain("\\caption{CELL CAPTION}");
+    expect(latex).toContain(
+      [
+        "\\begin{minipage}{90.00bp}",
+        "\\centering",
+        "\\includegraphics[width=90.00bp]{assets/images/cell.png}% Sentence alt: cell image",
+        "\\captionof{figure}{CELL CAPTION}",
+        "\\end{minipage}",
+      ].join("\n"),
+    );
+  });
+
+  it("round-trips a caption on an image inside a table cell", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [
+                    {
+                      type: "image",
+                      attrs: {
+                        path: "assets/images/cell.png",
+                        alt: "cell image",
+                        caption: "CELL CAPTION",
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    const { document: parsed } = latexToDocument(latex, settings);
+    const image = parsed.content?.[0]?.content?.[0]?.content?.[0]?.content?.[0];
+    expect(image?.type).toBe("image");
+    expect(image?.attrs?.caption).toBe("CELL CAPTION");
+    expect(image?.attrs?.alt).toBe("cell image");
+    expect(documentToLatex(parsed, settings)).toBe(latex);
+  });
+
   it("exports a block equation inside a table cell as display-style inline math", () => {
     const document: SentenceDocument = {
       type: "doc",
