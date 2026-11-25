@@ -3235,7 +3235,9 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Before `\\begin{document}`, add `\\usepackage{amsthm}` and `\\newcommand{\\ZXMACRO}{ZXMACRO EXPANDS}`. 3. Before `\\end{document}`, add `ZXPREAMBLE use \\ZXMACRO{} here.` 4. Click Apply source. 5. View > Visual. 6. View > LaTeX and click Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` The draft still contains the package and definition immediately after Apply, but the visual page shows the literal `\\ZXMACRO` call. After Refresh from visual the preamble no longer contains amsthm or \\newcommand, and the body contains `\\textbackslash{}ZXMACRO\\{\\}`. Probe: regeneratedPreambleHasPackage=false, regeneratedHasMacro=false, escapedMacroCall=true. The source only reveals the loss after a refresh, so the success toast is the only feedback at Apply time.",
       "source": "explore:source-editor:preamble packages and macros are reported synchronized but silently dropped, and their calls are escaped",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T05:58:31Z"
     },
     {
       "id": "qa-204",
@@ -3295,10 +3297,11 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read the `layout` stage, or reproduce by hand: open http://localhost:1420 at 1280x800, click 'New document', then Ctrl+A and Backspace to empty the page. Put the probe's 50-section HTML on the clipboard (50 blocks of `<h1>Heading N HDOCN</h1><p>[the probe's 69-word body] BODYN</p>`, with `<h2>` for N divisible by 5 and `<h3>` for N divisible by 11; 3,600 words total) and press Ctrl+V. The status bar reads 3,600 words / 10 pages and the sheet is 11,230px tall. The page height is 1,123px and the configured margin is 96px, so each page's text area is y=96..1027. The probe's DOM audit finds 26 text lines below the bottom margin and 22 above the top margin. On page 1 the last three line boxes end at 1,069, 1,094 and 1,120px, i.e. the final line is 3px above the page edge. Headings also sit in the margins: Heading 5 at 89px and Heading 16 at 18px from the top of pages 2 and 4, and Heading 10 at 1,093px and Heading 37 at 1,088px down pages 2 and 7 (the bottom margin starts at 1,027px). Headings 10 and 37 are followed by their body paragraph on the next page. Screenshot: qa/shots/probe-long-document-margins.png.\nActual: The probe measures 26 text lines below the bottom margin and 22 above the top margin across the 10 pages, with the last line of page 1 ending 3px above the page edge. Headings are affected too: Heading 16 is 18px below the top of page 4, and Heading 10 starts 66px below the bottom-margin line on page 2 with its paragraph starting on page 3.",
       "source": "explore:long-document:page text and headings overflow into the top and bottom margins",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T05:50:12Z",
-      "lastAttemptAt": "2026-11-25T05:50:12Z"
+      "lastAttemptAt": "2026-11-25T05:50:12Z",
+      "doneAt": "2026-11-25T05:57:51Z"
     },
     {
       "id": "qa-209",
