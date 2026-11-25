@@ -29,6 +29,7 @@ export const DEFAULT_SETTINGS: ProjectSettings = {
   footer: "",
   lineNumbers: false,
   spellcheck: true,
+  preamble: "",
 };
 
 export const EMPTY_GIT_STATE: GitState = {

@@ -636,6 +636,7 @@ export function documentToLatex(
   const typography = typographyPackages(settings);
   const usesColor =
     containsMark(content, "color") || containsMark(content, "highlight");
+  const preamble = settings.preamble.trim();
   return `${arxivComments ? `% Prepared for arXiv\n${arxivComments}\n` : ""}\\documentclass[${settings.fontSize},${settings.paperSize}${settings.columns === "two" ? ",twocolumn" : ""}]{${settings.documentClass}}
 ${typography}
 \\usepackage{amsmath,amssymb}
@@ -653,7 +654,7 @@ ${settings.lineNumbers ? "\\usepackage{lineno}\\linenumbers" : ""}
 ${header}
 ${footer}
 \\renewcommand{\\headrulewidth}{0pt}
-${title}
+${preamble ? `${preamble}\n` : ""}${title}
 
 \\begin{document}
 ${title ? "\\maketitle" : ""}
@@ -668,6 +669,143 @@ ${bibliography}
 
 \\end{document}
 `;
+}
+
+// The preamble Sentence generates comes only from settings and the document
+// body; anything else typed there (packages, macro and environment
+// definitions) belongs to the project. It is kept verbatim so regenerating the
+// source after an Apply does not quietly delete it.
+function preambleSource(latex: string): string {
+  const begin = findDocumentDelimiter(latex, "\\begin{document}", 0);
+  return begin < 0 ? "" : latex.slice(0, begin);
+}
+
+function extractCustomPreamble(
+  latex: string,
+  settings: ProjectSettings,
+  document: SentenceDocument,
+): string {
+  const source = preambleSource(latex);
+  if (!source.trim()) return "";
+  // Compare against what the settings and body would generate. Lines Sentence
+  // writes itself belong to settings, not to the project: keeping a second copy
+  // of a package with different options would make the PDF fail to compile.
+  const generated = preambleSource(
+    documentToLatex(document, { ...settings, preamble: "" }),
+  );
+  const generatedLines = new Map<string, number>();
+  const generatedPackages = new Set<string>();
+  const generatedCommands = new Set<string>();
+  const definedName =
+    /^\\(?:newcommand|renewcommand|providecommand|def|newfontfamily|newenvironment)\*?\s*\{?\s*\\([a-zA-Z]+)/;
+  for (const line of generated.split(/\r?\n/)) {
+    const text = line.trim();
+    if (!text) continue;
+    generatedLines.set(text, (generatedLines.get(text) ?? 0) + 1);
+    const packages = text.match(/^\\usepackage(?:\[[^\]]*\])?\{([^}]*)\}/);
+    if (packages) {
+      for (const name of packages[1].split(",")) {
+        if (name.trim()) generatedPackages.add(name.trim());
+      }
+      continue;
+    }
+    const defined = text.match(definedName);
+    if (defined) {
+      generatedCommands.add(defined[1]);
+      continue;
+    }
+    const command = text.match(/^\\([a-zA-Z]+)/);
+    if (command) generatedCommands.add(command[1]);
+  }
+
+  const custom: string[] = [];
+  for (const line of source.split(/\r?\n/)) {
+    const text = line.trim();
+    if (!text) continue;
+    const count = generatedLines.get(text) ?? 0;
+    if (count > 0) {
+      generatedLines.set(text, count - 1);
+      continue;
+    }
+    const packages = text.match(/^\\usepackage(?:\[([^\]]*)\])?\{([^}]*)\}/);
+    if (packages) {
+      const names = packages[2].split(",").map((name) => name.trim()).filter(Boolean);
+      const kept = names.filter((name) => !generatedPackages.has(name));
+      if (kept.length === 0) continue;
+      custom.push(
+        kept.length === names.length
+          ? line.trimEnd()
+          : `\\usepackage${packages[1] !== undefined ? `[${packages[1]}]` : ""}{${kept.join(",")}}`,
+      );
+      continue;
+    }
+    const defined = text.match(definedName);
+    if (defined) {
+      if (!generatedCommands.has(defined[1])) custom.push(line.trimEnd());
+      continue;
+    }
+    const command = text.match(/^\\([a-zA-Z]+)/);
+    if (command && generatedCommands.has(command[1])) continue;
+    custom.push(line.trimEnd());
+  }
+  return custom.join("\n").trim();
+}
+
+// Zero-argument macros can be expanded while importing the body, so a `\name{}`
+// call typed in the source becomes the text it prints instead of an escaped
+// literal. Definitions with parameters are left alone: `#1` has nothing to
+// become until the call is seen.
+function preambleMacros(preamble: string): Map<string, string> {
+  const macros = new Map<string, string>();
+  const definitions =
+    /\\(?:newcommand|renewcommand|providecommand)\*?\s*(?:\{\s*\\([a-zA-Z]+)\s*\}|\\([a-zA-Z]+))|\\def\s*\\([a-zA-Z]+)/g;
+  for (const match of preamble.matchAll(definitions)) {
+    const name = match[1] ?? match[2] ?? match[3];
+    let cursor = (match.index ?? 0) + match[0].length;
+    const optionalCount = preamble.slice(cursor).match(/^\s*\[(\d*)\]/);
+    if (optionalCount) {
+      if (Number(optionalCount[1] || "0") > 0) continue;
+      cursor += optionalCount[0].length;
+      if (/^\s*\[[^\]]*\]/.test(preamble.slice(cursor))) continue;
+    }
+    const open = preamble.indexOf("{", cursor);
+    if (open < 0) continue;
+    // A \def body is preceded by its parameter tokens; `#` means it takes
+    // arguments, which the body expansion cannot substitute.
+    if (preamble.slice(cursor, open).includes("#")) continue;
+    const close = findMatchingBrace(preamble, open);
+    if (close < 0) continue;
+    macros.set(name, preamble.slice(open + 1, close));
+  }
+  return macros;
+}
+
+function expandPreambleMacros(source: string, macros: Map<string, string>): string {
+  if (macros.size === 0) return source;
+  const expand = (text: string): string => {
+    let current = text;
+    // A macro may print another defined macro; stop as soon as nothing changes
+    // so a self-referencing definition cannot loop forever.
+    for (let pass = 0; pass < 8; pass += 1) {
+      let changed = false;
+      current = current.replace(
+        /\\([a-zA-Z]+)(?:\{\s*\})?/g,
+        (call, name: string) => {
+          const body = macros.get(name);
+          if (body === undefined) return call;
+          changed = true;
+          return body;
+        },
+      );
+      if (!changed) break;
+    }
+    return current;
+  };
+  // Verbatim text is printed as typed, so a macro name inside it is not a call.
+  return source
+    .split(/(\\begin\{verbatim\}[\s\S]*?\\end\{verbatim\})/)
+    .map((part, index) => (index % 2 === 1 ? part : expand(part)))
+    .join("");
 }
 
 function decodeLatexText(value: string): string {
@@ -1508,6 +1646,11 @@ export function latexToDocument(
     settings.lineSpacing = "single";
   }
   settings.paragraphSpacing = packages.includes("parskip") ? "gap" : "indent";
+  // Only macros from the user's own preamble lines may be expanded; the
+  // generated preamble is Sentence's, not the project's.
+  const macros = preambleMacros(
+    extractCustomPreamble(latex, settings, { type: "doc", content: [] }),
+  );
 
   const body = documentBody(latex);
   assertBalancedEnvironments(body);
@@ -1521,7 +1664,7 @@ export function latexToDocument(
     .replace(/\\bibliography\{[^}]*\}\s*/g, "")
     .replace(/\\tableofcontents\\newpage/g, "")
     .trim();
-  const blocks = splitLatexBlocks(source);
+  const blocks = splitLatexBlocks(expandPreambleMacros(source, macros));
   const content: DocumentNode[] = [];
 
   for (const block of blocks) {
@@ -1712,6 +1855,12 @@ export function latexToDocument(
   if (content.length === 0) {
     content.push({ type: "paragraph" });
   }
+  // Keep the user's own preamble lines so the next Refresh from visual writes
+  // them back instead of silently reporting a successful sync without them.
+  settings.preamble = extractCustomPreamble(latex, settings, {
+    type: "doc",
+    content,
+  });
   return { document: { type: "doc", content }, settings };
 }
 

@@ -3236,8 +3236,9 @@
       "hint": "Repro: 1. View > LaTeX. 2. Before `\\begin{document}`, add `\\usepackage{amsthm}` and `\\newcommand{\\ZXMACRO}{ZXMACRO EXPANDS}`. 3. Before `\\end{document}`, add `ZXPREAMBLE use \\ZXMACRO{} here.` 4. Click Apply source. 5. View > Visual. 6. View > LaTeX and click Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` The draft still contains the package and definition immediately after Apply, but the visual page shows the literal `\\ZXMACRO` call. After Refresh from visual the preamble no longer contains amsthm or \\newcommand, and the body contains `\\textbackslash{}ZXMACRO\\{\\}`. Probe: regeneratedPreambleHasPackage=false, regeneratedHasMacro=false, escapedMacroCall=true. The source only reveals the loss after a refresh, so the success toast is the only feedback at Apply time.",
       "source": "explore:source-editor:preamble packages and macros are reported synchronized but silently dropped, and their calls are escaped",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T05:58:31Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T05:58:31Z",
+      "lastAttemptAt": "2026-11-25T05:58:31Z"
     },
     {
       "id": "qa-204",
