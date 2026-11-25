@@ -12,6 +12,12 @@ describe("latexHasError", () => {
     expect(latexHasError("x^{", true)).toBe(true);
   });
 
+  it("flags a blank line, which ends the paragraph before the formula closes", () => {
+    expect(latexHasError("a\n\nb", false)).toBe(true);
+    expect(latexHasError("a\r\n  \r\nb", true)).toBe(true);
+    expect(latexHasError("a\nb", false)).toBe(false);
+  });
+
   it("accepts valid LaTeX", () => {
     expect(latexHasError("\\frac{a}{b}", false)).toBe(false);
     expect(latexHasError("\\color{#cc0000}x", false)).toBe(false);

@@ -27,6 +27,9 @@ export function renderLatex(latex: string, displayMode: boolean): string {
 export function latexHasError(latex: string, displayMode: boolean): boolean {
   const source = latex.trim();
   if (!source) return false;
+  // Math mode cannot cross a paragraph break: the blank line ends the paragraph
+  // before the closing delimiter, so the formula would not compile.
+  if (/\r?\n[ \t]*\r?\n/.test(source)) return true;
   try {
     const html = katex.renderToString(source, {
       displayMode,

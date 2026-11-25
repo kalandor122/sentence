@@ -549,3 +549,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T02:50:16Z START qa-186 on qa/qa-186-display-equation-inside-a-table-cell-is: Display equation inside a table cell is silently dropped from the LaTeX export
 2026-11-25T02:53:27Z PUSHED main
 2026-11-25T02:53:27Z DONE qa-186 (tsc -b, npm test, smoke all green)
+2026-11-25T02:54:01Z START qa-187 on qa/qa-187-blank-line-inside-inline-math-is-accepte: Blank line inside inline math is accepted, exported as invalid LaTeX, then silently converted to text on Apply source
