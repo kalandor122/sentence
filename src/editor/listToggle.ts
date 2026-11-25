@@ -121,6 +121,56 @@ export function splitOrderedListOnEmptyItem(editor: Editor): boolean {
   return true;
 }
 
+/**
+ * Turning numbering off for one item in the middle of a numbered run leaves the
+ * trailing items in a second list. ProseMirror's lift copies the list attrs, so
+ * that list restarts at 1 and the numbers jump backwards. Lift the item out
+ * ourselves and continue the trailing items at the number they already had.
+ */
+export function removeOrderedListItem(editor: Editor): boolean {
+  if (!editor.isEditable) return false;
+  const { state } = editor;
+  const { selection } = state;
+  if (!(selection instanceof TextSelection)) return false;
+  if (!editor.isActive("orderedList")) return false;
+  const { $from, $to } = selection;
+  if ($from.depth < 3) return false;
+  if ($from.before(-2) !== $to.before(-2) || $from.before(-1) !== $to.before(-1)) return false;
+  const item = $from.node(-1);
+  const list = $from.node(-2);
+  if (item.type.name !== "listItem" || list.type.name !== "orderedList") return false;
+
+  const index = $from.index(-2);
+  const items: ProseMirrorNode[] = [];
+  list.forEach((child) => items.push(child));
+  const start = Number(list.attrs.start ?? 1);
+  const baseStart = Number.isSafeInteger(start) && start > 0 ? start : 1;
+
+  const blocks: ProseMirrorNode[] = [];
+  const listPos = $from.before(-2);
+  if (index > 0) blocks.push(list.type.create(list.attrs, items.slice(0, index)));
+  const liftedPos = listPos + (index > 0 ? blocks[0].nodeSize : 0);
+  item.forEach((child) => blocks.push(child));
+  if (index < items.length - 1) {
+    blocks.push(
+      list.type.create({ ...list.attrs, start: baseStart + index + 1 }, items.slice(index + 1)),
+    );
+  }
+
+  const offsetFrom = $from.pos - $from.start(-1);
+  const offsetTo = $to.pos - $from.start(-1);
+  const tr = state.tr.replaceWith(listPos, listPos + list.nodeSize, blocks);
+  tr.setSelection(
+    TextSelection.between(
+      tr.doc.resolve(liftedPos + offsetFrom),
+      tr.doc.resolve(liftedPos + offsetTo),
+    ),
+  );
+  editor.view.dispatch(tr.scrollIntoView());
+  editor.commands.focus();
+  return true;
+}
+
 // Retag list nodes (including nested sublists) without touching their items,
 // so a full-document toggle converts lists in place instead of wrapping every
 // selected block - including paragraphs and nested lists - in a new list.
@@ -164,6 +214,7 @@ export function toggleList(editor: Editor, listType: "bulletList" | "orderedList
       return true;
     }
   }
+  if (listType === "orderedList" && removeOrderedListItem(editor)) return true;
   const cmd = listType === "bulletList" ? "toggleBulletList" : "toggleOrderedList";
   return editor.chain().focus()[cmd]().run();
 }
