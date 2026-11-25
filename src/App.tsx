@@ -416,6 +416,22 @@ function insertBlockContent(
 }
 
 function insertPageFurniture(editor: Editor | null, type: "pageBreak" | "toc") {
+  if (!editor) return;
+  // A block atom inserted mid-heading would split the heading in two. Page
+  // furniture belongs between blocks, so put it after the heading instead.
+  const { $from } = editor.state.selection;
+  for (let depth = $from.depth; depth > 0; depth -= 1) {
+    if ($from.node(depth).type.name === "heading") {
+      const caret = $from.pos;
+      editor
+        .chain()
+        .focus()
+        .insertContentAt($from.after(depth), { type })
+        .setTextSelection(caret)
+        .run();
+      return;
+    }
+  }
   insertBlockContent(editor, { type });
 }
 

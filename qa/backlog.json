@@ -3464,8 +3464,9 @@
       "hint": "Repro: In the demo document click the H2 heading 'Drafting with constraints', press Home, then ArrowRight four times so the caret sits after 'Draf' inside the heading. Click References > Table of contents (or Insert > Page break instead).\nActual: The heading is split into two headings, 'Draf' and 'ting with constraints', and the table of contents / page break is inserted between them. The TOC preview lists two entries ('1.1 Draf', '1.2 ting with constraints') and the exported LaTeX contains two \\subsection commands. With a page break the LaTeX is \\subsection{Draf}, \\newpage, \\subsection{ting with constraints}. Probe qa/probes/insert-media.mjs scenarios 'caret-in-heading-toc' and 'caret-in-heading-break'.",
       "source": "explore:insert-media:inserting a table of contents or a page break with the caret inside a heading splits the heading into two headings",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T09:18:14Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T09:18:14Z",
+      "lastAttemptAt": "2026-11-25T09:18:14Z"
     },
     {
       "id": "qa-219",
