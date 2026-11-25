@@ -1285,17 +1285,49 @@ const BLOCK_COMMAND_START =
 const BLOCK_COMMAND_LINE =
   /^\s*\\(?:(?:section|subsection|subsubsection)\*?(?:\[[^\]]*\])?\{|newpage\b|tableofcontents\b|includegraphics\b|noindent\s*\\rule\b)/;
 
+const HEADING_START = /^\s*\\(?:section|subsection|subsubsection)\*?(?:\[[^\]]*\])?\{/;
+
+// A heading whose title holds an inline image wraps onto a second line: the
+// alt text is a `%` comment, which has to end the line to stay a comment. The
+// braces still close on the next line, so the heading is one block and must not
+// be flushed until they do. Braces inside a comment or escaped with a backslash
+// do not count.
+function braceBalance(line: string): number {
+  let balance = 0;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    if (char === "\\") {
+      index += 1;
+    } else if (char === "%") {
+      break;
+    } else if (char === "{") {
+      balance += 1;
+    } else if (char === "}") {
+      balance -= 1;
+    }
+  }
+  return balance;
+}
+
 function splitLatexBlocks(source: string): string[] {
   const blocks: string[] = [];
   let current: string[] = [];
   let depth = 0;
+  // Braces left open by a heading line that is still part of the current block.
+  let headingOpen = 0;
   const flush = () => {
     const block = current.join("\n").trim();
     if (block) blocks.push(block);
     current = [];
+    headingOpen = 0;
   };
   for (const line of source.split(/\r?\n/)) {
-    if (depth === 0 && current.length > 0 && BLOCK_COMMAND_START.test(line)) {
+    if (
+      depth === 0 &&
+      headingOpen === 0 &&
+      current.length > 0 &&
+      BLOCK_COMMAND_START.test(line)
+    ) {
       flush();
     }
     if (!line.trim() && depth === 0) {
@@ -1326,7 +1358,10 @@ function splitLatexBlocks(source: string): string[] {
       continue;
     }
     current.push(line);
-    if (depth === 0 && BLOCK_COMMAND_LINE.test(line)) flush();
+    if (headingOpen > 0 || HEADING_START.test(line)) {
+      headingOpen = Math.max(0, headingOpen + braceBalance(line));
+    }
+    if (depth === 0 && headingOpen === 0 && BLOCK_COMMAND_LINE.test(line)) flush();
   }
   flush();
   return attachHeadingLabels(blocks);

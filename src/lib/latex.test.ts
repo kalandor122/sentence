@@ -2299,6 +2299,49 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("keeps an inline image inside a heading and its title intact", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "heading",
+          attrs: { level: 2 },
+          content: [
+            { type: "text", text: "Draf" },
+            {
+              type: "inlineImage",
+              attrs: {
+                path: "assets/images/icon.png",
+                alt: "icon.png",
+                naturalWidth: 120,
+                naturalHeight: 60,
+              },
+            },
+            { type: "text", text: "ting with constraints" },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("\\subsection{Draf\\includegraphics");
+
+    const parsed = latexToDocument(latex, DEFAULT_SETTINGS);
+    expect(parsed.document.content).toHaveLength(1);
+    const heading = parsed.document.content[0];
+    expect(heading.type).toBe("heading");
+    expect(heading.attrs?.level).toBe(2);
+    const image = heading.content?.find((node) => node.type === "inlineImage");
+    expect(image?.attrs?.path).toBe("assets/images/icon.png");
+    expect(image?.attrs?.alt).toBe("icon.png");
+    expect(
+      heading.content
+        ?.filter((node) => node.type === "text")
+        .map((node) => node.text)
+        .join(""),
+    ).toBe("Drafting with constraints");
+    expect(documentToLatex(parsed.document, settings)).toContain("\\subsection{Draf");
+  });
+
   it("keeps an inline image inside its paragraph", () => {
     const document: SentenceDocument = {
       type: "doc",

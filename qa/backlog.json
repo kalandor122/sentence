@@ -4131,8 +4131,9 @@
       "hint": "Repro: Open the demo project. Click the H2 heading 'Drafting with constraints', press Home, then ArrowRight four times so the caret is after 'Draf'. Click Insert > Image and choose a 120x60 PNG (probe uses icon.png): the picture is inserted inline inside the heading. Click View > LaTeX; the heading exports as one line '\\subsection{Draf\\includegraphics[width=\\linewidth,height=1.5em,keepaspectratio]{assets/images/icon.png}% Sentence alt: icon.png', with the rest of the heading ('ting with constraints}') on the next line. Add any edit (the probe appends ' % qa') and click Apply source, then switch back to Visual. The H2 heading is gone; the body now has ordinary paragraphs '\\subsection{Draf' and 'ting with constraints}', an inline image, and an empty image. Type one character and read View > LaTeX again: the heading is now '\\textbackslash{}subsection\\{Draf...'.\nActual: The source round trip deletes the heading: headings become ['H1:Introduction'] only, and the two literal paragraphs '\\subsection{Draf' and 'ting with constraints}' are created (the probe also finds a second empty image with path null). Re-exporting the corrupted document produces '\\textbackslash{}subsection\\{Draf\\includegraphics...' and no \\subsection command (subsectionCount 0), so the heading is lost from both the visual document and the LaTeX. Probe qa/probes/insert-media.mjs scenario 'image-in-heading-roundtrip'.",
       "source": "explore:insert-media:an image inserted inside a heading is re-imported as two literal paragraphs, destroying the heading and its latex",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T16:37:16Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T16:37:16Z",
+      "lastAttemptAt": "2026-11-25T16:37:16Z"
     },
     {
       "id": "qa-262",
