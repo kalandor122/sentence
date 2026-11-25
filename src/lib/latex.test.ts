@@ -1078,6 +1078,25 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("\\textbackslash{}");
   });
 
+  it("keeps the short title of a section out of the heading text and in the source", () => {
+    const source = [
+      "\\begin{document}",
+      "\\section[ZXSHORT]{ZXOPT FULL TITLE}",
+      "",
+      "ZXOPT BODY",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const heading = parsed.content[0];
+    expect(heading?.type).toBe("heading");
+    expect(heading?.attrs).toEqual({ level: 1, shortTitle: "ZXSHORT" });
+    expect(heading?.content?.map((node) => node.text).join("")).toBe("ZXOPT FULL TITLE");
+    expect(parsed.content[1]?.content?.map((node) => node.text).join("")).toBe("ZXOPT BODY");
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\section[ZXSHORT]{ZXOPT FULL TITLE}");
+    expect(exported).not.toContain("\\textbackslash{}");
+  });
+
   it("imports a list followed by text without a blank line", () => {
     const source = [
       "\\begin{document}",

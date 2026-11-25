@@ -30,6 +30,30 @@ describe("HeadingLabel", () => {
     editor.destroy();
     reloaded.destroy();
   });
+
+  it("keeps a heading short title through the editor", () => {
+    const editor = new Editor({
+      extensions: [StarterKit, HeadingLabel],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "heading",
+            attrs: { level: 1, shortTitle: "ZXSHORT" },
+            content: [{ type: "text", text: "ZXOPT FULL TITLE" }],
+          },
+        ],
+      },
+    });
+    expect(editor.getJSON().content?.[0]?.attrs?.shortTitle).toBe("ZXSHORT");
+    const html = editor.getHTML();
+    expect(html).toContain('data-short-title="ZXSHORT"');
+
+    const reloaded = new Editor({ extensions: [StarterKit, HeadingLabel], content: html });
+    expect(reloaded.getJSON().content?.[0]?.attrs?.shortTitle).toBe("ZXSHORT");
+    editor.destroy();
+    reloaded.destroy();
+  });
 });
 
 describe("CommentMark", () => {

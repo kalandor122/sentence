@@ -14,7 +14,9 @@ function stringAttribute(node: { attrs?: Record<string, unknown> }, name: string
 // Keeping it on the heading node means the next visual edit does not drop it
 // before the LaTeX is regenerated. The same goes for the star in
 // `\section*{...}`: it marks the heading unnumbered, so it has to survive the
-// editor's node schema or the next export silently numbers it.
+// editor's node schema or the next export silently numbers it. The optional
+// short title of `\section[Short]{Title}` is table-of-contents metadata and
+// round-trips the same way.
 export const HeadingLabel = Extension.create({
   name: "headingLabel",
 
@@ -28,6 +30,14 @@ export const HeadingLabel = Extension.create({
             parseHTML: (element) => element.getAttribute("data-label"),
             renderHTML: (attributes) =>
               attributes.label ? { "data-label": attributes.label } : {},
+          },
+          shortTitle: {
+            default: null,
+            parseHTML: (element) => element.getAttribute("data-short-title"),
+            renderHTML: (attributes) =>
+              attributes.shortTitle !== null && attributes.shortTitle !== undefined
+                ? { "data-short-title": attributes.shortTitle }
+                : {},
           },
           unnumbered: {
             default: false,
