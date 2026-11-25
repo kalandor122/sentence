@@ -907,6 +907,15 @@ export default function App() {
       }
     }
     draftSaveError.current = draftError;
+    // The revision debounce is longer than this autosave one, so writing the
+    // workspace as-is would store the new text without the revision it is
+    // waiting for. Fold the pending edit in first: "Saved locally" must never
+    // mean a tracked edit is saved but can no longer be reviewed.
+    current = withPendingRevision(current);
+    if (stillActive() && workspaceRef.current !== current) {
+      workspaceRef.current = current;
+      setWorkspace(current);
+    }
     const versionAtStart = changeVersion.current;
     const sourceDraftAtStart = sourceDraftDocument.current;
     // An invalid or outdated draft is never written; fall back to LaTeX
@@ -1113,12 +1122,19 @@ export default function App() {
     saveBrowserDraft(sourceDirty && source ? { source, document: sourceDraftDocument.current } : null);
   }, [source, sourceDirty]);
 
+  const flushRef = useRef<() => void>(() => undefined);
+  useEffect(() => {
+    // The listener below is registered once, so it must call the latest persist
+    // rather than the one from the first render (tracking still off there).
+    flushRef.current = () => {
+      if (!isDesktop) void persist();
+    };
+  });
+
   useEffect(() => {
     // A page reload can happen before the autosave debounce fires. Flush the
     // latest workspace synchronously on the way out so pending edits survive.
-    const flushPending = () => {
-      if (!isDesktop) void persist();
-    };
+    const flushPending = () => flushRef.current();
     window.addEventListener("pagehide", flushPending);
     return () => window.removeEventListener("pagehide", flushPending);
   }, []);
@@ -1206,6 +1222,23 @@ export default function App() {
     };
   };
 
+  // Fold everything edited since the baseline into a revision before the
+  // workspace is written. Saves happen on a shorter debounce than the revision
+  // timer, and leaving on pagehide saves immediately, so either can land in
+  // that window; committing here means the stored document and its review
+  // state always agree.
+  const withPendingRevision = (project: Workspace): Workspace => {
+    const baseline = revisionBaseline.current;
+    if (!tracking || !baseline) return project;
+    if (revisionTimer.current) {
+      window.clearTimeout(revisionTimer.current);
+      revisionTimer.current = null;
+    }
+    const revision = trackedRevisionFor(baseline, project.document);
+    revisionBaseline.current = project.document;
+    return revision ? { ...project, revisions: [revision, ...project.revisions] } : project;
+  };
+
   // Record everything edited since the baseline as one pending revision. Called
   // by the debounce timer and, so nothing is lost, when tracking is turned off
   // mid-debounce.
@@ -1220,7 +1253,11 @@ export default function App() {
     const revision = trackedRevisionFor(baseline, latest.document);
     revisionBaseline.current = latest.document;
     if (!revision) return;
-    setWorkspace((current) => current ? { ...current, revisions: [revision, ...current.revisions] } : current);
+    // Keep the ref in step with the state so an immediate flush or save still
+    // writes the revision.
+    const next: Workspace = { ...latest, revisions: [revision, ...latest.revisions] };
+    workspaceRef.current = next;
+    setWorkspace(next);
     markDirty();
   };
 
