@@ -3927,11 +3927,12 @@
       ],
       "hint": "Repro: 1. Click View, then LaTeX. 2. Put the caret before \\end{document} and type `ZXTABHISTORY`. 3. Click references.bib, then click document.tex. 4. Click in the textarea and press Ctrl+Z three times.\nActual: All three Ctrl+Z presses leave `ZXTABHISTORY` in the textarea. Typing `ZXTABNEW` after returning and pressing Ctrl+Z removes only `ZXTABNEW`, so undo still works for post-switch edits but the history from before the tab switch is gone. Probe: undoafterFileTabSwitch.markerStillPresentAfterThreeUndos=[true,true,true], undoRemovedPreSwitchTyping=false, newTypingAfterSwitchUndoable=true.",
       "source": "explore:source-editor:undo history is lost when switching to references.bib and back",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T17:04:18Z",
       "note": "WIP kept on its branch; retry",
-      "lastAttemptAt": "2026-11-25T17:04:18Z"
+      "lastAttemptAt": "2026-11-25T17:04:18Z",
+      "doneAt": "2026-11-25T17:10:54Z"
     },
     {
       "id": "qa-247",
@@ -3943,7 +3944,9 @@
       ],
       "hint": "Repro: 1. Click View, then LaTeX. 2. Before the real \\end{document}, insert `\\begin{verbatim}`, `ZXCODE \\end{document}`, `ZXCODE still code`, and `\\end{verbatim}`. 3. Click Apply source.\nActual: Apply reports `Invalid LaTeX: text after \\end{document} is not part of the document (\"ZXCODE still code\"). Move it before \\end{document}.` Valid LaTeX is rejected; the draft is preserved and Apply stays enabled. Probe: verbatimEndDocument.rejected=true, draftKept=true.",
       "source": "explore:source-editor:a verbatim block containing \\end{document} is rejected as trailing text",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T17:11:34Z"
     },
     {
       "id": "qa-248",

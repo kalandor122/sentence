@@ -769,3 +769,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T17:03:40Z PUSHED main
 2026-11-25T17:03:40Z DONE qa-263 (tsc -b, npm test, smoke all green)
 2026-11-25T17:04:18Z START qa-246 on qa/qa-246-undo-history-is-lost-when-switching-to-r: Undo history is lost when switching to references.bib and back
+2026-11-25T17:10:56Z PUSHED main
+2026-11-25T17:10:56Z DONE qa-246 (tsc -b, npm test, smoke all green)
