@@ -3172,8 +3172,9 @@
       "hint": "Repro: 1. Create a project and open the editor. 2. View > LaTeX. 3. Before the real \\end{document}, add the comment line `% ZXCOMMENTED \\end{document} marker`, a blank line, the paragraph `ZXAFTERCOMMENT paragraph`, a blank line, and keep the real \\end{document}. 4. Click Apply source. 5. View > Visual, then View > LaTeX and click Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` but the visual document does not contain ZXAFTERCOMMENT, and Refresh from visual drops the paragraph from the source. The draft still contains the paragraph immediately after Apply and Apply is disabled, so the pane looks synchronized while the document has silently lost the text. Probe: visualHasAfterComment=false, draftKeptAfterApply=true, regeneratedHasAfterComment=false, applyEnabledAfter=false.",
       "source": "explore:source-editor:a commented-out \\end{document} silently truncates the rest of the document",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T05:04:15Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T05:04:15Z",
+      "lastAttemptAt": "2026-11-25T05:04:15Z"
     },
     {
       "id": "qa-200",

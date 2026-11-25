@@ -185,6 +185,28 @@ describe("LaTeX generation", () => {
     expect(exported).toContain("Second paragraph with a literal \\% sign");
   });
 
+  it("keeps text after a commented-out end{document}", () => {
+    const latex = [
+      "\\documentclass{article}",
+      "% \\begin{document}",
+      "\\begin{document}",
+      "Before comment.",
+      "",
+      "% ZXCOMMENTED \\end{document} marker",
+      "",
+      "ZXAFTERCOMMENT paragraph",
+      "",
+      "\\end{document}",
+    ].join("\n");
+    const { document } = latexToDocument(latex, DEFAULT_SETTINGS);
+    expect(documentPlainText(document)).toBe(
+      "Before comment.\n\nZXAFTERCOMMENT paragraph",
+    );
+    expect(documentToLatex(document, DEFAULT_SETTINGS)).toContain(
+      "ZXAFTERCOMMENT paragraph",
+    );
+  });
+
   it("round-trips the Sentence subset", () => {
     const source: SentenceDocument = {
       type: "doc",
