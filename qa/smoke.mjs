@@ -272,7 +272,41 @@ try {
     }
   }
 
-  // 9. Console gate
+  // 9. Zotero import lives in the bibliography dialog
+  {
+    const opened = await page.evaluate(() => {
+      const tab = [...document.querySelectorAll("aside button, .sidebar button")].find((b) =>
+        /references/i.test(b.textContent || ""),
+      );
+      tab?.click();
+      return Boolean(tab);
+    });
+    hard("References panel is reachable", opened, "no References button in the sidebar");
+    await page.waitForTimeout(350);
+
+    const added = await page.evaluate(() => {
+      const add = [...document.querySelectorAll("button")].find((b) => (b.textContent || "").trim() === "Add");
+      add?.click();
+      return Boolean(add);
+    });
+    hard("bibliography panel has an Add button", added, "no Add button in References panel");
+    await page.waitForTimeout(450);
+
+    hard(
+      "bibliography dialog offers a Zotero search",
+      (await page.locator('.zotero-panel input[aria-label="Search Zotero"]').count()) === 1,
+      "no Zotero search field in the Add entry dialog",
+    );
+    hard(
+      "Zotero search button is present",
+      (await page.getByRole("button", { name: "Search Zotero", exact: true }).count()) === 1,
+      "",
+    );
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(200);
+  }
+
+  // 10. Console gate
   hard("no console errors", report.consoleErrors.length === 0, report.consoleErrors.slice(0, 5).join(" | "));
 } catch (e) {
   report.failures.push({ check: "harness", detail: String(e).slice(0, 500) });

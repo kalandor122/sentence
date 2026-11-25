@@ -54,6 +54,22 @@ references.bib    bibliography
 Two-column layout, paper size, margins, font size, line spacing and paragraph
 style are settings that flow into the preamble and back.
 
+## Zotero
+
+References come from your Zotero library, not a second database. In Zotero 7 open
+**Settings → Advanced** and tick **"Allow other applications on this computer to
+communicate with Zotero"**, then leave Zotero running.
+
+In Sentence: **References (sidebar) → Add → Search your Zotero library**. Picking a
+result writes a complete BibTeX entry — journal, volume, number, pages, DOI,
+publisher, ISBN/ISSN, abstract — into `references.bib`, with a `lastname+year+word`
+key that is deduped against what is already there. The request goes through Rust
+(`zotero_search`) because Zotero's local API sends no CORS headers, so a webview
+fetch would never reach it.
+
+`node qa/mock-zotero.mjs` serves a stand-in library on `127.0.0.1:23119` for testing
+(`ZOTERO_LIVE=1 cargo test --lib zotero` exercises the real request).
+
 ## Build and run
 
 Requirements: Node 20+, Rust (stable), and the Tauri 2 system dependencies.
