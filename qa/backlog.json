@@ -3799,7 +3799,9 @@
       ],
       "hint": "Repro: Create a project. Type `CancelFoot ` (with a trailing space), open Insert > Footnote, enter `Will cancel`, press Escape, then type `F`. Repeat with References > Insert citation > `Enter a key manually` (press Escape, then type `C`) and References > Cross-reference (press Escape, then type `R`).\nActual: Focus returns to the control that opened the dialog (`BUTTON:Footnote`, `BUTTON:Enter a key manually`, `BUTTON:Cross-reference`), so the typed characters are discarded; the paragraphs remain `CancelFoot `, `CancelCite ` and `CancelRef ` with no `F`, `C` or `R`.",
       "source": "explore:links-cites-footnotes:cancelling the insert dialogs drops the next typed characters",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T15:51:10Z"
     },
     {
       "id": "qa-239",
@@ -4019,10 +4021,11 @@
       ],
       "hint": "Repro: Open a project, click into the document, select all and type \"mode probe paragraph\". Press Ctrl+Alt+2 (Source): the status bar switches to Source and focus lands in the \"LaTeX source\" textarea. Press Ctrl+Alt+1 (Visual): the status bar switches to Visual, but document.activeElement is <body>, not the ProseMirror editor. Type \"QRS\": the document still reads \"mode probe paragraph\", and QRS appears nowhere on the page or in the LaTeX source. Typing only works again after clicking the page, pressing F6 or tabbing back. The same happens when leaving Split for Visual while the caret is in the source pane: Ctrl+Alt+1 from Split puts focus on <body> and the next typing is lost.\nActual: After Ctrl+Alt+1 the LaTeX textarea is gone from the DOM and activeElement is {tag: \"BODY\"}; nothing has moved focus into the visual editor. Typing QRS leaves the visual document unchanged (\"mode probe paragraph\") and bodyText does not contain QRS. Ctrl+Alt+2 works because focus lands in the source textarea; there is no equivalent handoff for visual.",
       "source": "explore:keyboard:ctrl+alt+1 back to visual leaves focus on <body>, so the next keystrokes are silently discarded",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T15:47:12Z",
-      "lastAttemptAt": "2026-11-25T15:47:12Z"
+      "lastAttemptAt": "2026-11-25T15:47:12Z",
+      "doneAt": "2026-11-25T15:50:31Z"
     },
     {
       "id": "qa-254",
