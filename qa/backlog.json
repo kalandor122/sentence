@@ -3575,10 +3575,11 @@
       ],
       "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'inner one', press Tab, press Enter, type 'inner two'. Click at the end of 'inner one' and click Home > Bulleted list (the button is shown pressed). Also select both 'inner one' and 'inner two' and click the same button.\nActual: 'inner one' is promoted out of the sublist but remains a bulleted list item, and 'inner two' is re-nested under it. The DOM becomes '<ul><li><p>outer</p></li><li><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>' and the LaTeX is '\\item outer\\n\\item inner one\\n\\begin{itemize}\\n\\item inner two\\n\\end{itemize}': the bullet on 'inner one' is never removed. With both items selected, only the parent leaves the list and the nested item stays as a top-level bullet list.",
       "source": "explore:lists:clicking the highlighted list button inside a nested item only outdents it and keeps the bullet",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T10:52:01Z",
-      "lastAttemptAt": "2026-11-25T10:52:01Z"
+      "lastAttemptAt": "2026-11-25T10:52:01Z",
+      "doneAt": "2026-11-25T10:56:58Z"
     },
     {
       "id": "qa-226",
@@ -3590,7 +3591,9 @@
       ],
       "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'child one', press Tab, press Enter, type 'child two', press Enter, type 'child three'. Click at the end of 'child one', press Enter (an empty second child item appears), press Enter again and type 'typed'. Repeat with Home > Numbered list.\nActual: 'typed' is inserted inside the parent list item, between two split child lists: the DOM is '<ul><li><p>outer</p><ul><li><p>child one</p></li></ul><p>typed</p><ul><li><p>child two</p></li><li><p>child three</p></li></ul></li></ul>' and the LaTeX is '\\item outer\\n\\begin{itemize}\\n\\item child one\\n\\end{itemize}\\ntyped\\n\\begin{itemize}\\n\\item child two\\n\\item child three\\n\\end{itemize}', so 'typed' becomes text of the parent item rather than a list item. The numbered variant behaves the same and exports the second nested list as '\\setcounter{enumii}{1}'.",
       "source": "explore:lists:enter on an empty item in the middle of a nested list turns the new text into part of the parent item",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T11:06:46Z"
     },
     {
       "id": "qa-227",
@@ -3614,6 +3617,42 @@
       ],
       "hint": "Repro: Create a new document. Type 'outer one', click Home > Numbered list, press Enter, type 'middle one', press Tab, press Enter, type 'deep one', press Tab. Read the three markers in the editor, then open Source and read the LaTeX.\nActual: All three items render with the decimal marker '1.' (the computed list-style-type is 'decimal' for the level 0, 1 and 2 <ol> elements), giving '1. outer one / 1. middle one / 1. deep one', while the exported LaTeX is three plain nested \\begin{enumerate} blocks with no label customisation, which compile to 1., (a), i.",
       "source": "explore:lists:every level of a nested numbered list is labelled 1. in the visual editor",
+      "status": "open"
+    },
+    {
+      "id": "qa-229",
+      "title": "A table caption containing a closing brace is silently corrupted by a LaTeX source round trip",
+      "why": "Exploratory pass on tables (content): expected The caption stays 'R&D 50% {x}' in the visual table, the Caption field, and the re-exported LaTeX.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new project. Insert tab > Insert table. Click a body cell, type 'R&D 50% {x}' into the Table toolbar's Caption field, then switch to View > LaTeX and confirm the line \\caption{R\\&D 50\\% \\{x\\}}. Add a new line containing '% check' at the end of the source and click Apply source. Look at the caption under the table and the Caption field, then switch to View > LaTeX again.\nActual: After Apply source the visible caption and the Caption field both read 'R&D 50% {x\\' - the closing brace is gone and a backslash is appended. The re-exported line is \\caption{R\\&D 50\\% \\{x\\\\}}, so the literal '}' is permanently lost and replaced by a LaTeX line break. A caption without a brace ('Simple caption') round-trips unchanged, and caption text is the only place this was observed; the same '{x}' text in a table cell survives the round trip.",
+      "source": "explore:tables:a table caption containing a closing brace is silently corrupted by a latex source round trip",
+      "status": "open"
+    },
+    {
+      "id": "qa-230",
+      "title": "Tab in the last table cell jumps to the 'Visual' view button and the next keystrokes are discarded",
+      "why": "Exploratory pass on tables (functional): expected Tab from the last cell either adds a row (Word's behaviour) or moves the caret into the empty paragraph directly after the table, so continued typing lands in a text position.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new project. Insert tab > Insert table. Click the bottom-right cell, type 'b3', press Tab once, then type 'AFTER' without clicking anywhere. Read the document and then switch to View > LaTeX and read the source.\nActual: The table stays 3x3 with no new row, the empty paragraph after the table is skipped, and focus lands on the 'Visual (Ctrl+Alt+1)' view button in the bottom status bar (document.activeElement is that BUTTON, activeElement.closest('.tiptap') is false). Typing 'AFTER' produces no text anywhere in the document or in the exported LaTeX. Clicking the paragraph after the table and typing works, so the text position exists but Tab bypasses it.",
+      "source": "explore:tables:tab in the last table cell jumps to the 'visual' view button and the next keystrokes are discarded",
+      "status": "open"
+    },
+    {
+      "id": "qa-231",
+      "title": "'Add row above' in the header row inserts the new row below the header instead",
+      "why": "Exploratory pass on tables (ux): expected Each press inserts a blank row directly above the row that holds the caret, or, if the header must stay in row 1, the control is disabled or relabelled in the header row.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new project. Insert tab > Insert table. Type 'HEAD' in the first-row middle cell and 'BODY' in the second-row middle cell. Click the HEAD cell and press the Table toolbar's 'Add row above' button. Then click the BODY row and press 'Add row above' again.\nActual: The first press leaves HEAD in row 1 and adds the blank row at row 2, directly below the header: cells become HEAD, blank, BODY, blank. The second press inserts correctly above BODY, giving HEAD, blank, blank, BODY, blank. The same button therefore does not do what its label says while the caret is in the header row.",
+      "source": "explore:tables:'add row above' in the header row inserts the new row below the header instead",
       "status": "open"
     }
   ]
