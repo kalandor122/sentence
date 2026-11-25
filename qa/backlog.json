@@ -3935,10 +3935,11 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.longList` / `stages.longBlockquote`, or reproduce by hand at 1280x800: open http://localhost:1420, click 'New document', press Ctrl+A then Backspace, and paste an 80-item bulleted list through the clipboard. Each item is `List item N List item with enough words to wrap onto a second line so the list grows well past one page.` (the probe pastes `<ul><li>...</li></ul>` with exactly that text; the status bar then reads 1,760 words / 6 pages). The probe's page audit measures 160 line boxes: 15 sit above a page's 96px top margin, 17 sit below the 96px bottom margin, and 2 line boxes cross a straight page rule (page 4: 4,478-4,494 crosses the rule at 4,492; page 5: 5,610-5,626 crosses the rule at 5,615). Pasting 40 copies of `Quoted paragraph N with several words so the blockquote grows past a page boundary in a long document.` inside one `<blockquote>` instead gives 720 words / 4 pages, 6 top-margin lines, 10 bottom-margin lines and 3 rule crossings (page 1: 1,117-1,136 crosses 1,123; page 2: 2,246-2,265 crosses 2,246; page 3: 3,355-3,374 crosses 3,369). Screenshots: qa/shots/probe-long-document-list.png and qa/shots/probe-long-document-blockquote.png.\nActual: The editor only paginates top-level paragraphs and H1-H3 blocks; a UL/OL or BLOCKQUOTE that is taller than a page is left untouched. In the 6-page list, 15 lines land in top margins and 17 in bottom margins, and the rule at 4,492px and 5,615px is drawn through the line boxes of items 62 and 79 (visible in the screenshot: item 62's second line sits on the page edge and item 63 starts about 30px below it, inside the 96px margin). The blockquote behaves the same way: 16 lines in the margins and a rule through 'Quoted paragraph 10', '25' and '39'.",
       "source": "explore:long-document:lists and blockquotes are never paginated: page rules cut through their lines and text sits in the margins",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T14:29:24Z",
-      "lastAttemptAt": "2026-11-25T14:29:24Z"
+      "lastAttemptAt": "2026-11-25T14:29:24Z",
+      "doneAt": "2026-11-25T14:37:08Z"
     },
     {
       "id": "qa-249",
@@ -3950,7 +3951,9 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.pageBreakMidWord`, or reproduce by hand: open http://localhost:1420, click 'New document', Ctrl+A then Backspace, type `The quick brown fox jumps over the lazy dog.`, press Home, press ArrowRight 12 times (the caret now sits between `br` and `own`), open the Insert tab and click 'Page break'. The status bar goes from 9 words to 10 words and the editor becomes `The quick br` / page break / `own fox jumps over the lazy dog.`. Open View > LaTeX: the source contains `The quick br`, a blank line, `\\newpage`, then `own fox jumps over the lazy dog.` Switch back to Visual, click the page break and press Backspace: the break is gone but the document remains two paragraphs (`The quick br` and `own fox jumps over the lazy dog.`) and still reports 10 words. A source-to-visual round trip also keeps the split.\nActual: The page break splits the paragraph at the caret and the word `brown` is divided into `br` and `own`, which then export as two separate words around `\\newpage` (word count 9 -> 10). Deleting the break leaves two paragraphs and does not reunite the word, so the typo persists in the document and in the LaTeX source.",
       "source": "explore:long-document:a page break inserted inside a word permanently splits the word and inflates the word count",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T14:37:48Z"
     },
     {
       "id": "qa-250",
