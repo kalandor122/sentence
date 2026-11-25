@@ -552,3 +552,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T02:54:01Z START qa-187 on qa/qa-187-blank-line-inside-inline-math-is-accepte: Blank line inside inline math is accepted, exported as invalid LaTeX, then silently converted to text on Apply source
 2026-11-25T02:55:37Z PUSHED main
 2026-11-25T02:55:37Z DONE qa-187 (tsc -b, npm test, smoke all green)
+2026-11-25T02:56:11Z START qa-188 on qa/qa-188-display-equations-inside-blockquotes-or: Display equations inside blockquotes or list items are imported as literal text and escaped on export

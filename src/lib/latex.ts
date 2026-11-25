@@ -935,13 +935,36 @@ function nestedListSpans(
   return spans;
 }
 
+// A quote or a list item can hold a display equation. It is a block node like
+// any other block, so the surrounding text must be split around it; otherwise
+// parseInline reads the environment as literal text and it is escaped on export.
+const DISPLAY_MATH_BODY =
+  /\\begin\{equation(\*?)\}\s*([\s\S]*?)\s*\\end\{equation\1\}|\\\[\s*([\s\S]*?)\s*\\\]|\$\$\s*([\s\S]*?)\s*\$\$/;
+
+function pushBodyParagraphs(content: DocumentNode[], text: string): void {
+  let rest = text;
+  for (;;) {
+    const match = rest.match(DISPLAY_MATH_BODY);
+    if (!match) break;
+    const before = rest.slice(0, match.index).trim();
+    if (before) content.push({ type: "paragraph", content: parseInline(before).content });
+    content.push({
+      type: "mathBlock",
+      attrs: {
+        latex: (match[2] ?? match[3] ?? match[4]).trim(),
+        numbered: match[1] === "",
+      },
+    });
+    rest = rest.slice((match.index ?? 0) + match[0].length);
+  }
+  const trailing = rest.trim();
+  if (trailing) content.push({ type: "paragraph", content: parseInline(trailing).content });
+}
+
 function parseListItemContent(body: string): DocumentNode[] {
   const content: DocumentNode[] = [];
   let cursor = 0;
-  const pushParagraph = (text: string) => {
-    const trimmed = text.trim();
-    if (trimmed) content.push({ type: "paragraph", content: parseInline(trimmed).content });
-  };
+  const pushParagraph = (text: string) => pushBodyParagraphs(content, text);
   for (const span of nestedListSpans(body)) {
     pushParagraph(body.slice(cursor, span.start));
     if (!content.some((node) => node.type === "paragraph")) {
@@ -1482,9 +1505,11 @@ export function latexToDocument(
     }
     const quote = block.match(/^\\begin\{quote\}([\s\S]*)\\end\{quote\}$/);
     if (quote) {
+      const quoteContent: DocumentNode[] = [];
+      pushBodyParagraphs(quoteContent, quote[1].trim());
       content.push({
         type: "blockquote",
-        content: [{ type: "paragraph", content: parseInline(quote[1].trim()).content }],
+        content: quoteContent.length > 0 ? quoteContent : [{ type: "paragraph" }],
       });
       continue;
     }

@@ -712,6 +712,37 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("\\textbackslash{}begin");
   });
 
+  it("imports display math inside a quote and a list item as block math", () => {
+    const source = [
+      "\\begin{document}",
+      "",
+      "\\begin{quote}",
+      "\\begin{equation*}",
+      "q=1",
+      "\\end{equation*}",
+      "\\end{quote}",
+      "",
+      "\\begin{itemize}",
+      "\\item Before",
+      "\\begin{equation*}",
+      "L=1",
+      "\\end{equation*}",
+      "\\end{itemize}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    expect(parsed.content[0]?.type).toBe("blockquote");
+    expect(parsed.content[0]?.content?.map((node) => node.type)).toEqual(["mathBlock"]);
+    expect(parsed.content[0]?.content?.[0]?.attrs).toEqual({ latex: "q=1", numbered: false });
+    const item = parsed.content[1]?.content?.[0];
+    expect(item?.content?.map((node) => node.type)).toEqual(["paragraph", "mathBlock"]);
+    expect(item?.content?.[1]?.attrs).toEqual({ latex: "L=1", numbered: false });
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\begin{quote}\n\\begin{equation*}\nq=1\n\\end{equation*}\n\\end{quote}");
+    expect(exported).toContain("\\item Before\n\\begin{equation*}\nL=1\n\\end{equation*}");
+    expect(exported).not.toContain("\\textbackslash{}begin");
+  });
+
   it("imports bracket, dollar and single-line equation display math as math blocks", () => {
     const source = [
       "\\begin{document}",
