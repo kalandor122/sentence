@@ -3863,10 +3863,11 @@
       ],
       "hint": "Repro: 1. Open http://localhost:1420 in a fresh browser profile. 2. Click New document. 3. Click Review in the sidebar rail to open the Comments panel.\nActual: The only thread ('This is the kind of paragraph that benefits from a quieter interface.', by Editor) is detached: the card shows 'The text this comment was attached to was deleted, so it has no highlight in the document.' and the editor contains no .comment-highlight for it. The demo document has no text carrying the demo comment mark, so a brand-new project opens with a false deleted-text warning.",
       "source": "explore:review:demo document seeds a comment that is not anchored, so review opens with a deleted-text warning",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T15:54:45Z",
-      "lastAttemptAt": "2026-11-25T15:54:45Z"
+      "lastAttemptAt": "2026-11-25T15:54:45Z",
+      "doneAt": "2026-11-25T15:56:51Z"
     },
     {
       "id": "qa-243",
@@ -3926,7 +3927,9 @@
       ],
       "hint": "Repro: 1. Click View, then LaTeX. 2. Put the caret before \\end{document} and type `ZXTABHISTORY`. 3. Click references.bib, then click document.tex. 4. Click in the textarea and press Ctrl+Z three times.\nActual: All three Ctrl+Z presses leave `ZXTABHISTORY` in the textarea. Typing `ZXTABNEW` after returning and pressing Ctrl+Z removes only `ZXTABNEW`, so undo still works for post-switch edits but the history from before the tab switch is gone. Probe: undoafterFileTabSwitch.markerStillPresentAfterThreeUndos=[true,true,true], undoRemovedPreSwitchTyping=false, newTypingAfterSwitchUndoable=true.",
       "source": "explore:source-editor:undo history is lost when switching to references.bib and back",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T15:57:31Z"
     },
     {
       "id": "qa-247",
