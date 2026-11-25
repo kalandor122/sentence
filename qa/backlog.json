@@ -4119,6 +4119,56 @@
       "hint": "Repro: Load the start screen, focus \"New document\" with Tab and press Enter. The editor loads, but document.activeElement is <body>; the next Tab press goes to the \"Skip to writing surface\" link at the top of the new screen. Focus is not placed in the editor or on any heading of the new view.\nActual: After Enter activeElement is BODY; the probe's first Tab after the transition reaches the skip link, starting the whole page tab order again.",
       "source": "explore:keyboard:creating a project from the start screen drops keyboard focus on <body>",
       "status": "open"
+    },
+    {
+      "id": "qa-261",
+      "title": "An image inserted inside a heading is re-imported as two literal paragraphs, destroying the heading and its LaTeX",
+      "why": "Exploratory pass on insert-media (functional): expected An inline image in a heading is represented in the exported source in a way the app's own importer accepts, so Apply source preserves one H2 heading 'Drafting with constraints' containing the image.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the demo project. Click the H2 heading 'Drafting with constraints', press Home, then ArrowRight four times so the caret is after 'Draf'. Click Insert > Image and choose a 120x60 PNG (probe uses icon.png): the picture is inserted inline inside the heading. Click View > LaTeX; the heading exports as one line '\\subsection{Draf\\includegraphics[width=\\linewidth,height=1.5em,keepaspectratio]{assets/images/icon.png}% Sentence alt: icon.png', with the rest of the heading ('ting with constraints}') on the next line. Add any edit (the probe appends ' % qa') and click Apply source, then switch back to Visual. The H2 heading is gone; the body now has ordinary paragraphs '\\subsection{Draf' and 'ting with constraints}', an inline image, and an empty image. Type one character and read View > LaTeX again: the heading is now '\\textbackslash{}subsection\\{Draf...'.\nActual: The source round trip deletes the heading: headings become ['H1:Introduction'] only, and the two literal paragraphs '\\subsection{Draf' and 'ting with constraints}' are created (the probe also finds a second empty image with path null). Re-exporting the corrupted document produces '\\textbackslash{}subsection\\{Draf\\includegraphics...' and no \\subsection command (subsectionCount 0), so the heading is lost from both the visual document and the LaTeX. Probe qa/probes/insert-media.mjs scenario 'image-in-heading-roundtrip'.",
+      "source": "explore:insert-media:an image inserted inside a heading is re-imported as two literal paragraphs, destroying the heading and its latex",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T16:37:16Z"
+    },
+    {
+      "id": "qa-262",
+      "title": "A text-block-tall figure with a caption is drawn across the page boundary and the page count drops when the caption is a",
+      "why": "Exploratory pass on insert-media (visual): expected A figure that no longer fits with its caption is moved to the next page (or the image is reduced by the caption's height) so it is never drawn across the page edge, and adding a caption cannot reduce the page count.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the demo, press Ctrl+End, click Insert > Image and choose a 200x3000 PNG. The image is capped at 931 px (the A4 text height) and pagination moves it whole onto page 2: figure padding-top 448 px, image y=1220..2151, status 3 pages. Click the picture, type 'A tall figure with a caption.' into the Figure caption field and press Tab. The figure's padding-top becomes 0 px and the image moves back to y=772..1703, while the caption is at y=1695..1715; the page boundary line is at y=1123. The status bar changes from 3 pages to 2. (Compiling the exported source with the bundled Tectonic gives a 2-page PDF with the figure whole on page 2.)\nActual: With the caption the figure is no longer snapped: figure padding is 0 px, so the 931 px image spans y=772..1703 and crosses the page edge at y=1123, covering page 1's bottom margin and page 2's top margin (probe flags pageLineCrossesImage and imageOutsideContentBox). The reported page count falls from 3 to 2. The exported PDF is 2 pages with the figure on page 2, so the visual page puts the image on a different page than the PDF. Probe qa/probes/insert-media.mjs scenario 'image-tall-caption'.",
+      "source": "explore:insert-media:a text-block-tall figure with a caption is drawn across the page boundary and the page count drops when the caption is a",
+      "status": "open"
+    },
+    {
+      "id": "qa-263",
+      "title": "A caption typed on an image inside a table cell is silently dropped from the LaTeX",
+      "why": "Exploratory pass on insert-media (content): expected The caption entered in the offered Figure caption field is preserved in the exported document, or the field is not offered (with an explanation) for a picture in a table cell so a caption cannot be entered and lost.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the demo, press Ctrl+End, press Enter, click Insert > Insert table, click the first cell, then click Insert > Image and choose a 120x60 PNG. Click the picture in the cell: the Image toolbar offers the 'Figure caption' field. Type 'CELL CAPTION' and press Tab. The cell shows the caption under the picture (figcaption 'CELL CAPTION', 1 figure in the td), but View > LaTeX contains only '\\includegraphics[width=90.00bp]{assets/images/cell\\_caption.png}% Sentence alt: cell_caption.png' inside the tabular: 0 \\caption commands and no 'CELL CAPTION' in the tabular.\nActual: The caption is visible in the editor but absent from the generated LaTeX (captionCount 0, captionInTabular false); the image exports as an inline \\includegraphics inside the tabular with only the alt-text comment. The caption disappears from the PDF with no warning. Probe qa/probes/insert-media.mjs scenario 'image-caption-in-cell'.",
+      "source": "explore:insert-media:a caption typed on an image inside a table cell is silently dropped from the latex",
+      "status": "open"
+    },
+    {
+      "id": "qa-264",
+      "title": "The TOC preview drops inline math from a heading, so its entry does not match the printed contents",
+      "why": "Exploratory pass on insert-media (content): expected The contents preview shows the entry as the PDF contents will print it from \\section{The \\(x^2\\) model}, e.g. '2 The x^2 model'.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open View > LaTeX and insert '\\section{The \\(x^2\\) model}' before \\end{document}; click Apply source. Place the caret at the end of the document and click References > Table of contents.\nActual: The preview entry reads '2 The model' (the formula is missing), while the exported source still contains '\\section{The \\(x^2\\) model}', so the visual contents and the PDF contents disagree. Probe qa/probes/insert-media.mjs scenario 'toc-math-heading'.",
+      "source": "explore:insert-media:the toc preview drops inline math from a heading, so its entry does not match the printed contents",
+      "status": "open"
     }
   ]
 }
