@@ -110,6 +110,20 @@ describe("bibliography", () => {
     expect(missingCitationKeys({ type: "doc", content: [] }, sample)).toEqual([]);
   });
 
+  it("reports each key of a multi-key citation separately", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [{ type: "citation", attrs: { key: "knuth1984,ghost2026" } }],
+        },
+      ],
+    };
+    expect(missingCitationKeys(document, sample)).toEqual(["ghost2026"]);
+    expect(missingCitationKeys(document, "")).toEqual(["knuth1984", "ghost2026"]);
+  });
+
   it("rejects duplicate keys and formats a draft entry", () => {
     expect(() => addBibliographyEntry(sample, {
       key: "knuth1984", type: "misc", author: "", year: "", title: "",

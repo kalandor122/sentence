@@ -5,6 +5,7 @@ import {
   documentPlainText,
   documentToLatex,
   escapeLatex,
+  isLatexCitationTarget,
   isLatexReferenceTarget,
   latexToDocument,
   restoreImageSources,
@@ -54,6 +55,33 @@ describe("LaTeX generation", () => {
     expect(latex).toContain("BadCite \\cite{badkey}");
     expect(latex).toContain("BadRef \\ref{fig}");
     expect(latex).not.toContain("bad key}}");
+  });
+
+  it("keeps the keys of a multi-key citation separate", () => {
+    expect(isLatexCitationTarget("einstein1905,knuth1984")).toBe(true);
+    expect(isLatexCitationTarget("einstein1905, knuth1984")).toBe(true);
+    expect(isLatexCitationTarget("einstein1905,")).toBe(false);
+    expect(isLatexCitationTarget("einstein1905,bad key")).toBe(false);
+
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "MultiCite " },
+            { type: "citation", attrs: { key: "sentence2026,ghost2026" } },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("MultiCite \\cite{sentence2026,ghost2026}");
+
+    const parsed = latexToDocument(latex, settings).document;
+    const citation = (parsed.content[0]?.content ?? []).find((node) => node.type === "citation");
+    expect(citation?.attrs?.key).toBe("sentence2026,ghost2026");
+    expect(documentToLatex(parsed, settings)).toContain("\\cite{sentence2026,ghost2026}");
   });
 
   it("serializes rich content and custom nodes", () => {

@@ -41,10 +41,30 @@ export function isLatexReferenceTarget(value: string): boolean {
   return REFERENCE_TARGET_PATTERN.test(value);
 }
 
+// One \cite may name several keys separated by commas, so a citation is valid
+// when every key in the list is. An empty key still breaks the list.
+export function isLatexCitationTarget(value: string): boolean {
+  const keys = value.split(",").map((key) => key.trim());
+  return keys.length > 0 && keys.every((key) => isLatexReferenceTarget(key));
+}
+
+export function citationKeys(value: string): string[] {
+  return value
+    .split(",")
+    .map((key) => key.trim())
+    .filter(Boolean);
+}
+
 // Keys still arrive from imported LaTeX or a hand-edited .bib, so the exporter
 // removes the characters that would break the command instead of trusting them.
 export function latexReferenceTarget(value: string): string {
   return value.replace(/[\s{},%\\#()]+/g, "");
+}
+
+// The comma is the separator between keys in a multi-key citation, so it has to
+// survive the cleaning that each individual key gets.
+export function latexCitationKeys(value: string): string {
+  return citationKeys(value).map(latexReferenceTarget).join(",");
 }
 
 export function imageAssetPath(fileName: string): string {
@@ -266,7 +286,7 @@ function inlineContent(nodes: DocumentNode[] | undefined, settings: ProjectSetti
         return `\\(${attribute(node, "latex") ?? ""}\\)`;
       }
       if (node.type === "citation") {
-        return `\\cite{${latexReferenceTarget(attribute(node, "key") ?? "")}}`;
+        return `\\cite{${latexCitationKeys(attribute(node, "key") ?? "")}}`;
       }
       if (node.type === "footnote") {
         return `\\footnote{${escapeLatex(attribute(node, "text") ?? "")}}`;
@@ -846,7 +866,7 @@ function parseInline(source: string): InlineParseResult {
     const citeMatch = remainder.match(/^\\cite\{([^}]*)\}/);
     if (citeMatch) {
       flush();
-      content.push({ type: "citation", attrs: { key: citeMatch[1] } });
+      content.push({ type: "citation", attrs: { key: citationKeys(citeMatch[1]).join(",") } });
       index += citeMatch[0].length;
       continue;
     }
