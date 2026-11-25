@@ -3463,10 +3463,11 @@
       ],
       "hint": "Repro: Press Ctrl+K in the editor to open the Add link dialog and Tab to the link input. Computed style of the focused input: outline-style none (the global input:focus-visible outline is overridden by .dialog-field input:focus), border-color rgb(124, 156, 136) against rgb(209, 205, 196) at rest (1.9:1 between the two border colours; 2.99:1 against the #fffefa field background), plus a rgba(76, 124, 97, 0.12) 0 0 0 2px shadow. The Cancel and Close buttons in the same dialog show the solid 2px focus outline.\nActual: Focus on dialog inputs is indicated only by a thin border-colour swap plus a 12%-alpha shadow (outline: none), so the focus ring disappears on the field a keyboard user has just tabbed into while every button keeps its outline.",
       "source": "explore:keyboard:dialog text fields drop the 2px focus outline and show only a 1px border-colour change",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T13:38:59Z",
-      "lastAttemptAt": "2026-11-25T13:38:59Z"
+      "lastAttemptAt": "2026-11-25T13:38:59Z",
+      "doneAt": "2026-11-25T13:40:31Z"
     },
     {
       "id": "qa-218",
@@ -3846,6 +3847,68 @@
       ],
       "hint": "Repro: 1. Open http://localhost:1420 in a fresh browser profile. 2. Click New document. 3. Click Review in the sidebar rail to open the Comments panel.\nActual: The only thread ('This is the kind of paragraph that benefits from a quieter interface.', by Editor) is detached: the card shows 'The text this comment was attached to was deleted, so it has no highlight in the document.' and the editor contains no .comment-highlight for it. The demo document has no text carrying the demo comment mark, so a brand-new project opens with a false deleted-text warning.",
       "source": "explore:review:demo document seeds a comment that is not anchored, so review opens with a deleted-text warning",
+      "status": "open"
+    },
+    {
+      "id": "qa-243",
+      "title": "A braced table column spec (p{4cm}, @{}) corrupts the first cell and is rewritten",
+      "why": "Exploratory pass on source-editor (content): expected The imported table has two columns with `ZXPCOLNAME` in the first cell and `Value` in the second, and the re-exported table keeps a `p{4cm}l` (or equivalent) column spec.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Start a project and open the editor. 2. Click View, then LaTeX. 3. Before \\end{document}, insert a table with \\begin{table}[htbp], \\centering, \\caption{ZXPCOLCAP}, \\begin{tabular}{p{4cm}l}, \\hline, the rows `ZXPCOLNAME & Value \\\\` and `ZXPCOLCELL & 9 \\\\`, \\hline, \\end{tabular}, \\end{table}. 4. Click Apply source. 5. Click View, then Visual. 6. Click View, then LaTeX, then Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` but the first cell becomes `l} ZXPCOLNAME`. After Refresh from visual the table is written with `\\begin{tabular}{cl}` and a first row `l\\}` followed by `ZXPCOLNAME`. With `\\begin{tabular}{@{}ll@{}}` the first cell becomes `ll@{}} ZXATSPEC` and the spec is rewritten as `{ll}`. Probe: pColumnSpec.visualTables=[[\"l} ZXPCOLNAME\",\"Value\"],[\"ZXPCOLCELL\",\"9\"]], pColumnSpec.spec=\"cl\", atColumnSpec.regeneratedRegion contains `ll@\\{\\}\\}`.",
+      "source": "explore:source-editor:a braced table column spec (p{4cm}, @{}) corrupts the first cell and is rewritten",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T14:02:04Z"
+    },
+    {
+      "id": "qa-244",
+      "title": "Verbatim code is LaTeX-escaped on re-export, changing the code",
+      "why": "Exploratory pass on source-editor (content): expected The verbatim block still contains the code exactly as written: `ZXCODE printf(\"%d\", a_b & c);`.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Click View, then LaTeX. 2. Before \\end{document}, insert `\\begin{verbatim}`, the line `ZXCODE printf(\"%d\", a_b & c);`, and `\\end{verbatim}`. 3. Click Apply source. 4. Click View, then LaTeX, then Refresh from visual.\nActual: Refresh from visual writes the line as `ZXCODE printf(\"\\%d\", a\\_b \\& c);` inside `\\begin{verbatim}`. LaTeX prints those added backslashes literally, so the PDF shows different code from the source the user typed. The visual code block itself still shows the original text. Probe: verbatimSpecialChars.codeEscapedInVerbatim=true, regeneratedVerbatim=`\\begin{verbatim}\\nZXCODE printf(\"\\%d\", a\\_b \\& c);\\n\\end{verbatim}`.",
+      "source": "explore:source-editor:verbatim code is latex-escaped on re-export, changing the code",
+      "status": "open"
+    },
+    {
+      "id": "qa-245",
+      "title": "Valid LaTeX environments outside the supported subset are shown literally and then escaped",
+      "why": "Exploratory pass on source-editor (content): expected The description list is imported, or Apply reports the construct as unsupported and leaves the LaTeX unchanged.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Click View, then LaTeX. 2. Before \\end{document}, insert `\\begin{description}`, `\\item[ZXTERM] ZXTERM definition text.`, and `\\end{description}`. 3. Click Apply source. 4. Click View, then Visual. 5. Click View, then LaTeX, then Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` The visual page shows the raw lines `\\begin{description}`, `\\item[ZXTERM] ZXTERM definition text.`, `\\end{description}` as paragraph text. Refresh from visual rewrites them as `\\textbackslash{}begin\\{description\\}`, `\\textbackslash{}item[ZXTERM] ...`, `\\textbackslash{}end\\{description\\}`, so the environment no longer compiles. The same was observed for `\\begin{theorem}...\\end{theorem}`. Probe: unsupportedDescriptionEnv.leakedCommands=true, beginEscaped=true, endEscaped=true; unsupportedTheoremEnv.beginEscaped=true.",
+      "source": "explore:source-editor:valid latex environments outside the supported subset are shown literally and then escaped",
+      "status": "open"
+    },
+    {
+      "id": "qa-246",
+      "title": "Undo history is lost when switching to references.bib and back",
+      "why": "Exploratory pass on source-editor (functional): expected The first Ctrl+Z removes `ZXTABHISTORY`, exactly as it does when the file tabs are not used.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Click View, then LaTeX. 2. Put the caret before \\end{document} and type `ZXTABHISTORY`. 3. Click references.bib, then click document.tex. 4. Click in the textarea and press Ctrl+Z three times.\nActual: All three Ctrl+Z presses leave `ZXTABHISTORY` in the textarea. Typing `ZXTABNEW` after returning and pressing Ctrl+Z removes only `ZXTABNEW`, so undo still works for post-switch edits but the history from before the tab switch is gone. Probe: undoafterFileTabSwitch.markerStillPresentAfterThreeUndos=[true,true,true], undoRemovedPreSwitchTyping=false, newTypingAfterSwitchUndoable=true.",
+      "source": "explore:source-editor:undo history is lost when switching to references.bib and back",
+      "status": "open"
+    },
+    {
+      "id": "qa-247",
+      "title": "A verbatim block containing \\end{document} is rejected as trailing text",
+      "why": "Exploratory pass on source-editor (functional): expected The `\\end{document}` inside verbatim is code, so the block is imported and the document applies.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Click View, then LaTeX. 2. Before the real \\end{document}, insert `\\begin{verbatim}`, `ZXCODE \\end{document}`, `ZXCODE still code`, and `\\end{verbatim}`. 3. Click Apply source.\nActual: Apply reports `Invalid LaTeX: text after \\end{document} is not part of the document (\"ZXCODE still code\"). Move it before \\end{document}.` Valid LaTeX is rejected; the draft is preserved and Apply stays enabled. Probe: verbatimEndDocument.rejected=true, draftKept=true.",
+      "source": "explore:source-editor:a verbatim block containing \\end{document} is rejected as trailing text",
       "status": "open"
     }
   ]
