@@ -105,6 +105,7 @@ export const DEMO_DOCUMENT: SentenceDocument = {
       content: [
         {
           type: "text",
+          marks: [{ type: "comment", attrs: { markId: "demo-comment" } }],
           text: "Good tools stay close to the work. They make the structure visible without turning every decision into ceremony. A paragraph should feel like a paragraph, a table like a table, and the source should remain legible to both people and machines.",
         },
       ],
