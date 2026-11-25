@@ -488,3 +488,6 @@ Aborting
 2026-11-24T23:36:59Z PUSHED main
 2026-11-24T23:36:59Z DONE qa-171 (tsc -b, npm test, smoke all green)
 2026-11-24T23:37:33Z START qa-173 on qa/qa-173-an-unapplied-unparsable-latex-draft-is-d: An unapplied, unparsable LaTeX draft is discarded on navigation away or reload with no warning
+2026-11-25T00:04:09Z PUSHED main
+2026-11-25T00:04:09Z DONE qa-173 (tsc -b, npm test, smoke all green)
+2026-11-25T00:13:55Z EXPLORE keyboard: 4 new items, agent exit 0

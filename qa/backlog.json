@@ -2743,10 +2743,61 @@
       ],
       "hint": "Repro: 1) Open http://localhost:1420, click 'New document', wait until the top bar reads 'Saved locally'. 2) Click 'Source' in the status bar. 3) In the LaTeX textarea replace the final \\end{document} line with 'Plan persist-nav-1' (the draft now has no \\end{document}). 4) Within 400 ms, before the 1100 ms autosave, navigate to about:blank and then back to http://localhost:1420. 5) Read the top bar, the editor, and localStorage['sentence.workspace']. Variant: instead wait 1.5 s (the top bar shows 'Editing' and 'Retry save: Invalid LaTeX: missing \\end{document}.'), then reload the page and open 'Source' to read the textarea.\nActual: No warning is shown (0 beforeunload dialogs in either variant), and the draft text is gone from the editor, the textarea and localStorage['sentence.workspace'] after returning; the top bar then reads 'Saved locally'. In the 400 ms variant no parse error was ever displayed before leaving (saveError null, toast null) because the debounce had not fired. In the awaited variant the draft is likewise absent after reload (draftMarkerInSource false, draftMarkerInStorage false, dialogsSeen 0). The pagehide flush in persist() re-parses the draft, catches the failure, and writes only the last good visual document, so the unapplied source text is lost silently. Probe evidence: qa/probes/persistence.mjs phases 'invalid-draft-navigation' and 'invalid-source-draft-after-reload'.",
       "source": "explore:persistence:an unapplied, unparsable latex draft is discarded on navigation away or reload with no warning",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-24T23:37:33Z",
-      "lastAttemptAt": "2026-11-24T23:37:33Z"
+      "lastAttemptAt": "2026-11-24T23:37:33Z",
+      "doneAt": "2026-11-25T00:04:07Z"
+    },
+    {
+      "id": "qa-174",
+      "title": "Tab in the document wraps the paragraph in a block quote instead of moving focus",
+      "why": "Exploratory pass on keyboard (functional): expected Tab moves keyboard focus to the next control without changing the document; paragraph indentation is already available on Ctrl+].",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open a project, click into a plain paragraph and press Tab once. Clean-document version: click the editor, press Ctrl+A then Backspace, type \"TABPROBE paragraph\", press Tab once, then open source view with Ctrl+Alt+2 and look at the paragraph.\nActual: Focus stays in the .sentence-editor and the paragraph is rewritten: <p>TABPROBE paragraph</p> becomes <blockquote><p>TABPROBE paragraph</p></blockquote><p><br></p> (blockquote count 0 -> 1, plus an appended empty paragraph). The generated LaTeX contains \\begin{quote} followed by TABPROBE paragraph. Only the second Tab press reaches the \"Visual\" status-bar button. The 40-stop Tab walk started from the quick-access button also changed the demo document from 1 to 2 blockquotes.",
+      "source": "explore:keyboard:tab in the document wraps the paragraph in a block quote instead of moving focus",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T00:14:09Z"
+    },
+    {
+      "id": "qa-175",
+      "title": "Tab never leaves a table and appends a row at the end",
+      "why": "Exploratory pass on keyboard (functional): expected Tab moves through the table cells and then out of the table to the next control, without changing the table structure.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the Insert ribbon tab, focus \"Insert table\" and press Enter to create the 3x3 table, click the first cell, then press Tab ten times.\nActual: All ten Tab presses left document.activeElement on the .sentence-editor; the table had 3 rows before and 4 after, because Tab in the last cell runs addRowAfter(). Only Escape (which then lands on the \"Visual\" mode button) gets focus out of the table.",
+      "source": "explore:keyboard:tab never leaves a table and appends a row at the end",
+      "status": "open"
+    },
+    {
+      "id": "qa-176",
+      "title": "Text colour popover uses role=menu but has plain-button children and no arrow-key navigation",
+      "why": "Exploratory pass on keyboard (ux): expected A role=menu exposes role=menuitem children that ArrowUp/ArrowDown move between (WAI-ARIA menu pattern).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: On the Home ribbon tab focus \"Text color\", press Enter to open the swatch popover, press ArrowDown, then Tab through the swatches.\nActual: .color-popover has role=\"menu\" and aria-label \"Text color\", but all ten children have no role (plain buttons) and ArrowDown leaves focus on the \"Text color\" trigger. Only Tab reaches the swatches (\"No color\", \"Black\", \"Dark gray\", ... \"Blue\"). Enter on a swatch and Escape to close both work.",
+      "source": "explore:keyboard:text colour popover uses role=menu but has plain-button children and no arrow-key navigation",
+      "status": "open"
+    },
+    {
+      "id": "qa-177",
+      "title": "Document editor is exposed as role=textbox without aria-multiline",
+      "why": "Exploratory pass on keyboard (ux): expected A multi-line contenteditable textbox sets aria-multiline=\"true\" so screen readers announce a multi-line edit field.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the editor and inspect the .sentence-editor element after tabbing into it.\nActual: The element has role=\"textbox\" and aria-label \"Document editor\" but aria-multiline is null, so the main writing surface is exposed as a single-line textbox to assistive technology.",
+      "source": "explore:keyboard:document editor is exposed as role=textbox without aria-multiline",
+      "status": "open"
     }
   ]
 }
