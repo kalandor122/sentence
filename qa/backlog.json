@@ -2823,10 +2823,11 @@
       ],
       "hint": "Repro: Open the editor and inspect the .sentence-editor element after tabbing into it.\nActual: The element has role=\"textbox\" and aria-label \"Document editor\" but aria-multiline is null, so the main writing surface is exposed as a single-line textbox to assistive technology.",
       "source": "explore:keyboard:document editor is exposed as role=textbox without aria-multiline",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T02:24:19Z",
-      "lastAttemptAt": "2026-11-25T02:24:19Z"
+      "lastAttemptAt": "2026-11-25T02:24:19Z",
+      "doneAt": "2026-11-25T02:25:14Z"
     },
     {
       "id": "qa-178",
@@ -2870,7 +2871,9 @@
       ],
       "hint": "Repro: Insert an image named 'qa image #1.png' at the end of the document. Click View > LaTeX, press Ctrl+End, type a space and Backspace so Apply source becomes enabled, click Apply source, then View > Visual and read the img alt attribute.\nActual: Before Apply the img has alt='qa image #1.png'; after Apply it has alt=''. Block images emit no '% Sentence alt' comment in the generated LaTeX (only inline images do) and the parser fills alt from the empty figure caption, so the alt text disappears from the document and from the HTML/Markdown exports. Probe: qa/probes/insert-media.mjs scenario 'image' (once.info vs apply.info).",
       "source": "explore:insert-media:block images lose their alt text when the document is synchronized from latex",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T02:25:50Z"
     },
     {
       "id": "qa-181",
