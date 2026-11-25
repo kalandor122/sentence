@@ -4008,10 +4008,11 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.longHeadingOutline`, or reproduce by hand: open http://localhost:1420, click 'New document', Ctrl+A then Backspace, and paste 10 headings where the first is `Long heading ` + 40 copies of `word ` + `LONGEND` (220 characters) and the other nine are `Heading N LHN`, each followed by a body paragraph. In the Outline panel the first entry is a single 12px-tall line that is 1,238px wide inside a 246px-wide panel: `.sidebar-panel` reports scrollWidth 1,245 against clientWidth 246, the entry's right edge is at x=1,313 while the 314px-wide sidebar ends at x=314, and the `H1` level badge is off-screen. The heading itself wraps normally inside the 794px sheet, with no horizontal overflow of the page. Screenshot: qa/shots/probe-long-document-outline-heading.png.\nActual: The heading text is rendered on one unbroken line, extends past the sidebar's right edge and is clipped there; the panel gains a ~999px horizontal scroll range and the `H1` badge is pushed off-screen, so the outline cannot be read at a glance and the panel scrolls sideways.",
       "source": "explore:long-document:a long heading in the outline does not wrap; it is clipped and forces a 1,000px horizontal scroll inside the sidebar",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T17:15:02Z",
-      "lastAttemptAt": "2026-11-25T17:15:02Z"
+      "lastAttemptAt": "2026-11-25T17:15:02Z",
+      "doneAt": "2026-11-25T17:17:24Z"
     },
     {
       "id": "qa-252",
@@ -4187,6 +4188,32 @@
       ],
       "hint": "Repro: Open View > LaTeX and insert '\\section{The \\(x^2\\) model}' before \\end{document}; click Apply source. Place the caret at the end of the document and click References > Table of contents.\nActual: The preview entry reads '2 The model' (the formula is missing), while the exported source still contains '\\section{The \\(x^2\\) model}', so the visual contents and the PDF contents disagree. Probe qa/probes/insert-media.mjs scenario 'toc-math-heading'.",
       "source": "explore:insert-media:the toc preview drops inline math from a heading, so its entry does not match the printed contents",
+      "status": "open"
+    },
+    {
+      "id": "qa-265",
+      "title": "Removing the bullet from a nested item creates a second paragraph that the LaTeX merges into the parent item",
+      "why": "Exploratory pass on lists (content): expected The editor shows 'outer' as a bullet and 'inner one' as a separate paragraph below it, so the LaTeX keeps that paragraph break (a blank line between them) and the PDF prints 'inner one' on its own line inside the item.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'inner one', press Tab, press Enter, type 'inner two'. Click at the end of 'inner one' and click Home > Bulleted list (the button is shown pressed). Open Source in the status bar, click Refresh from visual, and read the LaTeX textarea.\nActual: The editor DOM is '<ul><li><p>outer</p><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>' (two paragraph blocks), but the generated LaTeX is '\\begin{itemize}\\n\\item outer\\ninner one\\n\\begin{itemize}\\n\\item inner two\\n\\end{itemize}\\n\\end{itemize}'. The two paragraphs are joined by a single newline, which LaTeX reads as a space, so 'outer' and 'inner one' print as one paragraph in the PDF.",
+      "source": "explore:lists:removing the bullet from a nested item creates a second paragraph that the latex merges into the parent item",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T17:57:44Z"
+    },
+    {
+      "id": "qa-266",
+      "title": "List item text that starts with a square bracket is written as an \\item optional label and loses its brackets",
+      "why": "Exploratory pass on lists (content): expected The brackets are literal document text, so they are protected in the LaTeX (for example '\\item {[}draft] note') and the PDF keeps the bullet/number and prints '[draft] note' in full.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document and type '[draft] note'. Click Home > Bulleted list, open Source in the status bar, click Refresh from visual and read the LaTeX textarea. Clear the document, type '[appendix] item', click Home > Numbered list and read the LaTeX again.\nActual: The LaTeX is '\\begin{itemize}\\n\\item [draft] note\\n\\end{itemize}', and the numbered variant is '\\begin{enumerate}\\n\\item [appendix] item\\n\\end{enumerate}'. Text in brackets directly after \\item is LaTeX's optional label argument, so it replaces the bullet/number and the literal brackets are dropped; the PDF prints 'draft note' with 'draft' as the label instead of '[draft] note'.",
+      "source": "explore:lists:list item text that starts with a square bracket is written as an \\item optional label and loses its brackets",
       "status": "open"
     }
   ]
