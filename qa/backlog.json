@@ -4147,8 +4147,9 @@
       "hint": "Repro: Open the demo, press Ctrl+End, click Insert > Image and choose a 200x3000 PNG. The image is capped at 931 px (the A4 text height) and pagination moves it whole onto page 2: figure padding-top 448 px, image y=1220..2151, status 3 pages. Click the picture, type 'A tall figure with a caption.' into the Figure caption field and press Tab. The figure's padding-top becomes 0 px and the image moves back to y=772..1703, while the caption is at y=1695..1715; the page boundary line is at y=1123. The status bar changes from 3 pages to 2. (Compiling the exported source with the bundled Tectonic gives a 2-page PDF with the figure whole on page 2.)\nActual: With the caption the figure is no longer snapped: figure padding is 0 px, so the 931 px image spans y=772..1703 and crosses the page edge at y=1123, covering page 1's bottom margin and page 2's top margin (probe flags pageLineCrossesImage and imageOutsideContentBox). The reported page count falls from 3 to 2. The exported PDF is 2 pages with the figure on page 2, so the visual page puts the image on a different page than the PDF. Probe qa/probes/insert-media.mjs scenario 'image-tall-caption'.",
       "source": "explore:insert-media:a text-block-tall figure with a caption is drawn across the page boundary and the page count drops when the caption is a",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T16:44:49Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T16:44:49Z",
+      "lastAttemptAt": "2026-11-25T16:44:49Z"
     },
     {
       "id": "qa-263",
