@@ -3560,8 +3560,9 @@
       "hint": "Repro: Create a new document. Type 'one', click Home > Numbered list, press Enter and type 'two', press Enter and type 'three', press Enter and type 'four'. Click at the end of 'two' and click Home > Numbered list (Ctrl+Shift+7 gives the same result). Read the editor, then open Source and read the LaTeX.\nActual: The trailing items restart at 1. The editor DOM is '<ol><li><p>one</p></li></ol><p>two</p><ol><li><p>three</p></li><li><p>four</p></li></ol>' (the second <ol> has no start attribute, so it shows 1. three and 2. four next to 1. one) and the LaTeX is two separate \\begin{enumerate} blocks, the second with no \\setcounter{enumi}, so the PDF prints two items numbered 1. The same happens with a three-item list and Ctrl+Shift+7.",
       "source": "explore:lists:turning numbering off for one item in a numbered list restarts the remaining items at 1",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T10:46:56Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T10:46:56Z",
+      "lastAttemptAt": "2026-11-25T10:46:56Z"
     },
     {
       "id": "qa-225",

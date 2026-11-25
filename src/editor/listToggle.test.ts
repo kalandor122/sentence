@@ -94,6 +94,72 @@ describe("toggleList", () => {
   });
 });
 
+describe("removing one numbered item", () => {
+  // Positions run from the list start; an item's paragraph opens one past the
+  // item start, so the cursor inside "two" below sits at 8.
+  it("continues the trailing items at the number they already had", () => {
+    const editor = createEditor(
+      "<ol><li><p>one</p></li><li><p>two</p></li><li><p>three</p></li><li><p>four</p></li></ol>",
+    );
+    editor.commands.setTextSelection(8);
+    expect(toggleList(editor, "orderedList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      '<ol><li><p>one</p></li></ol><p>two</p><ol start="3"><li><p>three</p></li><li><p>four</p></li></ol>',
+    );
+    editor.destroy();
+  });
+
+  it("keeps the numbers of the items below a removed leading item", () => {
+    const editor = createEditor(
+      "<ol><li><p>one</p></li><li><p>two</p></li><li><p>three</p></li></ol>",
+    );
+    editor.commands.setTextSelection(2);
+    expect(toggleList(editor, "orderedList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      '<p>one</p><ol start="2"><li><p>two</p></li><li><p>three</p></li></ol>',
+    );
+    editor.destroy();
+  });
+
+  it("keeps an explicit start when continuing a list", () => {
+    const editor = createEditor(
+      '<ol start="4"><li><p>four</p></li><li><p>five</p></li><li><p>six</p></li></ol>',
+    );
+    editor.commands.setTextSelection(11);
+    expect(toggleList(editor, "orderedList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      '<ol start="4"><li><p>four</p></li></ol><p>five</p><ol start="6"><li><p>six</p></li></ol>',
+    );
+    editor.destroy();
+  });
+
+  it("keeps a nested sublist with the item it belongs to", () => {
+    const editor = createEditor(
+      "<ol><li><p>one</p></li><li><p>two</p><ul><li><p>child</p></li></ul></li><li><p>three</p></li></ol>",
+    );
+    // End of "two", right before its nested list.
+    editor.commands.setTextSelection(13);
+    expect(toggleList(editor, "orderedList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      '<ol><li><p>one</p></li></ol><p>two</p><ul><li><p>child</p></li></ul><ol start="3"><li><p>three</p></li></ol>',
+    );
+    const { $from } = editor.state.selection;
+    expect($from.parent.textContent).toBe("two");
+    editor.destroy();
+  });
+
+  it("leaves the selection in the unnumbered paragraph", () => {
+    const editor = createEditor(
+      "<ol><li><p>one</p></li><li><p>two</p></li><li><p>three</p></li></ol>",
+    );
+    editor.commands.setTextSelection(8);
+    expect(toggleList(editor, "orderedList")).toBe(true);
+    const { $from } = editor.state.selection;
+    expect($from.parent.textContent).toBe("two");
+    editor.destroy();
+  });
+});
+
 describe("splitListItemKeepingSublist", () => {
   it("adds a sibling after the sublist instead of adopting it", () => {
     const editor = createEditor(

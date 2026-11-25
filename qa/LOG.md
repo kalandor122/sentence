@@ -656,3 +656,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T10:27:07Z START qa-223 on qa/qa-223-the-properties-generate-table-of-content: The Properties 'Generate table of contents' switch adds a contents page the visual editor never shows; adding a ribbon T
 2026-11-25T10:46:18Z PUSHED main
 2026-11-25T10:46:18Z DONE qa-223 (tsc -b, npm test, smoke all green)
+2026-11-25T10:46:56Z START qa-224 on qa/qa-224-turning-numbering-off-for-one-item-in-a: Turning numbering off for one item in a numbered list restarts the remaining items at 1
