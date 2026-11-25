@@ -278,7 +278,17 @@ def cycle(dry_run: bool = False) -> str:
         return "dry-run"
 
     if not clean_tree():
-        log(f"DIRTY TREE before {item['id']} — stashing so the loop can continue")
+        # Someone (usually the supervising agent) may be holding work in the tree.
+        # Never stash that away: it looks like the work vanished. Idle instead.
+        _, status_out = git("status", "--porcelain")
+        foreign = [
+            line for line in status_out.splitlines()
+            if line.strip() and not line[3:].strip().startswith("qa/")
+        ]
+        if foreign:
+            log(f"WORK IN PROGRESS outside qa/ ({len(foreign)} file(s)) — leaving the tree alone, idling")
+            return "busy"
+        log(f"DIRTY qa/ before {item['id']} — stashing bookkeeping so the loop can continue")
         stash_msg = f"qa-loop-autostash-{now()}"
         code, out = git("stash", "push", "-u", "-m", stash_msg)
         if code == 0:
