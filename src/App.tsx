@@ -56,10 +56,12 @@ import {
   type TextExportFormat,
 } from "./lib/exporters";
 import {
+  citationKeys,
   countWords,
   documentPlainText,
   documentToLatex,
   hasCitations,
+  isLatexCitationTarget,
   isLatexReferenceTarget,
   latexToDocument,
   restoreImageSources,
@@ -1256,8 +1258,15 @@ export default function App() {
     if (!editor) return;
     editor.chain().focus().insertContent({ type: "citation", attrs: { key } }).run();
     const current = workspaceRef.current;
-    if (current && parseBibliography(current.bibliography).every((entry) => entry.key !== key)) {
-      setToast(`Citation “${key}” is not in the bibliography. Add an entry for it to resolve the reference.`);
+    if (!current) return;
+    const bibliography = parseBibliography(current.bibliography);
+    const missing = citationKeys(key).filter(
+      (part) => bibliography.every((entry) => entry.key !== part),
+    );
+    if (missing.length === 1) {
+      setToast(`Citation “${missing[0]}” is not in the bibliography. Add an entry for it to resolve the reference.`);
+    } else if (missing.length > 1) {
+      setToast(`Citation keys ${missing.map((part) => `“${part}”`).join(", ")} are not in the bibliography. Add entries for them to resolve the references.`);
     }
   };
 
@@ -1559,8 +1568,8 @@ export default function App() {
       if (!workspace || !editor) return "Open a document before adding a comment.";
       return editor.state.selection.empty ? "Select text before adding a comment." : null;
     }
-    if (dialog?.kind === "citation" && !isLatexReferenceTarget(value)) {
-      return "A BibTeX key cannot contain spaces, commas, braces, parentheses or LaTeX special characters.";
+    if (dialog?.kind === "citation" && !isLatexCitationTarget(value)) {
+      return "A BibTeX key cannot contain spaces, braces, parentheses or LaTeX special characters. Separate several keys with commas.";
     }
     if (dialog?.kind === "cross-reference" && !isLatexReferenceTarget(value)) {
       return "A label cannot contain spaces, braces, parentheses or LaTeX special characters.";

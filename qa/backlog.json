@@ -3032,8 +3032,9 @@
       "hint": "Repro: Create a project. Open View > LaTeX and insert the line `MultiCite \\cite{sentence2026,ghost2026} done.` before `\\end{document}`, then click Visual. Type `ZZ` at the end of the document and open View > LaTeX again.\nActual: The visual editor turns the pair into one citation labelled `[sentence2026,ghost2026]`, the References panel reports `sentence2026,ghost2026` as a single key missing from the bibliography, and the regenerated source reads `\\cite{sentence2026ghost2026}`: the comma is stripped and both keys become one nonexistent key. The manual citation dialog also rejects commas, so a multi-key citation cannot be created or preserved through the UI.",
       "source": "explore:links-cites-footnotes:multi-key citations are merged into one invalid key by the latex round trip",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T03:20:53Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T03:20:53Z",
+      "lastAttemptAt": "2026-11-25T03:20:53Z"
     },
     {
       "id": "qa-191",

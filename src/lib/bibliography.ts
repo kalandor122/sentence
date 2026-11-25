@@ -1,3 +1,4 @@
+import { citationKeys } from "./latex";
 import type { DocumentNode, SentenceDocument } from "./types";
 
 export interface BibliographyField {
@@ -213,7 +214,9 @@ function collectCitationKeys(nodes: DocumentNode[] | undefined, keys: Set<string
   for (const node of nodes ?? []) {
     if (node.type === "citation") {
       const key = node.attrs?.key;
-      if (typeof key === "string" && key.trim()) keys.add(key.trim());
+      if (typeof key === "string") {
+        for (const part of citationKeys(key)) keys.add(part);
+      }
     }
     collectCitationKeys(node.content, keys);
   }
