@@ -116,6 +116,23 @@ function containsMark(nodes: DocumentNode[] | undefined, type: string): boolean 
   );
 }
 
+// \captionof comes from the caption package, so only a picture captioned
+// inside a table cell makes the export load it.
+function hasCaptionedImageInCell(nodes: DocumentNode[] | undefined): boolean {
+  return (nodes ?? []).some((node) => {
+    if (node.type === "table") {
+      return (node.content ?? []).some((row) =>
+        (row.content ?? []).some((cell) =>
+          (cell.content ?? []).some(
+            (child) => child.type === "image" && (attribute(child, "caption") ?? "").trim() !== "",
+          ),
+        ),
+      );
+    }
+    return hasCaptionedImageInCell(node.content);
+  });
+}
+
 export function hasCitations(document: SentenceDocument): boolean {
   return nodesContainCitations(document.content);
 }
@@ -329,6 +346,26 @@ function inlineImageToLatex(node: DocumentNode, settings: ProjectSettings, inlin
   return alt ? `${image}% Sentence alt: ${metadataComment(alt)}\n` : image;
 }
 
+// A figure cannot float inside a tabular cell and \caption only works in a
+// float, so a captioned picture in a cell becomes a minipage as wide as the
+// graphic with a \captionof, which the caption package provides for exactly
+// this case. Dropping the caption would leave it visible in the page and
+// missing from the PDF with no warning.
+function imageInCellToLatex(node: DocumentNode, settings: ProjectSettings): string {
+  const graphic = inlineImageToLatex(node, settings, false);
+  const caption = attribute(node, "caption") ?? "";
+  if (!caption.trim()) return graphic;
+  const options = imageOptions(node, settings, false) ?? "";
+  const width = options.match(/(?:^|,)width=([^,]+)/)?.[1] ?? "\\linewidth";
+  return [
+    `\\begin{minipage}{${width}}`,
+    "\\centering",
+    graphic.trimEnd(),
+    `\\captionof{figure}{${escapeLatex(caption)}}`,
+    "\\end{minipage}",
+  ].join("\n");
+}
+
 type LatexColumnAlign = "l" | "c" | "r";
 
 function cellAlign(cell: DocumentNode): LatexColumnAlign {
@@ -363,7 +400,7 @@ function tableCellToLatex(
   // an inline graphic that stays in its own cell.
   const body = children
     .map((child) => {
-      if (child.type === "image") return inlineImageToLatex(child, settings, false);
+      if (child.type === "image") return imageInCellToLatex(child, settings);
       if (child.type === "mathBlock") return mathBlockInCellToLatex(child);
       return inlineContent([child], settings);
     })
@@ -715,12 +752,13 @@ export function documentToLatex(
   const typography = typographyPackages(settings);
   const usesColor =
     containsMark(content, "color") || containsMark(content, "highlight");
+  const usesCaptionOf = hasCaptionedImageInCell(content);
   const preamble = settings.preamble.trim();
   return `${arxivComments ? `% Prepared for arXiv\n${arxivComments}\n` : ""}\\documentclass[${settings.fontSize},${settings.paperSize}${settings.columns === "two" ? ",twocolumn" : ""}]{${settings.documentClass}}
 ${typography}
 \\usepackage{amsmath,amssymb}
 \\usepackage{graphicx}
-\\usepackage{booktabs}
+${usesCaptionOf ? "\\usepackage{caption}\n" : ""}\\usepackage{booktabs}
 \\usepackage{ulem}
 \\usepackage{microtype}
 ${usesColor ? "\\usepackage{xcolor}\n" : ""}\\usepackage[hidelinks]{hyperref}
@@ -1435,6 +1473,27 @@ function parseList(source: string, type: "bulletList" | "orderedList"): Document
 // form of a math block, so restore the block instead of demoting it to inline
 // math. This keeps an equation placed in a cell through a source round trip.
 function tableCellParagraphToNode(paragraph: string): DocumentNode {
+  // A captioned picture in a cell is exported as a minipage holding the graphic
+  // and its \captionof; read it back as the same block image so the caption is
+  // not turned into cell text on the next sync.
+  const minipage = paragraph
+    .trim()
+    .match(/^\\begin\{minipage\}\{[^{}]*\}([\s\S]*?)\\end\{minipage\}$/);
+  const graphics = minipage?.[1].match(/\\includegraphics(?:\[[^\]]*\])?\{([^}]*)\}/);
+  const caption = minipage ? commandArgument(minipage[1], "\\captionof{figure}") : null;
+  if (minipage && graphics && caption !== null) {
+    const captionText = decodeLatexText(caption);
+    const altComment = minipage[1].match(/% Sentence alt: ([^\r\n]*)/);
+    const altText = altComment ? decodeLatexText(altComment[1].trim()) : "";
+    return {
+      type: "image",
+      attrs: {
+        src: decodeLatexVerbatim(graphics[1]),
+        alt: altText || captionText,
+        caption: captionText,
+      },
+    };
+  }
   const content = parseInline(paragraph.trim()).content;
   const only = content.length === 1 ? content[0] : undefined;
   const latex = only?.type === "mathInline" ? attribute(only, "latex") ?? "" : "";
@@ -2109,10 +2168,19 @@ export function latexToDocument(
       );
       // A caption may hold escaped braces such as \{x\}, so a plain [^}]* match
       // would stop before the real closing brace and keep its backslash.
-      const caption = commandArgument(block, "\\caption");
+      // The frame around the tabular is where the table's own \caption and
+      // \label live: a caption written inside a cell (a picture on a minipage
+      // with \captionof) belongs to that picture, not to the table.
+      const tabularStart = block.indexOf("\\begin{tabular}");
+      const tabularEnd = block.indexOf("\\end{tabular}");
+      const tableFrame =
+        tabularStart >= 0 && tabularEnd > tabularStart
+          ? block.slice(0, tabularStart) + block.slice(tabularEnd)
+          : block;
+      const caption = commandArgument(tableFrame, "\\caption");
       // A table's \label names the target of a \ref. It is metadata on the
       // table node, not cell text, so the next Refresh from visual keeps it.
-      const label = block.match(/\\label\{([^{}]*)\}/)?.[1];
+      const label = tableFrame.match(/\\label\{([^{}]*)\}/)?.[1];
       const headerless = /% Sentence table header:\s*(?:none|off|false)/i.test(block);
       // A row break may carry an optional vertical-space argument such as
       // \\[4pt]; it is row spacing, not cell text, so it ends the row too.
