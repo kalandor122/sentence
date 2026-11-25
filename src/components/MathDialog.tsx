@@ -5,6 +5,7 @@ import { latexHasError, renderLatex } from "../editor/KatexMath";
 interface MathDialogProps {
   open: boolean;
   display: boolean;
+  environment?: string;
   initialLatex?: string;
   onClose: () => void;
   onSubmit: (latex: string) => void;
@@ -32,6 +33,7 @@ const TEMPLATES: Array<{ label: string; snippet: string }> = [
 export default function MathDialog({
   open,
   display,
+  environment = "",
   initialLatex = "",
   onClose,
   onSubmit,
@@ -43,10 +45,12 @@ export default function MathDialog({
     if (open) setLatex(initialLatex);
   }, [initialLatex, open]);
 
-  const html = useMemo(() => renderLatex(latex, display), [latex, display]);
+  const html = useMemo(() => renderLatex(latex, display, environment), [display, environment, latex]);
   const invalid = useMemo(
-    () => latex.trim().length > 0 && (html.includes("katex-error") || latexHasError(latex, display)),
-    [display, html, latex],
+    () =>
+      latex.trim().length > 0 &&
+      (html.includes("katex-error") || latexHasError(latex, display, environment)),
+    [display, environment, html, latex],
   );
   const editing = initialLatex.trim().length > 0;
 

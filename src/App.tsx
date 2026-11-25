@@ -160,6 +160,7 @@ type DialogState =
 
 interface MathEditorState {
   display: boolean;
+  environment: string;
   latex: string;
   editing: boolean;
 }
@@ -2094,7 +2095,7 @@ export default function App() {
         onModeChange={handleModeChange}
         onSettingsChange={handleSettingsChange}
         onInsertImage={() => imageInput.current?.click()}
-        onInsertMath={(display) => setMathEditor({ display, latex: "", editing: false })}
+        onInsertMath={(display) => setMathEditor({ display, environment: "", latex: "", editing: false })}
         onInsertCitation={openReferences}
         onInsertFootnote={() => setDialog({ kind: "footnote" })}
         onInsertCrossReference={() => setDialog({ kind: "cross-reference" })}
@@ -2236,7 +2237,9 @@ export default function App() {
                       setSidebarOpen(true);
                       setSidebarPanel("comments");
                     }}
-                    onEditMath={(latex, display) => setMathEditor({ display, latex, editing: true })}
+                    onEditMath={(latex, display, environment) =>
+                      setMathEditor({ display, environment, latex, editing: true })
+                    }
                     onEditFootnote={(text, position) => setDialog({ kind: "footnote", initialValue: text, position })}
                     onPageCountChange={setVisualPages}
                   />
@@ -2413,6 +2416,7 @@ export default function App() {
       <MathDialog
         open={Boolean(mathEditor)}
         display={mathEditor?.display ?? false}
+        environment={mathEditor?.environment ?? ""}
         initialLatex={mathEditor?.latex ?? ""}
         onClose={closeMathEditor}
         onSubmit={handleMathSubmit}

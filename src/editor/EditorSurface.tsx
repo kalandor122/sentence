@@ -58,7 +58,7 @@ interface EditorSurfaceProps {
   onReady: (editor: Editor | null) => void;
   onStateChange: () => void;
   onCommentSelected: (markId: string) => void;
-  onEditMath: (latex: string, display: boolean) => void;
+  onEditMath: (latex: string, display: boolean, environment: string) => void;
   onEditFootnote: (text: string, position: number) => void;
   onPageCountChange: (pages: number) => void;
 }
@@ -235,7 +235,7 @@ export default function EditorSurface({
         const math = target.closest<HTMLElement>("[data-math-inline],[data-math-block]");
         if (math) {
           const display = Boolean(math.dataset.mathBlock !== undefined);
-          onEditMath(math.dataset.latex ?? "", display);
+          onEditMath(math.dataset.latex ?? "", display, math.dataset.mathEnvironment ?? "");
           return false;
         }
         const mark = target.closest<HTMLElement>("[data-comment-id]");

@@ -7,8 +7,16 @@ import { useMemo } from "react";
 // katex-error span. Render with a sentinel to detect those cases too.
 const ERROR_SENTINEL = "__sentence_katex_error__";
 
-export function renderLatex(latex: string, displayMode: boolean): string {
+// An align/gather body is only valid inside its own environment, so wrap it
+// before handing it to KaTeX as well.
+function mathSource(latex: string, environment: string): string {
   const source = latex.trim();
+  if (!source || !environment) return source;
+  return `\\begin{${environment}}${source}\\end{${environment}}`;
+}
+
+export function renderLatex(latex: string, displayMode: boolean, environment = ""): string {
+  const source = mathSource(latex, environment);
   if (!source) return "";
   try {
     return katex.renderToString(source, {
@@ -24,8 +32,8 @@ export function renderLatex(latex: string, displayMode: boolean): string {
   }
 }
 
-export function latexHasError(latex: string, displayMode: boolean): boolean {
-  const source = latex.trim();
+export function latexHasError(latex: string, displayMode: boolean, environment = ""): boolean {
+  const source = mathSource(latex, environment);
   if (!source) return false;
   // Math mode cannot cross a paragraph break: the blank line ends the paragraph
   // before the closing delimiter, so the formula would not compile.
@@ -47,7 +55,11 @@ function KatexNodeView({ node }: NodeViewProps) {
   const latex = typeof node.attrs.latex === "string" ? node.attrs.latex : "";
   const displayMode = node.type.name === "mathBlock";
   const numbered = node.attrs.numbered === true;
-  const html = useMemo(() => renderLatex(latex, displayMode), [latex, displayMode]);
+  const environment = typeof node.attrs.environment === "string" ? node.attrs.environment : "";
+  const html = useMemo(
+    () => renderLatex(latex, displayMode, environment),
+    [environment, latex, displayMode],
+  );
   return (
     <NodeViewWrapper
       as={displayMode ? "div" : "span"}
@@ -56,6 +68,7 @@ function KatexNodeView({ node }: NodeViewProps) {
       data-math-inline={displayMode ? undefined : ""}
       data-latex={latex}
       data-numbered={displayMode ? (numbered ? "true" : "false") : undefined}
+      data-math-environment={environment || undefined}
       title={latex}
     >
       <span className="katex-output" contentEditable={false} dangerouslySetInnerHTML={{ __html: html }} />

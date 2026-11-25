@@ -604,3 +604,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T05:58:31Z START qa-203 on qa/qa-203-preamble-packages-and-macros-are-reporte: Preamble packages and macros are reported synchronized but silently dropped, and their calls are escaped
 2026-11-25T06:09:31Z PUSHED main
 2026-11-25T06:09:31Z DONE qa-203 (tsc -b, npm test, smoke all green)
+2026-11-25T06:10:09Z START qa-204 on qa/qa-204-hand-written-align-environments-are-impo: Hand-written align environments are imported as literal text and escaped
