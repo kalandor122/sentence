@@ -3744,8 +3744,9 @@
       "hint": "Repro: Create a project. At the end type `ClickCite ` (with a trailing space), open References > Insert citation, click `Enter a key manually`, enter `sentence2026`, click Insert. Click the `[sentence2026]` in the text once, then type `X`. Repeat with `ClickRef ` (trailing space), References > Cross-reference, label `fig:click`, then click `ref: fig:click` and type `X`.\nActual: The click selects the atom (`.ProseMirror-selectednode` is set) and the next keystroke replaces it. `ClickCite [sentence2026]` becomes `ClickCite X` and the exported LaTeX contains no `\\cite`; `ClickRef ref: fig:click` becomes `ClickRef X` and the export contains no `\\ref`. Both references are silently lost.",
       "source": "explore:links-cites-footnotes:clicking a citation or cross-reference and typing deletes it",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T12:36:40Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T12:36:40Z",
+      "lastAttemptAt": "2026-11-25T12:36:40Z"
     },
     {
       "id": "qa-237",
