@@ -38,7 +38,7 @@ export default function TopBar({
       </button>
       <div className="document-heading">
         <span>{projectName}</span>
-        <small>{dirty ? "Editing" : "Saved locally"}</small>
+        <small>{dirty ? "Editing" : saveState === "error" ? "Not saved" : "Saved locally"}</small>
       </div>
       <div className="topbar-spacer" />
       <button className="branch-pill" type="button" onClick={onOpenGit} title="Open Git">
