@@ -1650,6 +1650,33 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(parsed.document, settings)).toBe(latex);
   });
 
+  it("keeps an image alt text across a source round trip", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "image",
+          attrs: { path: "assets/images/qa-image--1.png", alt: "qa image #1.png" },
+        },
+        {
+          type: "image",
+          attrs: {
+            path: "assets/images/photo.png",
+            alt: "photo.png",
+            caption: "Architecture & flow",
+          },
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("% Sentence alt: qa image #1.png");
+    const parsed = latexToDocument(latex, DEFAULT_SETTINGS);
+    expect(parsed.document.content[0].attrs?.alt).toBe("qa image #1.png");
+    expect(parsed.document.content[1].attrs?.alt).toBe("photo.png");
+    expect(parsed.document.content[1].attrs?.caption).toBe("Architecture & flow");
+    expect(documentToLatex(parsed.document, settings)).toBe(latex);
+  });
+
   it("exports an inserted image at the size the page shows", () => {
     const document: SentenceDocument = {
       type: "doc",
