@@ -1317,6 +1317,21 @@ button:disabled {
   margin-bottom: 0.3em;
 }
 
+/* The article class labels the four enumerate levels 1., (a), i. and A. Match
+   them here, or every nested level would repeat the decimal marker of the
+   first while the exported PDF numbers and letters the levels in turn. */
+.sentence-editor ol ol > li::marker {
+  content: "(" counter(list-item, lower-alpha) ") ";
+}
+
+.sentence-editor ol ol ol > li::marker {
+  content: counter(list-item, lower-roman) ". ";
+}
+
+.sentence-editor ol ol ol ol > li::marker {
+  content: counter(list-item, upper-alpha) ". ";
+}
+
 .sentence-editor img {
   display: block;
   max-width: 100%;

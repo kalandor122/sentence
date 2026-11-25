@@ -3640,8 +3640,9 @@
       "hint": "Repro: Create a new document. Type 'outer one', click Home > Numbered list, press Enter, type 'middle one', press Tab, press Enter, type 'deep one', press Tab. Read the three markers in the editor, then open Source and read the LaTeX.\nActual: All three items render with the decimal marker '1.' (the computed list-style-type is 'decimal' for the level 0, 1 and 2 <ol> elements), giving '1. outer one / 1. middle one / 1. deep one', while the exported LaTeX is three plain nested \\begin{enumerate} blocks with no label customisation, which compile to 1., (a), i.",
       "source": "explore:lists:every level of a nested numbered list is labelled 1. in the visual editor",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T14:54:19Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T14:54:19Z",
+      "lastAttemptAt": "2026-11-25T14:54:19Z"
     },
     {
       "id": "qa-229",
