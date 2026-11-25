@@ -26,5 +26,23 @@ Override the fixer model with `QA_MODEL=opencode/<model>`.
 
 Notes:
 - One lockfile (`qa/.loop.lock`) — concurrent cycles exit immediately.
-- The loop ignores `qa/` when deciding whether the tree is dirty.
+- `qa/` only dirties the tree harmlessly; uncommitted work **outside** `qa/` makes the loop idle instead of stashing it.
 - Anything the smoke gate fails becomes a `critical` backlog item automatically.
+
+## Verifying the Zotero import for real
+
+`qa/mock-zotero.mjs` covers the parser. The local API itself is worth checking
+once against the real client:
+
+```sh
+curl -sL -o /tmp/z.txz "https://www.zotero.org/download/client/dl?channel=release&platform=linux-x86_64"
+tar -xf /tmp/z.txz -C /tmp && mkdir -p /tmp/zprof
+printf '%s\n' 'user_pref("extensions.zotero.httpServer.enabled", true);' \
+  'user_pref("extensions.zotero.httpServer.localAPI.enabled", true);' > /tmp/zprof/prefs.js
+/tmp/Zotero_linux-x86_64/zotero -profile /tmp/zprof -no-remote &
+# seed an item with POST /connector/saveItems, then:
+ZOTERO_LIVE=1 cargo test --manifest-path src-tauri/Cargo.toml --lib zotero
+```
+
+Then kill Zotero and delete `/tmp/zprof`, `/tmp/zdata`, `/tmp/Zotero_linux-x86_64`.
+
