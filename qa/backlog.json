@@ -3559,10 +3559,11 @@
       ],
       "hint": "Repro: Create a new document. Type 'one', click Home > Numbered list, press Enter and type 'two', press Enter and type 'three', press Enter and type 'four'. Click at the end of 'two' and click Home > Numbered list (Ctrl+Shift+7 gives the same result). Read the editor, then open Source and read the LaTeX.\nActual: The trailing items restart at 1. The editor DOM is '<ol><li><p>one</p></li></ol><p>two</p><ol><li><p>three</p></li><li><p>four</p></li></ol>' (the second <ol> has no start attribute, so it shows 1. three and 2. four next to 1. one) and the LaTeX is two separate \\begin{enumerate} blocks, the second with no \\setcounter{enumi}, so the PDF prints two items numbered 1. The same happens with a three-item list and Ctrl+Shift+7.",
       "source": "explore:lists:turning numbering off for one item in a numbered list restarts the remaining items at 1",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T10:46:56Z",
-      "lastAttemptAt": "2026-11-25T10:46:56Z"
+      "lastAttemptAt": "2026-11-25T10:46:56Z",
+      "doneAt": "2026-11-25T10:51:21Z"
     },
     {
       "id": "qa-225",
@@ -3574,7 +3575,9 @@
       ],
       "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'inner one', press Tab, press Enter, type 'inner two'. Click at the end of 'inner one' and click Home > Bulleted list (the button is shown pressed). Also select both 'inner one' and 'inner two' and click the same button.\nActual: 'inner one' is promoted out of the sublist but remains a bulleted list item, and 'inner two' is re-nested under it. The DOM becomes '<ul><li><p>outer</p></li><li><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>' and the LaTeX is '\\item outer\\n\\item inner one\\n\\begin{itemize}\\n\\item inner two\\n\\end{itemize}': the bullet on 'inner one' is never removed. With both items selected, only the parent leaves the list and the nested item stays as a top-level bullet list.",
       "source": "explore:lists:clicking the highlighted list button inside a nested item only outdents it and keeps the bullet",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T10:52:01Z"
     },
     {
       "id": "qa-226",
