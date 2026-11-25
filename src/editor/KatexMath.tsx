@@ -8,9 +8,11 @@ import { useMemo } from "react";
 const ERROR_SENTINEL = "__sentence_katex_error__";
 
 // An align/gather body is only valid inside its own environment, so wrap it
-// before handing it to KaTeX as well.
+// before handing it to KaTeX as well. \label is a cross-reference target for
+// the LaTeX compiler, which KaTeX does not implement, so it stays in the
+// stored source but is dropped from the render.
 function mathSource(latex: string, environment: string): string {
-  const source = latex.trim();
+  const source = latex.replace(/\\label\s*\{[^{}]*\}/g, "").trim();
   if (!source || !environment) return source;
   return `\\begin{${environment}}${source}\\end{${environment}}`;
 }
