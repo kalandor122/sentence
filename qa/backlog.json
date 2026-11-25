@@ -3080,8 +3080,9 @@
       "hint": "Repro: Create a project. At the end type `EditFocus `, open Insert > Footnote, enter `EF note`, click Insert, double-click the marker, change the note to `EF edited`, click Update, then type `NEXT`.\nActual: The caret is left before the marker, so typing `NEXT` inserts ahead of it: the line becomes `EditFocus NEXT\u00b9`. The continuing text is written on the wrong side of the note reference.",
       "source": "explore:links-cites-footnotes:after updating a footnote the caret is placed before the marker",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T03:31:52Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T03:31:52Z",
+      "lastAttemptAt": "2026-11-25T03:31:52Z"
     }
   ]
 }
