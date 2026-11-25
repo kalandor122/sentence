@@ -534,3 +534,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T01:59:07Z DONE qa-176 (tsc -b, npm test, smoke all green)
 2026-11-25T02:19:42Z EXPLORE tables: 2 new items, agent exit 0
 2026-11-25T02:19:56Z START qa-184 on qa/qa-184-deleting-the-last-row-or-last-column-eje: Deleting the last row or last column ejects the caret from the table, hides the table toolbar, and sends subsequent typi
+2026-11-25T02:23:45Z PUSHED main
+2026-11-25T02:23:45Z DONE qa-184 (tsc -b, npm test, smoke all green)

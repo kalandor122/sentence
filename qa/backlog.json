@@ -2823,7 +2823,9 @@
       ],
       "hint": "Repro: Open the editor and inspect the .sentence-editor element after tabbing into it.\nActual: The element has role=\"textbox\" and aria-label \"Document editor\" but aria-multiline is null, so the main writing surface is exposed as a single-line textbox to assistive technology.",
       "source": "explore:keyboard:document editor is exposed as role=textbox without aria-multiline",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T02:24:19Z"
     },
     {
       "id": "qa-178",
@@ -2927,10 +2929,11 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table (3x3 with header row). Click the middle cell of the last (third) row, type 'tail', then click 'Delete row' in the Table toolbar and type 'OUTSIDE' without clicking anywhere else. Repeat with a column: click a cell in the last column and click 'Delete column', then type 'AFTERCOL'.\nActual: The table shrinks (3x3 to 2x3 for the row delete, then 2x3 to 2x2 for the column delete) but the selection is no longer in any cell: document.activeElement is the editor div, focusCell reports inTable: false, and .table-toolbar is gone. Typing then lands in a paragraph after the table, so the exported LaTeX ends with '\\end{table}\\n\\nOUTSIDE' (and '\\n\\nAFTERCOL' after the column delete) instead of putting the text in a cell. Deleting a non-last row/column leaves the caret in the table and the toolbar visible.",
       "source": "explore:tables:deleting the last row or last column ejects the caret from the table, hides the table toolbar, and sends subsequent typi",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T02:19:56Z",
-      "lastAttemptAt": "2026-11-25T02:19:56Z"
+      "lastAttemptAt": "2026-11-25T02:19:56Z",
+      "doneAt": "2026-11-25T02:23:43Z"
     },
     {
       "id": "qa-185",
