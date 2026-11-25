@@ -1,4 +1,4 @@
-import { mergeAttributes } from "@tiptap/core";
+import { mergeAttributes, type Editor } from "@tiptap/core";
 import { Table, TableView } from "@tiptap/extension-table";
 import type { DOMOutputSpec, Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { TextSelection } from "@tiptap/pm/state";
@@ -6,7 +6,7 @@ import type { Transaction } from "@tiptap/pm/state";
 import { TableMap, addRow, deleteColumn, deleteRow, isInTable, selectedRect } from "@tiptap/pm/tables";
 import type { TableRect } from "@tiptap/pm/tables";
 import type { EditorView } from "@tiptap/pm/view";
-import { focusAfterEditor, focusBeforeEditor } from "./focus";
+import { focusBeforeEditor } from "./focus";
 
 function captionText(node: { attrs?: Record<string, unknown> }): string {
   const value = node.attrs?.caption;
@@ -58,6 +58,24 @@ function keepSelectionInTable(tr: Transaction, rect: TableRect, row: number, col
   tr.setSelection(TextSelection.near(tr.doc.resolve(rect.tableStart + target + 1), 1));
 }
 
+// Handing focus to the next control outside the page drops the keys that
+// follow, so Tab out of the last cell keeps the caret in the text flow
+// instead: the block after the table, or a new paragraph when the table ends
+// its parent.
+function leaveTableForward(editor: Editor): boolean {
+  const { state, view } = editor;
+  const { $from } = state.selection;
+  let depth = $from.depth;
+  while (depth > 0 && $from.node(depth).type.spec.tableRole !== "table") depth -= 1;
+  if (depth === 0) return false;
+  const after = $from.after(depth);
+  const tr = state.tr;
+  if (!tr.doc.nodeAt(after)) tr.insert(after, state.schema.nodes.paragraph.create());
+  tr.setSelection(TextSelection.near(tr.doc.resolve(after), 1)).scrollIntoView();
+  view.dispatch(tr);
+  return true;
+}
+
 // Tables carry their caption as a node attribute so it survives the visual/LaTeX
 // round trip without becoming a paragraph inside the table.
 export const CaptionTable = Table.extend({
@@ -106,15 +124,15 @@ export const CaptionTable = Table.extend({
   },
 
   // Tiptap appends a row when Tab is pressed in the last cell. Tab is focus
-  // navigation here too: walk the cells and then hand focus to the next
-  // control instead of changing the table structure.
+  // navigation here too: walk the cells and then step out after the table
+  // instead of changing the table structure.
   addKeyboardShortcuts() {
     return {
       ...this.parent?.(),
       Tab: () => {
         if (!isInTable(this.editor.state)) return false;
         if (this.editor.commands.goToNextCell()) return true;
-        return focusAfterEditor(this.editor);
+        return leaveTableForward(this.editor);
       },
       "Shift-Tab": () => {
         if (!isInTable(this.editor.state)) return false;

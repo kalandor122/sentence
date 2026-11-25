@@ -3648,8 +3648,9 @@
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click the bottom-right cell, type 'b3', press Tab once, then type 'AFTER' without clicking anywhere. Read the document and then switch to View > LaTeX and read the source.\nActual: The table stays 3x3 with no new row, the empty paragraph after the table is skipped, and focus lands on the 'Visual (Ctrl+Alt+1)' view button in the bottom status bar (document.activeElement is that BUTTON, activeElement.closest('.tiptap') is false). Typing 'AFTER' produces no text anywhere in the document or in the exported LaTeX. Clicking the paragraph after the table and typing works, so the text position exists but Tab bypasses it.",
       "source": "explore:tables:tab in the last table cell jumps to the 'visual' view button and the next keystrokes are discarded",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T11:14:56Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T11:14:56Z",
+      "lastAttemptAt": "2026-11-25T11:14:57Z"
     },
     {
       "id": "qa-231",
