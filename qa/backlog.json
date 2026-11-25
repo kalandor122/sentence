@@ -3251,10 +3251,11 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add a display block containing `\\begin{align}`, `ZXALIGN a &= b + c \\\\`, `d &= e`, and `\\end{align}`. 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: Apply reports success, but zero math blocks are created and the visual page shows the raw `\\begin{align}...\\end{align}` lines as paragraph text (leakedCommands=true). Refresh from visual escapes every command: `\\textbackslash{}begin\\{align\\}`, `\\&`, `\\textbackslash{}end\\{align\\}`. Probe mathBlocks=[], escaped commands present.",
       "source": "explore:source-editor:hand-written align environments are imported as literal text and escaped",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T06:10:09Z",
-      "lastAttemptAt": "2026-11-25T06:10:09Z"
+      "lastAttemptAt": "2026-11-25T06:10:09Z",
+      "doneAt": "2026-11-25T06:16:29Z"
     },
     {
       "id": "qa-205",
@@ -3266,7 +3267,9 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add a table with `\\caption{ZXCAPTION}` and `\\label{tab:zxtable}`, rows `Name & Value \\\\` and `ZXTABLELABEL & 7 \\\\`, then a blank line and `See Table~\\ref{tab:zxtable}.` 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: The table and caption import correctly, but the regenerated table contains no `\\label{tab:zxtable}`; only `See Table\\textasciitilde{}\\ref{tab:zxtable}` remains. The label was silently dropped, so the reference has no target. Probe: labelKept=false, refKept=true.",
       "source": "explore:source-editor:a hand-written table \\label is silently dropped, leaving a dangling \\ref",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T06:17:09Z"
     },
     {
       "id": "qa-206",
