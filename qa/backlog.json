@@ -3679,10 +3679,11 @@
       ],
       "hint": "Repro: 1. Create a new document, open View > LaTeX.\n2. Before \\end{document} add this body:\n\\begin{equation}\n\\label{eq:energy}\nE=mc^2\n\\end{equation}\n\nSee \\ref{eq:energy}.\n3. Click Apply source (the toast says 'Visual document synchronized from LaTeX.'), then switch to View > Visual.\n4. Click the rendered equation.\nExpected: the \\label is handled as the equation's reference target (the following \\ref already resolves to 'eq:energy'), the page shows E=mc^2 without error text, and the edit dialog opens with Update enabled.\nActual: the equation displays the literal \\label{eq:energy} in KaTeX's red error colour next to E=mc^2 (the math node has redErrorText true). Clicking it opens 'Edit equation', but the dialog marks the input invalid (aria-invalid true) and Update stays disabled; changing the formula to a valid expression does not enable Update. Only deleting the \\label makes it valid. The source still round-trips the \\label unchanged, but a standard labelled numbered equation cannot be rendered cleanly or edited.\nActual: None",
       "source": "explore:math:an equation carrying its \\label renders the label as red error text and can no longer be edited",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T11:54:56Z",
-      "lastAttemptAt": "2026-11-25T11:54:56Z"
+      "lastAttemptAt": "2026-11-25T11:54:56Z",
+      "doneAt": "2026-11-25T11:56:56Z"
     },
     {
       "id": "qa-233",
@@ -3694,7 +3695,9 @@
       ],
       "hint": "Repro: 1. Create a new document and open View > LaTeX.\n2. Before \\end{document} add:\n\\begin{equation}\na\n\nb\n\\end{equation}\n3. Click Apply source: the toast reports 'Visual document synchronized from LaTeX.'\n4. Switch to View > Visual: a display math block renders 'a b' with no error indicator (no katex-error, no red text).\n5. Switch back to View > LaTeX and click Refresh from visual: the exported source still contains the blank line between a and b inside \\begin{equation}...\\end{equation}.\nExpected: the blank line is rejected with the same validation the math dialog applies to `a\\n\\nb` (Insert disabled), or it is normalised to a single line, so the exported .tex remains compilable.\nActual: the document is accepted and reported as synchronised; the math node stores latex 'a\\n\\nb' and the exporter writes the blank line back verbatim. A blank line ends the paragraph before the closing environment in LaTeX, so the generated equation does not compile.\nActual: None",
       "source": "explore:math:a blank line inside a display equation is accepted from the source and re-exported as uncompilable latex",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T11:57:36Z"
     },
     {
       "id": "qa-234",

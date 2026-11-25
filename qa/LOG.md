@@ -677,3 +677,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T11:23:17Z DONE qa-198 (tsc -b, npm test, smoke all green)
 2026-11-25T11:54:38Z EXPLORE math: 4 new items, agent exit 0
 2026-11-25T11:54:56Z START qa-232 on qa/qa-232-an-equation-carrying-its-label-renders-t: An equation carrying its \label renders the label as red error text and can no longer be edited
+2026-11-25T11:56:58Z PUSHED main
+2026-11-25T11:56:58Z DONE qa-232 (tsc -b, npm test, smoke all green)
