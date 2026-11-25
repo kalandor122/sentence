@@ -3711,10 +3711,11 @@
       ],
       "hint": "Repro: 1. Open Insert > 'Inline equation'.\n2. In the LaTeX source textarea type `a`, press Enter twice, then type `b` (the value is `a\\n\\nb`).\n3. Look at the preview and try Ctrl+Enter.\nExpected: the dialog explains why the input is invalid (for example 'blank lines are not allowed in math'), the way malformed input such as `\\frac{` shows a KaTeX parse error.\nActual: the preview renders normally as 'ab' with no .katex-error, no red content and no role=alert message, while the Insert button is disabled and the textarea has aria-invalid='true'. Ctrl+Enter does nothing and no text anywhere identifies the problem, so the blocked state is unexplained.\nActual: None",
       "source": "explore:math:invalid blank-line math disables insert with no visible error message",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T12:00:29Z",
-      "lastAttemptAt": "2026-11-25T12:00:29Z"
+      "lastAttemptAt": "2026-11-25T12:00:29Z",
+      "doneAt": "2026-11-25T12:02:23Z"
     },
     {
       "id": "qa-235",
@@ -3726,7 +3727,9 @@
       ],
       "hint": "Repro: 1. Create a new document and open View > LaTeX.\n2. Before \\end{document} add the single line `Before $$F=ma$$ after.`\n3. Click Apply source (the toast says 'Visual document synchronized from LaTeX.') and switch to View > Visual.\n4. Observe the page, then open View > LaTeX and click Refresh from visual.\nExpected: the display math is recognised (standalone `$$F=ma$$` becomes a math block) or at least left as `$$...$$` in the export; the formula must not become literal dollars.\nActual: the visual document contains no math node, just the paragraph text 'Before $$F=ma$$ after.', and the exported body escapes both delimiters: `Before \\$\\$F=ma\\$\\$ after.` The equation is lost and the PDF would print the dollar signs as text, although this is valid TeX display math in running text.\nActual: None",
       "source": "explore:math:$$...$$ inside a paragraph is silently converted into literal dollar text",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T12:03:03Z"
     }
   ]
 }
