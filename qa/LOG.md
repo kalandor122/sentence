@@ -742,3 +742,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T14:57:52Z DONE qa-228 (tsc -b, npm test, smoke all green)
 2026-11-25T15:14:48Z EXPLORE persistence: 1 new items, agent exit 0
 2026-11-25T15:15:06Z START qa-252 on qa/qa-252-a-tracked-edit-saved-just-before-a-reloa: A tracked edit saved just before a reload loses its tracked revision
+2026-11-25T15:19:54Z PUSHED main
+2026-11-25T15:19:54Z DONE qa-252 (tsc -b, npm test, smoke all green)
