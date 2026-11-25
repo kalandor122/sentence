@@ -2807,10 +2807,11 @@
       ],
       "hint": "Repro: On the Home ribbon tab focus \"Text color\", press Enter to open the swatch popover, press ArrowDown, then Tab through the swatches.\nActual: .color-popover has role=\"menu\" and aria-label \"Text color\", but all ten children have no role (plain buttons) and ArrowDown leaves focus on the \"Text color\" trigger. Only Tab reaches the swatches (\"No color\", \"Black\", \"Dark gray\", ... \"Blue\"). Enter on a swatch and Escape to close both work.",
       "source": "explore:keyboard:text colour popover uses role=menu but has plain-button children and no arrow-key navigation",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T01:56:49Z",
-      "lastAttemptAt": "2026-11-25T01:56:49Z"
+      "lastAttemptAt": "2026-11-25T01:56:49Z",
+      "doneAt": "2026-11-25T01:59:05Z"
     },
     {
       "id": "qa-177",
@@ -2915,6 +2916,32 @@
       "startedAt": "2026-11-25T01:52:21Z",
       "lastAttemptAt": "2026-11-25T01:52:21Z",
       "doneAt": "2026-11-25T01:56:13Z"
+    },
+    {
+      "id": "qa-184",
+      "title": "Deleting the last row or last column ejects the caret from the table, hides the table toolbar, and sends subsequent typi",
+      "why": "Exploratory pass on tables (functional): expected After deleting a row or column, the caret stays in the nearest remaining cell of the table, the Table toolbar stays available, and typing continues inside the table.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new project. Insert tab > Insert table (3x3 with header row). Click the middle cell of the last (third) row, type 'tail', then click 'Delete row' in the Table toolbar and type 'OUTSIDE' without clicking anywhere else. Repeat with a column: click a cell in the last column and click 'Delete column', then type 'AFTERCOL'.\nActual: The table shrinks (3x3 to 2x3 for the row delete, then 2x3 to 2x2 for the column delete) but the selection is no longer in any cell: document.activeElement is the editor div, focusCell reports inTable: false, and .table-toolbar is gone. Typing then lands in a paragraph after the table, so the exported LaTeX ends with '\\end{table}\\n\\nOUTSIDE' (and '\\n\\nAFTERCOL' after the column delete) instead of putting the text in a cell. Deleting a non-last row/column leaves the caret in the table and the toolbar visible.",
+      "source": "explore:tables:deleting the last row or last column ejects the caret from the table, hides the table toolbar, and sends subsequent typi",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T02:19:56Z"
+    },
+    {
+      "id": "qa-185",
+      "title": "A table caption typed in the Table toolbar is exported to LaTeX but never shown in the visual document",
+      "why": "Exploratory pass on tables (visual): expected The caption is rendered with the table in the visual page, matching the exported \\caption{Data \\& results}, as figure captions are rendered under images.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new project. Insert tab > Insert table. Click a body cell so the Table toolbar appears, type 'Data & results' into its Caption field, then look at the page around the table. Switch to View > LaTeX and read the table block.\nActual: The caption exists only as data-caption=\"Data & results\" on the table element and in the exported LaTeX (\\caption{Data \\& results}); the visual page renders no caption element and no caption text next to the table, so the caption is invisible unless the user opens the LaTeX source or the compiled PDF.",
+      "source": "explore:tables:a table caption typed in the table toolbar is exported to latex but never shown in the visual document",
+      "status": "open"
     }
   ]
 }
