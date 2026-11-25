@@ -594,8 +594,9 @@ export default function App() {
   const findInput = useRef<HTMLInputElement>(null);
   const sourceTextarea = useRef<HTMLTextAreaElement>(null);
   // Undo history of the source editor, kept here because the editor unmounts
-  // whenever the view leaves the LaTeX pane.
-  const sourceHistory = useRef<SourceHistory | null>(null);
+  // whenever the view leaves the LaTeX pane. One stack per file, so switching
+  // between document.tex and references.bib does not drop the other file's.
+  const sourceHistory = useRef<Record<string, SourceHistory | null>>({});
   // Document the current clean source was last applied from. Re-entering the
   // source view regenerates LaTeX from the document, which would rewrite a
   // hand-written draft (and drop its undo history) even though nothing changed.
@@ -750,7 +751,7 @@ export default function App() {
     workspaceRef.current = tab.workspace;
     setSource(tab.source);
     sourceRef.current = tab.source;
-    sourceHistory.current = null;
+    sourceHistory.current = {};
     setSourceFile("document.tex");
     setSourceDirty(tab.sourceDirty);
     sourceDirtyRef.current = tab.sourceDirty;
@@ -778,7 +779,7 @@ export default function App() {
     setWorkspace(null);
     sourceRef.current = "";
     setSource("");
-    sourceHistory.current = null;
+    sourceHistory.current = {};
     sourceDirtyRef.current = false;
     setSourceDirty(false);
     sourceDraftDocument.current = null;
@@ -849,7 +850,7 @@ export default function App() {
     workspaceRef.current = project;
     setSource(latex);
     sourceRef.current = latex;
-    sourceHistory.current = null;
+    sourceHistory.current = {};
     setSourceFile("document.tex");
     setSourceDirty(false);
     sourceDirtyRef.current = false;
@@ -2457,6 +2458,7 @@ export default function App() {
                   activeLine={sourceFile === "document.tex" ? compileResult?.diagnostics.find((item) => item.line)?.line : undefined}
                   textareaRef={sourceTextarea}
                   historyRef={sourceHistory}
+                  historyKey={sourceFile}
                   undoBoundary={sourceUndoBoundary}
                 />
               </section>
