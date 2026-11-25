@@ -5,6 +5,7 @@ import {
   pageBreakFill,
   pageCountFromBottom,
   pageGeometry,
+  pageLineGaps,
 } from "./pagination";
 
 describe("pageGeometry", () => {
@@ -59,5 +60,39 @@ describe("pageBreakFill", () => {
     const height = 148;
     const fill = pageBreakFill(top, height, geometry);
     expect(top + fill + height).toBe(geometry.height + geometry.margin);
+  });
+});
+
+describe("pageLineGaps", () => {
+  it("moves the line crossing a page edge to the next page's text area", () => {
+    const geometry = pageGeometry(DEFAULT_SETTINGS);
+    const lines = Array.from({ length: 120 }, (_, index) => ({
+      top: geometry.margin + index * 25,
+      bottom: geometry.margin + index * 25 + 16,
+    }));
+    const gaps = pageLineGaps(
+      lines,
+      geometry.margin,
+      geometry.margin + 120 * 25,
+      geometry,
+    );
+    expect(gaps.length).toBeGreaterThan(1);
+
+    let shift = 0;
+    let gapIndex = 0;
+    lines.forEach((line, index) => {
+      if (gapIndex < gaps.length && gaps[gapIndex].line === index) {
+        shift += gaps[gapIndex].height;
+        gapIndex += 1;
+      }
+      const top = line.top + shift;
+      const bottom = line.bottom + shift;
+      const pageTop = Math.floor(top / geometry.height) * geometry.height;
+      expect(top).toBeGreaterThanOrEqual(pageTop + geometry.margin);
+      expect(bottom).toBeLessThanOrEqual(
+        pageTop + geometry.height - geometry.margin,
+      );
+    });
+    expect(gapIndex).toBe(gaps.length);
   });
 });

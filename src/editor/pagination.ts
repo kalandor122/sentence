@@ -58,6 +58,48 @@ export function pageBoundaryWithin(
   return boundary < bottom ? boundary : null;
 }
 
+export interface LineSpan {
+  top: number;
+  bottom: number;
+}
+
+export interface LineGap {
+  line: number;
+  height: number;
+}
+
+// A block taller than a page cannot move as a whole, so its lines are split at
+// the page edges instead. The line that would cross a page's bottom margin
+// starts at the top margin of the next page; the rule then falls in the blank
+// gap between the two pages instead of across a line. `top` and `bottom` are
+// unscaled sheet coordinates of the block.
+export function pageLineGaps(
+  lines: LineSpan[],
+  top: number,
+  bottom: number,
+  geometry: PageGeometry,
+): LineGap[] {
+  const gaps: LineGap[] = [];
+  let shift = 0;
+  let index = 0;
+  for (
+    let boundary = Math.ceil(Math.max(0, top) / geometry.height) * geometry.height;
+    boundary < bottom + shift && index < lines.length;
+    boundary += geometry.height
+  ) {
+    const contentBottom = boundary - geometry.margin;
+    while (index < lines.length && lines[index].bottom + shift <= contentBottom) {
+      index += 1;
+    }
+    if (index >= lines.length) break;
+    const height = Math.round(boundary + geometry.margin - lines[index].top - shift);
+    if (height <= 0) continue;
+    gaps.push({ line: index, height });
+    shift += height;
+  }
+  return gaps;
+}
+
 // An explicit break fills the rest of its page so the following block starts at
 // the top margin of the next one. `top` and `height` are unscaled layout pixels.
 export function pageBreakFill(top: number, height: number, geometry: PageGeometry): number {
