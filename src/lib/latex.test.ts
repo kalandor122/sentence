@@ -773,6 +773,26 @@ describe("LaTeX generation", () => {
     expect(exported).toContain("\\begin{equation*}\na^2+b^2=c^2\n\\end{equation*}");
   });
 
+  it("normalises a blank line inside a display equation so the export still compiles", () => {
+    const source = [
+      "\\begin{document}",
+      "",
+      "\\begin{equation}",
+      "a",
+      "",
+      "b",
+      "\\end{equation}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    expect(parsed.content).toHaveLength(1);
+    expect(parsed.content[0]?.type).toBe("mathBlock");
+    expect(parsed.content[0]?.attrs).toEqual({ latex: "a\nb", numbered: true });
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\begin{equation}\na\nb\n\\end{equation}");
+    expect(exported).not.toMatch(/\\begin\{equation\}\n[\s\S]*\n[ \t]*\n[\s\S]*\\end\{equation\}/);
+  });
+
   it("imports numbered equation environments as editable display math and keeps them numbered", () => {
     const source = [
       "\\begin{document}",

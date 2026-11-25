@@ -679,3 +679,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T11:54:56Z START qa-232 on qa/qa-232-an-equation-carrying-its-label-renders-t: An equation carrying its \label renders the label as red error text and can no longer be edited
 2026-11-25T11:56:58Z PUSHED main
 2026-11-25T11:56:58Z DONE qa-232 (tsc -b, npm test, smoke all green)
+2026-11-25T11:57:36Z START qa-233 on qa/qa-233-a-blank-line-inside-a-display-equation-i: A blank line inside a display equation is accepted from the source and re-exported as uncompilable LaTeX
