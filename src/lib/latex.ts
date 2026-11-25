@@ -1176,6 +1176,36 @@ const DISPLAY_MATH_BODY =
 // verbatim instead of being read as paragraph text and escaped on export.
 const MATH_BLOCK_ENVIRONMENTS = ["align", "align*", "gather", "gather*"];
 
+// Environments the parser turns into a node. A block that opens with any other
+// environment would be read as paragraph text and escaped on export, so an
+// Apply has to report it instead of silently rewriting the user's LaTeX.
+const SUPPORTED_ENVIRONMENTS = new Set([
+  "abstract",
+  "align",
+  "align*",
+  "center",
+  "document",
+  "enumerate",
+  "equation",
+  "equation*",
+  "figure",
+  "flushleft",
+  "flushright",
+  "gather",
+  "gather*",
+  "itemize",
+  "quote",
+  "table",
+  "tabular",
+  "verbatim",
+]);
+
+function assertSupportedEnvironment(text: string): void {
+  const match = text.trim().match(/^\\begin\{([a-zA-Z*]+)\}/);
+  if (!match || SUPPORTED_ENVIRONMENTS.has(match[1])) return;
+  throw new Error(`Invalid LaTeX: unsupported environment "${match[1]}".`);
+}
+
 // A blank line inside math ends the paragraph before the closing delimiter, so
 // the environment would never compile. Math has no paragraph break anyway: join
 // the body back onto fewer lines instead of writing the blank line out again.
@@ -1212,7 +1242,10 @@ function pushBodyParagraphs(content: DocumentNode[], text: string): void {
 function parseListItemContent(body: string): DocumentNode[] {
   const content: DocumentNode[] = [];
   let cursor = 0;
-  const pushParagraph = (text: string) => pushBodyParagraphs(content, text);
+  const pushParagraph = (text: string) => {
+    assertSupportedEnvironment(text);
+    pushBodyParagraphs(content, text);
+  };
   for (const span of nestedListSpans(body)) {
     pushParagraph(body.slice(cursor, span.start));
     if (!content.some((node) => node.type === "paragraph")) {
@@ -1861,6 +1894,7 @@ export function latexToDocument(
       const textAlign =
         aligned[1] === "center" ? "center" : aligned[1] === "flushleft" ? "left" : "right";
       const inner = aligned[2].trim();
+      assertSupportedEnvironment(inner);
       const innerHeading = parseHeadingBlock(inner);
       if (innerHeading) {
         content.push({
@@ -1908,6 +1942,7 @@ export function latexToDocument(
     const quote = block.match(/^\\begin\{quote\}([\s\S]*)\\end\{quote\}$/);
     if (quote) {
       const quoteContent: DocumentNode[] = [];
+      assertSupportedEnvironment(quote[1]);
       pushBodyParagraphs(quoteContent, quote[1].trim());
       content.push({
         type: "blockquote",
@@ -2069,6 +2104,7 @@ export function latexToDocument(
     // Display math can sit inside running text, e.g. "Before $$F=ma$$ after.".
     // Splitting it out keeps the equation a block node instead of letting
     // parseInline read the delimiters as literal dollars and escape them.
+    assertSupportedEnvironment(block);
     pushBodyParagraphs(content, block);
   }
 

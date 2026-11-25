@@ -437,6 +437,52 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("rejects an environment outside the supported subset instead of escaping it", () => {
+    for (const name of ["description", "theorem"]) {
+      const source = [
+        "\\begin{document}",
+        `\\begin{${name}}`,
+        `ZX${name.toUpperCase()} body text.`,
+        `\\end{${name}}`,
+        "\\end{document}",
+      ].join("\n");
+      expect(() => latexToDocument(source, DEFAULT_SETTINGS)).toThrow(
+        `Invalid LaTeX: unsupported environment "${name}".`,
+      );
+    }
+  });
+
+  it("rejects an unsupported environment nested in a quote", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{quote}",
+      "\\begin{description}",
+      "\\item[ZXTERM] ZXTERM definition text.",
+      "\\end{description}",
+      "\\end{quote}",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(source, DEFAULT_SETTINGS)).toThrow(
+      'Invalid LaTeX: unsupported environment "description".',
+    );
+  });
+
+  it("keeps a cases environment inside display math", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{equation}",
+      "f(x) = \\begin{cases} 1 & x > 0 \\\\ 0 & x \\le 0 \\end{cases}",
+      "\\end{equation}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    expect(parsed.content[0]?.type).toBe("mathBlock");
+    expect(parsed.content[0]?.attrs?.latex).toContain("\\begin{cases}");
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\begin{cases} 1 & x > 0 \\\\ 0 & x \\le 0 \\end{cases}");
+    expect(exported).not.toContain("\\textbackslash{}begin\\{cases\\}");
+  });
+
   it("rejects a missing closing brace instead of rewriting the content", () => {
     const tabular = [
       "\\begin{document}",

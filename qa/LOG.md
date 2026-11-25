@@ -721,3 +721,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T14:05:39Z START qa-244 on qa/qa-244-verbatim-code-is-latex-escaped-on-re-exp: Verbatim code is LaTeX-escaped on re-export, changing the code
 2026-11-25T14:07:30Z PUSHED main
 2026-11-25T14:07:30Z DONE qa-244 (tsc -b, npm test, smoke all green)
+2026-11-25T14:08:08Z START qa-245 on qa/qa-245-valid-latex-environments-outside-the-sup: Valid LaTeX environments outside the supported subset are shown literally and then escaped

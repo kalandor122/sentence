@@ -3892,8 +3892,9 @@
       "hint": "Repro: 1. Click View, then LaTeX. 2. Before \\end{document}, insert `\\begin{description}`, `\\item[ZXTERM] ZXTERM definition text.`, and `\\end{description}`. 3. Click Apply source. 4. Click View, then Visual. 5. Click View, then LaTeX, then Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` The visual page shows the raw lines `\\begin{description}`, `\\item[ZXTERM] ZXTERM definition text.`, `\\end{description}` as paragraph text. Refresh from visual rewrites them as `\\textbackslash{}begin\\{description\\}`, `\\textbackslash{}item[ZXTERM] ...`, `\\textbackslash{}end\\{description\\}`, so the environment no longer compiles. The same was observed for `\\begin{theorem}...\\end{theorem}`. Probe: unsupportedDescriptionEnv.leakedCommands=true, beginEscaped=true, endEscaped=true; unsupportedTheoremEnv.beginEscaped=true.",
       "source": "explore:source-editor:valid latex environments outside the supported subset are shown literally and then escaped",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T14:08:08Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T14:08:08Z",
+      "lastAttemptAt": "2026-11-25T14:08:08Z"
     },
     {
       "id": "qa-246",
