@@ -1522,6 +1522,24 @@ describe("LaTeX generation", () => {
     expect(plainParsed.settings.paragraphSpacing).toBe("indent");
   });
 
+  it("emits and round-trips two-column layout", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Two columns." }] },
+      ],
+    };
+    const twoColumn: ProjectSettings = { ...settings, columns: "two" };
+    const latex = documentToLatex(document, twoColumn);
+    expect(latex).toContain("\\documentclass[11pt,a4paper,twocolumn]{article}");
+    expect(latexToDocument(latex, DEFAULT_SETTINGS).settings.columns).toBe("two");
+
+    const singleColumn = documentToLatex(document, { ...settings, columns: "one" });
+    expect(singleColumn).toContain("\\documentclass[11pt,a4paper]{article}");
+    expect(singleColumn).not.toContain("twocolumn");
+    expect(latexToDocument(singleColumn, DEFAULT_SETTINGS).settings.columns).toBe("one");
+  });
+
   it("serializes and round-trips per-selection text styles", () => {
     const document: SentenceDocument = {
       type: "doc",

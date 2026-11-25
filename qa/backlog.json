@@ -3016,8 +3016,9 @@
       "hint": "Add `columns: \"one\" | \"two\"` to ProjectSettings in src/lib/types.ts (default \"one\"). Emit the `twocolumn` class option in documentToLatex (src/lib/latex.ts, the \\documentclass line around 512) and parse it back in latexToDocument. Add a Columns control to the Layout ribbon group in src/components/Ribbon.tsx. Acceptance: unit tests in src/lib/latex.test.ts prove article+two emits \\documentclass[11pt,a4paper,twocolumn]{article} and that latexToDocument reads it back; gate green.",
       "source": "roadmap:two-column documents: settings, preamble and round trip",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T02:58:41Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T02:58:41Z",
+      "lastAttemptAt": "2026-11-25T02:58:41Z"
     }
   ]
 }
