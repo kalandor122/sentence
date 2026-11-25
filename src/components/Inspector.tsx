@@ -31,7 +31,10 @@ export default function Inspector({
     const previous = document.activeElement as HTMLElement | null;
     closeRef.current?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onCloseRef.current();
+      if (event.key !== "Escape") return;
+      // The panel is not modal: an overlay in front of it (a dialog or the find bar) owns Escape.
+      if (document.querySelector(".modal-backdrop, .find-bar")) return;
+      onCloseRef.current();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => {

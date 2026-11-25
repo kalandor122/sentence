@@ -3392,8 +3392,9 @@
       "hint": "Repro: In the editor click the Settings (avatar) button to open the Properties panel, click into a word in the document, then press Ctrl+K to open the Add link dialog. Press Escape once. The Properties panel closes, the Add link dialog and its backdrop stay open, and focus is moved to the avatar Settings button underneath the backdrop. Pressing Escape a second time finally closes the dialog. The find bar behaves the same way: with Properties open press Ctrl+F, then Escape \u2014 the panel closes, the find bar stays open and focus is on the Settings button.\nActual: The Inspector's window keydown handler closes the panel on Escape without checking for a dialog or find bar on top, and its effect cleanup restores focus to the Settings button. Probe counts before/after one Escape: {modal 1, inspector 1} -> {modal 1, inspector 0, focus BUTTON.avatar-button \"Settings\"}; the dialog needs a second Escape. For the find bar: {find 1, inspector 1} -> {find 1, inspector 0, focus \"Settings\"}.",
       "source": "explore:keyboard:escape closes the properties panel behind a dialog instead of the dialog in front of it, and leaves focus on the page be",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T08:03:47Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T08:03:47Z",
+      "lastAttemptAt": "2026-11-25T08:03:47Z"
     },
     {
       "id": "qa-214",
