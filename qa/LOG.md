@@ -651,3 +651,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T09:45:06Z DONE qa-221 (tsc -b, npm test, smoke all green)
 2026-11-25T10:17:34Z EXPLORE lists: 5 new items, agent exit 0
 2026-11-25T10:17:52Z START qa-222 on qa/qa-222-the-toc-preview-lists-a-heading-that-the: The TOC preview lists a heading that the exporter turns into \maketitle and removes from the body
+2026-11-25T10:26:29Z PUSHED main
+2026-11-25T10:26:29Z DONE qa-222 (tsc -b, npm test, smoke all green)

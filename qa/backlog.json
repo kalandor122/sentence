@@ -3527,10 +3527,11 @@
       ],
       "hint": "Repro: Click Layout > Document properties, set Title to 'Introduction' (the demo's first H1 is also 'Introduction'), close Properties, press Ctrl+End, then click References > Table of contents.\nActual: The preview lists '1 Introduction' and '1.1 Drafting with constraints' (numbers 1 and 1.1), but the exported LaTeX contains \\title{Introduction} and no \\section{Introduction} at all - only \\subsection{Drafting with constraints}. The PDF contents will not contain the 'Introduction' entry the preview shows. Probe qa/probes/insert-media.mjs scenario 'toc-title-heading'.",
       "source": "explore:insert-media:the toc preview lists a heading that the exporter turns into \\maketitle and removes from the body",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T10:17:52Z",
-      "lastAttemptAt": "2026-11-25T10:17:52Z"
+      "lastAttemptAt": "2026-11-25T10:17:52Z",
+      "doneAt": "2026-11-25T10:26:27Z"
     },
     {
       "id": "qa-223",
@@ -3542,7 +3543,9 @@
       ],
       "hint": "Repro: Click Layout > Document properties, check 'Generate table of contents', close Properties, and compare the page with View > LaTeX. Then place the caret at the end of the document and click References > Table of contents and compare again.\nActual: With the switch on, the visual document has 0 [data-toc] blocks and the status bar still reports 1 page, while the LaTeX contains \\tableofcontents\\newpage (an extra PDF page). Inserting a TOC from the ribbon then shows 1 TOC block but the LaTeX contains 2 \\tableofcontents commands. Probe qa/probes/insert-media.mjs scenario 'toc-setting'.",
       "source": "explore:insert-media:the properties 'generate table of contents' switch adds a contents page the visual editor never shows; adding a ribbon t",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T10:27:07Z"
     },
     {
       "id": "qa-224",
