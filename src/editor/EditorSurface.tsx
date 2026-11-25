@@ -21,6 +21,7 @@ import {
   TableOfContents,
 } from "./extensions";
 import { FindHighlight } from "./find";
+import { focusAfterEditor } from "./focus";
 import { changeIndent, nestListItem } from "./indent";
 import { toggleList } from "./listToggle";
 import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
@@ -98,30 +99,6 @@ const ListShortcuts = Extension.create({
     };
   },
 });
-
-// Hand focus to the next control after the page, wrapping to the first one, so
-// Escape from the editing surface always lands on something the keyboard can use.
-function focusAfterEditor(editor: Editor): boolean {
-  const dom = editor.view.dom;
-  const focusable = Array.from(
-    document.querySelectorAll<HTMLElement>(
-      'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    ),
-  ).filter(
-    (element) =>
-      !element.hasAttribute("disabled") &&
-      element.tabIndex >= 0 &&
-      element.getClientRects().length > 0 &&
-      !dom.contains(element),
-  );
-  const next =
-    focusable.find(
-      (element) => dom.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ) ?? focusable[0];
-  if (!next) return false;
-  next.focus();
-  return true;
-}
 
 // The WebView's native spellchecker uses lang to pick a dictionary; keeping
 // these in one place avoids drift between editor creation and later toggles.

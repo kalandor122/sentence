@@ -33,15 +33,28 @@ function createEditor(withHeaderRow: boolean): Editor {
   });
 }
 
-function createSizedEditor(rows: number, columns: number): Editor {
+function createSizedEditor(rows: number, columns: number, element?: HTMLElement): Editor {
   const row = { type: "tableRow", content: Array.from({ length: columns }, () => cell(false)) };
+  const host = element ?? document.createElement("div");
+  if (!element) document.body.appendChild(host);
   return new Editor({
+    element: host,
     extensions: [StarterKit, TableKit.configure({ table: false }), CaptionTable],
     content: {
       type: "doc",
       content: [{ type: "table", content: Array.from({ length: rows }, () => row) }],
     },
   });
+}
+
+function pressTab(editor: Editor, back = false): boolean {
+  const event = new KeyboardEvent("keydown", {
+    key: "Tab",
+    shiftKey: back,
+    bubbles: true,
+    cancelable: true,
+  });
+  return editor.view.someProp("handleKeyDown", (handler) => handler(editor.view, event)) ?? false;
 }
 
 function tableRowTypes(document: SentenceDocument): string[][] {
@@ -127,5 +140,44 @@ describe("CaptionTable", () => {
     expect(editor.can().deleteRow()).toBe(false);
     expect(editor.commands.deleteRow()).toBe(false);
     editor.destroy();
+  });
+
+  it("walks the cells with Tab and releases the last one without adding a row", () => {
+    const editor = createSizedEditor(2, 2);
+    const positions = cellPositions(editor);
+    editor.commands.setTextSelection(positions[0]);
+    for (let index = 1; index < positions.length; index += 1) {
+      expect(pressTab(editor)).toBe(true);
+      expect(editor.state.selection.from).toBe(positions[index]);
+    }
+    expect(pressTab(editor)).toBe(false);
+    expect(editor.state.selection.from).toBe(positions[positions.length - 1]);
+    expect(rowTypes(editor)).toHaveLength(2);
+    editor.destroy();
+  });
+
+  it("moves the caret back with Shift-Tab", () => {
+    const editor = createSizedEditor(2, 2);
+    const positions = cellPositions(editor);
+    editor.commands.setTextSelection(positions[3]);
+    expect(pressTab(editor, true)).toBe(true);
+    expect(editor.state.selection.from).toBe(positions[2]);
+    editor.destroy();
+  });
+
+  it("hands focus to the next control when Tab leaves the last cell", () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const editor = createSizedEditor(2, 2, host);
+    const button = document.createElement("button");
+    button.getClientRects = () => ({ length: 1 }) as unknown as DOMRectList;
+    document.body.appendChild(button);
+    editor.commands.setTextSelection(cellPositions(editor)[3]);
+    expect(pressTab(editor)).toBe(true);
+    expect(document.activeElement).toBe(button);
+    expect(rowTypes(editor)).toHaveLength(2);
+    editor.destroy();
+    host.remove();
+    button.remove();
   });
 });

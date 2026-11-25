@@ -2776,8 +2776,9 @@
       "hint": "Repro: Open the Insert ribbon tab, focus \"Insert table\" and press Enter to create the 3x3 table, click the first cell, then press Tab ten times.\nActual: All ten Tab presses left document.activeElement on the .sentence-editor; the table had 3 rows before and 4 after, because Tab in the last cell runs addRowAfter(). Only Escape (which then lands on the \"Visual\" mode button) gets focus out of the table.",
       "source": "explore:keyboard:tab never leaves a table and appends a row at the end",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T00:17:10Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T00:17:10Z",
+      "lastAttemptAt": "2026-11-25T00:17:10Z"
     },
     {
       "id": "qa-176",
