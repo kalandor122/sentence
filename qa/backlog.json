@@ -3327,10 +3327,11 @@
       ],
       "hint": "Repro: In the same empty document, paste one 3,100-word paragraph with Ctrl+V: 100 copies of the 30-word sentence 'The visual editor keeps this sentence in the document model while the LaTeX source is generated. Measurements and observations are recorded together so that later edits remain easy to review.' joined by single spaces, with W1..W100 appended to the copies (the probe's `oneParagraph` stage builds exactly this). The status bar reads 3,100 words / 5 pages and the editor contains one paragraph whose box is 5,047px tall. The page rules sit at 1,123, 2,246, 3,369 and 4,492px in sheet coordinates. All four rules cross a line box: 1,123 vs 1,123-1,139, 2,246 vs 2,233-2,249, 3,369 vs 3,368-3,384, and 4,492 vs 4,479-4,495. Screenshot: qa/shots/probe-long-document-one-paragraph.png.\nActual: The single paragraph is not shifted at any boundary: all four painted page rules coincide with a line box (one at the top edge of a line, three through the line box), so a line of text is visually sliced at every page boundary.",
       "source": "explore:long-document:a paragraph longer than a page is cut by every page rule",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T06:45:35Z",
-      "lastAttemptAt": "2026-11-25T06:45:35Z"
+      "lastAttemptAt": "2026-11-25T06:45:35Z",
+      "doneAt": "2026-11-25T06:59:55Z"
     },
     {
       "id": "qa-210",
@@ -3358,7 +3359,9 @@
       ],
       "hint": "Repro: 1) Open http://localhost:1420 with no saved workspace so the start screen shows. 2) In the devtools console run: const orig = Storage.prototype.setItem; Storage.prototype.setItem = function (key, value) { if (key === 'sentence.workspace') throw new DOMException('The quota has been exceeded.', 'QuotaExceededError'); return orig.call(this, key, value); }; (simulates a full or blocked localStorage). 3) Click 'New document'. 4) Wait 1 s. The editor opens and the top bar reads 'Saved locally' next to a 'Retry save: The quota has been exceeded.' button and the same quota toast, while localStorage['sentence.workspace'] does not exist and no check icon is shown. 5) Restore Storage.prototype.setItem to orig and click 'Retry save': the document is then written and the indicator remains 'Saved locally'. Probe evidence: qa/probes/persistence.mjs phase 'create-with-storage-blocked'.\nActual: The header label is driven only by the dirty flag, which is set to false when a workspace is adopted, so it renders 'Saved locally' even though persistBrowser failed. The same top bar simultaneously shows 'Retry save: The quota has been exceeded.' and localStorage has no sentence.workspace key (workspaceKey false), i.e. no saved copy exists. The error UI and the saved label contradict each other.",
       "source": "explore:persistence:the save indicator says 'saved locally' while the initial workspace write has failed",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T07:00:35Z"
     }
   ]
 }
