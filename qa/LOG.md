@@ -500,3 +500,4 @@ Aborting
 2026-11-25T00:21:40Z START qa-155 on qa/qa-155-a-citation-key-missing-from-the-bibliogr: A citation key missing from the bibliography is inserted with no warning
 2026-11-25T00:25:06Z PUSHED main
 2026-11-25T00:25:06Z DONE qa-155 (tsc -b, npm test, smoke all green)
+2026-11-25T00:25:41Z START qa-161 on qa/qa-161-deleting-the-text-a-comment-is-attached: Deleting the text a comment is attached to leaves the thread listed with no highlight and no way to locate it

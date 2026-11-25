@@ -2568,8 +2568,9 @@
       "hint": "Repro: 1. Type 'Keep this comment text'. 2. Select 'comment' and add the comment 'Comment on removed word'. 3. With tracking off, press Backspace to delete the selected word. 4. Open the Review sidebar and click the remaining comment thread.\nActual: The thread 'Comment on removed word' remains in the Review panel and still counts in the unresolved badge (1), but the editor contains zero comment highlights. Clicking the thread marks it active in the sidebar only; no text is highlighted and no indicator says the anchor is gone.",
       "source": "explore:review:deleting the text a comment is attached to leaves the thread listed with no highlight and no way to locate it",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T00:25:41Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T00:25:41Z",
+      "lastAttemptAt": "2026-11-25T00:25:41Z"
     },
     {
       "id": "qa-162",
