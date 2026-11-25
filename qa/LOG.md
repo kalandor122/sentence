@@ -542,3 +542,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T02:25:50Z START qa-180 on qa/qa-180-block-images-lose-their-alt-text-when-th: Block images lose their alt text when the document is synchronized from LaTeX
 2026-11-25T02:27:41Z PUSHED main
 2026-11-25T02:27:41Z DONE qa-180 (tsc -b, npm test, smoke all green)
+2026-11-25T02:28:15Z START qa-185 on qa/qa-185-a-table-caption-typed-in-the-table-toolb: A table caption typed in the Table toolbar is exported to LaTeX but never shown in the visual document

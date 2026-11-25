@@ -2952,8 +2952,9 @@
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click a body cell so the Table toolbar appears, type 'Data & results' into its Caption field, then look at the page around the table. Switch to View > LaTeX and read the table block.\nActual: The caption exists only as data-caption=\"Data & results\" on the table element and in the exported LaTeX (\\caption{Data \\& results}); the visual page renders no caption element and no caption text next to the table, so the caption is invisible unless the user opens the LaTeX source or the compiled PDF.",
       "source": "explore:tables:a table caption typed in the table toolbar is exported to latex but never shown in the visual document",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T02:28:15Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T02:28:15Z",
+      "lastAttemptAt": "2026-11-25T02:28:15Z"
     }
   ]
 }

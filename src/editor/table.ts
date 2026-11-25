@@ -1,9 +1,38 @@
-import { Table } from "@tiptap/extension-table";
+import { mergeAttributes } from "@tiptap/core";
+import { Table, TableView } from "@tiptap/extension-table";
+import type { DOMOutputSpec, Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { TextSelection } from "@tiptap/pm/state";
 import type { Transaction } from "@tiptap/pm/state";
 import { TableMap, addRow, deleteColumn, deleteRow, isInTable, selectedRect } from "@tiptap/pm/tables";
 import type { TableRect } from "@tiptap/pm/tables";
+import type { EditorView } from "@tiptap/pm/view";
 import { focusAfterEditor, focusBeforeEditor } from "./focus";
+
+function captionText(node: { attrs?: Record<string, unknown> }): string {
+  const value = node.attrs?.caption;
+  return typeof value === "string" ? value : "";
+}
+
+// The resizable table's node view builds its own <table>, so the visible
+// caption has to be added there. It is not editor content: the toolbar field is
+// the only place to change it, which keeps it out of the table's rows.
+class CaptionTableView extends TableView {
+  constructor(
+    node: ProseMirrorNode,
+    cellMinWidth: number,
+    view?: EditorView,
+    HTMLAttributes?: Record<string, unknown>,
+  ) {
+    super(node, cellMinWidth, view, HTMLAttributes);
+    const text = captionText(node);
+    if (!text) return;
+    const caption = document.createElement("caption");
+    caption.className = "table-caption";
+    caption.contentEditable = "false";
+    caption.textContent = text;
+    this.table.insertBefore(caption, this.table.firstChild);
+  }
+}
 
 function selectionInTable(tr: Transaction): boolean {
   const { $from } = tr.selection;
@@ -32,15 +61,40 @@ function keepSelectionInTable(tr: Transaction, rect: TableRect, row: number, col
 // Tables carry their caption as a node attribute so it survives the visual/LaTeX
 // round trip without becoming a paragraph inside the table.
 export const CaptionTable = Table.extend({
+  addNodeView() {
+    return ({ node, view, HTMLAttributes }) =>
+      new CaptionTableView(
+        node,
+        this.options.cellMinWidth,
+        view,
+        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      );
+  },
+
   addAttributes() {
     return {
       ...this.parent?.(),
       caption: {
         default: "",
-        parseHTML: (element) => element.getAttribute("data-caption") ?? "",
+        parseHTML: (element) =>
+          element.querySelector(":scope > caption")?.textContent ??
+          element.getAttribute("data-caption") ??
+          "",
         renderHTML: (attributes) => (attributes.caption ? { "data-caption": attributes.caption } : {}),
       },
     };
+  },
+
+  // The caption is visible in the page as well as exported as \caption, the
+  // same way a figure shows its caption under the image.
+  renderHTML({ node, HTMLAttributes }) {
+    const caption = captionText(node);
+    return [
+      "table",
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      ...(caption ? ([["caption", {}, caption]] as DOMOutputSpec[]) : []),
+      ["tbody", 0],
+    ];
   },
 
   // Tiptap appends a row when Tab is pressed in the last cell. Tab is focus

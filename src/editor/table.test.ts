@@ -184,6 +184,38 @@ describe("CaptionTable", () => {
     editor.destroy();
   });
 
+  it("shows the caption above the table and clears it with the attribute", () => {
+    const editor = createSizedEditor(2, 2);
+    editor.commands.setTextSelection(cellPositions(editor)[0]);
+    expect(editor.view.dom.querySelector("table > caption")).toBeNull();
+    editor.commands.updateAttributes("table", { caption: "Data & results" });
+    const caption = editor.view.dom.querySelector("table > caption");
+    expect(caption?.textContent).toBe("Data & results");
+    editor.commands.updateAttributes("table", { caption: "Second pass" });
+    expect(editor.view.dom.querySelector("table > caption")?.textContent).toBe("Second pass");
+    editor.commands.updateAttributes("table", { caption: "" });
+    expect(editor.view.dom.querySelector("table > caption")).toBeNull();
+    editor.destroy();
+  });
+
+  it("keeps the caption in its HTML form", () => {
+    const editor = createSizedEditor(2, 2);
+    editor.commands.setTextSelection(cellPositions(editor)[0]);
+    editor.commands.updateAttributes("table", { caption: "Data & results" });
+    const html = editor.getHTML();
+    expect(html).toContain("<caption>Data &amp; results</caption>");
+    const reloaded = new Editor({
+      extensions: [StarterKit, TableKit.configure({ table: false }), CaptionTable],
+      content: html,
+    });
+    const table = (reloaded.getJSON() as SentenceDocument).content.find(
+      (node) => node.type === "table",
+    );
+    expect(table?.attrs?.caption).toBe("Data & results");
+    editor.destroy();
+    reloaded.destroy();
+  });
+
   it("moves the caret back with Shift-Tab", () => {
     const editor = createSizedEditor(2, 2);
     const positions = cellPositions(editor);
