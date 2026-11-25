@@ -5,7 +5,7 @@ import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import { TableKit } from "@tiptap/extension-table";
 import TextAlign from "@tiptap/extension-text-align";
-import { NodeSelection } from "@tiptap/pm/state";
+import { NodeSelection, TextSelection } from "@tiptap/pm/state";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   Citation,
@@ -266,6 +266,19 @@ export default function EditorSurface({
         const node = view.state.doc.nodeAt(position);
         if (node?.type.name !== "footnote") return false;
         editFootnoteRef.current(typeof node.attrs.text === "string" ? node.attrs.text : "", position);
+        return true;
+      },
+      // A footnote marker is an atom, so clicking it selects the whole node and
+      // the next keystroke would replace the note with body text. Typing while
+      // the marker is selected lands beside it instead; removing the note stays
+      // an explicit Backspace/Delete.
+      handleTextInput(view, _from, _to, text) {
+        const { selection } = view.state;
+        if (!(selection instanceof NodeSelection) || selection.node.type.name !== "footnote") return false;
+        const position = selection.to;
+        const transaction = view.state.tr.insertText(text, position).scrollIntoView();
+        transaction.setSelection(TextSelection.create(transaction.doc, position + text.length));
+        view.dispatch(transaction);
         return true;
       },
       // Keyboard access to the same editor: select the marker with the arrow
