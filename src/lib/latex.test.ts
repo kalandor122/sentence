@@ -1060,6 +1060,33 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("\\textbackslash{}label");
   });
 
+  it("keeps a section label on the line after the heading", () => {
+    const source = [
+      "\\begin{document}",
+      "\\section{ZXSEPLABEL}",
+      "\\label{sec:seplabel}",
+      "",
+      "ZXSEP BODY",
+      "",
+      "See \\ref{sec:seplabel}.",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const heading = parsed.content[0];
+    expect(heading?.type).toBe("heading");
+    expect(heading?.attrs).toEqual({ level: 1, label: "sec:seplabel" });
+    expect(heading?.content?.map((node) => node.text).join("")).toBe("ZXSEPLABEL");
+    expect(parsed.content.map((node) => node.type)).toEqual([
+      "heading",
+      "paragraph",
+      "paragraph",
+    ]);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\section{ZXSEPLABEL}\\label{sec:seplabel}");
+    expect(exported).toContain("\\ref{sec:seplabel}");
+    expect(exported).not.toContain("\\textbackslash{}label");
+  });
+
   it("keeps a starred section unnumbered instead of escaping its command", () => {
     const source = [
       "\\begin{document}",
