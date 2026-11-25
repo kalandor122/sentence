@@ -1859,8 +1859,10 @@ export function latexToDocument(
         /\\begin\{figure\}(?:\[[^\]]*\])?[\s\S]*?\\includegraphics(?:\[[^\]]*\])?\{([^}]*)\}[\s\S]*?\\end\{figure\}/,
       ) ?? block.match(/^\\includegraphics(?:\[[^\]]*\])?\{([^}]*)\}$/);
     if (image) {
-      const caption = block.match(/\\caption\{([^}]*)\}/);
-      const captionText = caption ? decodeLatexText(caption[1]) : "";
+      // A caption may hold escaped braces such as \{x\}, so a plain [^}]* match
+      // would stop before the real closing brace and keep its backslash.
+      const caption = commandArgument(block, "\\caption");
+      const captionText = caption ? decodeLatexText(caption) : "";
       // A caption is the fallback alt text, because that is the only text a
       // hand-written figure carries; an explicit alt comment wins over it.
       const altComment = block.match(/% Sentence alt: ([^\r\n]*)/);
@@ -1903,7 +1905,9 @@ export function latexToDocument(
       const columnAligns = Array.from(tabular?.[1] ?? "")
         .filter((char) => char === "l" || char === "c" || char === "r")
         .map((char) => (char === "c" ? "center" : char === "r" ? "right" : "left"));
-      const caption = block.match(/\\caption\{([^}]*)\}/)?.[1];
+      // A caption may hold escaped braces such as \{x\}, so a plain [^}]* match
+      // would stop before the real closing brace and keep its backslash.
+      const caption = commandArgument(block, "\\caption");
       // A table's \label names the target of a \ref. It is metadata on the
       // table node, not cell text, so the next Refresh from visual keeps it.
       const label = block.match(/\\label\{([^{}]*)\}/)?.[1];
@@ -1920,7 +1924,7 @@ export function latexToDocument(
         : [];
       if (rows.length > 0) {
         const attrs: Record<string, string> = {};
-        if (caption !== undefined) attrs.caption = decodeLatexText(caption);
+        if (caption !== null) attrs.caption = decodeLatexText(caption);
         if (label) attrs.label = label;
         content.push({
           type: "table",

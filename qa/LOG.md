@@ -666,3 +666,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T11:06:46Z START qa-226 on qa/qa-226-enter-on-an-empty-item-in-the-middle-of: Enter on an empty item in the middle of a nested list turns the new text into part of the parent item
 2026-11-25T11:11:39Z PUSHED main
 2026-11-25T11:11:39Z DONE qa-226 (tsc -b, npm test, smoke all green)
+2026-11-25T11:12:17Z START qa-229 on qa/qa-229-a-table-caption-containing-a-closing-bra: A table caption containing a closing brace is silently corrupted by a LaTeX source round trip
