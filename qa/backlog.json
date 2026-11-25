@@ -3951,10 +3951,11 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.pageBreakMidWord`, or reproduce by hand: open http://localhost:1420, click 'New document', Ctrl+A then Backspace, type `The quick brown fox jumps over the lazy dog.`, press Home, press ArrowRight 12 times (the caret now sits between `br` and `own`), open the Insert tab and click 'Page break'. The status bar goes from 9 words to 10 words and the editor becomes `The quick br` / page break / `own fox jumps over the lazy dog.`. Open View > LaTeX: the source contains `The quick br`, a blank line, `\\newpage`, then `own fox jumps over the lazy dog.` Switch back to Visual, click the page break and press Backspace: the break is gone but the document remains two paragraphs (`The quick br` and `own fox jumps over the lazy dog.`) and still reports 10 words. A source-to-visual round trip also keeps the split.\nActual: The page break splits the paragraph at the caret and the word `brown` is divided into `br` and `own`, which then export as two separate words around `\\newpage` (word count 9 -> 10). Deleting the break leaves two paragraphs and does not reunite the word, so the typo persists in the document and in the LaTeX source.",
       "source": "explore:long-document:a page break inserted inside a word permanently splits the word and inflates the word count",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T14:37:48Z",
-      "lastAttemptAt": "2026-11-25T14:37:48Z"
+      "lastAttemptAt": "2026-11-25T14:37:48Z",
+      "doneAt": "2026-11-25T14:43:26Z"
     },
     {
       "id": "qa-250",
@@ -3966,7 +3967,9 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.paste.caretAfterPaste` and `stages.pasteScroll`, or reproduce by hand at 1280x800: open http://localhost:1420, click 'New document', press Ctrl+A then Backspace, and paste the probe's 50-heading/3,600-word document (50 blocks of `<h1|h2|h3>Heading N HDOCN</h1><p>[69-word body] BODYN</p>`, 3,600 words / 13 pages). After the paste and after waiting 2s, the editor's scrollTop is 13,220 of a maximum 14,082; the last paragraph (BODY50) occupies 843-969px inside the 627px-tall editor viewport and the caret at the end of the document is at 948px, i.e. 321px below the visible area. Pressing Ctrl+End leaves scrollTop at 13,220 and the caret still off-screen. Pasting one 3,100-word paragraph instead leaves scrollTop at 4,836 of 6,221 with the caret 1,561px down (934px below the viewport); Ctrl+End again does not move the view.\nActual: The paste scrolls only partway (13,220 of 14,082; 4,836 of 6,221) and the caret and last block stay below the viewport. Because the caret is already at the document end, Ctrl+End produces no selection change and therefore no scroll, so the view remains on the middle of the document and the end can only be reached by wheeling.",
       "source": "explore:long-document:after pasting a long document the view stops short of the caret at the end, and ctrl+end does not scroll it into view",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T14:44:06Z"
     },
     {
       "id": "qa-251",
