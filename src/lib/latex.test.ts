@@ -893,6 +893,25 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("\\$\\$");
   });
 
+  it("imports display math inside running paragraph text as a block", () => {
+    const source = [
+      "\\begin{document}",
+      "",
+      "Before $$ZXINLINE F=ma$$ after.",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    expect(parsed.content.map((node) => node.type)).toEqual([
+      "paragraph",
+      "mathBlock",
+      "paragraph",
+    ]);
+    expect(parsed.content[1]?.attrs).toEqual({ latex: "ZXINLINE F=ma", numbered: false });
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("Before\n\n\\begin{equation*}\nZXINLINE F=ma\n\\end{equation*}\n\nafter.");
+    expect(exported).not.toContain("\\$\\$");
+  });
+
   it("keeps escaped dollar signs as literal text", () => {
     const source = "\\begin{document}\nCosts \\$5 and \\$10.\n\\end{document}";
     const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
