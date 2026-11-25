@@ -409,9 +409,10 @@ function blockToLatex(node: DocumentNode, settings: ProjectSettings, enumDepth =
       // round trip would silently number a section they deliberately left out.
       const star = node.attrs?.unnumbered === true ? "*" : "";
       const label = latexReferenceTarget(attribute(node, "label") ?? "");
+      const short = attribute(node, "shortTitle");
       return wrapAlignment(
         node,
-        `\\${command}${star}{${inlineContent(node.content, settings)}}${label ? `\\label{${label}}` : ""}`,
+        `\\${command}${star}${short === null ? "" : `[${short}]`}{${inlineContent(node.content, settings)}}${label ? `\\label{${label}}` : ""}`,
       );
     }
     case "bulletList":
@@ -1002,11 +1003,11 @@ function parseListItemContent(body: string): DocumentNode[] {
 // new block: LaTeX treats it that way, so a missing blank line must not turn
 // \section or \begin{table} into escaped literal text.
 const BLOCK_COMMAND_START =
-  /^\s*\\(?:begin\{[a-zA-Z*]+\}|(?:section|subsection|subsubsection)\*?\{|newpage\b|tableofcontents\b|includegraphics\b|noindent\s*\\rule\b)/;
+  /^\s*\\(?:begin\{[a-zA-Z*]+\}|(?:section|subsection|subsubsection)\*?(?:\[[^\]]*\])?\{|newpage\b|tableofcontents\b|includegraphics\b|noindent\s*\\rule\b)/;
 // Commands whose whole block is the line itself, so the following line starts a
 // new block as well.
 const BLOCK_COMMAND_LINE =
-  /^\s*\\(?:(?:section|subsection|subsubsection)\*?\{|newpage\b|tableofcontents\b|includegraphics\b|noindent\s*\\rule\b)/;
+  /^\s*\\(?:(?:section|subsection|subsubsection)\*?(?:\[[^\]]*\])?\{|newpage\b|tableofcontents\b|includegraphics\b|noindent\s*\\rule\b)/;
 
 function splitLatexBlocks(source: string): string[] {
   const blocks: string[] = [];
@@ -1372,16 +1373,27 @@ function documentBody(latex: string): string {
 // `\section{Title}\label{sec:title}` puts a reference target on the same line
 // as its heading. The label is metadata, not part of the title, so it has to be
 // split off before the braces are matched or the last `}` becomes text.
+// `\section[Short]{Title}` carries an optional short title for the table of
+// contents: it is not heading text either, but it must survive the round trip.
 function parseHeadingBlock(
   block: string,
-): { level: number; title: string; label: string | null; unnumbered: boolean } | null {
+): {
+  level: number;
+  title: string;
+  short: string | null;
+  label: string | null;
+  unnumbered: boolean;
+} | null {
   const labelMatch = block.match(/\\label\{([^{}]*)\}\s*$/);
   const body = (labelMatch ? block.slice(0, labelMatch.index ?? 0) : block).trim();
-  const heading = body.match(/^\\(section|subsection|subsubsection)(\*?)\{([\s\S]*)\}$/);
+  const heading = body.match(
+    /^\\(section|subsection|subsubsection)(\*?)(?:\[([^\]]*)\])?\{([\s\S]*)\}$/,
+  );
   if (!heading) return null;
   return {
     level: heading[1] === "section" ? 1 : heading[1] === "subsection" ? 2 : 3,
-    title: heading[3],
+    title: heading[4],
+    short: heading[3] ?? null,
     label: labelMatch ? labelMatch[1] : null,
     unnumbered: heading[2] === "*",
   };
@@ -1505,6 +1517,7 @@ export function latexToDocument(
             level: innerHeading.level,
             textAlign,
             ...(innerHeading.label ? { label: innerHeading.label } : {}),
+            ...(innerHeading.short !== null ? { shortTitle: innerHeading.short } : {}),
             ...(innerHeading.unnumbered ? { unnumbered: true } : {}),
           },
           content: parseInline(innerHeading.title).content,
@@ -1525,6 +1538,7 @@ export function latexToDocument(
         attrs: {
           level: heading.level,
           ...(heading.label ? { label: heading.label } : {}),
+          ...(heading.short !== null ? { shortTitle: heading.short } : {}),
           ...(heading.unnumbered ? { unnumbered: true } : {}),
         },
         content: parseInline(heading.title).content,

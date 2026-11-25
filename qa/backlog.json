@@ -3204,8 +3204,9 @@
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add `\\section[ZXSHORT]{ZXOPT FULL TITLE}`, a blank line, and `ZXOPT BODY`. 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: Apply reports success but no heading is created: the visual page shows the raw line `\\section[ZXSHORT]{ZXOPT FULL TITLE}` as a paragraph (headings remain only Introduction and Drafting with constraints). Refresh from visual writes `\\textbackslash{}section[ZXSHORT]\\{ZXOPT FULL TITLE\\}`, corrupting valid LaTeX. Probe: headingKept=false, escapedCommand=true.",
       "source": "explore:source-editor:a section with an optional short title is imported as literal text and escaped",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T05:17:18Z"
+      "attempts": 2,
+      "startedAt": "2026-11-25T05:17:18Z",
+      "lastAttemptAt": "2026-11-25T05:22:57Z"
     },
     {
       "id": "qa-202",
