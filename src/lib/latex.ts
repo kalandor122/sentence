@@ -570,7 +570,10 @@ function listItemToLatex(node: DocumentNode, settings: ProjectSettings, enumDept
     .map((child) => blockToLatex(child, settings, enumDepth))
     .filter(Boolean)
     .join("\n");
-  return `\\item ${content}`;
+  // LaTeX reads a bracket right after \item as the optional label that replaces
+  // the bullet or number, so `[draft] note` would silently lose its brackets.
+  // A group in front of the bracket keeps it as printed text.
+  return `\\item ${content.replace(/^([ \t]*)\[/, "$1{[}")}`;
 }
 
 function naturalImageSize(node: DocumentNode): { width: number; height: number } | null {
@@ -937,7 +940,9 @@ function decodeLatexVerbatim(value: string): string {
 // shown as a tilde. URLs and file names are different: a `~` there is part of
 // the address, so those arguments are decoded verbatim instead.
 function decodeLatexText(value: string): string {
-  return decodeLatexVerbatim(value.replace(/~/g, "\u00a0"));
+  // `{[}` is the export's guard against \item taking a leading bracket as its
+  // optional label; it prints a plain bracket, so it reads back as one.
+  return decodeLatexVerbatim(value.replace(/\{\[\}/g, "[").replace(/~/g, "\u00a0"));
 }
 
 function commandArgument(source: string, command: string): string | null {
