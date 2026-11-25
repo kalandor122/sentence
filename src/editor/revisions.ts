@@ -2,7 +2,7 @@ import { Extension, type Editor } from "@tiptap/core";
 import { type Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
-import { findDocumentMatches, type FindRange } from "./find";
+import { findDocumentMatches, type FindMatch, type FindRange } from "./find";
 import {
   deletionAnchor,
   nodeText,
@@ -16,6 +16,26 @@ interface RevisionMarkState {
 }
 
 const revisionKey = new PluginKey<RevisionMarkState>("sentenceRevisionMarks");
+
+type Path = readonly (string | number)[];
+
+// A change path starts with the top-level block it was recorded in. Anchoring
+// within that block matters: with an identical line earlier in the document the
+// first match would draw the decoration in the wrong paragraph. The block is
+// only used when it still contains the anchor text, because the editor may have
+// moved on to a later revision whose blocks shifted.
+function findChangeMatches(doc: ProseMirrorNode, query: string, path: Path | null): FindMatch[] {
+  const matches = findDocumentMatches(doc, query);
+  const index = path?.[0] === "content" ? path[1] : undefined;
+  if (typeof index !== "number" || path === null || path.length < 2 || index >= doc.childCount) return matches;
+  let from = 0;
+  for (let child = 0; child < index; child += 1) from += doc.child(child).nodeSize;
+  const to = from + doc.child(index).nodeSize;
+  const inside = matches.filter(
+    (match) => match.ranges[0].from >= from && match.ranges[match.ranges.length - 1].to <= to,
+  );
+  return inside.length ? inside : matches;
+}
 
 function positionAt(ranges: FindRange[], offset: number): number | null {
   let remaining = offset;
@@ -33,11 +53,12 @@ function markInsertion(
   text: string,
   revision: Revision,
   colorClass: string,
+  path: Path | null,
   offset = 0,
   length = text.length,
 ): void {
   if (!text) return;
-  const match = findDocumentMatches(doc, text)[0];
+  const match = findChangeMatches(doc, text, path)[0];
   if (!match) return;
   const from = positionAt(match.ranges, offset);
   const to = positionAt(match.ranges, offset + length);
@@ -58,6 +79,7 @@ function markDeletion(
   revision: Revision,
   colorClass: string,
   key: string,
+  path: Path | null,
   prefix = "",
   suffix = "",
 ): void {
@@ -71,7 +93,7 @@ function markDeletion(
   ];
   let position: number | null = null;
   for (const anchor of anchors) {
-    const match = findDocumentMatches(doc, anchor.text)[0];
+    const match = findChangeMatches(doc, anchor.text, path)[0];
     if (!match) continue;
     position = anchor.atEnd
       ? match.ranges[match.ranges.length - 1].to
@@ -115,18 +137,18 @@ export const RevisionMarks = Extension.create({
               for (const change of revisionChanges(revision)) {
                 const key = change.path.join(".");
                 if (change.kind === "text") {
-                  markInsertion(decorations, state.doc, change.after, revision, colorClass, change.prefix.length, change.inserted.length);
+                  markInsertion(decorations, state.doc, change.after, revision, colorClass, change.path, change.prefix.length, change.inserted.length);
                   if (change.removed) {
-                    markDeletion(decorations, state.doc, change.removed, revision, colorClass, key, change.prefix, change.suffix);
+                    markDeletion(decorations, state.doc, change.removed, revision, colorClass, key, change.path, change.prefix, change.suffix);
                   }
                   continue;
                 }
                 if (change.before === undefined && change.after !== undefined) {
-                  markInsertion(decorations, state.doc, nodeText(change.after), revision, colorClass);
+                  markInsertion(decorations, state.doc, nodeText(change.after), revision, colorClass, change.path);
                 } else if (change.after === undefined) {
                   const anchor = deletionAnchor(revision, change);
                   if (anchor) {
-                    markDeletion(decorations, state.doc, anchor.text, revision, colorClass, key, anchor.prefix, anchor.suffix);
+                    markDeletion(decorations, state.doc, anchor.text, revision, colorClass, key, null, anchor.prefix, anchor.suffix);
                   }
                 }
               }

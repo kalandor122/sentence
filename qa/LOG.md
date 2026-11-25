@@ -573,3 +573,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T03:33:56Z PUSHED main
 2026-11-25T03:33:56Z DONE qa-193 (tsc -b, npm test, smoke all green)
 2026-11-25T04:05:15Z EXPLORE review: 5 new items, agent exit 0
+2026-11-25T04:05:33Z START qa-194 on qa/qa-194-tracked-change-decorations-are-drawn-in: Tracked-change decorations are drawn in the wrong paragraph when an identical line appears earlier
