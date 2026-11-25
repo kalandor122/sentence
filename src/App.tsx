@@ -1733,6 +1733,13 @@ export default function App() {
     }
     linkSubmitted.current = false;
     setDialog(null);
+    // The dialog took focus from the writing surface; hand it back at the old
+    // caret so the next typed character continues the sentence instead of
+    // being swallowed by the ribbon or sidebar button that opened the dialog.
+    window.requestAnimationFrame(() => {
+      if (mode === "source") sourceTextarea.current?.focus();
+      else editor?.commands.focus();
+    });
   };
 
   const closeMathEditor = () => {

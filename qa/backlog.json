@@ -3800,8 +3800,9 @@
       "hint": "Repro: Create a project. Type `CancelFoot ` (with a trailing space), open Insert > Footnote, enter `Will cancel`, press Escape, then type `F`. Repeat with References > Insert citation > `Enter a key manually` (press Escape, then type `C`) and References > Cross-reference (press Escape, then type `R`).\nActual: Focus returns to the control that opened the dialog (`BUTTON:Footnote`, `BUTTON:Enter a key manually`, `BUTTON:Cross-reference`), so the typed characters are discarded; the paragraphs remain `CancelFoot `, `CancelCite ` and `CancelRef ` with no `F`, `C` or `R`.",
       "source": "explore:links-cites-footnotes:cancelling the insert dialogs drops the next typed characters",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T15:51:10Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T15:51:10Z",
+      "lastAttemptAt": "2026-11-25T15:51:10Z"
     },
     {
       "id": "qa-239",
