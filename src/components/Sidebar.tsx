@@ -220,6 +220,24 @@ interface RevisionListProps {
   onRejectAll: () => void;
 }
 
+const REVISION_PREVIEW_LENGTH = 180;
+const REVISION_PREVIEW_CONTEXT = 40;
+
+function revisionPreview(before: string, after: string) {
+  let changeStart = 0;
+  while (changeStart < before.length && changeStart < after.length && before[changeStart] === after[changeStart]) {
+    changeStart += 1;
+  }
+  const windowStart = (text: string) =>
+    Math.max(0, Math.min(changeStart - REVISION_PREVIEW_CONTEXT, text.length - REVISION_PREVIEW_LENGTH));
+  const beforeStart = windowStart(before);
+  const afterStart = windowStart(after);
+  return {
+    before: before.slice(beforeStart, beforeStart + REVISION_PREVIEW_LENGTH),
+    after: after.slice(afterStart, afterStart + REVISION_PREVIEW_LENGTH),
+  };
+}
+
 function RevisionList({
   revisions,
   onAccept,
@@ -245,34 +263,37 @@ function RevisionList({
       ) : (
         <p className="panel-empty">Edits made with Tracking on appear here for review.</p>
       )}
-      {revisions.map((revision) => (
-        <article className={`revision-card ${revisionAuthorClass(revision.author)}`} key={revision.id}>
-          <header>
-            <strong><span className="revision-dot" aria-hidden="true" />{revision.author}</strong>
-            <small>{new Date(revision.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small>
-          </header>
-          <p className="revision-before">{revision.before.slice(-180) || "Empty document"}</p>
-          <p className="revision-after">{revision.after.slice(-180)}</p>
-          <div role="group" aria-label={`Review change by ${revision.author}`}>
-            <button
-              type="button"
-              className="accent-button small"
-              onClick={() => onAccept(revision.id)}
-              aria-label={`Accept change by ${revision.author}`}
-            >
-              Accept
-            </button>
-            <button
-              type="button"
-              className="secondary-button small"
-              onClick={() => onReject(revision.id)}
-              aria-label={`Reject change by ${revision.author}`}
-            >
-              Reject
-            </button>
-          </div>
-        </article>
-      ))}
+      {revisions.map((revision) => {
+        const preview = revisionPreview(revision.before, revision.after);
+        return (
+          <article className={`revision-card ${revisionAuthorClass(revision.author)}`} key={revision.id}>
+            <header>
+              <strong><span className="revision-dot" aria-hidden="true" />{revision.author}</strong>
+              <small>{new Date(revision.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small>
+            </header>
+            <p className="revision-before">{preview.before || "Empty document"}</p>
+            <p className="revision-after">{preview.after}</p>
+            <div role="group" aria-label={`Review change by ${revision.author}`}>
+              <button
+                type="button"
+                className="accent-button small"
+                onClick={() => onAccept(revision.id)}
+                aria-label={`Accept change by ${revision.author}`}
+              >
+                Accept
+              </button>
+              <button
+                type="button"
+                className="secondary-button small"
+                onClick={() => onReject(revision.id)}
+                aria-label={`Reject change by ${revision.author}`}
+              >
+                Reject
+              </button>
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 }
