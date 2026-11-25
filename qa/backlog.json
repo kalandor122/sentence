@@ -3639,10 +3639,11 @@
       ],
       "hint": "Repro: Create a new document. Type 'outer one', click Home > Numbered list, press Enter, type 'middle one', press Tab, press Enter, type 'deep one', press Tab. Read the three markers in the editor, then open Source and read the LaTeX.\nActual: All three items render with the decimal marker '1.' (the computed list-style-type is 'decimal' for the level 0, 1 and 2 <ol> elements), giving '1. outer one / 1. middle one / 1. deep one', while the exported LaTeX is three plain nested \\begin{enumerate} blocks with no label customisation, which compile to 1., (a), i.",
       "source": "explore:lists:every level of a nested numbered list is labelled 1. in the visual editor",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T14:54:19Z",
-      "lastAttemptAt": "2026-11-25T14:54:19Z"
+      "lastAttemptAt": "2026-11-25T14:54:19Z",
+      "doneAt": "2026-11-25T14:57:50Z"
     },
     {
       "id": "qa-229",
@@ -3987,6 +3988,20 @@
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.longHeadingOutline`, or reproduce by hand: open http://localhost:1420, click 'New document', Ctrl+A then Backspace, and paste 10 headings where the first is `Long heading ` + 40 copies of `word ` + `LONGEND` (220 characters) and the other nine are `Heading N LHN`, each followed by a body paragraph. In the Outline panel the first entry is a single 12px-tall line that is 1,238px wide inside a 246px-wide panel: `.sidebar-panel` reports scrollWidth 1,245 against clientWidth 246, the entry's right edge is at x=1,313 while the 314px-wide sidebar ends at x=314, and the `H1` level badge is off-screen. The heading itself wraps normally inside the 794px sheet, with no horizontal overflow of the page. Screenshot: qa/shots/probe-long-document-outline-heading.png.\nActual: The heading text is rendered on one unbroken line, extends past the sidebar's right edge and is clipped there; the panel gains a ~999px horizontal scroll range and the `H1` badge is pushed off-screen, so the outline cannot be read at a glance and the panel scrolls sideways.",
       "source": "explore:long-document:a long heading in the outline does not wrap; it is clipped and forces a 1,000px horizontal scroll inside the sidebar",
       "status": "open"
+    },
+    {
+      "id": "qa-252",
+      "title": "A tracked edit saved just before a reload loses its tracked revision",
+      "why": "Exploratory pass on persistence (functional): expected Once the app reports the document as saved, or when a page unloads, any pending tracked revision should be committed with the document, so after a reload History can still show, accept, or reject the edit. The saved indicator should not say 'Saved locally' while revision metadata is still unpersisted.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1) Open http://localhost:1420 with no saved workspace, click 'New document' and wait for the top bar to read 'Saved locally'. 2) Open the Review tab and click 'Track changes' (it becomes 'Tracking on'). 3) Click at the end of the last paragraph, type ' track-one' and wait 3.2 s: Review > History shows one tracked revision. 4) Reload the page (Ctrl+R). The tracking mode resets off. 5) Review > Track changes again. 6) Click at the end of the last paragraph, type ' track-two' and wait until the top bar reads 'Saved locally' with its check icon (about 1.3 s after typing), then reload immediately. 7) After the reload 'track-two' is still in the document and the top bar still reads 'Saved locally', but Review > History still lists only the 'track-one' revision; localStorage['sentence.workspace'].revisions has the same count as before the edit (2 in the probe) and no revision contains 'track-two'. The edit was silently accepted as untracked, so it can no longer be reviewed or rejected. Probe evidence: qa/probes/persistence.mjs phase 'tracked-change-reload' (pending: savedAt 1302 ms, indicator 'Saved locally' with check, revisionCount 2, storedHasThird true; after reload: textHasThird true, revisionCount 2, thirdInRevision false). Controls in the same phase show a tracked edit that waits 3.2 s does store its revision, both before and after a reload.\nActual: Visual tracked edits are committed by a separate 1800 ms timer (revisionTimer in src/App.tsx), while the workspace autosave runs after 1100 ms and sets saveState to 'saved'. The pagehide flush in App.tsx calls persist(), which writes workspaceRef.current as-is and never commits the pending revisionBaseline, so reloading between the autosave and the revision timer stores the text without its Revision. The History panel and the stored revisions array silently omit the edit even though the top bar said 'Saved locally' with a check icon.",
+      "source": "explore:persistence:a tracked edit saved just before a reload loses its tracked revision",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T15:15:06Z"
     }
   ]
 }
