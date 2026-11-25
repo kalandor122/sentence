@@ -3303,7 +3303,9 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add `ZXTILDE see Eq.~1 and Fig.~2.` 3. Click Apply source. 4. View > LaTeX and click Refresh from visual.\nActual: Refresh from visual writes `Eq.\\textasciitilde{}1 and Fig.\\textasciitilde{}2`, which renders a literal tilde instead of a non-breaking space. The visual page also shows a visible tilde. Probe: literalTildeEscape=true, nonBreakingTildeKept=false.",
       "source": "explore:source-editor:a non-breaking space written as ~ is re-exported as a literal tilde",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T12:52:19Z"
     },
     {
       "id": "qa-208",
@@ -3759,10 +3761,11 @@
       ],
       "hint": "Repro: Create a project. At the end type `UndoLink word`, select `word`, press Ctrl+K, enter `https://undo.example.org`, click Insert, then press Ctrl+Z once and open View > LaTeX.\nActual: The word remains linked with the placeholder href `https://` after the first undo; the generated source reads `UndoLink \\href{https://}{word}`. A second Ctrl+Z is required to remove the link. Adding the link is split into two history steps (the temporary `https://` link applied when the dialog opens, then the entered address), so undo stops on the placeholder.",
       "source": "explore:links-cites-footnotes:undo after adding a hyperlink leaves a placeholder https:// link",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T12:39:26Z",
-      "lastAttemptAt": "2026-11-25T12:39:26Z"
+      "lastAttemptAt": "2026-11-25T12:39:26Z",
+      "doneAt": "2026-11-25T12:51:39Z"
     },
     {
       "id": "qa-238",
