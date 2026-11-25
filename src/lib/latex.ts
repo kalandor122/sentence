@@ -330,7 +330,7 @@ function cellAlign(cell: DocumentNode): LatexColumnAlign {
 // in a cell is written as inline math in display style instead, and the
 // \displaystyle prefix is what the importer turns back into a block.
 function mathBlockInCellToLatex(node: DocumentNode): string {
-  return `\\(\\displaystyle ${attribute(node, "latex") ?? ""}\\)`;
+  return `\\(\\displaystyle ${normaliseMathBody(attribute(node, "latex") ?? "")}\\)`;
 }
 
 // A \multicolumn span is a real table-cell attribute, not text: the cell covers
@@ -487,11 +487,12 @@ function blockToLatex(node: DocumentNode, settings: ProjectSettings, enumDepth =
       return tableToLatex(node, settings);
     case "mathBlock": {
       const mathEnvironment = attribute(node, "environment");
+      const body = normaliseMathBody(attribute(node, "latex") ?? "");
       if (mathEnvironment) {
-        return `\\begin{${mathEnvironment}}\n${attribute(node, "latex") ?? ""}\n\\end{${mathEnvironment}}`;
+        return `\\begin{${mathEnvironment}}\n${body}\n\\end{${mathEnvironment}}`;
       }
       const environment = node.attrs?.numbered === true ? "equation" : "equation*";
-      return `\\begin{${environment}}\n${attribute(node, "latex") ?? ""}\n\\end{${environment}}`;
+      return `\\begin{${environment}}\n${body}\n\\end{${environment}}`;
     }
     case "pageBreak":
       return "\\newpage";
@@ -1157,10 +1158,17 @@ const DISPLAY_MATH_BODY =
 // verbatim instead of being read as paragraph text and escaped on export.
 const MATH_BLOCK_ENVIRONMENTS = ["align", "align*", "gather", "gather*"];
 
+// A blank line inside math ends the paragraph before the closing delimiter, so
+// the environment would never compile. Math has no paragraph break anyway: join
+// the body back onto fewer lines instead of writing the blank line out again.
+function normaliseMathBody(body: string): string {
+  return body.replace(/\r?\n(?:[ \t]*\r?\n)+/g, "\n").trim();
+}
+
 function parseMathEnvironmentBlock(block: string): { environment: string; body: string } | null {
   const match = block.match(/^\\begin\{([a-zA-Z]+\*?)\}\s*([\s\S]*?)\s*\\end\{\1\}$/);
   if (!match || !MATH_BLOCK_ENVIRONMENTS.includes(match[1])) return null;
-  return { environment: match[1], body: match[2].trim() };
+  return { environment: match[1], body: normaliseMathBody(match[2]) };
 }
 
 function pushBodyParagraphs(content: DocumentNode[], text: string): void {
@@ -1173,7 +1181,7 @@ function pushBodyParagraphs(content: DocumentNode[], text: string): void {
     content.push({
       type: "mathBlock",
       attrs: {
-        latex: (match[2] ?? match[3] ?? match[4]).trim(),
+        latex: normaliseMathBody(match[2] ?? match[3] ?? match[4]),
         numbered: match[1] === "",
       },
     });
@@ -1330,7 +1338,7 @@ function tableCellParagraphToNode(paragraph: string): DocumentNode {
   const latex = only?.type === "mathInline" ? attribute(only, "latex") ?? "" : "";
   const displayMatch = latex.match(/^\\displaystyle\s+([\s\S]*)$/);
   if (displayMatch) {
-    return { type: "mathBlock", attrs: { latex: displayMatch[1].trim(), numbered: false } };
+    return { type: "mathBlock", attrs: { latex: normaliseMathBody(displayMatch[1]), numbered: false } };
   }
   return { type: "paragraph", content };
 }
@@ -1830,7 +1838,7 @@ export function latexToDocument(
       block.match(/^\\\[\s*([\s\S]*?)\s*\\\]$/) ??
       block.match(/^\$\$\s*([\s\S]*?)\s*\$\$$/);
     if (displayMath) {
-      content.push({ type: "mathBlock", attrs: { latex: displayMath[1].trim(), numbered: false } });
+      content.push({ type: "mathBlock", attrs: { latex: normaliseMathBody(displayMath[1]), numbered: false } });
       continue;
     }
     // The body may be on its own lines or inline with the environment tags.
@@ -1840,7 +1848,7 @@ export function latexToDocument(
     if (equation) {
       content.push({
         type: "mathBlock",
-        attrs: { latex: equation[2].trim(), numbered: equation[1] !== "*" },
+        attrs: { latex: normaliseMathBody(equation[2]), numbered: equation[1] !== "*" },
       });
       continue;
     }
