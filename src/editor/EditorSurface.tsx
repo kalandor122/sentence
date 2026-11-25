@@ -720,13 +720,15 @@ export default function EditorSurface({
     "--paper-margin": `${geometry.margin}px`,
     "--paper-font-size": `${geometry.fontSize}px`,
     "--sentence-page-count": pageCount,
+    "--para-before": `${settings.paragraphSpaceBefore ?? 0}pt`,
+    "--para-after": `${settings.paragraphSpaceAfter ?? 10}pt`,
   } as CSSProperties;
 
   return (
     <div className="visual-editor-scroll" style={paperStyle}>
       <div className="paper-stack" aria-hidden="true" />
       <article
-        className={`paper-sheet ${settings.paragraphSpacing === "gap" ? "paper-parskip" : ""}`}
+        className="paper-sheet"
         style={paperStyle}
       >
         {showFrontMatter ? (

@@ -1960,7 +1960,9 @@ describe("LaTeX generation", () => {
     expect(plain).toContain(`\\setmainfont[${mainFontSpec}]{lmroman10}`);
     expect(plain).not.toContain(`\\setmainfont[${mainFontSpec}]{texgyretermes}`);
     expect(plain).not.toContain("setspace");
-    expect(plain).not.toContain("parskip");
+    // Space after applies in both modes, so indent mode still sets \parskip.
+    expect(plain).toContain("\\setlength{\\parskip}");
+    expect(plain).not.toContain("\\usepackage{parskip}");
     const plainParsed = latexToDocument(plain, DEFAULT_SETTINGS);
     expect(plainParsed.settings.fontFamily).toBe("default");
     expect(plainParsed.settings.lineSpacing).toBe("single");
@@ -2496,5 +2498,30 @@ describe("document statistics", () => {
       ],
     };
     expect(countWords(document)).toBe(5);
+  });
+});
+
+describe("paragraph spacing (Word-style points)", () => {
+  const doc: SentenceDocument = {
+    type: "doc",
+    content: [{ type: "paragraph", content: [{ type: "text", text: "One." }] }],
+  };
+  const base: ProjectSettings = { ...DEFAULT_SETTINGS, paragraphSpacing: "gap", paragraphSpaceAfter: 10 };
+
+  it("emits parskip in points and no indent in gap mode", () => {
+    const latex = documentToLatex(doc, base);
+    expect(latex).toContain("\\setlength{\\parskip}{10.0pt plus 2pt}");
+    expect(latex).not.toContain("\\setlength{\\parindent}");
+  });
+
+  it("keeps the indent in indent mode and still honours Space after", () => {
+    const latex = documentToLatex(doc, { ...base, paragraphSpacing: "indent", paragraphSpaceAfter: 24 });
+    expect(latex).toContain("\\setlength{\\parskip}{24.0pt plus 2pt}");
+    expect(latex).toContain("\\setlength{\\parindent}{1.5em}");
+  });
+
+  it("round-trips the Space after value", () => {
+    const latex = documentToLatex(doc, { ...base, paragraphSpaceAfter: 18 });
+    expect(latexToDocument(latex, DEFAULT_SETTINGS).settings.paragraphSpaceAfter).toBe(18);
   });
 });

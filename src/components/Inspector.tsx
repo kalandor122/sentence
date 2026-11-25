@@ -138,6 +138,30 @@ export default function Inspector({
               <option value="gap">Spaced paragraphs</option>
             </select>
           </label>
+          <div className="property-row">
+            <label className="property-field">
+              <span>Space before (pt)</span>
+              <input
+                type="number"
+                min={0}
+                max={72}
+                step={1}
+                value={settings.paragraphSpaceBefore ?? 0}
+                onChange={(event) => onSettingsChange({ paragraphSpaceBefore: Math.max(0, Math.min(72, Number(event.target.value) || 0)) })}
+              />
+            </label>
+            <label className="property-field">
+              <span>Space after (pt)</span>
+              <input
+                type="number"
+                min={0}
+                max={72}
+                step={1}
+                value={settings.paragraphSpaceAfter ?? 10}
+                onChange={(event) => onSettingsChange({ paragraphSpaceAfter: Math.max(0, Math.min(72, Number(event.target.value) || 0)) })}
+              />
+            </label>
+          </div>
         </section>
         <section className="inspector-section">
           <h3><FileText size={15} /> arXiv paper</h3>

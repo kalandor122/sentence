@@ -606,7 +606,14 @@ function typographyPackages(settings: ProjectSettings): string {
     lines.push("\\usepackage{setspace}");
     lines.push(settings.lineSpacing === "double" ? "\\doublespacing" : "\\onehalfspacing");
   }
+  // Word-style paragraph spacing: Space before/after in points applies in both
+  // modes; indent mode adds a first-line indent on top, gap mode drops it.
   if (settings.paragraphSpacing === "gap") lines.push("\\usepackage{parskip}");
+  const spaceAfter = Number(settings.paragraphSpaceAfter ?? 10);
+  if (Number.isFinite(spaceAfter) && spaceAfter > 0) {
+    lines.push(`\\setlength{\\parskip}{${spaceAfter.toFixed(1)}pt plus 2pt}`);
+  }
+  if (settings.paragraphSpacing === "indent") lines.push("\\setlength{\\parindent}{1.5em}");
   return lines.join("\n");
 }
 
@@ -1865,6 +1872,9 @@ export function latexToDocument(
     settings.lineSpacing = "single";
   }
   settings.paragraphSpacing = packages.includes("parskip") ? "gap" : "indent";
+  const parskip = latex.match(/\\setlength\{\\parskip\}\{([\d.]+)pt/);
+  settings.paragraphSpaceAfter = parskip ? Number(parskip[1]) : 10;
+  settings.paragraphSpaceBefore = 0;
   // Only macros from the user's own preamble lines may be expanded; the
   // generated preamble is Sentence's, not the project's.
   const macros = preambleMacros(

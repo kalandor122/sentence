@@ -23,6 +23,8 @@ export const DEFAULT_SETTINGS: ProjectSettings = {
   fontFamily: "default",
   lineSpacing: "single",
   paragraphSpacing: "indent",
+  paragraphSpaceBefore: 0,
+  paragraphSpaceAfter: 10,
   columns: "one",
   includeToc: false,
   header: "",

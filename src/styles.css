@@ -1209,7 +1209,8 @@ button:disabled {
 }
 
 .sentence-editor p {
-  margin: 0 0 1.1em;
+  /* Word-style paragraph spacing: Space before / Space after, in points. */
+  margin: var(--para-before, 0pt) 0 var(--para-after, 10pt);
 }
 
 .sentence-editor p[data-line-spacing="single"] {
@@ -1222,10 +1223,6 @@ button:disabled {
 
 .sentence-editor p[data-line-spacing="double"] {
   line-height: 2.6;
-}
-
-.paper-parskip .sentence-editor p {
-  margin: 0 0 1.5em;
 }
 
 .sentence-editor h1,
@@ -2555,6 +2552,12 @@ button:disabled {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.property-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
 
 .property-field {

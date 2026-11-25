@@ -43,6 +43,10 @@ export interface ProjectSettings {
   fontFamily: "default" | "times" | "palatino";
   lineSpacing: "single" | "onehalf" | "double";
   paragraphSpacing: "indent" | "gap";
+  /** Space before a paragraph, in points (Word-style). */
+  paragraphSpaceBefore: number;
+  /** Space after a paragraph, in points (Word-style). */
+  paragraphSpaceAfter: number;
   columns: "one" | "two";
   includeToc: boolean;
   header: string;
