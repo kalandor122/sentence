@@ -176,15 +176,29 @@ function ColorPalette({
     pendingFocus.current = null;
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    // The backdrop covers the whole window, so Escape must close the palette from
+    // wherever focus went after tabbing out of it.
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(false);
+      triggerRef.current?.focus();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
   return (
     <div
       className="color-menu"
-      onKeyDown={(event) => {
-        if (event.key !== "Escape" || !open) return;
-        event.preventDefault();
-        event.stopPropagation();
+      onBlur={(event) => {
+        if (!open) return;
+        const next = event.relatedTarget as Node | null;
+        if (next && event.currentTarget.contains(next)) return;
         setOpen(false);
-        triggerRef.current?.focus();
       }}
     >
       <button

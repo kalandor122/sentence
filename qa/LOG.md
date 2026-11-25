@@ -630,3 +630,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T08:03:47Z START qa-213 on qa/qa-213-escape-closes-the-properties-panel-behin: Escape closes the Properties panel behind a dialog instead of the dialog in front of it, and leaves focus on the page be
 2026-11-25T08:08:58Z PUSHED main
 2026-11-25T08:08:58Z DONE qa-213 (tsc -b, npm test, smoke all green)
+2026-11-25T08:09:36Z START qa-214 on qa/qa-214-tabbing-out-of-the-text-colour-palette-l: Tabbing out of the text-colour palette leaves it and its full-window backdrop open, and Escape no longer closes it
