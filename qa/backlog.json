@@ -3811,10 +3811,11 @@
       ],
       "hint": "Repro: 1. New document; Review tab > Track changes. 2. Triple-click the last paragraph ('The central model can be expressed compactly: meaning = structure + language.') so the whole paragraph is selected. 3. Press Backspace. 4. Wait 2.5 s and open History in the sidebar rail.\nActual: The paragraph simply becomes empty: there is 1 revision card but 0 .sentence-revision-deletion and 0 .sentence-revision-insertion elements in the page, so the document gives no indication that anything was deleted. Only the History card records the change.",
       "source": "explore:review:deleting all text of a paragraph leaves no inline tracked-deletion marker",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T13:30:48Z",
-      "lastAttemptAt": "2026-11-25T13:30:48Z"
+      "lastAttemptAt": "2026-11-25T13:30:48Z",
+      "doneAt": "2026-11-25T13:33:42Z"
     },
     {
       "id": "qa-241",
@@ -3826,7 +3827,9 @@
       ],
       "hint": "Repro: 1. New document; Review tab > Track changes. 2. Click at the end of the document, press Enter and type 'TRACKEDALPHA inserted sentence.'. 3. Wait 2.5 s and open History in the sidebar rail.\nActual: The inserted words are present in the card DOM but clipped: .revision-after has clientHeight 55px and scrollHeight 78px because of the .revision-card > p { max-height: 55px; overflow: hidden } rule, and the inserted text's bounding box ends at 600px while the preview box ends at 579px. There is no scroll, expand control or tooltip, so the visible before and after snippets both end at '...only the thought remains.' and look identical, hiding the change entirely.",
       "source": "explore:review:tracked-change card clips its preview so the changed words are invisible",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T13:34:22Z"
     },
     {
       "id": "qa-242",
