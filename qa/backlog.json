@@ -3859,10 +3859,11 @@
       ],
       "hint": "Repro: 1. Start a project and open the editor. 2. Click View, then LaTeX. 3. Before \\end{document}, insert a table with \\begin{table}[htbp], \\centering, \\caption{ZXPCOLCAP}, \\begin{tabular}{p{4cm}l}, \\hline, the rows `ZXPCOLNAME & Value \\\\` and `ZXPCOLCELL & 9 \\\\`, \\hline, \\end{tabular}, \\end{table}. 4. Click Apply source. 5. Click View, then Visual. 6. Click View, then LaTeX, then Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` but the first cell becomes `l} ZXPCOLNAME`. After Refresh from visual the table is written with `\\begin{tabular}{cl}` and a first row `l\\}` followed by `ZXPCOLNAME`. With `\\begin{tabular}{@{}ll@{}}` the first cell becomes `ll@{}} ZXATSPEC` and the spec is rewritten as `{ll}`. Probe: pColumnSpec.visualTables=[[\"l} ZXPCOLNAME\",\"Value\"],[\"ZXPCOLCELL\",\"9\"]], pColumnSpec.spec=\"cl\", atColumnSpec.regeneratedRegion contains `ll@\\{\\}\\}`.",
       "source": "explore:source-editor:a braced table column spec (p{4cm}, @{}) corrupts the first cell and is rewritten",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T14:02:04Z",
-      "lastAttemptAt": "2026-11-25T14:02:04Z"
+      "lastAttemptAt": "2026-11-25T14:02:04Z",
+      "doneAt": "2026-11-25T14:04:59Z"
     },
     {
       "id": "qa-244",
@@ -3874,7 +3875,9 @@
       ],
       "hint": "Repro: 1. Click View, then LaTeX. 2. Before \\end{document}, insert `\\begin{verbatim}`, the line `ZXCODE printf(\"%d\", a_b & c);`, and `\\end{verbatim}`. 3. Click Apply source. 4. Click View, then LaTeX, then Refresh from visual.\nActual: Refresh from visual writes the line as `ZXCODE printf(\"\\%d\", a\\_b \\& c);` inside `\\begin{verbatim}`. LaTeX prints those added backslashes literally, so the PDF shows different code from the source the user typed. The visual code block itself still shows the original text. Probe: verbatimSpecialChars.codeEscapedInVerbatim=true, regeneratedVerbatim=`\\begin{verbatim}\\nZXCODE printf(\"\\%d\", a\\_b \\& c);\\n\\end{verbatim}`.",
       "source": "explore:source-editor:verbatim code is latex-escaped on re-export, changing the code",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T14:05:39Z"
     },
     {
       "id": "qa-245",

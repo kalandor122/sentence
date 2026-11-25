@@ -716,3 +716,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T13:40:33Z DONE qa-217 (tsc -b, npm test, smoke all green)
 2026-11-25T14:01:46Z EXPLORE source-editor: 5 new items, agent exit 0
 2026-11-25T14:02:04Z START qa-243 on qa/qa-243-a-braced-table-column-spec-p-4cm-corrupt: A braced table column spec (p{4cm}, @{}) corrupts the first cell and is rewritten
+2026-11-25T14:05:01Z PUSHED main
+2026-11-25T14:05:01Z DONE qa-243 (tsc -b, npm test, smoke all green)
