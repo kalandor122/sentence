@@ -708,3 +708,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T13:30:48Z START qa-240 on qa/qa-240-deleting-all-text-of-a-paragraph-leaves: Deleting all text of a paragraph leaves no inline tracked-deletion marker
 2026-11-25T13:33:44Z PUSHED main
 2026-11-25T13:33:44Z DONE qa-240 (tsc -b, npm test, smoke all green)
+2026-11-25T13:34:22Z START qa-241 on qa/qa-241-tracked-change-card-clips-its-preview-so: Tracked-change card clips its preview so the changed words are invisible

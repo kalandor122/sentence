@@ -3828,8 +3828,9 @@
       "hint": "Repro: 1. New document; Review tab > Track changes. 2. Click at the end of the document, press Enter and type 'TRACKEDALPHA inserted sentence.'. 3. Wait 2.5 s and open History in the sidebar rail.\nActual: The inserted words are present in the card DOM but clipped: .revision-after has clientHeight 55px and scrollHeight 78px because of the .revision-card > p { max-height: 55px; overflow: hidden } rule, and the inserted text's bounding box ends at 600px while the preview box ends at 579px. There is no scroll, expand control or tooltip, so the visible before and after snippets both end at '...only the thought remains.' and look identical, hiding the change entirely.",
       "source": "explore:review:tracked-change card clips its preview so the changed words are invisible",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T13:34:22Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T13:34:22Z",
+      "lastAttemptAt": "2026-11-25T13:34:22Z"
     },
     {
       "id": "qa-242",

@@ -228,13 +228,10 @@ function revisionPreview(before: string, after: string) {
   while (changeStart < before.length && changeStart < after.length && before[changeStart] === after[changeStart]) {
     changeStart += 1;
   }
-  const windowStart = (text: string) =>
-    Math.max(0, Math.min(changeStart - REVISION_PREVIEW_CONTEXT, text.length - REVISION_PREVIEW_LENGTH));
-  const beforeStart = windowStart(before);
-  const afterStart = windowStart(after);
+  const windowStart = Math.max(0, changeStart - REVISION_PREVIEW_CONTEXT);
   return {
-    before: before.slice(beforeStart, beforeStart + REVISION_PREVIEW_LENGTH),
-    after: after.slice(afterStart, afterStart + REVISION_PREVIEW_LENGTH),
+    before: before.slice(windowStart, windowStart + REVISION_PREVIEW_LENGTH),
+    after: after.slice(windowStart, windowStart + REVISION_PREVIEW_LENGTH),
   };
 }
 
