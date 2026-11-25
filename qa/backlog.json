@@ -3680,8 +3680,9 @@
       "hint": "Repro: 1. Create a new document, open View > LaTeX.\n2. Before \\end{document} add this body:\n\\begin{equation}\n\\label{eq:energy}\nE=mc^2\n\\end{equation}\n\nSee \\ref{eq:energy}.\n3. Click Apply source (the toast says 'Visual document synchronized from LaTeX.'), then switch to View > Visual.\n4. Click the rendered equation.\nExpected: the \\label is handled as the equation's reference target (the following \\ref already resolves to 'eq:energy'), the page shows E=mc^2 without error text, and the edit dialog opens with Update enabled.\nActual: the equation displays the literal \\label{eq:energy} in KaTeX's red error colour next to E=mc^2 (the math node has redErrorText true). Clicking it opens 'Edit equation', but the dialog marks the input invalid (aria-invalid true) and Update stays disabled; changing the formula to a valid expression does not enable Update. Only deleting the \\label makes it valid. The source still round-trips the \\label unchanged, but a standard labelled numbered equation cannot be rendered cleanly or edited.\nActual: None",
       "source": "explore:math:an equation carrying its \\label renders the label as red error text and can no longer be edited",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T11:54:56Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T11:54:56Z",
+      "lastAttemptAt": "2026-11-25T11:54:56Z"
     },
     {
       "id": "qa-233",

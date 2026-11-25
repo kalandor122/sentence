@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { latexHasError } from "./KatexMath";
+import { latexHasError, renderLatex } from "./KatexMath";
 
 describe("latexHasError", () => {
   it("flags commands KaTeX renders in its error colour", () => {
@@ -22,5 +22,12 @@ describe("latexHasError", () => {
     expect(latexHasError("\\frac{a}{b}", false)).toBe(false);
     expect(latexHasError("\\color{#cc0000}x", false)).toBe(false);
     expect(latexHasError("", false)).toBe(false);
+  });
+
+  it("ignores a \\label, which is a cross-reference target rather than math", () => {
+    const labelled = "\\label{eq:energy}\nE=mc^2";
+    expect(latexHasError(labelled, true)).toBe(false);
+    expect(renderLatex(labelled, true)).not.toContain("katex-error");
+    expect(renderLatex(labelled, true)).not.toContain("eq:energy");
   });
 });
