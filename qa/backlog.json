@@ -3480,8 +3480,9 @@
       "hint": "Repro: In the demo document press Ctrl+End, click Insert > Image and supply a 200x3000 px PNG.\nActual: The editor renders the image 202x3002 px, crossing three page boundaries and changing the status bar from 1 page to 4 pages. The exported LaTeX is \\includegraphics[width=\\linewidth,height=\\textheight,keepaspectratio], which scales the same image to one text block in the PDF, so the visual page and the PDF disagree. Probe qa/probes/insert-media.mjs scenario 'image-tall'.",
       "source": "explore:insert-media:a tall image is rendered at full natural height across several pages while the exported pdf scales it to fit one page",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T09:21:18Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T09:21:18Z",
+      "lastAttemptAt": "2026-11-25T09:21:18Z"
     },
     {
       "id": "qa-220",

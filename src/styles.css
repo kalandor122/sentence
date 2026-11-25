@@ -1297,13 +1297,18 @@ button:disabled {
 .sentence-editor img {
   display: block;
   max-width: 100%;
+  /* The exporter pins an oversized figure to the text block, so the page shows
+     the same size instead of letting the picture run over page boundaries. */
+  max-height: var(--paper-content-height, 861px);
   height: auto;
-  margin: 1.4em auto;
+  margin: 0 auto;
   border: 1px solid #e0dcd3;
 }
 
 .sentence-editor figure.figure-block {
-  margin: 0;
+  /* The picture itself has no margin: a figure as tall as the text block has to
+     measure exactly that, so the page can move it whole to the next page. */
+  margin: 1.4em 0;
 }
 
 .sentence-editor figure.figure-block figcaption {
