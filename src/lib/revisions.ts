@@ -48,6 +48,23 @@ function textChange(path: Path, before: string, after: string): Change[] {
   return [{ kind: "text", path, prefix: prefixText, removed, inserted, suffix: suffixText, after }];
 }
 
+// The editor materialises schema defaults on every node (TextAlign's
+// `textAlign: null`, mark-split text runs), so a block that was not touched can
+// still differ from its stored JSON. Align array items by their type and text
+// only, so a split pairs against the paragraph it came from instead of leaving
+// every unchanged block after it to be matched one position out of step.
+function alignmentKey(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) return value.map(alignmentKey).join("");
+  if (isObject(value)) {
+    if (typeof value.text === "string") return value.text;
+    if (value.type === "hardBreak") return "\n";
+    const type = typeof value.type === "string" ? value.type : "";
+    return `${type}{${alignmentKey(value.content)}}`;
+  }
+  return JSON.stringify(value);
+}
+
 function changesBetween(before: unknown, after: unknown, path: Path): Change[] {
   if (before === after) return [];
   if (typeof before === "string" && typeof after === "string") {
@@ -61,7 +78,7 @@ function changesBetween(before: unknown, after: unknown, path: Path): Change[] {
     const matchedAfter = new Set<number>();
     after.forEach((item, index) => {
       const found = before.findIndex((candidate, beforeIndex) =>
-        !matchedBefore.has(beforeIndex) && equalValue(candidate, item));
+        !matchedBefore.has(beforeIndex) && alignmentKey(candidate) === alignmentKey(item));
       if (found >= 0) {
         matchedBefore.add(found);
         matchedAfter.add(index);
