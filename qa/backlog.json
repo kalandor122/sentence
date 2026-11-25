@@ -3945,8 +3945,9 @@
       "hint": "Repro: 1. Click View, then LaTeX. 2. Before the real \\end{document}, insert `\\begin{verbatim}`, `ZXCODE \\end{document}`, `ZXCODE still code`, and `\\end{verbatim}`. 3. Click Apply source.\nActual: Apply reports `Invalid LaTeX: text after \\end{document} is not part of the document (\"ZXCODE still code\"). Move it before \\end{document}.` Valid LaTeX is rejected; the draft is preserved and Apply stays enabled. Probe: verbatimEndDocument.rejected=true, draftKept=true.",
       "source": "explore:source-editor:a verbatim block containing \\end{document} is rejected as trailing text",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T17:11:34Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T17:11:34Z",
+      "lastAttemptAt": "2026-11-25T17:11:34Z"
     },
     {
       "id": "qa-248",

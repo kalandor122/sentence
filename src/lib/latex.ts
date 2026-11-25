@@ -1359,7 +1359,29 @@ function splitLatexBlocks(source: string): string[] {
     current = [];
     headingOpen = 0;
   };
+  let verbatim = false;
   for (const line of source.split(/\r?\n/)) {
+    // Verbatim bodies are printed as typed, so their `\begin`/`\end` text is not
+    // an environment boundary and must not split the block.
+    if (verbatim) {
+      const close = line.indexOf("\\end{verbatim}");
+      if (close < 0) {
+        current.push(line);
+        continue;
+      }
+      verbatim = false;
+      depth = Math.max(0, depth - 1);
+      const trailing = line.slice(close + "\\end{verbatim}".length);
+      if (trailing.trim()) {
+        current.push(line.slice(0, close + "\\end{verbatim}".length));
+        flush();
+        current.push(trailing);
+      } else {
+        current.push(line);
+        flush();
+      }
+      continue;
+    }
     if (
       depth === 0 &&
       headingOpen === 0 &&
@@ -1396,6 +1418,9 @@ function splitLatexBlocks(source: string): string[] {
       continue;
     }
     current.push(line);
+    if (line.includes("\\begin{verbatim}") && !line.includes("\\end{verbatim}")) {
+      verbatim = true;
+    }
     if (headingOpen > 0 || HEADING_START.test(line)) {
       headingOpen = Math.max(0, headingOpen + braceBalance(line));
     }
@@ -1811,12 +1836,34 @@ function assertBalancedMath(source: string): void {
   }
 }
 
+// A `\begin{document}`/`\end{document}` inside a verbatim environment is code
+// shown to the reader, not a document delimiter, so verbatim bodies are blanked
+// out before the delimiters are searched. Masking instead of removing keeps the
+// offsets aligned with the original source.
+function maskVerbatim(latex: string): string {
+  const open = "\\begin{verbatim}";
+  const close = "\\end{verbatim}";
+  let masked = "";
+  let index = 0;
+  while (index < latex.length) {
+    const start = latex.indexOf(open, index);
+    if (start < 0) break;
+    const end = latex.indexOf(close, start + open.length);
+    if (end < 0) break;
+    masked += latex.slice(index, start);
+    masked += latex.slice(start, end + close.length).replace(/[^\n]/g, " ");
+    index = end + close.length;
+  }
+  return masked + latex.slice(index);
+}
+
 // LaTeX ignores a `%`-commented `\begin{document}`/`\end{document}`, so the
 // delimiters have to be searched on comment-stripped lines. Searching the raw
 // source would let a commented-out `\end{document}` truncate the document.
 function findDocumentDelimiter(latex: string, needle: string, from: number): number {
+  const masked = maskVerbatim(latex);
   let offset = 0;
-  for (const line of latex.split("\n")) {
+  for (const line of masked.split("\n")) {
     const start = offset;
     offset += line.length + 1;
     if (offset <= from) continue;
