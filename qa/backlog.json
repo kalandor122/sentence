@@ -3048,8 +3048,9 @@
       "hint": "Repro: Create a project. At the end type `LinkTypeAdd `, then `wordone`, select `wordone`, press Ctrl+K, enter `https://type.example.org/add`, click Insert, and immediately type `AFTER` without clicking in the page. Then at the end type `RemoveType linkedword`, select `linkedword`, press Ctrl+K, enter `https://remove.example.org`, click Insert, click the new link, press Ctrl+K, click `Remove link`, and type `KEEP`.\nActual: The link text stays selected when the dialog closes. Typing `AFTER` replaces `wordone`, so the paragraph reads `LinkTypeAdd AFTER` and the link now has the text `AFTER`. Likewise, after Remove link, typing `KEEP` replaces `linkedword` and the paragraph reads `RemoveType KEEP`: the linked word is silently destroyed by the next keystroke.",
       "source": "explore:links-cites-footnotes:typing after applying or removing a hyperlink replaces the link text",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T03:25:17Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T03:25:17Z",
+      "lastAttemptAt": "2026-11-25T03:25:17Z"
     },
     {
       "id": "qa-192",

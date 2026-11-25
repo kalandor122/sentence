@@ -378,6 +378,15 @@ function wordRangeAtCursor(editor: Editor): { from: number; to: number } | null 
   return { from: $from.pos - start, to: $from.pos + end };
 }
 
+// Linking or unlinking leaves the affected text selected, so the next keystroke
+// would replace it. Put the caret after the text instead and drop the link from
+// the stored marks, so continuing the sentence types plain text.
+function caretAfterLink(editor: Editor) {
+  const { from, to } = editor.state.selection;
+  if (from !== to) editor.chain().focus().setTextSelection(to).run();
+  editor.commands.unsetMark("link");
+}
+
 // A block atom inserted at the end of the document leaves ProseMirror with a
 // node selection, so the next keystroke would replace the block just added.
 // Give the caret an empty paragraph after the atom instead.
@@ -1559,7 +1568,9 @@ export default function App() {
   };
 
   const removeLink = () => {
-    editor?.chain().focus().extendMarkRange("link").unsetLink().run();
+    if (!editor) return;
+    editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    caretAfterLink(editor);
     setDialog(null);
   };
 
@@ -1612,6 +1623,7 @@ export default function App() {
         } else {
           editor.chain().focus().extendMarkRange("link").setLink({ href: value }).run();
         }
+        caretAfterLink(editor);
         break;
       }
       case "comment": {
