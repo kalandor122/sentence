@@ -3252,8 +3252,9 @@
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add a display block containing `\\begin{align}`, `ZXALIGN a &= b + c \\\\`, `d &= e`, and `\\end{align}`. 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: Apply reports success, but zero math blocks are created and the visual page shows the raw `\\begin{align}...\\end{align}` lines as paragraph text (leakedCommands=true). Refresh from visual escapes every command: `\\textbackslash{}begin\\{align\\}`, `\\&`, `\\textbackslash{}end\\{align\\}`. Probe mathBlocks=[], escaped commands present.",
       "source": "explore:source-editor:hand-written align environments are imported as literal text and escaped",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T06:10:09Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T06:10:09Z",
+      "lastAttemptAt": "2026-11-25T06:10:09Z"
     },
     {
       "id": "qa-205",

@@ -2,7 +2,7 @@
 import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
-import { CommentMark, HeadingLabel } from "./extensions";
+import { CommentMark, HeadingLabel, MathBlock } from "./extensions";
 
 describe("HeadingLabel", () => {
   it("keeps a starred heading unnumbered through the editor", () => {
@@ -51,6 +51,31 @@ describe("HeadingLabel", () => {
 
     const reloaded = new Editor({ extensions: [StarterKit, HeadingLabel], content: html });
     expect(reloaded.getJSON().content?.[0]?.attrs?.shortTitle).toBe("ZXSHORT");
+    editor.destroy();
+    reloaded.destroy();
+  });
+});
+
+describe("MathBlock", () => {
+  it("keeps an align environment through the editor", () => {
+    const editor = new Editor({
+      extensions: [StarterKit, MathBlock],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "mathBlock",
+            attrs: { latex: "a &= b \\\\ c &= d", environment: "align" },
+          },
+        ],
+      },
+    });
+    expect(editor.getJSON().content?.[0]?.attrs?.environment).toBe("align");
+    const html = editor.getHTML();
+    expect(html).toContain('data-math-environment="align"');
+
+    const reloaded = new Editor({ extensions: [StarterKit, MathBlock], content: html });
+    expect(reloaded.getJSON().content?.[0]?.attrs?.environment).toBe("align");
     editor.destroy();
     reloaded.destroy();
   });

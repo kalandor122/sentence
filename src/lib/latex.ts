@@ -446,6 +446,10 @@ function blockToLatex(node: DocumentNode, settings: ProjectSettings, enumDepth =
     case "table":
       return tableToLatex(node, settings);
     case "mathBlock": {
+      const mathEnvironment = attribute(node, "environment");
+      if (mathEnvironment) {
+        return `\\begin{${mathEnvironment}}\n${attribute(node, "latex") ?? ""}\n\\end{${mathEnvironment}}`;
+      }
       const environment = node.attrs?.numbered === true ? "equation" : "equation*";
       return `\\begin{${environment}}\n${attribute(node, "latex") ?? ""}\n\\end{${environment}}`;
     }
@@ -1100,6 +1104,18 @@ function nestedListSpans(
 const DISPLAY_MATH_BODY =
   /\\begin\{equation(\*?)\}\s*([\s\S]*?)\s*\\end\{equation\1\}|\\\[\s*([\s\S]*?)\s*\\\]|\$\$\s*([\s\S]*?)\s*\$\$/;
 
+// A hand-written align or gather block is display math too, but its `&` and
+// `\\` row syntax is only valid inside that same environment. Keep the
+// environment name with the math block so it is editable and written back
+// verbatim instead of being read as paragraph text and escaped on export.
+const MATH_BLOCK_ENVIRONMENTS = ["align", "align*", "gather", "gather*"];
+
+function parseMathEnvironmentBlock(block: string): { environment: string; body: string } | null {
+  const match = block.match(/^\\begin\{([a-zA-Z]+\*?)\}\s*([\s\S]*?)\s*\\end\{\1\}$/);
+  if (!match || !MATH_BLOCK_ENVIRONMENTS.includes(match[1])) return null;
+  return { environment: match[1], body: match[2].trim() };
+}
+
 function pushBodyParagraphs(content: DocumentNode[], text: string): void {
   let rest = text;
   for (;;) {
@@ -1726,6 +1742,18 @@ export function latexToDocument(
       content.push({
         type: "blockquote",
         content: quoteContent.length > 0 ? quoteContent : [{ type: "paragraph" }],
+      });
+      continue;
+    }
+    const mathEnvironment = parseMathEnvironmentBlock(block);
+    if (mathEnvironment) {
+      content.push({
+        type: "mathBlock",
+        attrs: {
+          latex: mathEnvironment.body,
+          environment: mathEnvironment.environment,
+          numbered: false,
+        },
       });
       continue;
     }

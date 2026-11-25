@@ -762,6 +762,26 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("\\textbackslash{}begin");
   });
 
+  it("imports a hand-written align environment as display math and keeps it on export", () => {
+    const source = [
+      "\\begin{document}",
+      "",
+      "\\begin{align}",
+      "ZXALIGN a &= b + c \\\\",
+      "d &= e",
+      "\\end{align}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    expect(parsed.content).toHaveLength(1);
+    expect(parsed.content[0]?.type).toBe("mathBlock");
+    expect(parsed.content[0]?.attrs?.latex).toBe("ZXALIGN a &= b + c \\\\\nd &= e");
+    expect(parsed.content[0]?.attrs?.environment).toBe("align");
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\begin{align}\nZXALIGN a &= b + c \\\\\nd &= e\n\\end{align}");
+    expect(exported).not.toContain("\\textbackslash{}begin");
+  });
+
   it("imports display math inside a quote and a list item as block math", () => {
     const source = [
       "\\begin{document}",

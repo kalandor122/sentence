@@ -180,6 +180,14 @@ export const MathBlock = Node.create({
     return {
       latex: { default: "" },
       numbered: { default: false },
+      // Set only for a hand-written align/gather block: the environment its
+      // `&`/`\\` rows belong to, so the block is written back unchanged.
+      environment: {
+        default: "",
+        parseHTML: (element) => element.getAttribute("data-math-environment") ?? "",
+        renderHTML: (attributes) =>
+          attributes.environment ? { "data-math-environment": attributes.environment } : {},
+      },
     };
   },
 
@@ -194,6 +202,7 @@ export const MathBlock = Node.create({
         getAttrs: (element) => ({
           latex: element.getAttribute("data-latex") ?? element.textContent ?? "",
           numbered: element.getAttribute("data-numbered") === "true",
+          environment: element.getAttribute("data-math-environment") ?? "",
         }),
       },
     ];
