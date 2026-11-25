@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "./Modal";
-import { latexHasError, renderLatex } from "../editor/KatexMath";
+import { latexHasBlankLine, latexHasError, renderLatex } from "../editor/KatexMath";
 
 interface MathDialogProps {
   open: boolean;
@@ -53,6 +53,12 @@ export default function MathDialog({
     [display, environment, html, latex],
   );
   const editing = initialLatex.trim().length > 0;
+  const blankLine = useMemo(() => latexHasBlankLine(latex, environment), [environment, latex]);
+  const error = invalid
+    ? blankLine
+      ? "Blank lines are not allowed in math. Remove the empty line and try again."
+      : "This LaTeX could not be rendered. Check the syntax and try again."
+    : null;
 
   const insertSnippet = (snippet: string) => {
     const input = inputRef.current;
@@ -122,11 +128,13 @@ export default function MathDialog({
           value={latex}
           placeholder={"\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}"}
           aria-invalid={invalid}
+          aria-describedby={error ? "math-dialog-error" : undefined}
           onChange={(event) => setLatex(event.target.value)}
           onKeyDown={(event) => {
             if ((event.ctrlKey || event.metaKey) && event.key === "Enter") submit();
           }}
         />
+        {error ? <span className="dialog-field-error" id="math-dialog-error" role="alert">{error}</span> : null}
       </label>
       <div className="math-preview">
         {html ? (

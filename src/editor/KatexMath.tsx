@@ -34,12 +34,16 @@ export function renderLatex(latex: string, displayMode: boolean, environment = "
   }
 }
 
+// Math mode cannot cross a paragraph break: the blank line ends the paragraph
+// before the closing delimiter, so the formula would not compile.
+export function latexHasBlankLine(latex: string, environment = ""): boolean {
+  return /\r?\n[ \t]*\r?\n/.test(mathSource(latex, environment));
+}
+
 export function latexHasError(latex: string, displayMode: boolean, environment = ""): boolean {
   const source = mathSource(latex, environment);
   if (!source) return false;
-  // Math mode cannot cross a paragraph break: the blank line ends the paragraph
-  // before the closing delimiter, so the formula would not compile.
-  if (/\r?\n[ \t]*\r?\n/.test(source)) return true;
+  if (latexHasBlankLine(latex, environment)) return true;
   try {
     const html = katex.renderToString(source, {
       displayMode,
