@@ -3623,7 +3623,9 @@
       ],
       "hint": "Repro: Create a new document. Type 'parent', click Home > Bulleted list, press Enter, type 'child one', press Tab, click Home > Numbered list, press Enter, type 'child two'. With the caret inside the numbered child list, look at and read the Home > Bulleted list and Home > Numbered list buttons. Reverse the list types (numbered parent, bullet child) for the same result.\nActual: Both buttons are highlighted: both report aria-pressed=\"true\" (bullets=true, numbers=true) for a numbered child inside a bullet parent, and the same pair is reported for a bullet child inside a numbered parent.",
       "source": "explore:lists:both bulleted and numbered list buttons show as active in a mixed nested list",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T14:13:30Z"
     },
     {
       "id": "qa-228",
@@ -3891,10 +3893,11 @@
       ],
       "hint": "Repro: 1. Click View, then LaTeX. 2. Before \\end{document}, insert `\\begin{description}`, `\\item[ZXTERM] ZXTERM definition text.`, and `\\end{description}`. 3. Click Apply source. 4. Click View, then Visual. 5. Click View, then LaTeX, then Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` The visual page shows the raw lines `\\begin{description}`, `\\item[ZXTERM] ZXTERM definition text.`, `\\end{description}` as paragraph text. Refresh from visual rewrites them as `\\textbackslash{}begin\\{description\\}`, `\\textbackslash{}item[ZXTERM] ...`, `\\textbackslash{}end\\{description\\}`, so the environment no longer compiles. The same was observed for `\\begin{theorem}...\\end{theorem}`. Probe: unsupportedDescriptionEnv.leakedCommands=true, beginEscaped=true, endEscaped=true; unsupportedTheoremEnv.beginEscaped=true.",
       "source": "explore:source-editor:valid latex environments outside the supported subset are shown literally and then escaped",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T14:08:08Z",
-      "lastAttemptAt": "2026-11-25T14:08:08Z"
+      "lastAttemptAt": "2026-11-25T14:08:08Z",
+      "doneAt": "2026-11-25T14:12:50Z"
     },
     {
       "id": "qa-246",

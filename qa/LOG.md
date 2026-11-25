@@ -722,3 +722,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T14:07:30Z PUSHED main
 2026-11-25T14:07:30Z DONE qa-244 (tsc -b, npm test, smoke all green)
 2026-11-25T14:08:08Z START qa-245 on qa/qa-245-valid-latex-environments-outside-the-sup: Valid LaTeX environments outside the supported subset are shown literally and then escaped
+2026-11-25T14:12:52Z PUSHED main
+2026-11-25T14:12:52Z DONE qa-245 (tsc -b, npm test, smoke all green)
