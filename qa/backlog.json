@@ -2984,8 +2984,9 @@
       "hint": "Repro: 1. Choose 'New document', type 'Before ' and open Insert > 'Inline equation'.\n2. In the LaTeX source textarea enter `a`, then an empty line, then `b` (the value is `a\\n\\nb`). The preview renders 'ab' and Insert/Update stays enabled (`invalidClass: false`, `submitDisabled: false`).\n3. Click Insert, open View > 'LaTeX', click 'Refresh from visual' and read document.tex: it contains `Before \\(a` followed by a blank line and `b\\)`.\n4. Click 'Apply source'. The toast reports 'Visual document synchronized from LaTeX.'\n5. Switch to View > 'Visual': the math node is gone; the document is two plain paragraphs containing the literal text `\\(a` and `b\\)`.\n6. Open View > 'LaTeX' and click 'Refresh from visual' again: the body is now `Before \\textbackslash{}(a` / blank line / `b\\textbackslash{})`.\nExpected: a blank line inside math is invalid LaTeX (LaTeX ends the paragraph before the closing delimiter), so the dialog should flag it and disable Insert just as it does for `\\frac{` and unclosed `{`; failing that, Apply source must report an error instead of destroying the equation.\nActual: the blank line passes KaTeX validation and is inserted; the exported source is uncompilable, and applying it is reported as a success while the math node is silently replaced by escaped literal text.\nActual: None",
       "source": "explore:math:blank line inside inline math is accepted, exported as invalid latex, then silently converted to text on apply source",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T02:54:01Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T02:54:01Z",
+      "lastAttemptAt": "2026-11-25T02:54:01Z"
     },
     {
       "id": "qa-188",

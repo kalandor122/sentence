@@ -1271,11 +1271,17 @@ function assertBalancedMath(source: string): void {
     ) {
       verbatim = "verbatim";
     }
-    // Math mode cannot cross a paragraph break, so an odd $ count there is
-    // unbalanced rather than a formula continuing on the next line.
+    // Math mode cannot cross a paragraph break, so every delimiter still open
+    // there is unbalanced rather than a formula continuing on the next line.
     if (!line.trim()) {
       if (dollars % 2 === 1) {
         throw new Error('Invalid LaTeX: unclosed math delimiter "$".');
+      }
+      if (parenOpen) {
+        throw new Error('Invalid LaTeX: unclosed math delimiter "\\(".');
+      }
+      if (bracketOpen) {
+        throw new Error('Invalid LaTeX: unclosed math delimiter "\\[".');
       }
       dollars = 0;
     }

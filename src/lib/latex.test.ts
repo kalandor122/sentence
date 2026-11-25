@@ -361,6 +361,29 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("rejects a math delimiter left open by a blank line", () => {
+    const paren = [
+      "\\begin{document}",
+      "Before \\(a",
+      "",
+      "b\\)",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(paren, DEFAULT_SETTINGS)).toThrow(
+      'Invalid LaTeX: unclosed math delimiter "\\(".',
+    );
+    const bracket = [
+      "\\begin{document}",
+      "\\[a",
+      "",
+      "b\\]",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(bracket, DEFAULT_SETTINGS)).toThrow(
+      'Invalid LaTeX: unclosed math delimiter "\\[".',
+    );
+  });
+
   it("accepts balanced and escaped math delimiters", () => {
     const source = [
       "\\begin{document}",
