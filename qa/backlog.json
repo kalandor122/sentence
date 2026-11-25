@@ -3576,8 +3576,9 @@
       "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'inner one', press Tab, press Enter, type 'inner two'. Click at the end of 'inner one' and click Home > Bulleted list (the button is shown pressed). Also select both 'inner one' and 'inner two' and click the same button.\nActual: 'inner one' is promoted out of the sublist but remains a bulleted list item, and 'inner two' is re-nested under it. The DOM becomes '<ul><li><p>outer</p></li><li><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>' and the LaTeX is '\\item outer\\n\\item inner one\\n\\begin{itemize}\\n\\item inner two\\n\\end{itemize}': the bullet on 'inner one' is never removed. With both items selected, only the parent leaves the list and the nested item stays as a top-level bullet list.",
       "source": "explore:lists:clicking the highlighted list button inside a nested item only outdents it and keeps the bullet",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T10:52:01Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T10:52:01Z",
+      "lastAttemptAt": "2026-11-25T10:52:01Z"
     },
     {
       "id": "qa-226",

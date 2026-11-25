@@ -1,6 +1,6 @@
 import type { Editor } from "@tiptap/core";
 import { AllSelection, TextSelection } from "@tiptap/pm/state";
-import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import type { Node as ProseMirrorNode, ResolvedPos } from "@tiptap/pm/model";
 
 function isAllSelected(editor: Editor): boolean {
   const { state } = editor;
@@ -121,51 +121,88 @@ export function splitOrderedListOnEmptyItem(editor: Editor): boolean {
   return true;
 }
 
+// The innermost list around the selection decides what toggling means. If it
+// has the requested type the selected items lose their bullet/number; if it is
+// the other type the default toggle converts it in place.
+function findInnermostList(
+  $pos: ResolvedPos,
+  listType: "bulletList" | "orderedList",
+): { node: ProseMirrorNode; depth: number } | null {
+  for (let depth = $pos.depth; depth >= 1; depth--) {
+    const node = $pos.node(depth);
+    if (!isListNode(node)) continue;
+    return node.type.name === listType ? { node, depth } : null;
+  }
+  return null;
+}
+
 /**
- * Turning numbering off for one item in the middle of a numbered run leaves the
- * trailing items in a second list. ProseMirror's lift copies the list attrs, so
- * that list restarts at 1 and the numbers jump backwards. Lift the item out
- * ourselves and continue the trailing items at the number they already had.
+ * Turning a list type off for an item should remove the bullet or number, but
+ * ProseMirror's liftListItem only promotes a nested item into the enclosing
+ * list, so it keeps its bullet. Instead lift the selected items' content out of
+ * the list ourselves, whether that list is at the top level or nested. For a
+ * numbered list the trailing items also continue at the number they already
+ * had, since lifting would restart them at 1.
  */
-export function removeOrderedListItem(editor: Editor): boolean {
+export function removeListItem(
+  editor: Editor,
+  listType: "bulletList" | "orderedList",
+): boolean {
   if (!editor.isEditable) return false;
   const { state } = editor;
   const { selection } = state;
   if (!(selection instanceof TextSelection)) return false;
-  if (!editor.isActive("orderedList")) return false;
+  if (!editor.isActive(listType)) return false;
   const { $from, $to } = selection;
   if ($from.depth < 3) return false;
-  if ($from.before(-2) !== $to.before(-2) || $from.before(-1) !== $to.before(-1)) return false;
-  const item = $from.node(-1);
-  const list = $from.node(-2);
-  if (item.type.name !== "listItem" || list.type.name !== "orderedList") return false;
+  const fromList = findInnermostList($from, listType);
+  if (!fromList) return false;
+  const toList = findInnermostList($to, listType);
+  if (!toList || toList.depth !== fromList.depth) return false;
+  if ($from.before(fromList.depth) !== $to.before(fromList.depth)) return false;
 
-  const index = $from.index(-2);
+  const itemDepth = fromList.depth + 1;
+  if ($from.depth < itemDepth || $to.depth < itemDepth) return false;
+  if ($from.node(itemDepth).type.name !== "listItem") return false;
+  if ($to.node(itemDepth).type.name !== "listItem") return false;
+
+  const list = fromList.node;
   const items: ProseMirrorNode[] = [];
   list.forEach((child) => items.push(child));
+  const fromIndex = $from.index(fromList.depth);
+  const toIndex = Math.min($to.index(fromList.depth), items.length - 1);
+  if (fromIndex > toIndex) return false;
+
   const start = Number(list.attrs.start ?? 1);
   const baseStart = Number.isSafeInteger(start) && start > 0 ? start : 1;
 
   const blocks: ProseMirrorNode[] = [];
-  const listPos = $from.before(-2);
-  if (index > 0) blocks.push(list.type.create(list.attrs, items.slice(0, index)));
-  const liftedPos = listPos + (index > 0 ? blocks[0].nodeSize : 0);
-  item.forEach((child) => blocks.push(child));
-  if (index < items.length - 1) {
-    blocks.push(
-      list.type.create({ ...list.attrs, start: baseStart + index + 1 }, items.slice(index + 1)),
-    );
+  const listPos = $from.before(fromList.depth);
+  if (fromIndex > 0) blocks.push(list.type.create(list.attrs, items.slice(0, fromIndex)));
+  const liftedPos = listPos + (fromIndex > 0 ? blocks[0].nodeSize : 0);
+  items.slice(fromIndex, toIndex + 1).forEach((item) => {
+    item.forEach((child) => blocks.push(child));
+  });
+  if (toIndex < items.length - 1) {
+    const attrs =
+      listType === "orderedList"
+        ? { ...list.attrs, start: baseStart + toIndex + 1 }
+        : list.attrs;
+    blocks.push(list.type.create(attrs, items.slice(toIndex + 1)));
   }
 
-  const offsetFrom = $from.pos - $from.start(-1);
-  const offsetTo = $to.pos - $from.start(-1);
+  const itemStart = $from.start(itemDepth);
+  const offsetFrom = $from.pos - itemStart;
+  const offsetTo = $to.pos - itemStart;
   const tr = state.tr.replaceWith(listPos, listPos + list.nodeSize, blocks);
-  tr.setSelection(
-    TextSelection.between(
-      tr.doc.resolve(liftedPos + offsetFrom),
-      tr.doc.resolve(liftedPos + offsetTo),
-    ),
-  );
+  if (blocks.length > 0) {
+    tr.setSelection(
+      TextSelection.between(
+        tr.doc.resolve(liftedPos + offsetFrom),
+        tr.doc.resolve(liftedPos + offsetTo),
+      ),
+    );
+  }
   editor.view.dispatch(tr.scrollIntoView());
   editor.commands.focus();
   return true;
@@ -214,7 +251,7 @@ export function toggleList(editor: Editor, listType: "bulletList" | "orderedList
       return true;
     }
   }
-  if (listType === "orderedList" && removeOrderedListItem(editor)) return true;
+  if (removeListItem(editor, listType)) return true;
   const cmd = listType === "bulletList" ? "toggleBulletList" : "toggleOrderedList";
   return editor.chain().focus()[cmd]().run();
 }
