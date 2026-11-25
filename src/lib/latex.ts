@@ -484,10 +484,12 @@ function imageToLatex(node: DocumentNode, settings: ProjectSettings): string {
   const graphics = options
     ? `\\includegraphics[${options}]{${escapeLatex(filename)}}`
     : `\\includegraphics{${escapeLatex(filename)}}`;
+  // The alt text rides along as a comment, as it does for an inline image, so a
+  // source round trip does not lose it: a figure has no other place for it.
   return [
     "\\begin{figure}[htbp]",
     "\\centering",
-    graphics,
+    alt ? `${graphics}% Sentence alt: ${metadataComment(alt)}` : graphics,
     caption ? `\\caption{${escapeLatex(caption)}}` : "",
     "\\end{figure}",
   ]
@@ -1495,13 +1497,17 @@ export function latexToDocument(
     if (image) {
       const caption = block.match(/\\caption\{([^}]*)\}/);
       const captionText = caption ? decodeLatexText(caption[1]) : "";
+      // A caption is the fallback alt text, because that is the only text a
+      // hand-written figure carries; an explicit alt comment wins over it.
+      const altComment = block.match(/% Sentence alt: ([^\r\n]*)/);
+      const altText = altComment ? decodeLatexText(altComment[1].trim()) : "";
       content.push({
         type: "image",
         attrs: {
           src: decodeLatexText(image[1]),
           // LaTeX has one text for a figure: the caption. Show it in the
           // editor and keep it as the alt text for the HTML and Markdown exports.
-          alt: captionText,
+          alt: altText || captionText,
           caption: captionText,
         },
       });
