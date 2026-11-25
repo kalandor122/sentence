@@ -1583,6 +1583,34 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(parsed, settings)).toContain("\\caption{Results \\& discussion}");
   });
 
+  it("keeps escaped braces in a table caption through LaTeX", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          attrs: { caption: "R&D 50% {x}" },
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableHeader",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "H" }] }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("\\caption{R\\&D 50\\% \\{x\\}}");
+    const parsed = latexToDocument(`${latex}\n% check\n`, settings).document;
+    expect(parsed.content[0]?.attrs?.caption).toBe("R&D 50% {x}");
+    expect(documentToLatex(parsed, settings)).toContain("\\caption{R\\&D 50\\% \\{x\\}}");
+  });
+
   it("round-trips cell alignment through LaTeX column specs", () => {
     const header = (align?: string): DocumentNode => ({
       type: "tableHeader",

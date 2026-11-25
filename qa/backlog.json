@@ -3632,8 +3632,9 @@
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click a body cell, type 'R&D 50% {x}' into the Table toolbar's Caption field, then switch to View > LaTeX and confirm the line \\caption{R\\&D 50\\% \\{x\\}}. Add a new line containing '% check' at the end of the source and click Apply source. Look at the caption under the table and the Caption field, then switch to View > LaTeX again.\nActual: After Apply source the visible caption and the Caption field both read 'R&D 50% {x\\' - the closing brace is gone and a backslash is appended. The re-exported line is \\caption{R\\&D 50\\% \\{x\\\\}}, so the literal '}' is permanently lost and replaced by a LaTeX line break. A caption without a brace ('Simple caption') round-trips unchanged, and caption text is the only place this was observed; the same '{x}' text in a table cell survives the round trip.",
       "source": "explore:tables:a table caption containing a closing brace is silently corrupted by a latex source round trip",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T11:12:17Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T11:12:17Z",
+      "lastAttemptAt": "2026-11-25T11:12:17Z"
     },
     {
       "id": "qa-230",
