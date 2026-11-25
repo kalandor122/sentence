@@ -698,3 +698,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T12:52:19Z START qa-207 on qa/qa-207-a-non-breaking-space-written-as-is-re-ex: A non-breaking space written as ~ is re-exported as a literal tilde
 2026-11-25T12:55:18Z PUSHED main
 2026-11-25T12:55:18Z DONE qa-207 (tsc -b, npm test, smoke all green)
+2026-11-25T12:55:56Z START qa-216 on qa/qa-216-the-writing-surface-is-34-tab-presses-fr: The writing surface is 34 Tab presses from the top of the page, with no skip link or focus shortcut
