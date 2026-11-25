@@ -561,3 +561,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T03:00:40Z DONE qa-189 (tsc -b, npm test, smoke all green)
 2026-11-25T03:20:35Z EXPLORE links-cites-footnotes: 4 new items, agent exit 0
 2026-11-25T03:20:53Z START qa-190 on qa/qa-190-multi-key-citations-are-merged-into-one: Multi-key citations are merged into one invalid key by the LaTeX round trip
+2026-11-25T03:24:39Z PUSHED main
+2026-11-25T03:24:39Z DONE qa-190 (tsc -b, npm test, smoke all green)

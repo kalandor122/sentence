@@ -3031,10 +3031,11 @@
       ],
       "hint": "Repro: Create a project. Open View > LaTeX and insert the line `MultiCite \\cite{sentence2026,ghost2026} done.` before `\\end{document}`, then click Visual. Type `ZZ` at the end of the document and open View > LaTeX again.\nActual: The visual editor turns the pair into one citation labelled `[sentence2026,ghost2026]`, the References panel reports `sentence2026,ghost2026` as a single key missing from the bibliography, and the regenerated source reads `\\cite{sentence2026ghost2026}`: the comma is stripped and both keys become one nonexistent key. The manual citation dialog also rejects commas, so a multi-key citation cannot be created or preserved through the UI.",
       "source": "explore:links-cites-footnotes:multi-key citations are merged into one invalid key by the latex round trip",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T03:20:53Z",
-      "lastAttemptAt": "2026-11-25T03:20:53Z"
+      "lastAttemptAt": "2026-11-25T03:20:53Z",
+      "doneAt": "2026-11-25T03:24:37Z"
     },
     {
       "id": "qa-191",
@@ -3046,7 +3047,9 @@
       ],
       "hint": "Repro: Create a project. At the end type `LinkTypeAdd `, then `wordone`, select `wordone`, press Ctrl+K, enter `https://type.example.org/add`, click Insert, and immediately type `AFTER` without clicking in the page. Then at the end type `RemoveType linkedword`, select `linkedword`, press Ctrl+K, enter `https://remove.example.org`, click Insert, click the new link, press Ctrl+K, click `Remove link`, and type `KEEP`.\nActual: The link text stays selected when the dialog closes. Typing `AFTER` replaces `wordone`, so the paragraph reads `LinkTypeAdd AFTER` and the link now has the text `AFTER`. Likewise, after Remove link, typing `KEEP` replaces `linkedword` and the paragraph reads `RemoveType KEEP`: the linked word is silently destroyed by the next keystroke.",
       "source": "explore:links-cites-footnotes:typing after applying or removing a hyperlink replaces the link text",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T03:25:17Z"
     },
     {
       "id": "qa-192",
