@@ -24,7 +24,7 @@ import {
 import { FindHighlight } from "./find";
 import { focusAfterEditor } from "./focus";
 import { changeIndent, nestListItem } from "./indent";
-import { splitListItemKeepingSublist, splitOrderedListOnEmptyItem, toggleList } from "./listToggle";
+import { liftEmptyNestedItem, splitListItemKeepingSublist, splitOrderedListOnEmptyItem, toggleList } from "./listToggle";
 import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
 import { PageGaps, setPageGaps } from "./pageGaps";
 import {
@@ -108,13 +108,17 @@ const ListShortcuts = Extension.create({
 
 // Enter at the end of a list item with a nested sublist keeps that sublist
 // under the item it belongs to; the default split would give it to the new
-// sibling.
+// sibling. Enter on an empty nested item outdents it, since there is nothing to
+// split.
 const ListEnter = Extension.create({
   name: "sentenceListEnter",
   priority: 200,
   addKeyboardShortcuts() {
     return {
-      Enter: () => splitListItemKeepingSublist(this.editor) || splitOrderedListOnEmptyItem(this.editor),
+      Enter: () =>
+        splitListItemKeepingSublist(this.editor) ||
+        liftEmptyNestedItem(this.editor) ||
+        splitOrderedListOnEmptyItem(this.editor),
     };
   },
 });

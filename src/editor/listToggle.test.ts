@@ -2,7 +2,7 @@
 import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
-import { isListActive, splitListItemKeepingSublist, splitOrderedListOnEmptyItem, toggleList } from "./listToggle";
+import { liftEmptyNestedItem, isListActive, splitListItemKeepingSublist, splitOrderedListOnEmptyItem, toggleList } from "./listToggle";
 
 function createEditor(content: string): Editor {
   return new Editor({ extensions: [StarterKit], content });
@@ -227,6 +227,72 @@ describe("splitListItemKeepingSublist", () => {
     const paragraph = createEditor("<p>outside</p>");
     paragraph.commands.setTextSelection(7);
     expect(splitListItemKeepingSublist(paragraph)).toBe(false);
+    paragraph.destroy();
+  });
+});
+
+describe("liftEmptyNestedItem", () => {
+  it("outdents an empty item from the middle of a nested bullet list", () => {
+    const editor = createEditor(
+      "<ul><li><p>outer</p><ul><li><p>child one</p></li><li><p></p></li><li><p>child two</p></li></ul></li></ul>",
+    );
+    // The empty item's paragraph opens at 23.
+    editor.commands.setTextSelection(23);
+    expect(liftEmptyNestedItem(editor)).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ul><li><p>outer</p><ul><li><p>child one</p></li></ul></li><li><p></p><ul><li><p>child two</p></li></ul></li></ul>",
+    );
+    const { $from } = editor.state.selection;
+    expect($from.depth).toBe(3);
+    expect($from.parent.content.size).toBe(0);
+    editor.destroy();
+  });
+
+  it("outdents an empty item from the middle of a nested numbered list", () => {
+    const editor = createEditor(
+      "<ol><li><p>outer</p><ol><li><p>child one</p></li><li><p></p></li><li><p>child two</p></li></ol></li></ol>",
+    );
+    editor.commands.setTextSelection(23);
+    expect(liftEmptyNestedItem(editor)).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ol><li><p>outer</p><ol><li><p>child one</p></li></ol></li><li><p></p><ol><li><p>child two</p></li></ol></li></ol>",
+    );
+    const { $from } = editor.state.selection;
+    expect($from.parent.content.size).toBe(0);
+    editor.destroy();
+  });
+
+  it("outdents the last nested item the same way the default Enter does", () => {
+    const editor = createEditor(
+      "<ol><li><p>outer</p><ol><li><p>child</p></li><li><p></p></li></ol></li></ol>",
+    );
+    // The empty item's paragraph opens at 19.
+    editor.commands.setTextSelection(19);
+    expect(liftEmptyNestedItem(editor)).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ol><li><p>outer</p><ol><li><p>child</p></li></ol></li><li><p></p></li></ol>",
+    );
+    editor.destroy();
+  });
+
+  it("leaves top-level and filled items to the default Enter", () => {
+    const topLevel = createEditor(
+      "<ul><li><p>one</p></li><li><p></p></li><li><p>two</p></li></ul>",
+    );
+    topLevel.commands.setTextSelection(8);
+    expect(liftEmptyNestedItem(topLevel)).toBe(false);
+    topLevel.destroy();
+
+    const filled = createEditor(
+      "<ul><li><p>outer</p><ul><li><p>child</p></li></ul></li></ul>",
+    );
+    filled.commands.setTextSelection(14);
+    expect(liftEmptyNestedItem(filled)).toBe(false);
+    filled.destroy();
+
+    const paragraph = createEditor("<p>outside</p>");
+    paragraph.commands.setTextSelection(2);
+    expect(liftEmptyNestedItem(paragraph)).toBe(false);
     paragraph.destroy();
   });
 });
