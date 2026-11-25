@@ -627,3 +627,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T07:57:31Z START qa-212 on qa/qa-212-ctrl-alt-1-2-3-change-the-current-block: Ctrl+Alt+1/2/3 change the current block's heading level on their way to switching views
 2026-11-25T08:03:09Z PUSHED main
 2026-11-25T08:03:09Z DONE qa-212 (tsc -b, npm test, smoke all green)
+2026-11-25T08:03:47Z START qa-213 on qa/qa-213-escape-closes-the-properties-panel-behin: Escape closes the Properties panel behind a dialog instead of the dialog in front of it, and leaves focus on the page be
