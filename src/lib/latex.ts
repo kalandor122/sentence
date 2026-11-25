@@ -1340,14 +1340,29 @@ function assertBalancedMath(source: string): void {
   }
 }
 
+// LaTeX ignores a `%`-commented `\begin{document}`/`\end{document}`, so the
+// delimiters have to be searched on comment-stripped lines. Searching the raw
+// source would let a commented-out `\end{document}` truncate the document.
+function findDocumentDelimiter(latex: string, needle: string, from: number): number {
+  let offset = 0;
+  for (const line of latex.split("\n")) {
+    const start = offset;
+    offset += line.length + 1;
+    if (offset <= from) continue;
+    const index = stripLatexComment(line).indexOf(needle, Math.max(0, from - start));
+    if (index >= 0) return start + index;
+  }
+  return -1;
+}
+
 function documentBody(latex: string): string {
   const begin = "\\begin{document}";
   const end = "\\end{document}";
-  const beginIndex = latex.indexOf(begin);
+  const beginIndex = findDocumentDelimiter(latex, begin, 0);
   if (beginIndex < 0) {
     throw new Error("Invalid LaTeX: missing \\begin{document}.");
   }
-  const endIndex = latex.indexOf(end, beginIndex + begin.length);
+  const endIndex = findDocumentDelimiter(latex, end, beginIndex + begin.length);
   if (endIndex < 0) {
     throw new Error("Invalid LaTeX: missing \\end{document}.");
   }
