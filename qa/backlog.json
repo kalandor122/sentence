@@ -3464,8 +3464,9 @@
       "hint": "Repro: Press Ctrl+K in the editor to open the Add link dialog and Tab to the link input. Computed style of the focused input: outline-style none (the global input:focus-visible outline is overridden by .dialog-field input:focus), border-color rgb(124, 156, 136) against rgb(209, 205, 196) at rest (1.9:1 between the two border colours; 2.99:1 against the #fffefa field background), plus a rgba(76, 124, 97, 0.12) 0 0 0 2px shadow. The Cancel and Close buttons in the same dialog show the solid 2px focus outline.\nActual: Focus on dialog inputs is indicated only by a thin border-colour swap plus a 12%-alpha shadow (outline: none), so the focus ring disappears on the field a keyboard user has just tabbed into while every button keeps its outline.",
       "source": "explore:keyboard:dialog text fields drop the 2px focus outline and show only a 1px border-colour change",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T13:38:59Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T13:38:59Z",
+      "lastAttemptAt": "2026-11-25T13:38:59Z"
     },
     {
       "id": "qa-218",

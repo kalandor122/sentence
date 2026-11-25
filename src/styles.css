@@ -2575,20 +2575,6 @@ button:disabled {
   line-height: 1.5;
 }
 
-.property-field input:focus,
-.property-field select:focus,
-.property-field textarea:focus,
-.remote-field input:focus,
-.inline-create input:focus,
-.dialog-field input:focus,
-.dialog-field textarea:focus,
-.comment-reply-field textarea:focus,
-.commit-message:focus {
-  border-color: #7c9c88;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(76, 124, 97, 0.12);
-}
-
 .property-toggle {
   display: flex;
   align-items: center;
