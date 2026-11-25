@@ -6,7 +6,10 @@ interface SourceEditorProps {
   activeLine?: number;
   readOnly?: boolean;
   textareaRef?: RefObject<HTMLTextAreaElement | null>;
-  historyRef?: RefObject<SourceHistory | null>;
+  // One stack per file: document.tex and references.bib share this textarea, so
+  // the stack of the file that was left behind must survive the tab switch.
+  historyRef?: RefObject<Record<string, SourceHistory | null>>;
+  historyKey?: string;
   undoBoundary?: number;
 }
 
@@ -38,6 +41,7 @@ export default function SourceEditor({
   readOnly = false,
   textareaRef,
   historyRef,
+  historyKey = "document.tex",
   undoBoundary,
 }: SourceEditorProps) {
   const localTextarea = useRef<HTMLTextAreaElement>(null);
@@ -50,7 +54,7 @@ export default function SourceEditor({
   // the saved one (and the caret) when the text it edits is still the same.
   const initial = useRef<{ history: { entries: HistoryEntry[]; index: number }; selection: { start: number; end: number } | null }>(null);
   if (initial.current === null) {
-    const saved = historyRef?.current;
+    const saved = historyRef?.current?.[historyKey] ?? null;
     initial.current = saved && saved.entries[saved.index]?.value === value
       ? {
         history: { entries: saved.entries.map((entry) => ({ ...entry })), index: saved.index },
@@ -68,6 +72,7 @@ export default function SourceEditor({
       };
   }
   const history = useRef(initial.current.history);
+  const historyKeyRef = useRef(historyKey);
   const caret = useRef({ start: initial.current.selection?.start ?? 0, end: initial.current.selection?.end ?? 0 });
   const restoredSelection = useRef(initial.current.selection);
   const pending = useRef<PendingEdit | null>(null);
@@ -91,7 +96,7 @@ export default function SourceEditor({
 
   useEffect(() => () => {
     if (historyRef) {
-      historyRef.current = {
+      historyRef.current[historyKeyRef.current] = {
         entries: history.current.entries.map((entry) => ({ ...entry })),
         index: history.current.index,
         selectionStart: caret.current.start,
@@ -207,7 +212,32 @@ export default function SourceEditor({
   useEffect(() => {
     const node = textarea.current;
     if (!node) return;
-    if (node.value !== value) {
+    if (historyKeyRef.current !== historyKey) {
+      // Switching file tabs swaps the text without an edit, so keep the stack
+      // of the file being left and bring back the other file's own stack.
+      if (historyRef) {
+        historyRef.current[historyKeyRef.current] = {
+          entries: history.current.entries.map((entry) => ({ ...entry })),
+          index: history.current.index,
+          selectionStart: node.selectionStart,
+          selectionEnd: node.selectionEnd,
+        };
+      }
+      const saved = historyRef?.current?.[historyKey] ?? null;
+      const entry = saved?.entries[saved.index];
+      const restored = saved && entry && entry.value === value ? saved : null;
+      historyKeyRef.current = historyKey;
+      const start = Math.min(restored?.selectionStart ?? node.selectionStart, value.length);
+      const end = Math.min(restored?.selectionEnd ?? node.selectionEnd, value.length);
+      node.value = value;
+      node.setSelectionRange(start, end);
+      caret.current = { start, end };
+      restoredSelection.current = null;
+      boundary.current = true;
+      history.current = restored
+        ? { entries: restored.entries.map((item) => ({ ...item })), index: restored.index }
+        : { entries: [{ value, selectionStart: start, selectionEnd: end, inputType: "external" }], index: 0 };
+    } else if (node.value !== value) {
       const start = Math.min(node.selectionStart, value.length);
       const end = Math.min(node.selectionEnd, value.length);
       node.value = value;
@@ -231,7 +261,7 @@ export default function SourceEditor({
     caret.current = { start: offset, end: offset + length };
     const lineHeight = 22;
     node.scrollTop = Math.max(0, (activeLine - 3) * lineHeight);
-  }, [activeLine, value]);
+  }, [activeLine, historyKey, value]);
 
   return (
     <div className="source-editor">

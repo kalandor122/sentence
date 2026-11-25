@@ -3928,9 +3928,10 @@
       "hint": "Repro: 1. Click View, then LaTeX. 2. Put the caret before \\end{document} and type `ZXTABHISTORY`. 3. Click references.bib, then click document.tex. 4. Click in the textarea and press Ctrl+Z three times.\nActual: All three Ctrl+Z presses leave `ZXTABHISTORY` in the textarea. Typing `ZXTABNEW` after returning and pressing Ctrl+Z removes only `ZXTABNEW`, so undo still works for post-switch edits but the history from before the tab switch is gone. Probe: undoafterFileTabSwitch.markerStillPresentAfterThreeUndos=[true,true,true], undoRemovedPreSwitchTyping=false, newTypingAfterSwitchUndoable=true.",
       "source": "explore:source-editor:undo history is lost when switching to references.bib and back",
       "status": "in_progress",
-      "attempts": 0,
+      "attempts": 1,
       "startedAt": "2026-11-25T17:04:18Z",
-      "note": "WIP kept on its branch; retry"
+      "note": "WIP kept on its branch; retry",
+      "lastAttemptAt": "2026-11-25T17:04:18Z"
     },
     {
       "id": "qa-247",
