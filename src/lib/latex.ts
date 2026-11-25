@@ -1537,6 +1537,19 @@ function findDocumentDelimiter(latex: string, needle: string, from: number): num
   return -1;
 }
 
+// LaTeX ignores everything after `\end{document}`, and the body import stops
+// there, so text typed after it used to vanish while the source pane kept
+// showing it and the save reported success. Only blank lines and comments may
+// follow the end marker; anything else is rejected so the draft stays unsaved
+// and visible until it is moved inside the document.
+function trailingDocumentText(latex: string): string | null {
+  for (const line of latex.split(/\r?\n/)) {
+    const text = stripLatexComment(line).trim();
+    if (text) return text;
+  }
+  return null;
+}
+
 function documentBody(latex: string): string {
   const begin = "\\begin{document}";
   const end = "\\end{document}";
@@ -1547,6 +1560,13 @@ function documentBody(latex: string): string {
   const endIndex = findDocumentDelimiter(latex, end, beginIndex + begin.length);
   if (endIndex < 0) {
     throw new Error("Invalid LaTeX: missing \\end{document}.");
+  }
+  const trailing = trailingDocumentText(latex.slice(endIndex + end.length));
+  if (trailing) {
+    const snippet = trailing.length > 40 ? `${trailing.slice(0, 40)}...` : trailing;
+    throw new Error(
+      `Invalid LaTeX: text after \\end{document} is not part of the document ("${snippet}"). Move it before \\end{document}.`,
+    );
   }
   return latex.slice(beginIndex + begin.length, endIndex);
 }
