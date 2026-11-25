@@ -94,6 +94,45 @@ describe("toggleList", () => {
   });
 });
 
+describe("removing one bulleted item", () => {
+  it("removes the bullet on the last item", () => {
+    const editor = createEditor("<ul><li><p>one</p></li><li><p>two</p></li></ul>");
+    // End of "two".
+    editor.commands.setTextSelection(12);
+    expect(toggleList(editor, "bulletList")).toBe(true);
+    expect(getHTML(editor)).toBe("<ul><li><p>one</p></li></ul><p>two</p>");
+    editor.destroy();
+  });
+
+  it("removes the bullet instead of only outdenting a nested item", () => {
+    const editor = createEditor(
+      "<ul><li><p>outer</p><ul><li><p>inner one</p></li><li><p>inner two</p></li></ul></li></ul>",
+    );
+    // End of "inner one", before its sibling.
+    editor.commands.setTextSelection(21);
+    expect(toggleList(editor, "bulletList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ul><li><p>outer</p><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>",
+    );
+    const { $from } = editor.state.selection;
+    expect($from.parent.textContent).toBe("inner one");
+    editor.destroy();
+  });
+
+  it("removes the bullet from every selected nested item", () => {
+    const editor = createEditor(
+      "<ul><li><p>outer</p><ul><li><p>inner one</p></li><li><p>inner two</p></li></ul></li></ul>",
+    );
+    // Entire text of both nested items.
+    editor.commands.setTextSelection({ from: 12, to: 33 });
+    expect(toggleList(editor, "bulletList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ul><li><p>outer</p><p>inner one</p><p>inner two</p></li></ul>",
+    );
+    editor.destroy();
+  });
+});
+
 describe("removing one numbered item", () => {
   // Positions run from the list start; an item's paragraph opens one past the
   // item start, so the cursor inside "two" below sits at 8.

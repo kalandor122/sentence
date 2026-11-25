@@ -659,3 +659,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T10:46:56Z START qa-224 on qa/qa-224-turning-numbering-off-for-one-item-in-a: Turning numbering off for one item in a numbered list restarts the remaining items at 1
 2026-11-25T10:51:23Z PUSHED main
 2026-11-25T10:51:23Z DONE qa-224 (tsc -b, npm test, smoke all green)
+2026-11-25T10:52:01Z START qa-225 on qa/qa-225-clicking-the-highlighted-list-button-ins: Clicking the highlighted list button inside a nested item only outdents it and keeps the bullet
