@@ -27,6 +27,7 @@ import { changeIndent, nestListItem } from "./indent";
 import { liftEmptyNestedItem, splitListItemKeepingSublist, splitOrderedListOnEmptyItem, toggleList } from "./listToggle";
 import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
 import { PageGaps, setPageGaps } from "./pageGaps";
+import { ParagraphSpacing } from "./paragraphSpacing";
 import {
   pageBreakFill,
   pageCountFromBottom,
@@ -291,6 +292,7 @@ export default function EditorSurface({
   const geometry = pageGeometry(settings);
   const editor = useEditor({
     extensions: [
+      ParagraphSpacing,
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
         link: {

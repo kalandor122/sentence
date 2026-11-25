@@ -2525,3 +2525,23 @@ describe("paragraph spacing (Word-style points)", () => {
     expect(latexToDocument(latex, DEFAULT_SETTINGS).settings.paragraphSpaceAfter).toBe(18);
   });
 });
+
+describe("per-paragraph spacing", () => {
+  it("emits \\vspace* for one paragraph and parses it back onto that paragraph", () => {
+    const doc: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "First." }] },
+        { type: "paragraph", attrs: { spaceAfter: 24 }, content: [{ type: "text", text: "Second." }] },
+      ],
+    };
+    const latex = documentToLatex(doc, DEFAULT_SETTINGS);
+    expect(latex).toContain("\\vspace*{24.0pt}");
+    expect((latex.match(/\\vspace\*\{/g) ?? []).length).toBe(1);
+
+    const back = latexToDocument(latex, DEFAULT_SETTINGS);
+    const paragraphs = (back.document.content ?? []).filter((node) => node.type === "paragraph");
+    expect(paragraphs[0]?.attrs?.spaceAfter ?? 0).toBe(0);
+    expect(paragraphs[1]?.attrs?.spaceAfter).toBe(24);
+  });
+});

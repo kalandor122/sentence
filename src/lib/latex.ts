@@ -451,8 +451,17 @@ function orderedListStart(node: DocumentNode): number | null {
 
 function blockToLatex(node: DocumentNode, settings: ProjectSettings, enumDepth = 0): string {
   switch (node.type) {
-    case "paragraph":
-      return wrapAlignment(node, inlineContent(node.content, settings));
+    case "paragraph": {
+      const body = wrapAlignment(node, inlineContent(node.content, settings));
+      // Word-style per-paragraph spacing: space* blocks between paragraphs.
+      const before = Number(node.attrs?.spaceBefore) || 0;
+      const after = Number(node.attrs?.spaceAfter) || 0;
+      const out: string[] = [];
+      if (before > 0) out.push(`\\vspace*{${before.toFixed(1)}pt}`, "");
+      out.push(body);
+      if (after > 0) out.push("", `\\vspace*{${after.toFixed(1)}pt}`);
+      return out.join("\n");
+    }
     case "heading": {
       const level = Number(node.attrs?.level ?? 1);
       const command = level <= 1 ? "section" : level === 2 ? "subsection" : "subsubsection";
@@ -1896,7 +1905,19 @@ export function latexToDocument(
   const blocks = splitLatexBlocks(expandPreambleMacros(source, macros));
   const content: DocumentNode[] = [];
 
+  let pendingParagraphSpaceBefore = 0;
   for (const block of blocks) {
+    const vspace = block.match(/^\\vspace\*?\{([\d.]+)pt\}$/);
+    if (vspace) {
+      const points = Number(vspace[1]);
+      const previous = content[content.length - 1];
+      if (previous && previous.type === "paragraph") {
+        previous.attrs = { ...(previous.attrs ?? {}), spaceAfter: points };
+      } else {
+        pendingParagraphSpaceBefore = points;
+      }
+      continue;
+    }
     const aligned = block.match(
       /^\\begin\{(center|flushleft|flushright)\}\s*([\s\S]*?)\s*\\end\{\1\}$/,
     );
@@ -2127,6 +2148,11 @@ export function latexToDocument(
     type: "doc",
     content,
   });
+  // A leading \vspace* (before the first paragraph) has no previous block to
+  // attach to, so it becomes that paragraph's Space before.
+  if (pendingParagraphSpaceBefore > 0 && content[0]?.type === "paragraph") {
+    content[0].attrs = { ...(content[0].attrs ?? {}), spaceBefore: pendingParagraphSpaceBefore };
+  }
   return { document: { type: "doc", content }, settings };
 }
 

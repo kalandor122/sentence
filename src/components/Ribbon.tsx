@@ -49,6 +49,7 @@ import {
 import IconButton from "./IconButton";
 import ImageToolbar from "./ImageToolbar";
 import TableToolbar from "./TableToolbar";
+import ParagraphSpacingControl from "./ParagraphSpacingControl";
 import { changeIndent } from "../editor/indent";
 import { isListActive, toggleList } from "../editor/listToggle";
 import type {
@@ -536,7 +537,8 @@ export default function Ribbon({
               <IconButton label="Block quote" active={editor?.isActive("blockquote")} disabled={disabled} onClick={() => editor?.chain().focus().toggleBlockquote().run()}>
                 <Quote size={18} />
               </IconButton>
-            </RibbonGroup>
+                      <ParagraphSpacingControl editor={editor} editorVersion={editorVersion} />
+        </RibbonGroup>
             <RibbonGroup label="Links">
               <button type="button" className="ribbon-command wide" disabled={disabled} onClick={onInsertLink}>
                 <Link2 size={17} />
