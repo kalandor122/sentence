@@ -2567,10 +2567,11 @@
       ],
       "hint": "Repro: 1. Type 'Keep this comment text'. 2. Select 'comment' and add the comment 'Comment on removed word'. 3. With tracking off, press Backspace to delete the selected word. 4. Open the Review sidebar and click the remaining comment thread.\nActual: The thread 'Comment on removed word' remains in the Review panel and still counts in the unresolved badge (1), but the editor contains zero comment highlights. Clicking the thread marks it active in the sidebar only; no text is highlighted and no indicator says the anchor is gone.",
       "source": "explore:review:deleting the text a comment is attached to leaves the thread listed with no highlight and no way to locate it",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T00:25:41Z",
-      "lastAttemptAt": "2026-11-25T00:25:41Z"
+      "lastAttemptAt": "2026-11-25T00:25:41Z",
+      "doneAt": "2026-11-25T00:28:08Z"
     },
     {
       "id": "qa-162",
@@ -2810,6 +2811,44 @@
       ],
       "hint": "Repro: Open the editor and inspect the .sentence-editor element after tabbing into it.\nActual: The element has role=\"textbox\" and aria-label \"Document editor\" but aria-multiline is null, so the main writing surface is exposed as a single-line textbox to assistive technology.",
       "source": "explore:keyboard:document editor is exposed as role=textbox without aria-multiline",
+      "status": "open"
+    },
+    {
+      "id": "qa-178",
+      "title": "Every inserted image exports at 80% of the line width regardless of its natural size, so the PDF does not match the page",
+      "why": "Exploratory pass on insert-media (content): expected The exported image keeps the size the user sees on the page (natural size, or a size capped to the text block and page height), and an inline image is not 80% of the line width.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the demo document and press Ctrl+End. Click Insert > Image and supply a 40x80 px portrait PNG (the browser build feeds the hidden file input; cancelling the picker is clean). The figure renders 42x82 px on the page. Click View > LaTeX: the source contains \\includegraphics[width=0.8\\linewidth]{assets/images/<name>.png}. For the inline case, type 'SPLITLEFT SPLITRIGHT', place the caret after 'SPLITLEFT' and insert the same PNG: the image renders 12x22 px inside the sentence, yet the source again uses width=0.8\\linewidth. An image inserted into a table cell (cell 303 px wide) is exported with the same width=0.8\\linewidth inside the tabular.\nActual: The generated LaTeX always requests width=0.8\\linewidth (src/lib/latex.ts imageWidthArgument falls back to 0.8 when attrs.width is 0) and the editor exposes no width control. A 40x80 image shown at 42x82 px is exported ~361 pt wide and ~722 pt tall; compiling that exported source with the bundled Tectonic prints 'LaTeX Warning: Float too large for page by 24.69325pt', pushes the figure to its own page, and the image fills the whole text block and reaches into the footer. The mid-sentence image (12x22 px, max-height 1.5em in the editor) becomes the same 0.8\\linewidth graphic and the compiled document reports 'Overfull \\hbox (56.59232pt too wide)' on that line. Probe: qa/probes/insert-media.mjs scenarios 'image', 'image-inline-and-heading', 'table-cell'.",
+      "source": "explore:insert-media:every inserted image exports at 80% of the line width regardless of its natural size, so the pdf does not match the page",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T00:52:24Z"
+    },
+    {
+      "id": "qa-179",
+      "title": "Two different images with the same file name share one asset path and become the same picture after Apply source",
+      "why": "Exploratory pass on insert-media (functional): expected The two figures keep their own pictures (distinct asset paths or per-node image sources).",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the demo document press Ctrl+End, click Insert > Image and supply a red 120x60 PNG named 'qa image #1.png'. Press Ctrl+End again and use Insert > Image with a blue 40x80 PNG that has the same file name. Click View > LaTeX: both \\includegraphics entries read assets/images/qa-image--1.png. Press Ctrl+End in the source textarea, type a space and Backspace so Apply source becomes enabled, click Apply source, then View > Visual.\nActual: Both image nodes carry data-path='assets/images/qa-image--1.png' and the LaTeX references that one path twice. After Apply source both figures show the second (blue 40x80) image (both imgs report natural 40x80); the first image is silently replaced, with the toast 'Visual document synchronized from LaTeX.' Probe: qa/probes/insert-media.mjs scenario 'image' (latexTwice, apply.info). Observed in the browser build, whose asset path comes from imageAssetPath(file.name) with no uniquifier.",
+      "source": "explore:insert-media:two different images with the same file name share one asset path and become the same picture after apply source",
+      "status": "open"
+    },
+    {
+      "id": "qa-180",
+      "title": "Block images lose their alt text when the document is synchronized from LaTeX",
+      "why": "Exploratory pass on insert-media (content): expected The image keeps the alt text it had before the source synchronization (the file name).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert an image named 'qa image #1.png' at the end of the document. Click View > LaTeX, press Ctrl+End, type a space and Backspace so Apply source becomes enabled, click Apply source, then View > Visual and read the img alt attribute.\nActual: Before Apply the img has alt='qa image #1.png'; after Apply it has alt=''. Block images emit no '% Sentence alt' comment in the generated LaTeX (only inline images do) and the parser fills alt from the empty figure caption, so the alt text disappears from the document and from the HTML/Markdown exports. Probe: qa/probes/insert-media.mjs scenario 'image' (once.info vs apply.info).",
+      "source": "explore:insert-media:block images lose their alt text when the document is synchronized from latex",
       "status": "open"
     }
   ]

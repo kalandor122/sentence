@@ -501,3 +501,6 @@ Aborting
 2026-11-25T00:25:06Z PUSHED main
 2026-11-25T00:25:06Z DONE qa-155 (tsc -b, npm test, smoke all green)
 2026-11-25T00:25:41Z START qa-161 on qa/qa-161-deleting-the-text-a-comment-is-attached: Deleting the text a comment is attached to leaves the thread listed with no highlight and no way to locate it
+2026-11-25T00:28:10Z PUSHED main
+2026-11-25T00:28:10Z DONE qa-161 (tsc -b, npm test, smoke all green)
+2026-11-25T00:52:10Z EXPLORE insert-media: 3 new items, agent exit 0
