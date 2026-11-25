@@ -3143,10 +3143,11 @@
       ],
       "hint": "Repro: 1. Type 'Only paragraph'. 2. Review tab > Track changes. 3. Put the caret at the end of the paragraph and press Enter. 4. Wait 2.5 s and open the History sidebar.\nActual: The card shows before 'Only paragraph' and after 'Only paragraph' \u2014 identical \u2014 and the document gets no insertion decoration for the new empty paragraph. Accepting leaves the empty paragraph behind. Probe: revision {before:'Only paragraph', after:'Only paragraph'}, insertions [], deletions [], paragraphs ['Only paragraph', ''].",
       "source": "explore:review:a paragraph-break-only tracked change produces a history card with identical before/after text and no inline decoration",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T04:29:45Z",
-      "lastAttemptAt": "2026-11-25T04:29:45Z"
+      "lastAttemptAt": "2026-11-25T04:29:45Z",
+      "doneAt": "2026-11-25T04:35:36Z"
     },
     {
       "id": "qa-198",
@@ -3158,6 +3159,116 @@
       ],
       "hint": "Repro: 1. Type a long paragraph of about 400 characters, for example 'start ' followed by 42 filler words and ' end'. 2. Review tab > Track changes. 3. Put the caret at the very start of the paragraph and type 'Z'. 4. Wait 2.5 s and open the History sidebar.\nActual: Both previews are the last 180 characters of the paragraph and are byte-identical, so the card shows no difference even though the document now starts with 'Zstart ...'. Probe: beforeLength 180, afterLength 180, identical=true, editorStart 'Zstart filler0 filler1 filler2'.",
       "source": "explore:review:history card preview clips to the last 180 characters, so edits near the start of a long document show identical before/",
+      "status": "open"
+    },
+    {
+      "id": "qa-199",
+      "title": "A commented-out \\end{document} silently truncates the rest of the document",
+      "why": "Exploratory pass on source-editor (functional): expected The comment is ignored (as LaTeX does), the paragraph after it is imported into the visual document, and the regenerated LaTeX contains it before the real \\end{document}.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and open the editor. 2. View > LaTeX. 3. Before the real \\end{document}, add the comment line `% ZXCOMMENTED \\end{document} marker`, a blank line, the paragraph `ZXAFTERCOMMENT paragraph`, a blank line, and keep the real \\end{document}. 4. Click Apply source. 5. View > Visual, then View > LaTeX and click Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` but the visual document does not contain ZXAFTERCOMMENT, and Refresh from visual drops the paragraph from the source. The draft still contains the paragraph immediately after Apply and Apply is disabled, so the pane looks synchronized while the document has silently lost the text. Probe: visualHasAfterComment=false, draftKeptAfterApply=true, regeneratedHasAfterComment=false, applyEnabledAfter=false.",
+      "source": "explore:source-editor:a commented-out \\end{document} silently truncates the rest of the document",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T05:04:15Z"
+    },
+    {
+      "id": "qa-200",
+      "title": "Undo after Apply also removes the text that was just applied, and re-applying deletes it from the page",
+      "why": "Exploratory pass on source-editor (functional): expected One Ctrl+Z removes only `ZXNEW`; the applied `ZXAPPLIED` stays in the source, Apply stays disabled because the draft still equals the applied LaTeX.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View > LaTeX. 2. Put the caret before \\end{document} and type `ZXAPPLIED`. 3. Click Apply source and wait for the success toast. 4. Without moving the caret, type `ZXNEW`. 5. Press Ctrl+Z once. 6. Click Apply source if it is enabled. 7. Variant from a clean applied document: type `ZXFAIL`, Enter, `\\begin{itemize}`, Enter, `NOEND`; click Apply source (it fails); type `ZXTYPEDAFTERFAIL`; press Ctrl+Z once.\nActual: One Ctrl+Z removes both `ZXNEW` and the applied `ZXAPPLIED` from the textarea. Apply becomes enabled, and clicking it synchronizes the document without ZXAPPLIED, so the paragraph disappears from the visual page. Probe: undoKeptAppliedText=false, undoRemovedNewText=true, applyEnabledAfterUndo=true, visualHasAppliedTextAfterReapply=false. The same coalescing occurs when the edit was applied by switching to Visual and when Apply failed: after typing `ZXTYPEDAFTERFAIL` and pressing Ctrl+Z once, the `NOEND` line of the broken draft also disappeared (undoKeptEnvironmentText=false).",
+      "source": "explore:source-editor:undo after apply also removes the text that was just applied, and re-applying deletes it from the page",
+      "status": "open"
+    },
+    {
+      "id": "qa-201",
+      "title": "A section with an optional short title is imported as literal text and escaped",
+      "why": "Exploratory pass on source-editor (content): expected A level-1 heading `ZXOPT FULL TITLE` appears (the optional argument is the short title used in the table of contents), and the re-exported LaTeX keeps `\\section[ZXSHORT]{ZXOPT FULL TITLE}` or at least `\\section{ZXOPT FULL TITLE}`.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add `\\section[ZXSHORT]{ZXOPT FULL TITLE}`, a blank line, and `ZXOPT BODY`. 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: Apply reports success but no heading is created: the visual page shows the raw line `\\section[ZXSHORT]{ZXOPT FULL TITLE}` as a paragraph (headings remain only Introduction and Drafting with constraints). Refresh from visual writes `\\textbackslash{}section[ZXSHORT]\\{ZXOPT FULL TITLE\\}`, corrupting valid LaTeX. Probe: headingKept=false, escapedCommand=true.",
+      "source": "explore:source-editor:a section with an optional short title is imported as literal text and escaped",
+      "status": "open"
+    },
+    {
+      "id": "qa-202",
+      "title": "A section \\label on the line after the heading becomes literal text and is lost",
+      "why": "Exploratory pass on source-editor (content): expected The heading is `ZXSEPLABEL`, the label is attached to it, and the re-exported LaTeX contains `\\section{ZXSEPLABEL}\\label{sec:seplabel}` or an equivalent attached label so `\\ref{sec:seplabel}` resolves.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add `\\section{ZXSEPLABEL}` on one line, `\\label{sec:seplabel}` on the next line, a blank line, `ZXSEP BODY`, a blank line, and `See \\ref{sec:seplabel}.` 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: The heading is created, but the label becomes its own paragraph showing the raw command `\\label{sec:seplabel}` in the visual document (leakedCommands=true). Refresh from visual writes `\\textbackslash{}label\\{sec:seplabel\\}`, so the label is gone while `\\ref{sec:seplabel}` remains. Probe: labelKept=false, labelEscaped=true, refKept=true.",
+      "source": "explore:source-editor:a section \\label on the line after the heading becomes literal text and is lost",
+      "status": "open"
+    },
+    {
+      "id": "qa-203",
+      "title": "Preamble packages and macros are reported synchronized but silently dropped, and their calls are escaped",
+      "why": "Exploratory pass on source-editor (functional): expected The package and macro definition survive in the LaTeX (or Apply reports that preamble edits are unsupported), and the macro call is either expanded or preserved.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View > LaTeX. 2. Before `\\begin{document}`, add `\\usepackage{amsthm}` and `\\newcommand{\\ZXMACRO}{ZXMACRO EXPANDS}`. 3. Before `\\end{document}`, add `ZXPREAMBLE use \\ZXMACRO{} here.` 4. Click Apply source. 5. View > Visual. 6. View > LaTeX and click Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` The draft still contains the package and definition immediately after Apply, but the visual page shows the literal `\\ZXMACRO` call. After Refresh from visual the preamble no longer contains amsthm or \\newcommand, and the body contains `\\textbackslash{}ZXMACRO\\{\\}`. Probe: regeneratedPreambleHasPackage=false, regeneratedHasMacro=false, escapedMacroCall=true. The source only reveals the loss after a refresh, so the success toast is the only feedback at Apply time.",
+      "source": "explore:source-editor:preamble packages and macros are reported synchronized but silently dropped, and their calls are escaped",
+      "status": "open"
+    },
+    {
+      "id": "qa-204",
+      "title": "Hand-written align environments are imported as literal text and escaped",
+      "why": "Exploratory pass on source-editor (content): expected The align environment becomes display math (editable, like the supported equation environment), or Apply reports it as unsupported rather than rewriting it.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add a display block containing `\\begin{align}`, `ZXALIGN a &= b + c \\\\`, `d &= e`, and `\\end{align}`. 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: Apply reports success, but zero math blocks are created and the visual page shows the raw `\\begin{align}...\\end{align}` lines as paragraph text (leakedCommands=true). Refresh from visual escapes every command: `\\textbackslash{}begin\\{align\\}`, `\\&`, `\\textbackslash{}end\\{align\\}`. Probe mathBlocks=[], escaped commands present.",
+      "source": "explore:source-editor:hand-written align environments are imported as literal text and escaped",
+      "status": "open"
+    },
+    {
+      "id": "qa-205",
+      "title": "A hand-written table \\label is silently dropped, leaving a dangling \\ref",
+      "why": "Exploratory pass on source-editor (content): expected The table is imported with its caption and `\\label{tab:zxtable}` intact in the regenerated LaTeX, so the following \\ref refers to the table.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add a table with `\\caption{ZXCAPTION}` and `\\label{tab:zxtable}`, rows `Name & Value \\\\` and `ZXTABLELABEL & 7 \\\\`, then a blank line and `See Table~\\ref{tab:zxtable}.` 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: The table and caption import correctly, but the regenerated table contains no `\\label{tab:zxtable}`; only `See Table\\textasciitilde{}\\ref{tab:zxtable}` remains. The label was silently dropped, so the reference has no target. Probe: labelKept=false, refKept=true.",
+      "source": "explore:source-editor:a hand-written table \\label is silently dropped, leaving a dangling \\ref",
+      "status": "open"
+    },
+    {
+      "id": "qa-206",
+      "title": "\\multicolumn in a hand-written table is turned into a cell's literal text",
+      "why": "Exploratory pass on source-editor (content): expected The first row is a two-column spanning header (or Apply rejects the unsupported construct); the row should not contain the raw \\multicolumn command.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add a tabular with `\\hline`, `\\multicolumn{2}{c}{ZXMULTI HEADER} \\\\`, `ZXMULTI A & B \\\\`, `\\hline`, `\\end{tabular}` wrapped in a table environment. 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: The visual table has two rows, with the first row as an empty first cell and the second cell containing the literal string `\\multicolumn{2}{c}{ZXMULTI HEADER}`. Refresh from visual writes `\\textbackslash{}multicolumn\\{2\\}\\{c\\}\\{ZXMULTI HEADER\\}`, so the valid spanning header is destroyed. Probe cells: `[\"\", \"\\multicolumn{2}{c}{ZXMULTI HEADER}\"]`.",
+      "source": "explore:source-editor:\\multicolumn in a hand-written table is turned into a cell's literal text",
+      "status": "open"
+    },
+    {
+      "id": "qa-207",
+      "title": "A non-breaking space written as ~ is re-exported as a literal tilde",
+      "why": "Exploratory pass on source-editor (content): expected The `~` remains LaTeX's non-breaking space in the regenerated source (`Eq.~1`), with the same typography in the visual page.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add `ZXTILDE see Eq.~1 and Fig.~2.` 3. Click Apply source. 4. View > LaTeX and click Refresh from visual.\nActual: Refresh from visual writes `Eq.\\textasciitilde{}1 and Fig.\\textasciitilde{}2`, which renders a literal tilde instead of a non-breaking space. The visual page also shows a visible tilde. Probe: literalTildeEscape=true, nonBreakingTildeKept=false.",
+      "source": "explore:source-editor:a non-breaking space written as ~ is re-exported as a literal tilde",
       "status": "open"
     }
   ]
