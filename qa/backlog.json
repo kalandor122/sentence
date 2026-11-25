@@ -3944,10 +3944,11 @@
       ],
       "hint": "Repro: 1. Click View, then LaTeX. 2. Before the real \\end{document}, insert `\\begin{verbatim}`, `ZXCODE \\end{document}`, `ZXCODE still code`, and `\\end{verbatim}`. 3. Click Apply source.\nActual: Apply reports `Invalid LaTeX: text after \\end{document} is not part of the document (\"ZXCODE still code\"). Move it before \\end{document}.` Valid LaTeX is rejected; the draft is preserved and Apply stays enabled. Probe: verbatimEndDocument.rejected=true, draftKept=true.",
       "source": "explore:source-editor:a verbatim block containing \\end{document} is rejected as trailing text",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T17:11:34Z",
-      "lastAttemptAt": "2026-11-25T17:11:34Z"
+      "lastAttemptAt": "2026-11-25T17:11:34Z",
+      "doneAt": "2026-11-25T17:14:22Z"
     },
     {
       "id": "qa-248",
@@ -4007,7 +4008,9 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.longHeadingOutline`, or reproduce by hand: open http://localhost:1420, click 'New document', Ctrl+A then Backspace, and paste 10 headings where the first is `Long heading ` + 40 copies of `word ` + `LONGEND` (220 characters) and the other nine are `Heading N LHN`, each followed by a body paragraph. In the Outline panel the first entry is a single 12px-tall line that is 1,238px wide inside a 246px-wide panel: `.sidebar-panel` reports scrollWidth 1,245 against clientWidth 246, the entry's right edge is at x=1,313 while the 314px-wide sidebar ends at x=314, and the `H1` level badge is off-screen. The heading itself wraps normally inside the 794px sheet, with no horizontal overflow of the page. Screenshot: qa/shots/probe-long-document-outline-heading.png.\nActual: The heading text is rendered on one unbroken line, extends past the sidebar's right edge and is clipped there; the panel gains a ~999px horizontal scroll range and the `H1` badge is pushed off-screen, so the outline cannot be read at a glance and the panel scrolls sideways.",
       "source": "explore:long-document:a long heading in the outline does not wrap; it is clipped and forces a 1,000px horizontal scroll inside the sidebar",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T17:15:02Z"
     },
     {
       "id": "qa-252",
