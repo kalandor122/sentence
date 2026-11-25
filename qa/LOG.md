@@ -497,3 +497,4 @@ Aborting
 2026-11-25T00:17:10Z START qa-175 on qa/qa-175-tab-never-leaves-a-table-and-appends-a-r: Tab never leaves a table and appends a row at the end
 2026-11-25T00:21:05Z PUSHED main
 2026-11-25T00:21:05Z DONE qa-175 (tsc -b, npm test, smoke all green)
+2026-11-25T00:21:40Z START qa-155 on qa/qa-155-a-citation-key-missing-from-the-bibliogr: A citation key missing from the bibliography is inserted with no warning

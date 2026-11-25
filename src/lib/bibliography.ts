@@ -1,3 +1,5 @@
+import type { DocumentNode, SentenceDocument } from "./types";
+
 export interface BibliographyField {
   name: string;
   value: string;
@@ -205,6 +207,25 @@ export function parseBibliography(text: string): BibliographyEntry[] {
     index = parsed.end > index ? parsed.end : index + 1;
   }
   return entries;
+}
+
+function collectCitationKeys(nodes: DocumentNode[] | undefined, keys: Set<string>): void {
+  for (const node of nodes ?? []) {
+    if (node.type === "citation") {
+      const key = node.attrs?.key;
+      if (typeof key === "string" && key.trim()) keys.add(key.trim());
+    }
+    collectCitationKeys(node.content, keys);
+  }
+}
+
+// Citation keys the document uses that no bibliography entry defines, in
+// document order. LaTeX renders them as [?], so the editor has to flag them.
+export function missingCitationKeys(document: SentenceDocument, bibliography: string): string[] {
+  const keys = new Set<string>();
+  collectCitationKeys(document.content, keys);
+  const known = new Set(parseBibliography(bibliography).map((entry) => entry.key));
+  return [...keys].filter((key) => !known.has(key));
 }
 
 export function formatBibliographyEntry(

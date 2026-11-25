@@ -1200,7 +1200,12 @@ export default function App() {
   };
 
   const insertCitation = (key: string) => {
-    editor?.chain().focus().insertContent({ type: "citation", attrs: { key } }).run();
+    if (!editor) return;
+    editor.chain().focus().insertContent({ type: "citation", attrs: { key } }).run();
+    const current = workspaceRef.current;
+    if (current && parseBibliography(current.bibliography).every((entry) => entry.key !== key)) {
+      setToast(`Citation “${key}” is not in the bibliography. Add an entry for it to resolve the reference.`);
+    }
   };
 
   const saveBibliographyEntry = (draft: BibliographyDraft) => {

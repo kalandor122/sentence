@@ -2,12 +2,14 @@ import { describe, expect, it } from "vitest";
 import {
   addBibliographyEntry,
   formatBibliographyEntry,
+  missingCitationKeys,
   parseBibliography,
   removeBibliographyEntry,
   stringifyBibliography,
   updateBibliographyEntry,
   type BibliographyEntry,
 } from "./bibliography";
+import type { SentenceDocument } from "./types";
 
 const sample = `% A hand-edited bibliography
 @comment{ignored by the manager}
@@ -87,6 +89,25 @@ describe("bibliography", () => {
     const removed = removeBibliographyEntry(edited, "knuth1984");
     expect(parseBibliography(removed).map((entry) => entry.key)).toEqual(["lovelace1843", "hopper2026"]);
     expect(removed).toContain("% A hand-edited bibliography");
+  });
+
+  it("reports citation keys the bibliography does not define", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "citation", attrs: { key: "knuth1984" } },
+            { type: "citation", attrs: { key: "ghost2026" } },
+            { type: "citation", attrs: { key: "ghost2026" } },
+          ],
+        },
+      ],
+    };
+    expect(missingCitationKeys(document, sample)).toEqual(["ghost2026"]);
+    expect(missingCitationKeys(document, "")).toEqual(["knuth1984", "ghost2026"]);
+    expect(missingCitationKeys({ type: "doc", content: [] }, sample)).toEqual([]);
   });
 
   it("rejects duplicate keys and formats a draft entry", () => {
