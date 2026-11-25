@@ -51,6 +51,24 @@ export const HeadingLabel = Extension.create({
   },
 });
 
+// Ctrl+Alt+1/2/3 switch the view (Visual, LaTeX, Split) and the ribbon and
+// status bar advertise them. StarterKit's heading extension binds the same
+// keys to setHeading, so pressing one both switched the view and turned the
+// block under the caret into a section. Claim them ahead of that keymap; the
+// heading level is still available from the style menu.
+export const ViewModeShortcuts = Extension.create({
+  name: "viewModeShortcuts",
+  priority: 200,
+
+  addKeyboardShortcuts() {
+    return {
+      "Mod-Alt-1": () => true,
+      "Mod-Alt-2": () => true,
+      "Mod-Alt-3": () => true,
+    };
+  },
+});
+
 export const ProjectImage = Image.extend({
   addAttributes() {
     return {

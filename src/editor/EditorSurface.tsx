@@ -19,6 +19,7 @@ import {
   PageBreak,
   ProjectImage,
   TableOfContents,
+  ViewModeShortcuts,
 } from "./extensions";
 import { FindHighlight } from "./find";
 import { focusAfterEditor } from "./focus";
@@ -304,6 +305,7 @@ export default function EditorSurface({
       TabIndent,
       ListShortcuts,
       ListEnter,
+      ViewModeShortcuts,
     ],
     content: document,
     editable,
