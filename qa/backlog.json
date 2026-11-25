@@ -3304,8 +3304,9 @@
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add `ZXTILDE see Eq.~1 and Fig.~2.` 3. Click Apply source. 4. View > LaTeX and click Refresh from visual.\nActual: Refresh from visual writes `Eq.\\textasciitilde{}1 and Fig.\\textasciitilde{}2`, which renders a literal tilde instead of a non-breaking space. The visual page also shows a visible tilde. Probe: literalTildeEscape=true, nonBreakingTildeKept=false.",
       "source": "explore:source-editor:a non-breaking space written as ~ is re-exported as a literal tilde",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T12:52:19Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T12:52:19Z",
+      "lastAttemptAt": "2026-11-25T12:52:19Z"
     },
     {
       "id": "qa-208",

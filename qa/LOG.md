@@ -695,3 +695,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T12:39:26Z START qa-237 on qa/qa-237-undo-after-adding-a-hyperlink-leaves-a-p: Undo after adding a hyperlink leaves a placeholder https:// link
 2026-11-25T12:51:41Z PUSHED main
 2026-11-25T12:51:41Z DONE qa-237 (tsc -b, npm test, smoke all green)
+2026-11-25T12:52:19Z START qa-207 on qa/qa-207-a-non-breaking-space-written-as-is-re-ex: A non-breaking space written as ~ is re-exported as a literal tilde
