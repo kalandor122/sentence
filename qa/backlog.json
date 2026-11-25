@@ -3187,10 +3187,11 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Put the caret before \\end{document} and type `ZXAPPLIED`. 3. Click Apply source and wait for the success toast. 4. Without moving the caret, type `ZXNEW`. 5. Press Ctrl+Z once. 6. Click Apply source if it is enabled. 7. Variant from a clean applied document: type `ZXFAIL`, Enter, `\\begin{itemize}`, Enter, `NOEND`; click Apply source (it fails); type `ZXTYPEDAFTERFAIL`; press Ctrl+Z once.\nActual: One Ctrl+Z removes both `ZXNEW` and the applied `ZXAPPLIED` from the textarea. Apply becomes enabled, and clicking it synchronizes the document without ZXAPPLIED, so the paragraph disappears from the visual page. Probe: undoKeptAppliedText=false, undoRemovedNewText=true, applyEnabledAfterUndo=true, visualHasAppliedTextAfterReapply=false. The same coalescing occurs when the edit was applied by switching to Visual and when Apply failed: after typing `ZXTYPEDAFTERFAIL` and pressing Ctrl+Z once, the `NOEND` line of the broken draft also disappeared (undoKeptEnvironmentText=false).",
       "source": "explore:source-editor:undo after apply also removes the text that was just applied, and re-applying deletes it from the page",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T05:06:50Z",
-      "lastAttemptAt": "2026-11-25T05:06:50Z"
+      "lastAttemptAt": "2026-11-25T05:06:50Z",
+      "doneAt": "2026-11-25T05:16:38Z"
     },
     {
       "id": "qa-201",
@@ -3202,7 +3203,9 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add `\\section[ZXSHORT]{ZXOPT FULL TITLE}`, a blank line, and `ZXOPT BODY`. 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: Apply reports success but no heading is created: the visual page shows the raw line `\\section[ZXSHORT]{ZXOPT FULL TITLE}` as a paragraph (headings remain only Introduction and Drafting with constraints). Refresh from visual writes `\\textbackslash{}section[ZXSHORT]\\{ZXOPT FULL TITLE\\}`, corrupting valid LaTeX. Probe: headingKept=false, escapedCommand=true.",
       "source": "explore:source-editor:a section with an optional short title is imported as literal text and escaped",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T05:17:18Z"
     },
     {
       "id": "qa-202",
