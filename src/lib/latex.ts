@@ -55,6 +55,20 @@ export function imageAssetPath(fileName: string): string {
   return `assets/images/${safeName || "image.png"}`;
 }
 
+// LaTeX addresses a graphic by its path alone, so two files that happen to
+// share a name must not share a path: after a source round trip both figures
+// would resolve to whichever picture was written last.
+export function uniqueImageAssetPath(fileName: string, used: Iterable<string>): string {
+  const taken = new Set(used);
+  const candidate = imageAssetPath(fileName);
+  if (!taken.has(candidate)) return candidate;
+  const extension = /\.[a-z0-9]+$/i.exec(candidate)?.[0] ?? "";
+  const stem = extension ? candidate.slice(0, -extension.length) : candidate;
+  let suffix = 2;
+  while (taken.has(`${stem}-${suffix}${extension}`)) suffix += 1;
+  return `${stem}-${suffix}${extension}`;
+}
+
 function imageSourcePath(src: string, alt: string): string {
   if (!/^data:/i.test(src)) return src;
   const mime = /^data:image\/(png|jpe?g);/i.exec(src)?.[1]?.toLowerCase() ?? "png";

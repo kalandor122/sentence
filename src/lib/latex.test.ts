@@ -8,6 +8,7 @@ import {
   isLatexReferenceTarget,
   latexToDocument,
   restoreImageSources,
+  uniqueImageAssetPath,
 } from "./latex";
 import type { DocumentNode, ProjectSettings, SentenceDocument } from "./types";
 
@@ -1524,6 +1525,46 @@ describe("LaTeX generation", () => {
     expect(latex).toContain("{assets/images/imported-qa-test.png}");
     expect(latex).toContain("{assets/images/image.png}");
     expect(latex).not.toContain("data:");
+  });
+
+  it("gives an image a free asset path when its file name is already used", () => {
+    expect(uniqueImageAssetPath("qa image #1.png", [])).toBe("assets/images/qa-image--1.png");
+    expect(
+      uniqueImageAssetPath("qa image #1.png", ["assets/images/qa-image--1.png"]),
+    ).toBe("assets/images/qa-image--1-2.png");
+    expect(
+      uniqueImageAssetPath("qa image #1.png", [
+        "assets/images/qa-image--1.png",
+        "assets/images/qa-image--1-2.png",
+      ]),
+    ).toBe("assets/images/qa-image--1-3.png");
+    expect(uniqueImageAssetPath("photo.jpeg", ["assets/images/photo.png"])).toBe(
+      "assets/images/photo.jpeg",
+    );
+  });
+
+  it("keeps two images with the same file name apart across a source round trip", () => {
+    const red = "data:image/png;base64,red";
+    const blue = "data:image/png;base64,blue";
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "image", attrs: { src: red, alt: "qa image #1.png", path: "assets/images/qa-image--1.png" } },
+        {
+          type: "image",
+          attrs: { src: blue, alt: "qa image #1.png", path: "assets/images/qa-image--1-2.png" },
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain("{assets/images/qa-image--1.png}");
+    expect(latex).toContain("{assets/images/qa-image--1-2.png}");
+    const restored = restoreImageSources(
+      latexToDocument(latex, DEFAULT_SETTINGS).document,
+      document,
+    );
+    expect(restored.content[0].attrs?.src).toBe(red);
+    expect(restored.content[1].attrs?.src).toBe(blue);
   });
 
   it("writes only a caption the user wrote, never the image file name", () => {

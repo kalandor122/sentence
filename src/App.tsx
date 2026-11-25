@@ -60,10 +60,10 @@ import {
   documentPlainText,
   documentToLatex,
   hasCitations,
-  imageAssetPath,
   isLatexReferenceTarget,
   latexToDocument,
   restoreImageSources,
+  uniqueImageAssetPath,
 } from "./lib/latex";
 import {
   acceptRevisions,
@@ -422,6 +422,23 @@ function insertImage(editor: Editor | null, attrs: Record<string, string>) {
     return;
   }
   insertBlockContent(editor, { type: "image", attrs });
+}
+
+// Inserting two files that share a name must not reuse one asset path: LaTeX
+// refers to each figure by path, so the document's own images claim theirs.
+function documentImagePaths(document: SentenceDocument): string[] {
+  const paths: string[] = [];
+  const collect = (nodes: DocumentNode[] | undefined) => {
+    for (const node of nodes ?? []) {
+      if (node.type === "image" || node.type === "inlineImage") {
+        const path = node.attrs?.path;
+        if (typeof path === "string" && path) paths.push(path);
+      }
+      collect(node.content);
+    }
+  };
+  collect(document.content);
+  return paths;
 }
 
 // The image export writes a graphic at its own size, so the inserted node has
@@ -1647,7 +1664,7 @@ export default function App() {
     insertImage(editor, {
       src: dataUrl,
       alt: file.name,
-      path: imageAssetPath(file.name),
+      path: uniqueImageAssetPath(file.name, documentImagePaths(current.document)),
       ...dimensions,
     });
   };
