@@ -3424,8 +3424,9 @@
       "hint": "Repro: Insert ribbon tab, focus \"Inline equation\", press Enter, type x^2 and press Ctrl+Enter. Click into the document, press Ctrl+End and then ArrowLeft once: the equation is selected (selection constructor NodeSelection, node mathInline, class ProseMirror-selectednode). Press Enter: no dialog opens and the document is unchanged. A single mouse click on the equation opens the \"Edit inline equation\" dialog. The footnote control behaves as intended: arrow-select its marker and Enter opens \"Edit footnote\".\nActual: The editor's handleKeyDown only handles a NodeSelection whose node type is \"footnote\"; math nodes are edited solely through handleClick. Probe evidence: selection {type NodeSelection, node mathInline}, Enter -> modal 0; click -> modal 1, title \"Edit inline equation\".",
       "source": "explore:keyboard:existing equations cannot be opened from the keyboard; enter on the selected math node does nothing",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T08:14:14Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T08:14:14Z",
+      "lastAttemptAt": "2026-11-25T08:14:14Z"
     },
     {
       "id": "qa-216",
