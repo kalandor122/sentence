@@ -2744,8 +2744,9 @@
       "hint": "Repro: 1) Open http://localhost:1420, click 'New document', wait until the top bar reads 'Saved locally'. 2) Click 'Source' in the status bar. 3) In the LaTeX textarea replace the final \\end{document} line with 'Plan persist-nav-1' (the draft now has no \\end{document}). 4) Within 400 ms, before the 1100 ms autosave, navigate to about:blank and then back to http://localhost:1420. 5) Read the top bar, the editor, and localStorage['sentence.workspace']. Variant: instead wait 1.5 s (the top bar shows 'Editing' and 'Retry save: Invalid LaTeX: missing \\end{document}.'), then reload the page and open 'Source' to read the textarea.\nActual: No warning is shown (0 beforeunload dialogs in either variant), and the draft text is gone from the editor, the textarea and localStorage['sentence.workspace'] after returning; the top bar then reads 'Saved locally'. In the 400 ms variant no parse error was ever displayed before leaving (saveError null, toast null) because the debounce had not fired. In the awaited variant the draft is likewise absent after reload (draftMarkerInSource false, draftMarkerInStorage false, dialogsSeen 0). The pagehide flush in persist() re-parses the draft, catches the failure, and writes only the last good visual document, so the unapplied source text is lost silently. Probe evidence: qa/probes/persistence.mjs phases 'invalid-draft-navigation' and 'invalid-source-draft-after-reload'.",
       "source": "explore:persistence:an unapplied, unparsable latex draft is discarded on navigation away or reload with no warning",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-24T23:37:33Z"
+      "attempts": 1,
+      "startedAt": "2026-11-24T23:37:33Z",
+      "lastAttemptAt": "2026-11-24T23:37:33Z"
     }
   ]
 }

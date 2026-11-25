@@ -211,6 +211,41 @@ function saveBrowserWorkspace(project: Workspace): void {
   localStorage.setItem(BROWSER_WORKSPACE_KEY, JSON.stringify({ ...project, path: "" }));
 }
 
+// An unapplied LaTeX draft is not part of the workspace: the workspace always
+// holds the visual document, which is what an invalid draft cannot be applied
+// to. Keep the draft beside it so leaving the page (where the pagehide flush
+// can only save the visual document) does not silently drop the text.
+const BROWSER_DRAFT_KEY = "sentence.workspace.draft";
+
+interface BrowserDraft {
+  source: string;
+  document: string | null;
+}
+
+function loadBrowserDraft(): BrowserDraft | null {
+  if (isDesktop) return null;
+  try {
+    const raw = localStorage.getItem(BROWSER_DRAFT_KEY);
+    if (!raw) return null;
+    const saved = JSON.parse(raw) as Partial<BrowserDraft>;
+    if (typeof saved.source !== "string" || saved.source.length === 0) return null;
+    return { source: saved.source, document: typeof saved.document === "string" ? saved.document : null };
+  } catch {
+    return null;
+  }
+}
+
+function saveBrowserDraft(draft: BrowserDraft | null): void {
+  // Best effort: a draft that cannot be stored is still in the editor, and
+  // storage failures that matter are reported by the workspace autosave.
+  try {
+    if (draft) localStorage.setItem(BROWSER_DRAFT_KEY, JSON.stringify(draft));
+    else localStorage.removeItem(BROWSER_DRAFT_KEY);
+  } catch {
+    // Nothing to do here; the next workspace save reports a blocked storage.
+  }
+}
+
 function hydrate(snapshot: ProjectSnapshot): Workspace {
   return {
     path: snapshot.path,
@@ -391,16 +426,20 @@ function insertImage(editor: Editor | null, attrs: Record<string, string>) {
 
 export default function App() {
   const [workspace, setWorkspace] = useState<Workspace | null>(loadBrowserWorkspace);
+  // A draft left unapplied when the page went away is restored before the first
+  // render, so opening Source shows the user's text instead of regenerated
+  // LaTeX. Only restore it into a workspace that is actually on screen.
+  const [restoredDraft] = useState<BrowserDraft | null>(() => workspace ? loadBrowserDraft() : null);
   const workspaceRef = useRef<Workspace | null>(workspace);
   const [tabs, setTabsState] = useState<WorkspaceTab[]>([]);
   const tabsRef = useRef<WorkspaceTab[]>(tabs);
   const dirtyRef = useRef(false);
   const [source, setSource] = useState(() =>
-    workspace ? documentSource(workspace.document, workspace.settings) : "");
+    restoredDraft?.source ?? (workspace ? documentSource(workspace.document, workspace.settings) : ""));
   const sourceRef = useRef(source);
   const [sourceFile, setSourceFile] = useState<"document.tex" | "references.bib">("document.tex");
-  const [sourceDirty, setSourceDirty] = useState(false);
-  const sourceDirtyRef = useRef(false);
+  const [sourceDirty, setSourceDirty] = useState(restoredDraft !== null);
+  const sourceDirtyRef = useRef(sourceDirty);
   const [editor, setEditor] = useState<Editor | null>(null);
   const [editorVersion, setEditorVersion] = useState(0);
   const [mode, setMode] = useState<EditorMode>("visual");
@@ -468,7 +507,7 @@ export default function App() {
   // The visual document as it was when the current LaTeX draft started. If the
   // visual pane is edited before the draft is applied, the draft is older than
   // what the user sees and applying it would silently delete those edits.
-  const sourceDraftDocument = useRef<string | null>(null);
+  const sourceDraftDocument = useRef<string | null>(restoredDraft?.document ?? null);
   const sourceDraftWarning = useRef(false);
   // The visual editor unmounts in the LaTeX view. Keep the caret it had so a
   // citation or footnote inserted after coming back lands where the user was
@@ -734,6 +773,9 @@ export default function App() {
         sourceDirtyRef.current = false;
         sourceDraftDocument.current = null;
         sourceDraftWarning.current = false;
+        // The pagehide flush can run this far and then never render again, so
+        // drop the stored draft here rather than waiting for the effect.
+        if (!isDesktop) saveBrowserDraft(null);
         setSaveError(null);
       } catch (error) {
         // An unapplied draft can be hidden behind the visual editor. Letting
@@ -946,6 +988,14 @@ export default function App() {
   }, [dirty, workspace?.document, workspace?.settings, workspace?.comments, workspace?.revisions, workspace?.bibliography, source]);
 
   useEffect(() => {
+    // The browser workspace keeps only the visual document. Mirror an unapplied
+    // draft into its own key, on every keystroke rather than on the autosave
+    // debounce, so a navigation away mid-word still has it after coming back.
+    if (isDesktop) return;
+    saveBrowserDraft(sourceDirty && source ? { source, document: sourceDraftDocument.current } : null);
+  }, [source, sourceDirty]);
+
+  useEffect(() => {
     // A page reload can happen before the autosave debounce fires. Flush the
     // latest workspace synchronously on the way out so pending edits survive.
     const flushPending = () => {
@@ -953,6 +1003,12 @@ export default function App() {
     };
     window.addEventListener("pagehide", flushPending);
     return () => window.removeEventListener("pagehide", flushPending);
+  }, []);
+
+  useEffect(() => {
+    // The draft was recovered from a previous page load; say where it is so a
+    // reload does not look like it silently dropped it.
+    if (restoredDraft) setToast("Restored your unapplied LaTeX draft in the source pane.");
   }, []);
 
   const handleCreate = async (name: string, parentPath: string) => {
