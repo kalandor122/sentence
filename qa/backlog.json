@@ -2680,8 +2680,9 @@
       "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add a tabular with header `Name & Value \\\\` and last row `ZXLASTROW & 99` with no trailing `\\\\`, followed by `\\hline` and `\\end{tabular}`. 3. Click Apply source, then View tab > Visual.\nActual: Apply reports success, but the last visual cell is `99 \\hline` (probe cells: `[\"ZXLASTROW\", \"99 \\\\hline\"]`). Refresh from visual writes `ZXLASTROW & 99\\n\\textbackslash{}hline \\\\`, adding a row whose second cell is the literal text `\\hline`; the rule becomes table content.",
       "source": "explore:source-editor:a table's last row without a trailing \\\\ swallows the following \\hline into a cell",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T01:05:00Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T01:05:00Z",
+      "lastAttemptAt": "2026-11-25T01:05:00Z"
     },
     {
       "id": "qa-169",

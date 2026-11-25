@@ -1538,12 +1538,13 @@ export function latexToDocument(
       // A row break may carry an optional vertical-space argument such as
       // \\[4pt]; it is row spacing, not cell text, so it ends the row too.
       const parts = tabularBody.split(/\\\\\s*(?:\[[^\]]*\])?\s*(?:\n|$)/);
-      const rows =
-        parts.length > 1
-          ? parts
-              .map((row) => row.replace(/^\s*\\hline\s*/, "").trim())
-              .filter(Boolean)
-          : [];
+      // LaTeX lets the last row end at \end{tabular} without a trailing row
+      // break, so a single-row tabular with no \\ at all is still one row.
+      const rows = tabular
+        ? parts
+            .map((row) => row.replace(/^\s*\\hline\s*/, "").trim())
+            .filter(Boolean)
+        : [];
       if (rows.length > 0) {
         content.push({
           type: "table",

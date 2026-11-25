@@ -800,6 +800,62 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("textbackslash");
   });
 
+  it("keeps the closing \\hline out of a last row with no row break", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\begin{tabular}{ll}",
+      "\\hline",
+      "Name & Value \\\\",
+      "ZXLASTROW & 99",
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(table?.content).toHaveLength(2);
+    expect(
+      table?.content?.map((row) =>
+        row.content?.map((cell) => cell.content?.[0]?.content?.[0]?.text),
+      ),
+    ).toEqual([
+      ["Name", "Value"],
+      ["ZXLASTROW", "99"],
+    ]);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("ZXLASTROW & 99 \\\\\n");
+    expect(exported).not.toContain("textbackslash");
+  });
+
+  it("imports a single-row tabular that has no row break at all", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\begin{tabular}{ll}",
+      "\\hline",
+      "Name & Value",
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(table?.content).toHaveLength(1);
+    expect(
+      table?.content?.[0]?.content?.map((cell) => cell.content?.[0]?.content?.[0]?.text),
+    ).toEqual(["Name", "Value"]);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("Name & Value \\\\\n");
+    expect(exported).not.toContain("textbackslash");
+  });
+
   it("keeps a table without a header row through a source round trip", () => {
     const document: SentenceDocument = {
       type: "doc",

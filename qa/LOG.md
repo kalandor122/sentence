@@ -513,3 +513,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T01:00:55Z START qa-179 on qa/qa-179-two-different-images-with-the-same-file: Two different images with the same file name share one asset path and become the same picture after Apply source
 2026-11-25T01:04:26Z PUSHED main
 2026-11-25T01:04:26Z DONE qa-179 (tsc -b, npm test, smoke all green)
+2026-11-25T01:05:00Z START qa-168 on qa/qa-168-a-table-s-last-row-without-a-trailing-sw: A table's last row without a trailing \\ swallows the following \hline into a cell
