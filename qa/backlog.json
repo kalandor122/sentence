@@ -3203,10 +3203,11 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add `\\section[ZXSHORT]{ZXOPT FULL TITLE}`, a blank line, and `ZXOPT BODY`. 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: Apply reports success but no heading is created: the visual page shows the raw line `\\section[ZXSHORT]{ZXOPT FULL TITLE}` as a paragraph (headings remain only Introduction and Drafting with constraints). Refresh from visual writes `\\textbackslash{}section[ZXSHORT]\\{ZXOPT FULL TITLE\\}`, corrupting valid LaTeX. Probe: headingKept=false, escapedCommand=true.",
       "source": "explore:source-editor:a section with an optional short title is imported as literal text and escaped",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 2,
       "startedAt": "2026-11-25T05:17:18Z",
-      "lastAttemptAt": "2026-11-25T05:22:57Z"
+      "lastAttemptAt": "2026-11-25T05:22:57Z",
+      "doneAt": "2026-11-25T05:26:28Z"
     },
     {
       "id": "qa-202",
@@ -3218,7 +3219,9 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add `\\section{ZXSEPLABEL}` on one line, `\\label{sec:seplabel}` on the next line, a blank line, `ZXSEP BODY`, a blank line, and `See \\ref{sec:seplabel}.` 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: The heading is created, but the label becomes its own paragraph showing the raw command `\\label{sec:seplabel}` in the visual document (leakedCommands=true). Refresh from visual writes `\\textbackslash{}label\\{sec:seplabel\\}`, so the label is gone while `\\ref{sec:seplabel}` remains. Probe: labelKept=false, labelEscaped=true, refKept=true.",
       "source": "explore:source-editor:a section \\label on the line after the heading becomes literal text and is lost",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T05:27:08Z"
     },
     {
       "id": "qa-203",
