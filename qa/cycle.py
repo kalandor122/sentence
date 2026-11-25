@@ -259,6 +259,13 @@ def cycle(dry_run: bool = False) -> str:
             log(f"RECOVERED {i['id']} (in_progress for {int(age)} min)")
             save_backlog(data)
 
+    # Feature work orders used to starve: explore passes refill the defect queue
+    # faster than it drains, so the roadmap only advanced when it hit exactly zero.
+    # Keep a couple of defects in flight, but always make room for a feature.
+    if len([i for i in data["items"] if i["status"] == "open"]) <= 2:
+        if promote_from_roadmap(data):
+            data = load_backlog()
+
     item = pick(data)
     if not item:
         item = promote_from_roadmap(data)
