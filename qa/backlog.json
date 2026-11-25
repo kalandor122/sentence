@@ -3860,8 +3860,9 @@
       "hint": "Repro: 1. Start a project and open the editor. 2. Click View, then LaTeX. 3. Before \\end{document}, insert a table with \\begin{table}[htbp], \\centering, \\caption{ZXPCOLCAP}, \\begin{tabular}{p{4cm}l}, \\hline, the rows `ZXPCOLNAME & Value \\\\` and `ZXPCOLCELL & 9 \\\\`, \\hline, \\end{tabular}, \\end{table}. 4. Click Apply source. 5. Click View, then Visual. 6. Click View, then LaTeX, then Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` but the first cell becomes `l} ZXPCOLNAME`. After Refresh from visual the table is written with `\\begin{tabular}{cl}` and a first row `l\\}` followed by `ZXPCOLNAME`. With `\\begin{tabular}{@{}ll@{}}` the first cell becomes `ll@{}} ZXATSPEC` and the spec is rewritten as `{ll}`. Probe: pColumnSpec.visualTables=[[\"l} ZXPCOLNAME\",\"Value\"],[\"ZXPCOLCELL\",\"9\"]], pColumnSpec.spec=\"cl\", atColumnSpec.regeneratedRegion contains `ll@\\{\\}\\}`.",
       "source": "explore:source-editor:a braced table column spec (p{4cm}, @{}) corrupts the first cell and is rewritten",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T14:02:04Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T14:02:04Z",
+      "lastAttemptAt": "2026-11-25T14:02:04Z"
     },
     {
       "id": "qa-244",
