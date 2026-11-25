@@ -510,3 +510,4 @@ To https://github.com/kalandor122/sentence.git
  ! [remote rejected] main -> main (Internal Server Error)
 error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T01:00:21Z DONE qa-178 (tsc -b, npm test, smoke all green)
+2026-11-25T01:00:55Z START qa-179 on qa/qa-179-two-different-images-with-the-same-file: Two different images with the same file name share one asset path and become the same picture after Apply source
