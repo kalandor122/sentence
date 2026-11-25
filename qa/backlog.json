@@ -3407,10 +3407,11 @@
       ],
       "hint": "Repro: Home ribbon tab, focus \"Text color\" and press Enter to open the palette, then press Tab twelve times. Focus walks through the ten swatches to the neighbouring \"Highlight\" trigger and on to the Paragraph style select, but the palette remains open with its .color-backdrop (position fixed, inset 0, z-index 60) over the ribbon. Press Escape on the select: nothing happens. Shift+Tab back once to the \"Highlight\" trigger and press Escape: still nothing. elementFromPoint at a ribbon button's position returns DIV.color-backdrop, so ribbon clicks hit the backdrop instead of the control. Only Shift+Tab back onto one of the ten swatches and pressing Escape (or clicking the invisible backdrop) closes it and returns focus to the \"Text color\" button.\nActual: The palette stays mounted: popover 1 and color-backdrop 1 after the twelve Tabs and after both Escape presses; hit-test over the ribbon returns \"DIV.color-backdrop\". Only Escape while focus is inside the owning .color-menu works (Escape from the neighbouring Highlight palette is ignored because that menu's own open state is false).",
       "source": "explore:keyboard:tabbing out of the text-colour palette leaves it and its full-window backdrop open, and escape no longer closes it",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T08:09:36Z",
-      "lastAttemptAt": "2026-11-25T08:09:36Z"
+      "lastAttemptAt": "2026-11-25T08:09:36Z",
+      "doneAt": "2026-11-25T08:13:34Z"
     },
     {
       "id": "qa-215",
@@ -3422,7 +3423,9 @@
       ],
       "hint": "Repro: Insert ribbon tab, focus \"Inline equation\", press Enter, type x^2 and press Ctrl+Enter. Click into the document, press Ctrl+End and then ArrowLeft once: the equation is selected (selection constructor NodeSelection, node mathInline, class ProseMirror-selectednode). Press Enter: no dialog opens and the document is unchanged. A single mouse click on the equation opens the \"Edit inline equation\" dialog. The footnote control behaves as intended: arrow-select its marker and Enter opens \"Edit footnote\".\nActual: The editor's handleKeyDown only handles a NodeSelection whose node type is \"footnote\"; math nodes are edited solely through handleClick. Probe evidence: selection {type NodeSelection, node mathInline}, Enter -> modal 0; click -> modal 1, title \"Edit inline equation\".",
       "source": "explore:keyboard:existing equations cannot be opened from the keyboard; enter on the selected math node does nothing",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T08:14:14Z"
     },
     {
       "id": "qa-216",

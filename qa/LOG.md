@@ -631,3 +631,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T08:08:58Z PUSHED main
 2026-11-25T08:08:58Z DONE qa-213 (tsc -b, npm test, smoke all green)
 2026-11-25T08:09:36Z START qa-214 on qa/qa-214-tabbing-out-of-the-text-colour-palette-l: Tabbing out of the text-colour palette leaves it and its full-window backdrop open, and Escape no longer closes it
+2026-11-25T08:13:36Z PUSHED main
+2026-11-25T08:13:36Z DONE qa-214 (tsc -b, npm test, smoke all green)
