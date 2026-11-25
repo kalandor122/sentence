@@ -3144,8 +3144,9 @@
       "hint": "Repro: 1. Type 'Only paragraph'. 2. Review tab > Track changes. 3. Put the caret at the end of the paragraph and press Enter. 4. Wait 2.5 s and open the History sidebar.\nActual: The card shows before 'Only paragraph' and after 'Only paragraph' \u2014 identical \u2014 and the document gets no insertion decoration for the new empty paragraph. Accepting leaves the empty paragraph behind. Probe: revision {before:'Only paragraph', after:'Only paragraph'}, insertions [], deletions [], paragraphs ['Only paragraph', ''].",
       "source": "explore:review:a paragraph-break-only tracked change produces a history card with identical before/after text and no inline decoration",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T04:29:45Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T04:29:45Z",
+      "lastAttemptAt": "2026-11-25T04:29:45Z"
     },
     {
       "id": "qa-198",
