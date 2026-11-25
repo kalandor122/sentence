@@ -759,3 +759,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T15:56:53Z PUSHED main
 2026-11-25T15:56:53Z DONE qa-242 (tsc -b, npm test, smoke all green)
 2026-11-25T16:36:58Z EXPLORE insert-media: 4 new items, agent exit 0
+2026-11-25T16:37:16Z START qa-261 on qa/qa-261-an-image-inserted-inside-a-heading-is-re: An image inserted inside a heading is re-imported as two literal paragraphs, destroying the heading and its LaTeX
