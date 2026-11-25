@@ -24,15 +24,17 @@ interface TableActionProps {
   icon: ReactNode;
   disabled?: boolean;
   active?: boolean;
+  // Explains a disabled control without changing what it is called.
+  hint?: string;
   onClick: () => void;
 }
 
-function TableAction({ label, icon, disabled, active, onClick }: TableActionProps) {
+function TableAction({ label, icon, disabled, active, hint, onClick }: TableActionProps) {
   return (
     <button
       type="button"
       className="table-toolbar-action"
-      title={label}
+      title={hint ? `${label} (${hint})` : label}
       aria-label={label}
       aria-pressed={active}
       disabled={disabled}
@@ -59,6 +61,7 @@ export default function TableToolbar({ editor }: TableToolbarProps) {
     }
   }
   const headerRow = table?.firstChild?.firstChild?.type.name === "tableHeader";
+  const inHeaderRow = editor.isActive("tableHeader");
   const cellAttributes = editor.getAttributes(editor.isActive("tableHeader") ? "tableHeader" : "tableCell");
   const align: CellAlign =
     cellAttributes.align === "center" || cellAttributes.align === "right" ? cellAttributes.align : "left";
@@ -69,7 +72,13 @@ export default function TableToolbar({ editor }: TableToolbarProps) {
     <div className="table-toolbar" role="toolbar" aria-label="Table tools">
       <span className="table-toolbar-title" aria-hidden="true">Table</span>
       <div className="table-toolbar-group" role="group" aria-label="Rows">
-        <TableAction label="Add row above" icon={<Rows3 size={14} />} disabled={!editor.can().addRowBefore()} onClick={() => editor.chain().focus().addRowBefore().run()} />
+        <TableAction
+          label="Add row above"
+          icon={<Rows3 size={14} />}
+          disabled={!editor.can().addRowBefore()}
+          hint={inHeaderRow ? "header row stays in row 1; use Add row below" : undefined}
+          onClick={() => editor.chain().focus().addRowBefore().run()}
+        />
         <TableAction label="Add row below" icon={<Rows3 size={14} />} disabled={!editor.can().addRowAfter()} onClick={() => editor.chain().focus().addRowAfter().run()} />
         <TableAction label="Delete row" icon={<Rows3 size={14} />} disabled={!editor.can().deleteRow()} onClick={() => editor.chain().focus().deleteRow().run()} />
       </div>
