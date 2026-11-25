@@ -2474,7 +2474,9 @@
       ],
       "hint": "Repro: Create a project. Open References > Insert citation, click `Enter a key manually`, type `ghost2026` and click Insert.\nActual: `[ghost2026]` is inserted silently: no toast or warning appears anywhere, and the References panel still reports `1 of 1` with no indication that the document cites an unknown key.",
       "source": "explore:links-cites-footnotes:a citation key missing from the bibliography is inserted with no warning",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T00:21:40Z"
     },
     {
       "id": "qa-156",
@@ -2775,10 +2777,11 @@
       ],
       "hint": "Repro: Open the Insert ribbon tab, focus \"Insert table\" and press Enter to create the 3x3 table, click the first cell, then press Tab ten times.\nActual: All ten Tab presses left document.activeElement on the .sentence-editor; the table had 3 rows before and 4 after, because Tab in the last cell runs addRowAfter(). Only Escape (which then lands on the \"Visual\" mode button) gets focus out of the table.",
       "source": "explore:keyboard:tab never leaves a table and appends a row at the end",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T00:17:10Z",
-      "lastAttemptAt": "2026-11-25T00:17:10Z"
+      "lastAttemptAt": "2026-11-25T00:17:10Z",
+      "doneAt": "2026-11-25T00:21:04Z"
     },
     {
       "id": "qa-176",
