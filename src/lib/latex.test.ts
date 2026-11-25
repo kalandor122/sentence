@@ -881,6 +881,34 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(parsed, settings)).toContain("Costs \\$5 and \\$10.");
   });
 
+  it("imports a spanning \\multicolumn header instead of storing it as text", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\begin{tabular}{ll}",
+      "\\hline",
+      "\\multicolumn{2}{c}{ZXMULTI HEADER} \\\\",
+      "ZXMULTI A & B \\\\",
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(table?.content?.[0]?.content).toHaveLength(1);
+    expect(table?.content?.[0]?.content?.[0]?.attrs).toEqual({ align: "center", colspan: 2 });
+    expect(
+      table?.content?.[0]?.content?.[0]?.content?.[0]?.content?.[0]?.text,
+    ).toBe("ZXMULTI HEADER");
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\multicolumn{2}{c}{ZXMULTI HEADER} \\\\");
+    expect(exported).toContain("ZXMULTI A & B \\\\");
+    expect(exported).not.toContain("textbackslash");
+  });
+
   it("keeps the header row when importing table LaTeX", () => {
     const cells = [
       ["H1", "H2", "H3", "H4"],

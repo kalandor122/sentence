@@ -614,3 +614,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T06:33:24Z START qa-210 on qa/qa-210-text-typed-after-end-document-in-the-lat: Text typed after \end{document} in the LaTeX pane is silently discarded while the app reports it saved
 2026-11-25T06:39:11Z PUSHED main
 2026-11-25T06:39:11Z DONE qa-210 (tsc -b, npm test, smoke all green)
+2026-11-25T06:39:49Z START qa-206 on qa/qa-206-multicolumn-in-a-hand-written-table-is: \multicolumn in a hand-written table is turned into a cell's literal text
