@@ -20,10 +20,13 @@ export function tocEntries(editor: Editor): TocEntry[] {
     const level = Math.min(3, Math.max(1, Number(node.attrs.level ?? 1)));
     counters[level - 1] += 1;
     for (let deeper = level; deeper < counters.length; deeper += 1) counters[deeper] = 0;
+    // \section[Short]{Long} makes the PDF contents print the optional short
+    // title, so the preview has to show that rather than the heading text.
+    const shortTitle = typeof node.attrs.shortTitle === "string" ? node.attrs.shortTitle.trim() : "";
     entries.push({
       level,
       number: counters.slice(0, level).join("."),
-      text: node.textContent.trim(),
+      text: shortTitle || node.textContent.trim(),
     });
   });
   return entries;
