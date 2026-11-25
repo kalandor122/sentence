@@ -2875,10 +2875,11 @@
       ],
       "hint": "Repro: Create a new document. Type 'intro', press Enter, type 'one', click Home > Bulleted list, press Enter, type 'two', press Enter twice, type 'outro'. Press Ctrl+A (all four blocks are selected) and click Home > Numbered list. Repeat the same conversion with only the two list items selected (click 'one', press Home, then Shift+Down and Shift+End).\nActual: With the whole document selected, clicking Numbered list turns every selected block into one ordered list: the editor DOM is '<ol><li><p>intro</p><ul><li>one</li><li>two</li></ul></li><li><p>outro</p></li><li><p><br></p></li></ol>' and the LaTeX is '\\begin{enumerate}\\n\\item intro\\n\\begin{itemize}...\\end{itemize}\\n\\item outro\\n\\item \\n\\end{enumerate}'. The existing bullet list is moved under 'intro' as a sublist and an empty item is appended. With only a two-item bullet list in the document, Ctrl+A then Numbered list (ribbon button or Ctrl+Shift+7) also produces a third empty item and exports a trailing '\\item '; selecting only the list items produces two items with no empty item.",
       "source": "explore:lists:ctrl+a then switching list type wraps the whole document and nests the existing list",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T01:44:51Z",
-      "lastAttemptAt": "2026-11-25T01:44:51Z"
+      "lastAttemptAt": "2026-11-25T01:44:51Z",
+      "doneAt": "2026-11-25T01:48:41Z"
     },
     {
       "id": "qa-182",
@@ -2890,7 +2891,9 @@
       ],
       "hint": "Repro: Create a new document. Type 'parent', click Home > Bulleted list, press Enter, type 'child', press Tab. Click at the end of the 'parent' line, press Enter and type 'sibling'.\nActual: The existing sublist is transferred to the new item: the DOM is '<ul><li><p>parent</p></li><li><p>sibling</p><ul><li><p>child</p></li></ul></li></ul>', exported as '\\item parent\\n\\item sibling\\n\\begin{itemize}\\n\\item child\\n\\end{itemize}'. The child item silently changes parent from 'parent' to 'sibling'.",
       "source": "explore:lists:enter at the end of a parent item moves its nested sublist to the new item",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T01:49:17Z"
     },
     {
       "id": "qa-183",

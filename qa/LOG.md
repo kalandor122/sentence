@@ -521,3 +521,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T01:13:02Z DONE qa-169 (tsc -b, npm test, smoke all green)
 2026-11-25T01:44:37Z EXPLORE lists: 3 new items, agent exit 0
 2026-11-25T01:44:51Z START qa-181 on qa/qa-181-ctrl-a-then-switching-list-type-wraps-th: Ctrl+A then switching list type wraps the whole document and nests the existing list
+2026-11-25T01:48:43Z PUSHED main
+2026-11-25T01:48:43Z DONE qa-181 (tsc -b, npm test, smoke all green)
