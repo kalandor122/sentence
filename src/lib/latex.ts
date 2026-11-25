@@ -1053,7 +1053,30 @@ function splitLatexBlocks(source: string): string[] {
     if (depth === 0 && BLOCK_COMMAND_LINE.test(line)) flush();
   }
   flush();
-  return blocks;
+  return attachHeadingLabels(blocks);
+}
+
+// `\section{Title}` followed by `\label{sec:title}` on the next line is the
+// same reference target as the one-line form. A heading line flushes its block
+// on its own, so the label would otherwise become a paragraph of raw LaTeX and
+// be lost on the way back out.
+function attachHeadingLabels(blocks: string[]): string[] {
+  const result: string[] = [];
+  for (const block of blocks) {
+    const previous = result[result.length - 1];
+    const previousHeading = previous ? parseHeadingBlock(previous) : null;
+    if (
+      previous &&
+      previousHeading &&
+      !previousHeading.label &&
+      /^\\label\{[^{}]*\}$/.test(block)
+    ) {
+      result[result.length - 1] = `${previous}\n${block}`;
+      continue;
+    }
+    result.push(block);
+  }
+  return result;
 }
 
 function parseList(source: string, type: "bulletList" | "orderedList"): DocumentNode {

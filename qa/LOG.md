@@ -594,3 +594,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T05:16:40Z DONE qa-200 (tsc -b, npm test, smoke all green)
 2026-11-25T05:26:30Z PUSHED main
 2026-11-25T05:26:30Z DONE qa-201 (tsc -b, npm test, smoke all green)
+2026-11-25T05:27:08Z START qa-202 on qa/qa-202-a-section-label-on-the-line-after-the-he: A section \label on the line after the heading becomes literal text and is lost

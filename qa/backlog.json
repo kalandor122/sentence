@@ -3220,8 +3220,9 @@
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add `\\section{ZXSEPLABEL}` on one line, `\\label{sec:seplabel}` on the next line, a blank line, `ZXSEP BODY`, a blank line, and `See \\ref{sec:seplabel}.` 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: The heading is created, but the label becomes its own paragraph showing the raw command `\\label{sec:seplabel}` in the visual document (leakedCommands=true). Refresh from visual writes `\\textbackslash{}label\\{sec:seplabel\\}`, so the label is gone while `\\ref{sec:seplabel}` remains. Probe: labelKept=false, labelEscaped=true, refKept=true.",
       "source": "explore:source-editor:a section \\label on the line after the heading becomes literal text and is lost",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T05:27:08Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T05:27:08Z",
+      "lastAttemptAt": "2026-11-25T05:27:08Z"
     },
     {
       "id": "qa-203",
