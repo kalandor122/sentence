@@ -7,6 +7,7 @@ interface SourceEditorProps {
   readOnly?: boolean;
   textareaRef?: RefObject<HTMLTextAreaElement | null>;
   historyRef?: RefObject<SourceHistory | null>;
+  undoBoundary?: number;
 }
 
 interface HistoryEntry {
@@ -37,6 +38,7 @@ export default function SourceEditor({
   readOnly = false,
   textareaRef,
   historyRef,
+  undoBoundary,
 }: SourceEditorProps) {
   const localTextarea = useRef<HTMLTextAreaElement>(null);
   const textarea = textareaRef ?? localTextarea;
@@ -69,12 +71,23 @@ export default function SourceEditor({
   const caret = useRef({ start: initial.current.selection?.start ?? 0, end: initial.current.selection?.end ?? 0 });
   const restoredSelection = useRef(initial.current.selection);
   const pending = useRef<PendingEdit | null>(null);
+  // Applying the draft leaves the textarea's text in place, so a keystroke
+  // after Apply would otherwise look like a continuation of the edit that was
+  // just committed and one undo would remove both. Blurring the textarea (the
+  // Apply button, another view) or moving through the history ends the run.
+  const boundary = useRef(true);
   const onChangeRef = useRef(onChange);
   const actions = useRef({ undo: () => {}, redo: () => {} });
 
   useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
+
+  useEffect(() => {
+    // A commit happened in the app (Apply, autosave): never fold the next edit
+    // into the entry that was just applied.
+    boundary.current = true;
+  }, [undoBoundary]);
 
   useEffect(() => () => {
     if (historyRef) {
@@ -92,6 +105,7 @@ export default function SourceEditor({
       entries: [{ value: nextValue, selectionStart, selectionEnd, inputType: "external" }],
       index: 0,
     };
+    boundary.current = true;
   };
 
   const applyEntry = (index: number) => {
@@ -99,6 +113,7 @@ export default function SourceEditor({
     const entry = history.current.entries[index];
     if (!node || !entry) return;
     history.current.index = index;
+    boundary.current = true;
     node.value = entry.value;
     node.setSelectionRange(entry.selectionStart, entry.selectionEnd);
     caret.current = { start: entry.selectionStart, end: entry.selectionEnd };
@@ -160,7 +175,7 @@ export default function SourceEditor({
         inputType: edit.inputType,
       };
       const collapsed = edit.selectionStart === edit.selectionEnd;
-      const coalesce = collapsed && previous && previous.inputType === edit.inputType && (
+      const coalesce = !boundary.current && collapsed && previous && previous.inputType === edit.inputType && (
         edit.inputType === "insertText"
           ? edit.selectionEnd === previous.selectionEnd
           : edit.inputType === "deleteContentBackward" || edit.inputType === "deleteContentForward"
@@ -179,6 +194,7 @@ export default function SourceEditor({
         current.entries.push(entry);
       }
       current.index = current.entries.length - 1;
+      boundary.current = false;
     };
     node.addEventListener("beforeinput", onBeforeInput);
     node.addEventListener("input", onInput);
@@ -236,6 +252,9 @@ export default function SourceEditor({
         onSelect={(event) => {
           const node = event.currentTarget;
           caret.current = { start: node.selectionStart, end: node.selectionEnd };
+        }}
+        onBlur={() => {
+          boundary.current = true;
         }}
         onKeyDown={(event) => {
           if (!(event.ctrlKey || event.metaKey) || event.altKey || readOnly) return;
