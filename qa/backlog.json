@@ -2824,8 +2824,9 @@
       "hint": "Repro: Open the editor and inspect the .sentence-editor element after tabbing into it.\nActual: The element has role=\"textbox\" and aria-label \"Document editor\" but aria-multiline is null, so the main writing surface is exposed as a single-line textbox to assistive technology.",
       "source": "explore:keyboard:document editor is exposed as role=textbox without aria-multiline",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T02:24:19Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T02:24:19Z",
+      "lastAttemptAt": "2026-11-25T02:24:19Z"
     },
     {
       "id": "qa-178",
