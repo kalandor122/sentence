@@ -1,4 +1,3 @@
-import { documentPlainText } from "./latex";
 import type { DocumentNode, Revision, SentenceDocument } from "./types";
 
 type Path = (string | number)[];
@@ -243,6 +242,25 @@ export function trackedShape(document: SentenceDocument): string {
   return (document.content ?? []).map(visit).join("");
 }
 
+// Review cards preview before and after text, and a structural edit can add no
+// words at all. Keep block breaks and mark empty blocks so an inserted paragraph
+// break does not render as two identical previews.
+export function revisionText(document: SentenceDocument): string {
+  const visit = (node: DocumentNode): string => {
+    if (typeof node.text === "string") return node.text;
+    if (node.type === "hardBreak") return "\n";
+    if (node.type === "footnote") {
+      const text = node.attrs?.text;
+      return typeof text === "string" ? text : "";
+    }
+    const inner = (node.content ?? []).map(visit).join("");
+    return ["paragraph", "heading", "listItem", "blockquote"].includes(node.type)
+      ? `${inner || "¶"}\n`
+      : inner;
+  };
+  return (document.content ?? []).map(visit).join("").trim();
+}
+
 export function documentChanges(before: SentenceDocument, after: SentenceDocument): Change[] {
   return changesBetween(before, after, []);
 }
@@ -306,8 +324,8 @@ export function rejectRevisions(
       const afterDocument = undoDocumentChanges(item.afterDocument, changes);
       return {
         ...item,
-        before: documentPlainText(beforeDocument),
-        after: documentPlainText(afterDocument),
+        before: revisionText(beforeDocument),
+        after: revisionText(afterDocument),
         beforeDocument,
         afterDocument,
       };

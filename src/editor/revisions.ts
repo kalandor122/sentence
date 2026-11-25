@@ -72,6 +72,36 @@ function markInsertion(
   );
 }
 
+// An inserted empty block carries no text for the inline insertion mark to
+// anchor to, yet the reviewer still needs to see the new paragraph break.
+function markBlockInsertion(
+  decorations: Decoration[],
+  doc: ProseMirrorNode,
+  node: unknown,
+  revision: Revision,
+  colorClass: string,
+  path: Path,
+): void {
+  if (typeof node !== "object" || node === null) return;
+  const block = node as { type?: unknown; content?: unknown };
+  if (block.type !== "paragraph") return;
+  if (Array.isArray(block.content) && block.content.length > 0) return;
+  const index = path[0] === "content" ? path[1] : undefined;
+  if (typeof index !== "number" || index >= doc.childCount) return;
+  const child = doc.child(index);
+  if (child.type.name !== "paragraph" || child.content.size > 0) return;
+  let position = 0;
+  for (let previous = 0; previous < index; previous += 1) position += doc.child(previous).nodeSize;
+  const author = revision.author || "Author";
+  const dom = document.createElement("span");
+  dom.className = `sentence-revision-insertion sentence-revision-paragraph ${colorClass}`;
+  dom.textContent = "¶";
+  dom.title = `Paragraph break inserted by ${author}`;
+  dom.setAttribute("aria-label", `Paragraph break inserted by ${author}`);
+  dom.setAttribute("data-revision-id", revision.id);
+  decorations.push(Decoration.widget(position + 1, dom, { key: `${revision.id}:${path.join(".")}:paragraph` }));
+}
+
 function markDeletion(
   decorations: Decoration[],
   doc: ProseMirrorNode,
@@ -144,7 +174,12 @@ export const RevisionMarks = Extension.create({
                   continue;
                 }
                 if (change.before === undefined && change.after !== undefined) {
-                  markInsertion(decorations, state.doc, nodeText(change.after), revision, colorClass, change.path);
+                  const text = nodeText(change.after);
+                  if (text) {
+                    markInsertion(decorations, state.doc, text, revision, colorClass, change.path);
+                  } else {
+                    markBlockInsertion(decorations, state.doc, change.after, revision, colorClass, change.path);
+                  }
                 } else if (change.after === undefined) {
                   const anchor = deletionAnchor(revision, change);
                   if (anchor) {

@@ -8,6 +8,7 @@ import {
   nodeText,
   rejectRevisions,
   revisionChanges,
+  revisionText,
   trackedShape,
   trackedText,
   undoDocumentChanges,
@@ -116,6 +117,13 @@ describe("tracked text comparison", () => {
     expect(trackedShape(split)).not.toBe(trackedShape(single));
     expect(trackedShape(appended)).not.toBe(trackedShape(single));
     expect(trackedShape(annotated)).toBe(trackedShape(doc("Comment on tracked text")));
+  });
+
+  it("shows an inserted empty paragraph in the review preview", () => {
+    const single = doc("Only paragraph");
+    const appended: SentenceDocument = { type: "doc", content: [...single.content, { type: "paragraph" }] };
+    expect(revisionText(single)).toBe("Only paragraph");
+    expect(revisionText(appended)).toBe("Only paragraph\n¶");
   });
 });
 

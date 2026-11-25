@@ -58,4 +58,21 @@ describe("tracked change decorations", () => {
     expect(second.querySelector(".sentence-revision-insertion")?.textContent).toBe("row");
     editor.destroy();
   });
+
+  it("marks an inserted empty paragraph with a paragraph symbol", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "Only paragraph" }] }],
+    };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [...(before.content ?? []), { type: "paragraph" }],
+    };
+    const editor = new Editor({ extensions: [StarterKit, RevisionMarks], content: after });
+    setRevisionMarks(editor, [revision(before, after)]);
+
+    const [, second] = paragraphs(editor);
+    expect(second.querySelector(".sentence-revision-insertion")?.textContent).toBe("¶");
+    editor.destroy();
+  });
 });

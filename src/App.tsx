@@ -71,6 +71,7 @@ import {
   acceptRevisions,
   pendingRevisions,
   rejectRevisions,
+  revisionText,
   trackedShape,
 } from "./lib/revisions";
 import {
@@ -1143,8 +1144,8 @@ export default function App() {
       author: gitAuthor.name || workspaceRef.current?.settings.author || "You",
       createdAt: new Date().toISOString(),
       summary: "Tracked edit",
-      before: documentPlainText(baseline),
-      after: documentPlainText(after),
+      before: revisionText(baseline),
+      after: revisionText(after),
       beforeDocument: baseline,
       afterDocument: after,
       accepted: false,
