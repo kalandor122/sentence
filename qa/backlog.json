@@ -3283,7 +3283,9 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add a tabular with `\\hline`, `\\multicolumn{2}{c}{ZXMULTI HEADER} \\\\`, `ZXMULTI A & B \\\\`, `\\hline`, `\\end{tabular}` wrapped in a table environment. 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: The visual table has two rows, with the first row as an empty first cell and the second cell containing the literal string `\\multicolumn{2}{c}{ZXMULTI HEADER}`. Refresh from visual writes `\\textbackslash{}multicolumn\\{2\\}\\{c\\}\\{ZXMULTI HEADER\\}`, so the valid spanning header is destroyed. Probe cells: `[\"\", \"\\multicolumn{2}{c}{ZXMULTI HEADER}\"]`.",
       "source": "explore:source-editor:\\multicolumn in a hand-written table is turned into a cell's literal text",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T06:39:49Z"
     },
     {
       "id": "qa-207",
@@ -3335,10 +3337,11 @@
       ],
       "hint": "Repro: 1) Open http://localhost:1420 with no saved workspace (the start screen shows), click 'New document' and wait for the top bar to read 'Saved locally'. 2) Click 'Source' in the status bar. 3) Click in the LaTeX textarea, press Ctrl+End (the caret lands after the final \\end{document}) and type a new line such as 'trailing paragraph tail-1'. 4) Wait 1.6 s: the top bar still reads 'Saved locally' with its check icon and the console shows no error, localStorage['sentence.workspace.draft'] has been removed, and the textarea still shows the typed line, but the document inside localStorage['sentence.workspace'] does not contain 'tail-1'. 5) Switch to 'Visual': the text is not in the document. 6) Switch back to 'Source': the text is gone from the textarea too. 7) Reload the page: the textarea, the visual editor and localStorage contain no 'tail-1', there is no draft and no warning (toast null, Retry save absent). Variant: after step 3 click 'Apply source' instead of waiting; the toast reads 'Visual document synchronized from LaTeX.' while the visual editor and the stored document still do not contain the text, and a reload drops it permanently. Probe evidence: qa/probes/persistence.mjs phases 'source-after-end-document', 'source-after-end-autosave' and 'apply-source-after-end' (both the autosave path and the Apply path observed on 2026-11-25).\nActual: The source parser takes only the slice between \\begin{document} and \\end{document} (src/lib/latex.ts documentBody), so the trailing text is dropped without an error and the draft is treated as successfully applied. persist() deletes the mirrored draft (localStorage['sentence.workspace.draft'] gone), sets saveState to 'saved' ('Saved locally' plus check icon) and writes a workspace whose document JSON has no trace of the typed text. After autosave the source pane still shows the typed line, so the pane and the saved document disagree; switching views or reloading removes the line for good, with no toast and no Retry save. In the Apply variant the toast explicitly claims 'Visual document synchronized from LaTeX.' while the visual editor and stored document lack the text.",
       "source": "explore:persistence:text typed after \\end{document} in the latex pane is silently discarded while the app reports it saved",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T06:33:24Z",
-      "lastAttemptAt": "2026-11-25T06:33:24Z"
+      "lastAttemptAt": "2026-11-25T06:33:24Z",
+      "doneAt": "2026-11-25T06:39:09Z"
     },
     {
       "id": "qa-211",
