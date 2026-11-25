@@ -3128,8 +3128,9 @@
       "hint": "Repro: 1. Type 'Undo comment body'. 2. Select 'comment', open Review > New comment, enter 'Undo this comment' and click Comment. 3. Click in the editor and press Ctrl+Z.\nActual: The highlight disappears, but the thread stays in the Review panel, is marked with the note 'The text this comment was attached to was deleted, so it has no highlight in the document.' and still counts in the unresolved badge. The text was not deleted \u2014 the comment mark was undone. Probe: marks [], thread body 'Undo this comment', detached=true, detachedNote=true.",
       "source": "explore:review:undoing a comment addition leaves an orphaned thread with a false 'text was deleted' note",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T04:23:14Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T04:23:14Z",
+      "lastAttemptAt": "2026-11-25T04:23:14Z"
     },
     {
       "id": "qa-197",

@@ -579,3 +579,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T04:08:45Z START qa-195 on qa/qa-195-edits-applied-from-the-latex-source-pane: Edits applied from the LaTeX source pane while tracking is on are never recorded as revisions
 2026-11-25T04:22:36Z PUSHED main
 2026-11-25T04:22:36Z DONE qa-195 (tsc -b, npm test, smoke all green)
+2026-11-25T04:23:14Z START qa-196 on qa/qa-196-undoing-a-comment-addition-leaves-an-orp: Undoing a comment addition leaves an orphaned thread with a false 'text was deleted' note

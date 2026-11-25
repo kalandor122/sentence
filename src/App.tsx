@@ -564,6 +564,9 @@ export default function App() {
   const changeVersion = useRef(0);
   const revisionBaseline = useRef<SentenceDocument | null>(null);
   const revisionTimer = useRef<number | null>(null);
+  // Threads whose comment mark an undo removed. Keeping them lets a redo bring
+  // the thread back with the highlight instead of leaving it threadless.
+  const undoneCommentThreads = useRef<CommentThread[]>([]);
 
   useEffect(() => {
     workspaceRef.current = workspace;
@@ -1166,14 +1169,41 @@ export default function App() {
     markDirty();
   };
 
-  const handleDocumentUpdate = (document: SentenceDocument) => {
+  const handleDocumentUpdate = (document: SentenceDocument, undoneComments: string[] = []) => {
     const before = workspaceRef.current?.document;
     if (!isDesktop && before && JSON.stringify(before) === JSON.stringify(document)) return;
     const currentSettings = workspaceRef.current?.settings;
+    // Undo removes a comment's mark along with its thread. A redo puts the mark
+    // back, so its stashed thread returns with it rather than leaving a
+    // highlight no thread explains.
+    if (undoneComments.length > 0) {
+      const removed = (workspaceRef.current?.comments ?? []).filter((thread) => undoneComments.includes(thread.markId));
+      undoneCommentThreads.current = [...removed, ...undoneCommentThreads.current];
+      setActiveCommentId((id) => (id && undoneComments.includes(id) ? null : id));
+    }
+    const liveMarks = undoneCommentThreads.current.length > 0
+      ? new Set(commentAnchors(document).map((anchor) => anchor.markId))
+      : null;
+    const restoredThreads = liveMarks
+      ? undoneCommentThreads.current.filter((thread) => liveMarks.has(thread.markId))
+      : [];
+    if (liveMarks && restoredThreads.length > 0) {
+      undoneCommentThreads.current = undoneCommentThreads.current.filter((thread) => !liveMarks.has(thread.markId));
+    }
+    const keepThreads = (threads: CommentThread[]) => {
+      const kept = undoneComments.length > 0
+        ? threads.filter((thread) => !undoneComments.includes(thread.markId))
+        : threads;
+      return restoredThreads.length > 0 ? [...restoredThreads, ...kept] : kept;
+    };
     // Keep the ref current for the pagehide flush, which may run before React
     // commits the state update from a rapid edit.
-    workspaceRef.current = workspaceRef.current ? { ...workspaceRef.current, document } : null;
-    setWorkspace((current) => current ? { ...current, document } : current);
+    workspaceRef.current = workspaceRef.current
+      ? { ...workspaceRef.current, document, comments: keepThreads(workspaceRef.current.comments) }
+      : null;
+    setWorkspace((current) =>
+      current ? { ...current, document, comments: keepThreads(current.comments) } : current,
+    );
     if (!sourceDirtyRef.current && currentSettings) {
       const latex = documentToLatex(document, currentSettings);
       setSource(latex);
