@@ -1,5 +1,5 @@
 import type { Editor } from "@tiptap/core";
-import { AllSelection, TextSelection } from "@tiptap/pm/state";
+import { AllSelection, NodeSelection, TextSelection } from "@tiptap/pm/state";
 import type { Node as ProseMirrorNode, ResolvedPos } from "@tiptap/pm/model";
 
 function isAllSelected(editor: Editor): boolean {
@@ -26,8 +26,26 @@ function documentHasList(editor: Editor, listType: "bulletList" | "orderedList")
   return found;
 }
 
+// editor.isActive("bulletList") is also true for a numbered list nested inside a
+// bullet list, because every enclosing list counts. Report only the innermost
+// list that holds the caret so the two ribbon buttons are mutually exclusive.
+function enclosingListType(editor: Editor): string | null {
+  const { selection } = editor.state;
+  if (selection instanceof NodeSelection && isListNode(selection.node)) return selection.node.type.name;
+  if (!selection.empty) return null;
+  const { $from } = selection;
+  for (let depth = $from.depth; depth > 0; depth -= 1) {
+    const name = $from.node(depth).type.name;
+    if (name === "bulletList" || name === "orderedList") return name;
+  }
+  return null;
+}
+
 export function isListActive(editor: Editor, listType: "bulletList" | "orderedList"): boolean {
-  return editor.isActive(listType) || (isAllSelected(editor) && documentHasList(editor, listType));
+  if (isAllSelected(editor)) return documentHasList(editor, listType);
+  const enclosing = enclosingListType(editor);
+  if (enclosing) return enclosing === listType;
+  return editor.isActive(listType);
 }
 
 function unwrapList(node: ProseMirrorNode, listType: "bulletList" | "orderedList"): ProseMirrorNode[] {

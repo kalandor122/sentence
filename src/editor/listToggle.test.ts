@@ -94,6 +94,43 @@ describe("toggleList", () => {
   });
 });
 
+describe("isListActive", () => {
+  function selectText(editor: Editor, text: string) {
+    let pos = -1;
+    editor.state.doc.descendants((node, offset) => {
+      if (pos >= 0) return false;
+      if (node.isText && node.text === text) pos = offset + 1;
+      return pos < 0;
+    });
+    expect(pos).toBeGreaterThan(0);
+    editor.commands.setTextSelection(pos);
+  }
+
+  it("reports only the list type that holds the caret in a nested list", () => {
+    const bulletParent = createEditor(
+      "<ul><li><p>parent</p><ol><li><p>child one</p></li><li><p>child two</p></li></ol></li></ul>",
+    );
+    selectText(bulletParent, "child two");
+    expect(isListActive(bulletParent, "orderedList")).toBe(true);
+    expect(isListActive(bulletParent, "bulletList")).toBe(false);
+    selectText(bulletParent, "parent");
+    expect(isListActive(bulletParent, "bulletList")).toBe(true);
+    expect(isListActive(bulletParent, "orderedList")).toBe(false);
+    bulletParent.destroy();
+
+    const numberedParent = createEditor(
+      "<ol><li><p>parent</p><ul><li><p>child one</p></li><li><p>child two</p></li></ul></li></ol>",
+    );
+    selectText(numberedParent, "child one");
+    expect(isListActive(numberedParent, "bulletList")).toBe(true);
+    expect(isListActive(numberedParent, "orderedList")).toBe(false);
+    selectText(numberedParent, "parent");
+    expect(isListActive(numberedParent, "orderedList")).toBe(true);
+    expect(isListActive(numberedParent, "bulletList")).toBe(false);
+    numberedParent.destroy();
+  });
+});
+
 describe("removing one bulleted item", () => {
   it("removes the bullet on the last item", () => {
     const editor = createEditor("<ul><li><p>one</p></li><li><p>two</p></li></ul>");
