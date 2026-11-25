@@ -95,4 +95,22 @@ describe("pageLineGaps", () => {
     });
     expect(gapIndex).toBe(gaps.length);
   });
+
+  it("moves trailing lines out of a bottom margin even before the next page edge", () => {
+    const geometry = pageGeometry(DEFAULT_SETTINGS);
+    const lines = Array.from({ length: 40 }, (_, index) => ({
+      top: geometry.margin + index * 25,
+      bottom: geometry.margin + index * 25 + 16,
+    }));
+    const gaps = pageLineGaps(
+      lines,
+      geometry.margin,
+      lines[lines.length - 1].bottom,
+      geometry,
+    );
+    expect(gaps).toHaveLength(1);
+    expect(lines[gaps[0].line].top + gaps[0].height).toBeGreaterThanOrEqual(
+      geometry.height + geometry.margin,
+    );
+  });
 });

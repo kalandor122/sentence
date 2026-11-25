@@ -71,8 +71,10 @@ export interface LineGap {
 // A block taller than a page cannot move as a whole, so its lines are split at
 // the page edges instead. The line that would cross a page's bottom margin
 // starts at the top margin of the next page; the rule then falls in the blank
-// gap between the two pages instead of across a line. `top` and `bottom` are
-// unscaled sheet coordinates of the block.
+// gap between the two pages instead of across a line. The last boundary is
+// checked even when it lies past the block, since a block can also end inside a
+// page's bottom margin without reaching the next page edge. `top` and `bottom`
+// are unscaled sheet coordinates of the block.
 export function pageLineGaps(
   lines: LineSpan[],
   top: number,
@@ -84,7 +86,7 @@ export function pageLineGaps(
   let index = 0;
   for (
     let boundary = Math.ceil(Math.max(0, top) / geometry.height) * geometry.height;
-    boundary < bottom + shift && index < lines.length;
+    boundary - geometry.margin < bottom + shift && index < lines.length;
     boundary += geometry.height
   ) {
     const contentBottom = boundary - geometry.margin;

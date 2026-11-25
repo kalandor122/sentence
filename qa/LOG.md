@@ -728,3 +728,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T14:15:34Z PUSHED main
 2026-11-25T14:15:34Z DONE qa-227 (tsc -b, npm test, smoke all green)
 2026-11-25T14:29:06Z EXPLORE long-document: 4 new items, agent exit 0
+2026-11-25T14:29:24Z START qa-248 on qa/qa-248-lists-and-blockquotes-are-never-paginate: Lists and blockquotes are never paginated: page rules cut through their lines and text sits in the margins

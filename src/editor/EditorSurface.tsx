@@ -541,7 +541,9 @@ export default function EditorSurface({
         let gapShift = 0;
         for (const block of blocks) {
           if (!(block instanceof HTMLElement) || block.hasAttribute("data-page-break")) continue;
-          if (!/^(P|H[1-3])$/.test(block.tagName)) continue;
+          // Lists and blockquotes hold their text in child blocks, but a long
+          // one still has to be split at the page edges like a paragraph.
+          if (!/^(P|H[1-3]|UL|OL|BLOCKQUOTE)$/.test(block.tagName)) continue;
           if (block.offsetHeight <= geometry.contentHeight) continue;
           const lines = textLines(block, zoom);
           const top = offsetWithin(block, sheet);
