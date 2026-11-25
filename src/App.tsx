@@ -612,6 +612,9 @@ export default function App() {
   // citation or footnote inserted after coming back lands where the user was
   // working instead of at the top of the document.
   const visualSelection = useRef<{ from: number; to: number } | null>(null);
+  // A switch back to the visual view remounts the editor, which starts without
+  // keyboard focus. Ask the effect below to hand it back once it is mounted.
+  const focusVisualOnSwitch = useRef(false);
   const linkSubmitted = useRef(false);
   const changeVersion = useRef(0);
   const revisionBaseline = useRef<SentenceDocument | null>(null);
@@ -637,11 +640,18 @@ export default function App() {
   }, [source, sourceDirty]);
 
   useEffect(() => {
-    if (mode !== "source") return;
-    // A mode switch remounts the textarea, so the caret (and the keyboard
-    // focus the source view owns) must be handed back explicitly.
-    sourceTextarea.current?.focus();
-  }, [mode]);
+    if (mode === "source") {
+      // A mode switch remounts the textarea, so the caret (and the keyboard
+      // focus the source view owns) must be handed back explicitly.
+      sourceTextarea.current?.focus();
+      return;
+    }
+    if (!editor || mode !== "visual" || !focusVisualOnSwitch.current) return;
+    // Leaving the source pane also remounts the visual editor; without the
+    // same handoff focus lands on <body> and the next keystrokes are dropped.
+    focusVisualOnSwitch.current = false;
+    editor.commands.focus();
+  }, [editor, mode]);
 
   useEffect(() => {
     if (!editor || mode === "source") return;
@@ -1518,6 +1528,7 @@ export default function App() {
       sourceDraftWarning.current = false;
     }
     setMode(nextMode);
+    focusVisualOnSwitch.current = nextMode === "visual";
   };
 
   const handleSettingsChange = (patch: Partial<ProjectSettings>) => {
