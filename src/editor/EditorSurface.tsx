@@ -518,17 +518,25 @@ export default function EditorSurface({
     const snapSelector = `.sentence-editor[${snapScope}]`;
     const basePadding = new Map<number, number>();
     const snapShifts = new Map<number, number>();
+    // Picture heights in layout pixels, lowered so a captioned figure still
+    // fits one page's text area and can be moved as a unit.
+    const imageCaps = new Map<number, number>();
     const applySnap = () => {
-      snapStyle.textContent = Array.from(snapShifts)
-        .map(
+      snapStyle.textContent = [
+        ...Array.from(snapShifts).map(
           ([index, shift]) =>
             `${snapSelector} > :nth-child(${index + 1}) { padding-top: ${(basePadding.get(index) ?? 0) + shift}px; }`,
-        )
-        .join("\n");
+        ),
+        ...Array.from(imageCaps).map(
+          ([index, cap]) =>
+            `${snapSelector} > :nth-child(${index + 1}) img { max-height: ${cap}px; }`,
+        ),
+      ].join("\n");
     };
     const resetSnap = () => {
       basePadding.clear();
       snapShifts.clear();
+      imageCaps.clear();
       snapStyle.textContent = "";
     };
     const snapBlock = (block: HTMLElement, index: number, shift: number) => {
@@ -543,6 +551,19 @@ export default function EditorSurface({
       // Keep the child index so the generated :nth-child rules keep pointing at
       // the same block when page-break wrappers sit among them.
       const blocks = Array.from(dom.children) as HTMLElement[];
+      // The picture alone is capped at the text block's height, so a caption
+      // pushes the figure past one page and it would be drawn across the page
+      // edge: too tall to move whole and not split by line gaps. Shrink the
+      // picture by the caption's height so the figure fits a page again.
+      blocks.forEach((block, index) => {
+        if (!(block instanceof HTMLElement) || block.tagName !== "FIGURE") return;
+        const image = block.querySelector("img");
+        if (!image) return;
+        const excess = block.offsetHeight - geometry.contentHeight;
+        const cap = image.clientHeight - excess;
+        if (excess > 0 && cap > 0) imageCaps.set(index, Math.floor(cap));
+      });
+      if (imageCaps.size > 0) applySnap();
       // A nudge is padding, so it moves the content but not the border box.
       // Measure the content box: otherwise a shifted block still reports its
       // old position and collects another shift on every pass.
