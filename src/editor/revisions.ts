@@ -19,6 +19,22 @@ const revisionKey = new PluginKey<RevisionMarkState>("sentenceRevisionMarks");
 
 type Path = readonly (string | number)[];
 
+// Resolve a stored block path ("content", index, "content", index, ...) to the
+// block in the current document and the position just inside its content, so a
+// deletion can still be shown when the block has been emptied.
+function locateBlock(doc: ProseMirrorNode, path: Path): { node: ProseMirrorNode; position: number } | null {
+  let node = doc;
+  let contentStart = 0;
+  for (let step = 0; step < path.length; step += 2) {
+    const index = path[step + 1];
+    if (path[step] !== "content" || typeof index !== "number" || index >= node.childCount) return null;
+    for (let child = 0; child < index; child += 1) contentStart += node.child(child).nodeSize;
+    node = node.child(index);
+    contentStart += 1;
+  }
+  return node === doc ? null : { node, position: contentStart };
+}
+
 // A change path starts with the top-level block it was recorded in. Anchoring
 // within that block matters: with an identical line earlier in the document the
 // first match would draw the decoration in the wrong paragraph. The block is
@@ -112,6 +128,7 @@ function markDeletion(
   path: Path | null,
   prefix = "",
   suffix = "",
+  block: Path | null = null,
 ): void {
   if (!text) return;
   // Prefer the text immediately after the removed run; fall back to its left
@@ -129,6 +146,10 @@ function markDeletion(
       ? match.ranges[match.ranges.length - 1].to
       : match.ranges[0].from;
     break;
+  }
+  if (position === null && block) {
+    const located = locateBlock(doc, block);
+    if (located?.node.isTextblock && located.node.content.size === 0) position = located.position;
   }
   if (position === null) return;
   const author = revision.author || "Author";
@@ -183,7 +204,18 @@ export const RevisionMarks = Extension.create({
                 } else if (change.after === undefined) {
                   const anchor = deletionAnchor(revision, change);
                   if (anchor) {
-                    markDeletion(decorations, state.doc, anchor.text, revision, colorClass, key, null, anchor.prefix, anchor.suffix);
+                    markDeletion(
+                      decorations,
+                      state.doc,
+                      anchor.text,
+                      revision,
+                      colorClass,
+                      key,
+                      null,
+                      anchor.prefix,
+                      anchor.suffix,
+                      anchor.block ?? null,
+                    );
                   }
                 }
               }
