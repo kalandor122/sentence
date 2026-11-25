@@ -3171,10 +3171,11 @@
       ],
       "hint": "Repro: 1. Create a project and open the editor. 2. View > LaTeX. 3. Before the real \\end{document}, add the comment line `% ZXCOMMENTED \\end{document} marker`, a blank line, the paragraph `ZXAFTERCOMMENT paragraph`, a blank line, and keep the real \\end{document}. 4. Click Apply source. 5. View > Visual, then View > LaTeX and click Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` but the visual document does not contain ZXAFTERCOMMENT, and Refresh from visual drops the paragraph from the source. The draft still contains the paragraph immediately after Apply and Apply is disabled, so the pane looks synchronized while the document has silently lost the text. Probe: visualHasAfterComment=false, draftKeptAfterApply=true, regeneratedHasAfterComment=false, applyEnabledAfter=false.",
       "source": "explore:source-editor:a commented-out \\end{document} silently truncates the rest of the document",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T05:04:15Z",
-      "lastAttemptAt": "2026-11-25T05:04:15Z"
+      "lastAttemptAt": "2026-11-25T05:04:15Z",
+      "doneAt": "2026-11-25T05:06:10Z"
     },
     {
       "id": "qa-200",
@@ -3186,7 +3187,9 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Put the caret before \\end{document} and type `ZXAPPLIED`. 3. Click Apply source and wait for the success toast. 4. Without moving the caret, type `ZXNEW`. 5. Press Ctrl+Z once. 6. Click Apply source if it is enabled. 7. Variant from a clean applied document: type `ZXFAIL`, Enter, `\\begin{itemize}`, Enter, `NOEND`; click Apply source (it fails); type `ZXTYPEDAFTERFAIL`; press Ctrl+Z once.\nActual: One Ctrl+Z removes both `ZXNEW` and the applied `ZXAPPLIED` from the textarea. Apply becomes enabled, and clicking it synchronizes the document without ZXAPPLIED, so the paragraph disappears from the visual page. Probe: undoKeptAppliedText=false, undoRemovedNewText=true, applyEnabledAfterUndo=true, visualHasAppliedTextAfterReapply=false. The same coalescing occurs when the edit was applied by switching to Visual and when Apply failed: after typing `ZXTYPEDAFTERFAIL` and pressing Ctrl+Z once, the `NOEND` line of the broken draft also disappeared (undoKeptEnvironmentText=false).",
       "source": "explore:source-editor:undo after apply also removes the text that was just applied, and re-applying deletes it from the page",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T05:06:50Z"
     },
     {
       "id": "qa-201",
