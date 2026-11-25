@@ -75,6 +75,29 @@ export function splitListItemKeepingSublist(editor: Editor): boolean {
 }
 
 /**
+ * Enter on an empty item in the middle of a nested list has nothing to split:
+ * ProseMirror leaves the item in place and the fallback command tears a
+ * paragraph out of the parent item, so the text typed next joins the parent
+ * instead of becoming a list item. Outdent the empty item one level, exactly as
+ * Enter on the empty item at the end of the same sublist does, so the new text
+ * becomes a sibling of the parent item.
+ */
+export function liftEmptyNestedItem(editor: Editor): boolean {
+  if (!editor.isEditable) return false;
+  const { state } = editor;
+  const { selection } = state;
+  if (!(selection instanceof TextSelection) || !selection.empty) return false;
+  const { $from } = selection;
+  if ($from.depth < 4 || $from.parent.content.size !== 0) return false;
+  const item = $from.node(-1);
+  const list = $from.node(-2);
+  const parentItem = $from.node(-3);
+  if (item.type.name !== "listItem" || item.childCount !== 1) return false;
+  if (!isListNode(list) || parentItem.type.name !== "listItem") return false;
+  return editor.chain().liftListItem("listItem").run();
+}
+
+/**
  * Enter on an empty numbered item ends the numbering run in the middle of the
  * list. ProseMirror splits the list and copies the attrs, so the second half
  * silently restarts at 1 and two items carry the same number. Leave the empty
