@@ -4020,8 +4020,9 @@
       "hint": "Repro: Open a project, click into the document, select all and type \"mode probe paragraph\". Press Ctrl+Alt+2 (Source): the status bar switches to Source and focus lands in the \"LaTeX source\" textarea. Press Ctrl+Alt+1 (Visual): the status bar switches to Visual, but document.activeElement is <body>, not the ProseMirror editor. Type \"QRS\": the document still reads \"mode probe paragraph\", and QRS appears nowhere on the page or in the LaTeX source. Typing only works again after clicking the page, pressing F6 or tabbing back. The same happens when leaving Split for Visual while the caret is in the source pane: Ctrl+Alt+1 from Split puts focus on <body> and the next typing is lost.\nActual: After Ctrl+Alt+1 the LaTeX textarea is gone from the DOM and activeElement is {tag: \"BODY\"}; nothing has moved focus into the visual editor. Typing QRS leaves the visual document unchanged (\"mode probe paragraph\") and bodyText does not contain QRS. Ctrl+Alt+2 works because focus lands in the source textarea; there is no equivalent handoff for visual.",
       "source": "explore:keyboard:ctrl+alt+1 back to visual leaves focus on <body>, so the next keystrokes are silently discarded",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T15:47:12Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T15:47:12Z",
+      "lastAttemptAt": "2026-11-25T15:47:12Z"
     },
     {
       "id": "qa-254",
