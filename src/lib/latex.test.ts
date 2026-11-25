@@ -892,6 +892,36 @@ describe("LaTeX generation", () => {
     }
   });
 
+  it("keeps a hand-written table label so its \\ref still resolves", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\caption{ZXCAPTION}",
+      "\\label{tab:zxtable}",
+      "\\begin{tabular}{ll}",
+      "\\hline",
+      "Name & Value \\\\",
+      "ZXTABLELABEL & 7 \\\\",
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "",
+      "See Table~\\ref{tab:zxtable}.",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(table?.attrs).toEqual({ caption: "ZXCAPTION", label: "tab:zxtable" });
+    expect(table?.content).toHaveLength(2);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\caption{ZXCAPTION}\n\\label{tab:zxtable}");
+    expect(exported).toContain("ZXTABLELABEL & 7 \\\\");
+    expect(exported).toContain("\\ref{tab:zxtable}");
+    expect(exported).not.toContain("textbackslash");
+  });
+
   it("imports rows that end with row-spacing arguments like \\\\[4pt]", () => {
     const source = [
       "\\begin{document}",

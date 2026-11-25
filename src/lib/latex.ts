@@ -365,6 +365,9 @@ function tableToLatex(node: DocumentNode, settings: ProjectSettings): string {
     .map((row) => `${row.map((cell, index) => tableCellToLatex(cell, columnAligns[index] ?? "l", settings)).join(" & ")} \\\\`)
     .join("\n");
   const caption = attribute(node, "caption");
+  // A hand-written \label is the target a \ref points at, so it has to follow
+  // the caption out again or the reference is left dangling.
+  const label = latexReferenceTarget(attribute(node, "label") ?? "");
   // A header row changes the first row's cell type, which LaTeX itself cannot
   // express. Mark the header-less case so a source round trip keeps it off.
   const headerRow = rows[0]?.[0]?.type === "tableHeader";
@@ -372,6 +375,7 @@ function tableToLatex(node: DocumentNode, settings: ProjectSettings): string {
     "\\begin{table}[htbp]",
     "\\centering",
     caption ? `\\caption{${escapeLatex(caption)}}` : "",
+    label ? `\\label{${label}}` : "",
     headerRow ? "" : "% Sentence table header: none",
     `\\begin{tabular}{${columnAligns.join("")}}`,
     "\\hline",
@@ -1837,6 +1841,9 @@ export function latexToDocument(
         .filter((char) => char === "l" || char === "c" || char === "r")
         .map((char) => (char === "c" ? "center" : char === "r" ? "right" : "left"));
       const caption = block.match(/\\caption\{([^}]*)\}/)?.[1];
+      // A table's \label names the target of a \ref. It is metadata on the
+      // table node, not cell text, so the next Refresh from visual keeps it.
+      const label = block.match(/\\label\{([^{}]*)\}/)?.[1];
       const headerless = /% Sentence table header:\s*(?:none|off|false)/i.test(block);
       // A row break may carry an optional vertical-space argument such as
       // \\[4pt]; it is row spacing, not cell text, so it ends the row too.
@@ -1849,9 +1856,12 @@ export function latexToDocument(
             .filter(Boolean)
         : [];
       if (rows.length > 0) {
+        const attrs: Record<string, string> = {};
+        if (caption !== undefined) attrs.caption = decodeLatexText(caption);
+        if (label) attrs.label = label;
         content.push({
           type: "table",
-          ...(caption !== undefined ? { attrs: { caption: decodeLatexText(caption) } } : {}),
+          ...(Object.keys(attrs).length > 0 ? { attrs } : {}),
           content: rows.map((row, rowIndex) => ({
             type: "tableRow",
             content: splitTableRow(row).map((rawCell, columnIndex) => {

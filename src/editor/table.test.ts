@@ -216,6 +216,37 @@ describe("CaptionTable", () => {
     reloaded.destroy();
   });
 
+  it("keeps a table label on the node through a visual edit", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\caption{ZXCAPTION}",
+      "\\label{tab:zxtable}",
+      "\\begin{tabular}{ll}",
+      "\\hline",
+      "Name & Value \\\\",
+      "ZXTABLELABEL & 7 \\\\",
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const editor = new Editor({
+      extensions: [StarterKit, TableKit.configure({ table: false }), CaptionTable],
+      content: parsed,
+    });
+    editor.commands.setTextSelection(cellPositions(editor)[2]);
+    editor.commands.insertContent("edited");
+    const document = editor.getJSON() as SentenceDocument;
+    const table = document.content.find((node) => node.type === "table");
+    expect(table?.attrs?.label).toBe("tab:zxtable");
+    const exported = documentToLatex(document, DEFAULT_SETTINGS);
+    expect(exported).toContain("\\label{tab:zxtable}");
+    editor.destroy();
+  });
+
   it("moves the caret back with Shift-Tab", () => {
     const editor = createSizedEditor(2, 2);
     const positions = cellPositions(editor);
