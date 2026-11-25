@@ -2,6 +2,12 @@
   "notes": "Work orders for the QA loop, in order. cycle.py promotes the first item that is not already in the backlog whenever the queue is empty, then the loop builds it under qa/cycle.py's usual branch -> verify -> merge flow. Product definition: docs/PRODUCT.md. Keep items small enough for one cycle; split anything bigger instead of widening an item.",
   "items": [
     {
+      "title": "Start screen: replace the remaining hard-coded colours with tokens",
+      "why": "The editor is Word-styled now, but the start screen still has ~30 literal greens/creams, so the first screen a user sees is off-brand.",
+      "severity": "low",
+      "hint": "src/styles.css: the .start-* block (from `/* Start screen */` to `.start-card`) still hard-codes warm colours. Replace each literal with the matching token from docs/DESIGN.md (--chrome, --chrome-strong, --paper, --ink, --muted, --accent, --accent-soft, --line) and keep the grid pattern but derived from --ink at low alpha. No layout changes. Acceptance: no #rrggbb literals inside the .start-* block except transparent/rgba; gate still green."
+    },
+    {
       "title": "Show two-column layout in the visual page",
       "why": "The Columns control now changes the .tex but the page still renders one column, so the setting looks broken until you compile.",
       "severity": "medium",

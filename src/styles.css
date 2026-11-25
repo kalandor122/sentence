@@ -92,9 +92,9 @@ button:disabled {
   overflow: auto;
   padding: 44px clamp(32px, 6vw, 88px) 28px;
   background:
-    linear-gradient(90deg, rgba(40, 56, 46, 0.028) 1px, transparent 1px),
-    linear-gradient(rgba(40, 56, 46, 0.025) 1px, transparent 1px),
-    #f3f0e9;
+    linear-gradient(90deg, rgba(32, 31, 30, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(32, 31, 30, 0.025) 1px, transparent 1px),
+    var(--chrome);
   background-size: 36px 36px;
 }
 
@@ -125,10 +125,10 @@ button:disabled {
   place-items: center;
   width: 60px;
   height: 60px;
-  color: #f6f2e8;
-  background: #223e33;
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(33, 57, 47, 0.16);
+  color: #ffffff;
+  background: var(--accent);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(43, 87, 154, 0.24);
 }
 
 .start-brand div {
