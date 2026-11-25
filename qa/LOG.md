@@ -529,3 +529,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T01:52:21Z START qa-183 on qa/qa-183-leaving-a-numbered-list-from-the-middle: Leaving a numbered list from the middle restarts the remaining items at 1
 2026-11-25T01:56:15Z PUSHED main
 2026-11-25T01:56:15Z DONE qa-183 (tsc -b, npm test, smoke all green)
+2026-11-25T01:56:49Z START qa-176 on qa/qa-176-text-colour-popover-uses-role-menu-but-h: Text colour popover uses role=menu but has plain-button children and no arrow-key navigation

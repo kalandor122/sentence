@@ -2808,8 +2808,9 @@
       "hint": "Repro: On the Home ribbon tab focus \"Text color\", press Enter to open the swatch popover, press ArrowDown, then Tab through the swatches.\nActual: .color-popover has role=\"menu\" and aria-label \"Text color\", but all ten children have no role (plain buttons) and ArrowDown leaves focus on the \"Text color\" trigger. Only Tab reaches the swatches (\"No color\", \"Black\", \"Dark gray\", ... \"Blue\"). Enter on a swatch and Escape to close both work.",
       "source": "explore:keyboard:text colour popover uses role=menu but has plain-button children and no arrow-key navigation",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T01:56:49Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T01:56:49Z",
+      "lastAttemptAt": "2026-11-25T01:56:49Z"
     },
     {
       "id": "qa-177",
