@@ -2908,8 +2908,9 @@
       "hint": "Repro: Create a new document. Type 'one', click Home > Numbered list, press Enter, type 'two', press Enter, type 'three'. Click at the end of 'one', press Enter (an empty item appears as number 2), then press Enter again on that empty item. Read the editor and then the LaTeX source.\nActual: The list is split in two and the second list restarts at 1: the DOM is '<ol><li><p>one</p></li></ol><p><br></p><ol><li><p>two</p></li><li><p>three</p></li></ol>', the second '<ol>' has no start attribute, and the LaTeX is two separate '\\begin{enumerate}' blocks, '\\item one' then '\\item two'/'\\item three', with no '\\setcounter'. The PDF therefore numbers 'two' as 1 and 'three' as 2, and the document shows two items numbered 1.",
       "source": "explore:lists:leaving a numbered list from the middle restarts the remaining items at 1",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T01:52:21Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T01:52:21Z",
+      "lastAttemptAt": "2026-11-25T01:52:21Z"
     }
   ]
 }

@@ -74,6 +74,53 @@ export function splitListItemKeepingSublist(editor: Editor): boolean {
   return true;
 }
 
+/**
+ * Enter on an empty numbered item ends the numbering run in the middle of the
+ * list. ProseMirror splits the list and copies the attrs, so the second half
+ * silently restarts at 1 and two items carry the same number. Leave the empty
+ * item behind as a paragraph and start the trailing items at the number they
+ * already had. A bullet list has no numbers to keep, and an empty item at the
+ * end exits through the default lift, so both are left alone.
+ */
+export function splitOrderedListOnEmptyItem(editor: Editor): boolean {
+  if (!editor.isEditable) return false;
+  const { state } = editor;
+  const { selection } = state;
+  if (!(selection instanceof TextSelection) || !selection.empty) return false;
+  const { $from } = selection;
+  if ($from.depth < 3 || $from.parent.content.size !== 0) return false;
+  const item = $from.node(-1);
+  const list = $from.node(-2);
+  if (item.type.name !== "listItem" || item.childCount !== 1) return false;
+  if (list.type.name !== "orderedList") return false;
+  const index = $from.index(-2);
+  const items: ProseMirrorNode[] = [];
+  list.forEach((child) => items.push(child));
+  if (index >= items.length - 1) return false;
+
+  const start = Number(list.attrs.start ?? 1);
+  const blocks: ProseMirrorNode[] = [];
+  const listPos = $from.before(-2);
+  let paragraphPos = listPos;
+  if (index > 0) {
+    const before = list.type.create(list.attrs, items.slice(0, index));
+    blocks.push(before);
+    paragraphPos += before.nodeSize;
+  }
+  blocks.push($from.parent.type.create($from.parent.attrs));
+  blocks.push(
+    list.type.create(
+      { ...list.attrs, start: (Number.isSafeInteger(start) && start > 0 ? start : 1) + index },
+      items.slice(index + 1),
+    ),
+  );
+
+  const tr = state.tr.replaceWith(listPos, listPos + list.nodeSize, blocks);
+  tr.setSelection(TextSelection.create(tr.doc, paragraphPos + 1));
+  editor.view.dispatch(tr.scrollIntoView());
+  return true;
+}
+
 // Retag list nodes (including nested sublists) without touching their items,
 // so a full-document toggle converts lists in place instead of wrapping every
 // selected block - including paragraphs and nested lists - in a new list.
