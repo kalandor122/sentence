@@ -3511,10 +3511,11 @@
       ],
       "hint": "Repro: Open View > LaTeX and add '\\section*{Unnumbered Appendix}' followed by '\\section{After The Appendix}' before \\end{document}; click Apply source, then insert a table of contents.\nActual: The preview shows '2 Unnumbered Appendix' and '3 After The Appendix'. The exported source contains \\section*{Unnumbered Appendix} (unnumbered) and \\section{After The Appendix}, so LaTeX omits the starred heading and numbers the following section 2. Probe qa/probes/insert-media.mjs scenario 'toc-unnumbered'.",
       "source": "explore:insert-media:the toc preview numbers a starred (unnumbered) heading and shifts the numbering of later headings",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T09:41:13Z",
-      "lastAttemptAt": "2026-11-25T09:41:13Z"
+      "lastAttemptAt": "2026-11-25T09:41:13Z",
+      "doneAt": "2026-11-25T09:45:04Z"
     },
     {
       "id": "qa-222",
@@ -3526,7 +3527,9 @@
       ],
       "hint": "Repro: Click Layout > Document properties, set Title to 'Introduction' (the demo's first H1 is also 'Introduction'), close Properties, press Ctrl+End, then click References > Table of contents.\nActual: The preview lists '1 Introduction' and '1.1 Drafting with constraints' (numbers 1 and 1.1), but the exported LaTeX contains \\title{Introduction} and no \\section{Introduction} at all - only \\subsection{Drafting with constraints}. The PDF contents will not contain the 'Introduction' entry the preview shows. Probe qa/probes/insert-media.mjs scenario 'toc-title-heading'.",
       "source": "explore:insert-media:the toc preview lists a heading that the exporter turns into \\maketitle and removes from the body",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T10:17:52Z"
     },
     {
       "id": "qa-223",
@@ -3538,6 +3541,66 @@
       ],
       "hint": "Repro: Click Layout > Document properties, check 'Generate table of contents', close Properties, and compare the page with View > LaTeX. Then place the caret at the end of the document and click References > Table of contents and compare again.\nActual: With the switch on, the visual document has 0 [data-toc] blocks and the status bar still reports 1 page, while the LaTeX contains \\tableofcontents\\newpage (an extra PDF page). Inserting a TOC from the ribbon then shows 1 TOC block but the LaTeX contains 2 \\tableofcontents commands. Probe qa/probes/insert-media.mjs scenario 'toc-setting'.",
       "source": "explore:insert-media:the properties 'generate table of contents' switch adds a contents page the visual editor never shows; adding a ribbon t",
+      "status": "open"
+    },
+    {
+      "id": "qa-224",
+      "title": "Turning numbering off for one item in a numbered list restarts the remaining items at 1",
+      "why": "Exploratory pass on lists (content): expected Only 'two' leaves the list and the remaining items keep their numbers, so 'three' is 3 and 'four' is 4. That is what the app already does when a numbered item is removed with Enter on an empty item, which exports a \\setcounter so the trailing list continues.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Type 'one', click Home > Numbered list, press Enter and type 'two', press Enter and type 'three', press Enter and type 'four'. Click at the end of 'two' and click Home > Numbered list (Ctrl+Shift+7 gives the same result). Read the editor, then open Source and read the LaTeX.\nActual: The trailing items restart at 1. The editor DOM is '<ol><li><p>one</p></li></ol><p>two</p><ol><li><p>three</p></li><li><p>four</p></li></ol>' (the second <ol> has no start attribute, so it shows 1. three and 2. four next to 1. one) and the LaTeX is two separate \\begin{enumerate} blocks, the second with no \\setcounter{enumi}, so the PDF prints two items numbered 1. The same happens with a three-item list and Ctrl+Shift+7.",
+      "source": "explore:lists:turning numbering off for one item in a numbered list restarts the remaining items at 1",
+      "status": "open"
+    },
+    {
+      "id": "qa-225",
+      "title": "Clicking the highlighted list button inside a nested item only outdents it and keeps the bullet",
+      "why": "Exploratory pass on lists (functional): expected The clicked button turns the bullet off for 'inner one', exactly as it does on a top-level item: a flat two-item bullet list with the caret in the second item becomes 'one' in the list, 'two' as a paragraph.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'inner one', press Tab, press Enter, type 'inner two'. Click at the end of 'inner one' and click Home > Bulleted list (the button is shown pressed). Also select both 'inner one' and 'inner two' and click the same button.\nActual: 'inner one' is promoted out of the sublist but remains a bulleted list item, and 'inner two' is re-nested under it. The DOM becomes '<ul><li><p>outer</p></li><li><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>' and the LaTeX is '\\item outer\\n\\item inner one\\n\\begin{itemize}\\n\\item inner two\\n\\end{itemize}': the bullet on 'inner one' is never removed. With both items selected, only the parent leaves the list and the nested item stays as a top-level bullet list.",
+      "source": "explore:lists:clicking the highlighted list button inside a nested item only outdents it and keeps the bullet",
+      "status": "open"
+    },
+    {
+      "id": "qa-226",
+      "title": "Enter on an empty item in the middle of a nested list turns the new text into part of the parent item",
+      "why": "Exploratory pass on lists (functional): expected The empty nested item is outdented one level, so the caret moves to a new top-level item after 'outer' and 'typed' becomes a top-level bullet. This is what pressing Enter on the empty item at the end of the same nested list does (the DOM ends '<li><p>outer</p><ul>...</ul></li><li><p>typed</p></li>').",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'child one', press Tab, press Enter, type 'child two', press Enter, type 'child three'. Click at the end of 'child one', press Enter (an empty second child item appears), press Enter again and type 'typed'. Repeat with Home > Numbered list.\nActual: 'typed' is inserted inside the parent list item, between two split child lists: the DOM is '<ul><li><p>outer</p><ul><li><p>child one</p></li></ul><p>typed</p><ul><li><p>child two</p></li><li><p>child three</p></li></ul></li></ul>' and the LaTeX is '\\item outer\\n\\begin{itemize}\\n\\item child one\\n\\end{itemize}\\ntyped\\n\\begin{itemize}\\n\\item child two\\n\\item child three\\n\\end{itemize}', so 'typed' becomes text of the parent item rather than a list item. The numbered variant behaves the same and exports the second nested list as '\\setcounter{enumii}{1}'.",
+      "source": "explore:lists:enter on an empty item in the middle of a nested list turns the new text into part of the parent item",
+      "status": "open"
+    },
+    {
+      "id": "qa-227",
+      "title": "Both Bulleted and Numbered list buttons show as active in a mixed nested list",
+      "why": "Exploratory pass on lists (ux): expected Only the list type of the item that holds the caret is shown active, so Numbered list is highlighted and Bulleted list is not.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Type 'parent', click Home > Bulleted list, press Enter, type 'child one', press Tab, click Home > Numbered list, press Enter, type 'child two'. With the caret inside the numbered child list, look at and read the Home > Bulleted list and Home > Numbered list buttons. Reverse the list types (numbered parent, bullet child) for the same result.\nActual: Both buttons are highlighted: both report aria-pressed=\"true\" (bullets=true, numbers=true) for a numbered child inside a bullet parent, and the same pair is reported for a bullet child inside a numbered parent.",
+      "source": "explore:lists:both bulleted and numbered list buttons show as active in a mixed nested list",
+      "status": "open"
+    },
+    {
+      "id": "qa-228",
+      "title": "Every level of a nested numbered list is labelled 1. in the visual editor",
+      "why": "Exploratory pass on lists (visual): expected Nested levels show the same per-level markers the exported document produces (1., (a), i. for the article class), so the visual page and the PDF agree.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Type 'outer one', click Home > Numbered list, press Enter, type 'middle one', press Tab, press Enter, type 'deep one', press Tab. Read the three markers in the editor, then open Source and read the LaTeX.\nActual: All three items render with the decimal marker '1.' (the computed list-style-type is 'decimal' for the level 0, 1 and 2 <ol> elements), giving '1. outer one / 1. middle one / 1. deep one', while the exported LaTeX is three plain nested \\begin{enumerate} blocks with no label customisation, which compile to 1., (a), i.",
+      "source": "explore:lists:every level of a nested numbered list is labelled 1. in the visual editor",
       "status": "open"
     }
   ]
