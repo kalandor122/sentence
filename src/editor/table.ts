@@ -1,5 +1,6 @@
 import { Table } from "@tiptap/extension-table";
 import { addRow, deleteColumn, deleteRow, isInTable, selectedRect } from "@tiptap/pm/tables";
+import { focusAfterEditor, focusBeforeEditor } from "./focus";
 
 // Tables carry their caption as a node attribute so it survives the visual/LaTeX
 // round trip without becoming a paragraph inside the table.
@@ -11,6 +12,25 @@ export const CaptionTable = Table.extend({
         default: "",
         parseHTML: (element) => element.getAttribute("data-caption") ?? "",
         renderHTML: (attributes) => (attributes.caption ? { "data-caption": attributes.caption } : {}),
+      },
+    };
+  },
+
+  // Tiptap appends a row when Tab is pressed in the last cell. Tab is focus
+  // navigation here too: walk the cells and then hand focus to the next
+  // control instead of changing the table structure.
+  addKeyboardShortcuts() {
+    return {
+      ...this.parent?.(),
+      Tab: () => {
+        if (!isInTable(this.editor.state)) return false;
+        if (this.editor.commands.goToNextCell()) return true;
+        return focusAfterEditor(this.editor);
+      },
+      "Shift-Tab": () => {
+        if (!isInTable(this.editor.state)) return false;
+        if (this.editor.commands.goToPreviousCell()) return true;
+        return focusBeforeEditor(this.editor);
       },
     };
   },
