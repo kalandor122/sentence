@@ -644,3 +644,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T09:33:14Z PUSHED main
 2026-11-25T09:33:14Z DONE qa-219 (tsc -b, npm test, smoke all green)
 2026-11-25T09:33:52Z START qa-220 on qa/qa-220-the-toc-preview-shows-the-full-heading-t: The TOC preview shows the full heading text for \section[Short]{Long} instead of the short title the PDF contents will p
+2026-11-25T09:40:36Z PUSHED main
+2026-11-25T09:40:36Z DONE qa-220 (tsc -b, npm test, smoke all green)

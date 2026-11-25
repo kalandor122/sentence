@@ -3495,10 +3495,11 @@
       ],
       "hint": "Repro: Open View > LaTeX and add '\\section[Short Intro]{A Very Long Section Title That Will Not Fit}' just before \\end{document}; click Apply source, then place the caret at the end of the document and click References > Table of contents.\nActual: The preview lists '2 A Very Long Section Title That Will Not Fit'; the exported source still contains \\section[Short Intro]{A Very Long Section Title That Will Not Fit}, so the PDF contents will read 'Short Intro'. Probe qa/probes/insert-media.mjs scenario 'toc-short-title'.",
       "source": "explore:insert-media:the toc preview shows the full heading text for \\section[short]{long} instead of the short title the pdf contents will p",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T09:33:52Z",
-      "lastAttemptAt": "2026-11-25T09:33:52Z"
+      "lastAttemptAt": "2026-11-25T09:33:52Z",
+      "doneAt": "2026-11-25T09:40:34Z"
     },
     {
       "id": "qa-221",
@@ -3510,7 +3511,9 @@
       ],
       "hint": "Repro: Open View > LaTeX and add '\\section*{Unnumbered Appendix}' followed by '\\section{After The Appendix}' before \\end{document}; click Apply source, then insert a table of contents.\nActual: The preview shows '2 Unnumbered Appendix' and '3 After The Appendix'. The exported source contains \\section*{Unnumbered Appendix} (unnumbered) and \\section{After The Appendix}, so LaTeX omits the starred heading and numbers the following section 2. Probe qa/probes/insert-media.mjs scenario 'toc-unnumbered'.",
       "source": "explore:insert-media:the toc preview numbers a starred (unnumbered) heading and shifts the numbering of later headings",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T09:41:13Z"
     },
     {
       "id": "qa-222",
