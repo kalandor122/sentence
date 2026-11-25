@@ -3496,8 +3496,9 @@
       "hint": "Repro: Open View > LaTeX and add '\\section[Short Intro]{A Very Long Section Title That Will Not Fit}' just before \\end{document}; click Apply source, then place the caret at the end of the document and click References > Table of contents.\nActual: The preview lists '2 A Very Long Section Title That Will Not Fit'; the exported source still contains \\section[Short Intro]{A Very Long Section Title That Will Not Fit}, so the PDF contents will read 'Short Intro'. Probe qa/probes/insert-media.mjs scenario 'toc-short-title'.",
       "source": "explore:insert-media:the toc preview shows the full heading text for \\section[short]{long} instead of the short title the pdf contents will p",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T09:33:52Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T09:33:52Z",
+      "lastAttemptAt": "2026-11-25T09:33:52Z"
     },
     {
       "id": "qa-221",
