@@ -2679,10 +2679,11 @@
       ],
       "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add a tabular with header `Name & Value \\\\` and last row `ZXLASTROW & 99` with no trailing `\\\\`, followed by `\\hline` and `\\end{tabular}`. 3. Click Apply source, then View tab > Visual.\nActual: Apply reports success, but the last visual cell is `99 \\hline` (probe cells: `[\"ZXLASTROW\", \"99 \\\\hline\"]`). Refresh from visual writes `ZXLASTROW & 99\\n\\textbackslash{}hline \\\\`, adding a row whose second cell is the literal text `\\hline`; the rule becomes table content.",
       "source": "explore:source-editor:a table's last row without a trailing \\\\ swallows the following \\hline into a cell",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T01:05:00Z",
-      "lastAttemptAt": "2026-11-25T01:05:00Z"
+      "lastAttemptAt": "2026-11-25T01:05:00Z",
+      "doneAt": "2026-11-25T01:08:33Z"
     },
     {
       "id": "qa-169",
@@ -2694,7 +2695,9 @@
       ],
       "hint": "Repro: 1. View tab > LaTeX. 2. Put the caret before \\end{document} and type `ZXUNDO one two.`. 3. Press Ctrl+Z once; the textarea returns exactly to the applied text. 4. Look at the Apply source button, then click it.\nActual: Apply source remains enabled after the undo (probe applyEnabledAfterUndoAll=true) even though the text equals the applied source. Clicking it reports `Visual document synchronized from LaTeX.` while the textarea stays byte-identical (probe sourceUnchangedAfterNoopApply=true), so the dirty state is not cleared when undo returns to the applied text.",
       "source": "explore:source-editor:undoing every source edit leaves apply source enabled and reports a synchronisation that changed nothing",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T01:09:09Z"
     },
     {
       "id": "qa-170",
