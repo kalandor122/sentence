@@ -370,17 +370,30 @@ export function nodeText(value: unknown): string {
 }
 
 // A removed node has no position in the current document, so give the editor
-// surrounding text it can still use to place the strike-through inline.
-export function deletionAnchor(revision: Revision, change: Change): { text: string; prefix: string; suffix: string } | null {
+// surrounding text it can still use to place the strike-through inline. When
+// every character of a block is removed the block itself is the only anchor
+// left, so report its path as well.
+export function deletionAnchor(
+  revision: Revision,
+  change: Change,
+): { text: string; prefix: string; suffix: string; block?: Path } | null {
   if (change.kind !== "value" || change.before === undefined || change.after !== undefined || !revision.beforeDocument) return null;
   const text = nodeText(change.before);
   if (!text) return null;
-  const parent = getAt(mergeTextRuns(revision.beforeDocument), change.path.slice(0, -1));
+  const before = mergeTextRuns(revision.beforeDocument);
+  const parent = getAt(before, change.path.slice(0, -1));
   const key = change.path[change.path.length - 1];
-  if (!Array.isArray(parent) || typeof key !== "number") return null;
-  return {
-    text,
-    prefix: nodeText(parent.slice(0, key)).trim(),
-    suffix: nodeText(parent.slice(key + 1)).trim(),
-  };
+  if (Array.isArray(parent) && typeof key === "number") {
+    const owner = getAt(before, change.path.slice(0, -2));
+    return {
+      text,
+      prefix: nodeText(parent.slice(0, key)).trim(),
+      suffix: nodeText(parent.slice(key + 1)).trim(),
+      block: isObject(owner) && typeof owner.type === "string" ? change.path.slice(0, -2) : undefined,
+    };
+  }
+  if (isObject(parent) && key === "content" && parent.type !== "doc" && Array.isArray(change.before)) {
+    return { text, prefix: "", suffix: "", block: change.path.slice(0, -1) };
+  }
+  return null;
 }

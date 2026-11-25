@@ -59,6 +59,40 @@ describe("tracked change decorations", () => {
     editor.destroy();
   });
 
+  it("draws a deletion in a paragraph whose entire text was removed", () => {
+    const before = twoParagraphs("Keep this", "Gone entirely");
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Keep this" }] },
+        { type: "paragraph" },
+      ],
+    };
+    const editor = new Editor({ extensions: [StarterKit, RevisionMarks], content: after });
+    setRevisionMarks(editor, [revision(before, after)]);
+
+    const [, second] = paragraphs(editor);
+    expect(second.querySelector(".sentence-revision-deletion")?.textContent).toBe("Gone entirely");
+    editor.destroy();
+  });
+
+  it("keeps the deletion visible when the emptied paragraph stores empty content", () => {
+    const before = twoParagraphs("Keep this", "Gone entirely");
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Keep this" }] },
+        { type: "paragraph", content: [] },
+      ],
+    };
+    const editor = new Editor({ extensions: [StarterKit, RevisionMarks], content: after });
+    setRevisionMarks(editor, [revision(before, after)]);
+
+    const [, second] = paragraphs(editor);
+    expect(second.querySelector(".sentence-revision-deletion")?.textContent).toBe("Gone entirely");
+    editor.destroy();
+  });
+
   it("marks an inserted empty paragraph with a paragraph symbol", () => {
     const before: SentenceDocument = {
       type: "doc",
