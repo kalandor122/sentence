@@ -536,6 +536,11 @@ export default function App() {
   const recentRef = useRef<RecentProject[]>(recent);
   const [toast, setToast] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  // Bumped whenever the source draft is committed (Apply, autosave, leaving the
+  // pane) so the source editor starts a fresh undo step. Applying does not
+  // change the textarea's text, so without this the next keystroke would
+  // coalesce into the edit that was just applied and one undo would drop both.
+  const [sourceUndoBoundary, setSourceUndoBoundary] = useState(0);
   // The message that autosave reported for an unapplied source draft, so
   // discarding that draft can drop the error with it.
   const draftSaveError = useRef<string | null>(null);
@@ -837,6 +842,9 @@ export default function App() {
         sourceDirtyRef.current = false;
         sourceDraftDocument.current = null;
         sourceDraftWarning.current = false;
+        // Autosave commits the draft without the Apply button, so the next key
+        // still has to start a new undo step rather than extend the old one.
+        setSourceUndoBoundary((value) => value + 1);
         // The pagehide flush can run this far and then never render again, so
         // drop the stored draft here rather than waiting for the effect.
         if (!isDesktop) saveBrowserDraft(null);
@@ -1340,6 +1348,7 @@ export default function App() {
   const applySource = () => {
     const current = workspaceRef.current;
     if (!current) return;
+    setSourceUndoBoundary((value) => value + 1);
     try {
       const parsed = parseSourceDocument(current.document, sourceRef.current, current.settings);
       const next: Workspace = { ...current, document: parsed.document, settings: parsed.settings };
@@ -2271,6 +2280,7 @@ export default function App() {
                   activeLine={sourceFile === "document.tex" ? compileResult?.diagnostics.find((item) => item.line)?.line : undefined}
                   textareaRef={sourceTextarea}
                   historyRef={sourceHistory}
+                  undoBoundary={sourceUndoBoundary}
                 />
               </section>
             ) : null}
