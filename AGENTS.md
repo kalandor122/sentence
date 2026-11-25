@@ -111,3 +111,7 @@ The QA loop runs its fixer and tester agents on `opencode-go/deepseek-v4.1-flash
 systemd unit via `EnvironmentFile`). `opencode run --standalone` is used so each
 run picks up that key instead of reusing a background server started without it.
 Override with `QA_MODEL=opencode/<other>`.
+
+## Desktop builds
+
+`cargo build --release` alone ships the **previous** frontend: Tauri embeds `dist/` at compile time. Rebuild the desktop app with `npm run desktop:linux:build` (or `npx tauri build --no-bundle`), and copy `src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu` to `src-tauri/target/release/tectonic` afterwards.
