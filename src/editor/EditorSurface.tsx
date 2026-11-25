@@ -5,7 +5,7 @@ import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import { TableKit } from "@tiptap/extension-table";
 import TextAlign from "@tiptap/extension-text-align";
-import { NodeSelection, TextSelection } from "@tiptap/pm/state";
+import { NodeSelection, Selection, TextSelection } from "@tiptap/pm/state";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   Citation,
@@ -106,6 +106,27 @@ const ListShortcuts = Extension.create({
     return {
       "Mod-Shift-7": () => toggleList(this.editor, "orderedList"),
       "Mod-Shift-8": () => toggleList(this.editor, "bulletList"),
+    };
+  },
+});
+
+// Ctrl+End/Ctrl+Home jump to the document end/start. The WebView's own jump can
+// leave the caret below the scrolled page, and when the caret is already at the
+// boundary the selection does not change, so nothing scrolls at all. Dispatching
+// the selection with scrollIntoView makes the view follow the caret every time.
+const DocumentJumps = Extension.create({
+  name: "sentenceDocumentJumps",
+  priority: 200,
+  addKeyboardShortcuts() {
+    const jump = (toEnd: boolean) => () => {
+      const { state } = this.editor;
+      const selection = toEnd ? Selection.atEnd(state.doc) : Selection.atStart(state.doc);
+      this.editor.view.dispatch(state.tr.setSelection(selection).scrollIntoView());
+      return true;
+    };
+    return {
+      "Mod-End": jump(true),
+      "Mod-Home": jump(false),
     };
   },
 });
@@ -314,6 +335,7 @@ export default function EditorSurface({
       TabIndent,
       ListShortcuts,
       ListEnter,
+      DocumentJumps,
       ViewModeShortcuts,
     ],
     content: document,
@@ -479,6 +501,10 @@ export default function EditorSurface({
     }
     let frame = 0;
     let gapsApplied = false;
+    // Page snapping and line gaps move the text after ProseMirror has already
+    // scrolled to the caret, so a paste lands below the visible area. Follow the
+    // caret once the page layout has settled after an edit.
+    let followCaret = false;
     // Blocks nudged down when they do not fit inside a page's text area, so no
     // line or heading is left in the top or bottom margin. The rules live in a
     // style element because ProseMirror re-renders text nodes and would drop
@@ -638,14 +664,33 @@ export default function EditorSurface({
       );
       setPageCount(pages);
       onPageCountChange(pages);
+      if (followCaret) {
+        followCaret = false;
+        // Only dispatch when the caret actually ended up outside the visible
+        // page: an empty transaction per keystroke would re-render the chrome.
+        const scroller = dom.closest<HTMLElement>(".visual-editor-scroll");
+        if (scroller) {
+          const bounds = scroller.getBoundingClientRect();
+          const caret = editor.view.coordsAtPos(editor.state.selection.head);
+          if (caret.top < bounds.top || caret.bottom > bounds.bottom) {
+            // The empty transaction only asks ProseMirror to reveal the
+            // selection: its position is now measured after pagination.
+            editor.view.dispatch(editor.view.state.tr.scrollIntoView());
+          }
+        }
+      }
     };
 
     const schedule = () => {
       if (!frame) frame = window.requestAnimationFrame(paginate);
     };
+    const scheduleFollow = () => {
+      followCaret = true;
+      schedule();
+    };
 
     schedule();
-    editor.on("update", schedule);
+    editor.on("update", scheduleFollow);
     window.addEventListener("resize", schedule);
     const observer = new ResizeObserver(schedule);
     observer.observe(dom);
@@ -654,7 +699,7 @@ export default function EditorSurface({
 
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
-      editor.off("update", schedule);
+      editor.off("update", scheduleFollow);
       window.removeEventListener("resize", schedule);
       observer.disconnect();
       resetSnap();
