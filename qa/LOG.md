@@ -755,3 +755,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T15:51:10Z START qa-238 on qa/qa-238-cancelling-the-insert-dialogs-drops-the: Cancelling the insert dialogs drops the next typed characters
 2026-11-25T15:54:07Z PUSHED main
 2026-11-25T15:54:07Z DONE qa-238 (tsc -b, npm test, smoke all green)
+2026-11-25T15:54:45Z START qa-242 on qa/qa-242-demo-document-seeds-a-comment-that-is-no: Demo document seeds a comment that is not anchored, so Review opens with a deleted-text warning

@@ -3864,8 +3864,9 @@
       "hint": "Repro: 1. Open http://localhost:1420 in a fresh browser profile. 2. Click New document. 3. Click Review in the sidebar rail to open the Comments panel.\nActual: The only thread ('This is the kind of paragraph that benefits from a quieter interface.', by Editor) is detached: the card shows 'The text this comment was attached to was deleted, so it has no highlight in the document.' and the editor contains no .comment-highlight for it. The demo document has no text carrying the demo comment mark, so a brand-new project opens with a false deleted-text warning.",
       "source": "explore:review:demo document seeds a comment that is not anchored, so review opens with a deleted-text warning",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T15:54:45Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T15:54:45Z",
+      "lastAttemptAt": "2026-11-25T15:54:45Z"
     },
     {
       "id": "qa-243",
