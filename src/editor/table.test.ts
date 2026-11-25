@@ -247,6 +247,39 @@ describe("CaptionTable", () => {
     editor.destroy();
   });
 
+  it("keeps a spanning \\multicolumn header through a visual edit", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\begin{tabular}{ll}",
+      "\\hline",
+      "\\multicolumn{2}{c}{ZXMULTI HEADER} \\\\",
+      "ZXMULTI A & B \\\\",
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const editor = new Editor({
+      extensions: [StarterKit, TableKit.configure({ table: false }), CaptionTable],
+      content: parsed,
+    });
+    const table = (editor.getJSON() as SentenceDocument).content.find(
+      (node) => node.type === "table",
+    );
+    expect(table?.content?.[0]?.content).toHaveLength(1);
+    expect(table?.content?.[0]?.content?.[0]?.attrs?.colspan).toBe(2);
+    expect(editor.view.dom.querySelector("th")?.getAttribute("colspan")).toBe("2");
+    editor.commands.setTextSelection(cellPositions(editor)[0]);
+    editor.commands.insertContent("edited ");
+    const exported = documentToLatex(editor.getJSON() as SentenceDocument, DEFAULT_SETTINGS);
+    expect(exported).toContain("\\multicolumn{2}{c}{edited ZXMULTI HEADER} \\\\");
+    expect(exported).not.toContain("textbackslash");
+    editor.destroy();
+  });
+
   it("moves the caret back with Shift-Tab", () => {
     const editor = createSizedEditor(2, 2);
     const positions = cellPositions(editor);

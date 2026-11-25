@@ -333,6 +333,15 @@ function mathBlockInCellToLatex(node: DocumentNode): string {
   return `\\(\\displaystyle ${attribute(node, "latex") ?? ""}\\)`;
 }
 
+// A \multicolumn span is a real table-cell attribute, not text: the cell covers
+// several of the tabular's columns, so the export has to write the command back
+// or the valid spanning header would come back as escaped literal text.
+function tableCellSpan(cell: DocumentNode): number {
+  const value = cell.attrs?.colspan;
+  const span = typeof value === "number" ? value : typeof value === "string" ? Number(value) : 1;
+  return Number.isFinite(span) && span > 1 ? Math.floor(span) : 1;
+}
+
 function tableCellToLatex(
   cell: DocumentNode,
   columnAlign: LatexColumnAlign,
@@ -350,6 +359,8 @@ function tableCellToLatex(
     .filter(Boolean)
     .join("\\par ");
   const align = cellAlign(cell);
+  const span = tableCellSpan(cell);
+  if (span > 1) return `\\multicolumn{${span}}{${align}}{${body}}`;
   return align === columnAlign ? body : `\\multicolumn{1}{${align}}{${body}}`;
 }
 
@@ -357,12 +368,37 @@ function tableToLatex(node: DocumentNode, settings: ProjectSettings): string {
   const rows = (node.content ?? [])
     .filter((row) => row.type === "tableRow")
     .map((row) => (row.content ?? []).filter((cell) => cell.type === "tableCell" || cell.type === "tableHeader"));
-  const columnCount = Math.max(1, ...rows.map((row) => row.length));
-  const columnAligns = Array.from({ length: columnCount }, (_, index) =>
-    rows[0]?.[index] ? cellAlign(rows[0][index]) : "l",
+  const columnCount = Math.max(
+    1,
+    ...rows.map((row) => row.reduce((count, cell) => count + tableCellSpan(cell), 0)),
   );
+  const columnAligns: Array<LatexColumnAlign | undefined> = [];
+  // A spanning cell's alignment is row-local, so it cannot describe the whole
+  // column. Take each column's alignment from the first cell that covers just
+  // that column, which keeps a centered \multicolumn header from recentring the
+  // body and adding a \multicolumn{1} to every cell below it.
+  for (const row of rows) {
+    let column = 0;
+    for (const cell of row) {
+      const span = tableCellSpan(cell);
+      if (span === 1 && columnAligns[column] === undefined) {
+        columnAligns[column] = cellAlign(cell);
+      }
+      column += span;
+    }
+  }
+  for (let index = 0; index < columnCount; index += 1) columnAligns[index] ??= "l";
   const body = rows
-    .map((row) => `${row.map((cell, index) => tableCellToLatex(cell, columnAligns[index] ?? "l", settings)).join(" & ")} \\\\`)
+    .map((row) => {
+      let column = 0;
+      return `${row
+        .map((cell) => {
+          const latex = tableCellToLatex(cell, columnAligns[column] ?? "l", settings);
+          column += tableCellSpan(cell);
+          return latex;
+        })
+        .join(" & ")} \\\\`;
+    })
     .join("\n");
   const caption = attribute(node, "caption");
   // A hand-written \label is the target a \ref points at, so it has to follow
@@ -1882,27 +1918,38 @@ export function latexToDocument(
         content.push({
           type: "table",
           ...(Object.keys(attrs).length > 0 ? { attrs } : {}),
-          content: rows.map((row, rowIndex) => ({
-            type: "tableRow",
-            content: splitTableRow(row).map((rawCell, columnIndex) => {
-              const multiColumn = rawCell.trim().match(/^\\multicolumn\{1\}\{([lcr])\}\{([\s\S]*)\}$/);
-              const align = multiColumn
-                ? multiColumn[1] === "c"
-                  ? "center"
-                  : multiColumn[1] === "r"
-                    ? "right"
-                    : "left"
-                : columnAligns[columnIndex];
-              const cell = (multiColumn ? multiColumn[2] : rawCell).trim();
-              return {
-                type: rowIndex === 0 && !headerless ? "tableHeader" : "tableCell",
-                ...(align && align !== "left" ? { attrs: { align } } : {}),
-                content: cell.split(/(?<!\\)\\par\b/).map((paragraph) =>
-                  tableCellParagraphToNode(paragraph.trim()),
-                ),
-              };
-            }),
-          })),
+          content: rows.map((row, rowIndex) => {
+            let columnOffset = 0;
+            return {
+              type: "tableRow",
+              content: splitTableRow(row).map((rawCell) => {
+                const multiColumn = rawCell
+                  .trim()
+                  .match(/^\\multicolumn\{(\d+)\}\{([^}]*)\}\{([\s\S]*)\}$/);
+                const span = multiColumn ? Math.max(1, Number(multiColumn[1])) : 1;
+                const spec = multiColumn ? multiColumn[2].replace(/\|/g, "").trim() : "";
+                const align = multiColumn
+                  ? spec === "c"
+                    ? "center"
+                    : spec === "r"
+                      ? "right"
+                      : "left"
+                  : columnAligns[columnOffset];
+                const cell = (multiColumn ? multiColumn[3] : rawCell).trim();
+                const attrs: Record<string, string | number> = {};
+                if (align && align !== "left") attrs.align = align;
+                if (span > 1) attrs.colspan = span;
+                columnOffset += span;
+                return {
+                  type: rowIndex === 0 && !headerless ? "tableHeader" : "tableCell",
+                  ...(Object.keys(attrs).length > 0 ? { attrs } : {}),
+                  content: cell.split(/(?<!\\)\\par\b/).map((paragraph) =>
+                    tableCellParagraphToNode(paragraph.trim()),
+                  ),
+                };
+              }),
+            };
+          }),
         });
         continue;
       }

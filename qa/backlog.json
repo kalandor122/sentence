@@ -3284,8 +3284,9 @@
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add a tabular with `\\hline`, `\\multicolumn{2}{c}{ZXMULTI HEADER} \\\\`, `ZXMULTI A & B \\\\`, `\\hline`, `\\end{tabular}` wrapped in a table environment. 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: The visual table has two rows, with the first row as an empty first cell and the second cell containing the literal string `\\multicolumn{2}{c}{ZXMULTI HEADER}`. Refresh from visual writes `\\textbackslash{}multicolumn\\{2\\}\\{c\\}\\{ZXMULTI HEADER\\}`, so the valid spanning header is destroyed. Probe cells: `[\"\", \"\\multicolumn{2}{c}{ZXMULTI HEADER}\"]`.",
       "source": "explore:source-editor:\\multicolumn in a hand-written table is turned into a cell's literal text",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T06:39:49Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T06:39:49Z",
+      "lastAttemptAt": "2026-11-25T06:39:49Z"
     },
     {
       "id": "qa-207",
