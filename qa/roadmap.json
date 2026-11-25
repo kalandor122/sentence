@@ -2,6 +2,12 @@
   "notes": "Work orders for the QA loop, in order. cycle.py promotes the first item that is not already in the backlog whenever the queue is empty, then the loop builds it under qa/cycle.py's usual branch -> verify -> merge flow. Product definition: docs/PRODUCT.md. Keep items small enough for one cycle; split anything bigger instead of widening an item.",
   "items": [
     {
+      "title": "Show two-column layout in the visual page",
+      "why": "The Columns control now changes the .tex but the page still renders one column, so the setting looks broken until you compile.",
+      "severity": "medium",
+      "hint": "When settings.columns === 'two', the page body should render as two columns: set column-count/column-gap on the editor content column in src/styles.css driven by a data attribute on the page sheet, keep tables/figures/code blocks unbroken (break-inside: avoid), and make the page sheet width follow the paper width as it does now. Pagination measure must not count the same text twice \u2014 if columns confuse the height measurement, fall back to measuring the single-column flow but keep the visual two-column rendering. Acceptance: smoke sets Columns to Two and asserts the editor body reports column-count 2, then sets it back to One and asserts 1."
+    },
+    {
       "title": "Word-style design foundation: typography, density and colour tokens",
       "why": "The UI must read as Microsoft Word 365 at a glance: Segoe UI, dense ribbon, light grey chrome, blue accent. Everything else inherits these tokens, so do this before the chrome work.",
       "severity": "high",
