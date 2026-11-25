@@ -3423,10 +3423,11 @@
       ],
       "hint": "Repro: Insert ribbon tab, focus \"Inline equation\", press Enter, type x^2 and press Ctrl+Enter. Click into the document, press Ctrl+End and then ArrowLeft once: the equation is selected (selection constructor NodeSelection, node mathInline, class ProseMirror-selectednode). Press Enter: no dialog opens and the document is unchanged. A single mouse click on the equation opens the \"Edit inline equation\" dialog. The footnote control behaves as intended: arrow-select its marker and Enter opens \"Edit footnote\".\nActual: The editor's handleKeyDown only handles a NodeSelection whose node type is \"footnote\"; math nodes are edited solely through handleClick. Probe evidence: selection {type NodeSelection, node mathInline}, Enter -> modal 0; click -> modal 1, title \"Edit inline equation\".",
       "source": "explore:keyboard:existing equations cannot be opened from the keyboard; enter on the selected math node does nothing",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T08:14:14Z",
-      "lastAttemptAt": "2026-11-25T08:14:14Z"
+      "lastAttemptAt": "2026-11-25T08:14:14Z",
+      "doneAt": "2026-11-25T08:24:11Z"
     },
     {
       "id": "qa-216",
@@ -3450,6 +3451,80 @@
       ],
       "hint": "Repro: Press Ctrl+K in the editor to open the Add link dialog and Tab to the link input. Computed style of the focused input: outline-style none (the global input:focus-visible outline is overridden by .dialog-field input:focus), border-color rgb(124, 156, 136) against rgb(209, 205, 196) at rest (1.9:1 between the two border colours; 2.99:1 against the #fffefa field background), plus a rgba(76, 124, 97, 0.12) 0 0 0 2px shadow. The Cancel and Close buttons in the same dialog show the solid 2px focus outline.\nActual: Focus on dialog inputs is indicated only by a thin border-colour swap plus a 12%-alpha shadow (outline: none), so the focus ring disappears on the field a keyboard user has just tabbed into while every button keeps its outline.",
       "source": "explore:keyboard:dialog text fields drop the 2px focus outline and show only a 1px border-colour change",
+      "status": "open"
+    },
+    {
+      "id": "qa-218",
+      "title": "Inserting a table of contents or a page break with the caret inside a heading splits the heading into two headings",
+      "why": "Exploratory pass on insert-media (functional): expected The block is inserted at the caret without changing the heading text, or the command is refused/places the block after the heading; the document keeps one heading 'Drafting with constraints'.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the demo document click the H2 heading 'Drafting with constraints', press Home, then ArrowRight four times so the caret sits after 'Draf' inside the heading. Click References > Table of contents (or Insert > Page break instead).\nActual: The heading is split into two headings, 'Draf' and 'ting with constraints', and the table of contents / page break is inserted between them. The TOC preview lists two entries ('1.1 Draf', '1.2 ting with constraints') and the exported LaTeX contains two \\subsection commands. With a page break the LaTeX is \\subsection{Draf}, \\newpage, \\subsection{ting with constraints}. Probe qa/probes/insert-media.mjs scenarios 'caret-in-heading-toc' and 'caret-in-heading-break'.",
+      "source": "explore:insert-media:inserting a table of contents or a page break with the caret inside a heading splits the heading into two headings",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T09:18:14Z"
+    },
+    {
+      "id": "qa-219",
+      "title": "A tall image is rendered at full natural height across several pages while the exported PDF scales it to fit one page",
+      "why": "Exploratory pass on insert-media (visual): expected The page shows the image at the size the PDF will use (capped to the text block/page height, as the exporter does), so the page count and layout match the generated document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the demo document press Ctrl+End, click Insert > Image and supply a 200x3000 px PNG.\nActual: The editor renders the image 202x3002 px, crossing three page boundaries and changing the status bar from 1 page to 4 pages. The exported LaTeX is \\includegraphics[width=\\linewidth,height=\\textheight,keepaspectratio], which scales the same image to one text block in the PDF, so the visual page and the PDF disagree. Probe qa/probes/insert-media.mjs scenario 'image-tall'.",
+      "source": "explore:insert-media:a tall image is rendered at full natural height across several pages while the exported pdf scales it to fit one page",
+      "status": "open"
+    },
+    {
+      "id": "qa-220",
+      "title": "The TOC preview shows the full heading text for \\section[Short]{Long} instead of the short title the PDF contents will p",
+      "why": "Exploratory pass on insert-media (content): expected The TOC preview entry uses the short title ('Short Intro'), because \\tableofcontents prints the optional short title from the same exported source.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open View > LaTeX and add '\\section[Short Intro]{A Very Long Section Title That Will Not Fit}' just before \\end{document}; click Apply source, then place the caret at the end of the document and click References > Table of contents.\nActual: The preview lists '2 A Very Long Section Title That Will Not Fit'; the exported source still contains \\section[Short Intro]{A Very Long Section Title That Will Not Fit}, so the PDF contents will read 'Short Intro'. Probe qa/probes/insert-media.mjs scenario 'toc-short-title'.",
+      "source": "explore:insert-media:the toc preview shows the full heading text for \\section[short]{long} instead of the short title the pdf contents will p",
+      "status": "open"
+    },
+    {
+      "id": "qa-221",
+      "title": "The TOC preview numbers a starred (unnumbered) heading and shifts the numbering of later headings",
+      "why": "Exploratory pass on insert-media (content): expected The starred heading is omitted from the contents (and from the section counter), and 'After The Appendix' is section 2, matching the generated PDF.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open View > LaTeX and add '\\section*{Unnumbered Appendix}' followed by '\\section{After The Appendix}' before \\end{document}; click Apply source, then insert a table of contents.\nActual: The preview shows '2 Unnumbered Appendix' and '3 After The Appendix'. The exported source contains \\section*{Unnumbered Appendix} (unnumbered) and \\section{After The Appendix}, so LaTeX omits the starred heading and numbers the following section 2. Probe qa/probes/insert-media.mjs scenario 'toc-unnumbered'.",
+      "source": "explore:insert-media:the toc preview numbers a starred (unnumbered) heading and shifts the numbering of later headings",
+      "status": "open"
+    },
+    {
+      "id": "qa-222",
+      "title": "The TOC preview lists a heading that the exporter turns into \\maketitle and removes from the body",
+      "why": "Exploratory pass on insert-media (content): expected The preview matches the exported contents: the first heading is the document title, so it is not a numbered contents entry and Drafting with constraints is the first subsection.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Click Layout > Document properties, set Title to 'Introduction' (the demo's first H1 is also 'Introduction'), close Properties, press Ctrl+End, then click References > Table of contents.\nActual: The preview lists '1 Introduction' and '1.1 Drafting with constraints' (numbers 1 and 1.1), but the exported LaTeX contains \\title{Introduction} and no \\section{Introduction} at all - only \\subsection{Drafting with constraints}. The PDF contents will not contain the 'Introduction' entry the preview shows. Probe qa/probes/insert-media.mjs scenario 'toc-title-heading'.",
+      "source": "explore:insert-media:the toc preview lists a heading that the exporter turns into \\maketitle and removes from the body",
+      "status": "open"
+    },
+    {
+      "id": "qa-223",
+      "title": "The Properties 'Generate table of contents' switch adds a contents page the visual editor never shows; adding a ribbon T",
+      "why": "Exploratory pass on insert-media (visual): expected The generated contents are represented in the visual page (or the switch and the ribbon command are coordinated), so the page layout and the PDF agree and a document never gets two contents pages without warning.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Click Layout > Document properties, check 'Generate table of contents', close Properties, and compare the page with View > LaTeX. Then place the caret at the end of the document and click References > Table of contents and compare again.\nActual: With the switch on, the visual document has 0 [data-toc] blocks and the status bar still reports 1 page, while the LaTeX contains \\tableofcontents\\newpage (an extra PDF page). Inserting a TOC from the ribbon then shows 1 TOC block but the LaTeX contains 2 \\tableofcontents commands. Probe qa/probes/insert-media.mjs scenario 'toc-setting'.",
+      "source": "explore:insert-media:the properties 'generate table of contents' switch adds a contents page the visual editor never shows; adding a ribbon t",
       "status": "open"
     }
   ]
