@@ -763,3 +763,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T16:44:10Z PUSHED main
 2026-11-25T16:44:10Z DONE qa-261 (tsc -b, npm test, smoke all green)
 2026-11-25T16:44:49Z START qa-262 on qa/qa-262-a-text-block-tall-figure-with-a-caption: A text-block-tall figure with a caption is drawn across the page boundary and the page count drops when the caption is a
+2026-11-25T16:55:28Z PUSHED main
+2026-11-25T16:55:28Z DONE qa-262 (tsc -b, npm test, smoke all green)
