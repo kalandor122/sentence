@@ -3063,10 +3063,11 @@
       ],
       "hint": "Repro: Create a project. At the end type `MarkerType `, open Insert > Footnote, enter `MT note`, click Insert. Click the superscript marker once, then type `Q`.\nActual: The click selects the footnote atom (`.ProseMirror-selectednode` is set); the next keystroke replaces it with body text. The paragraph becomes `MarkerType Q`, `MT note` disappears from the page, and the note is removed from the exported LaTeX instead of only the marker being edited.",
       "source": "explore:links-cites-footnotes:clicking a footnote marker and typing deletes the footnote",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T03:28:44Z",
-      "lastAttemptAt": "2026-11-25T03:28:44Z"
+      "lastAttemptAt": "2026-11-25T03:28:44Z",
+      "doneAt": "2026-11-25T03:31:12Z"
     },
     {
       "id": "qa-193",
@@ -3078,7 +3079,9 @@
       ],
       "hint": "Repro: Create a project. At the end type `EditFocus `, open Insert > Footnote, enter `EF note`, click Insert, double-click the marker, change the note to `EF edited`, click Update, then type `NEXT`.\nActual: The caret is left before the marker, so typing `NEXT` inserts ahead of it: the line becomes `EditFocus NEXT\u00b9`. The continuing text is written on the wrong side of the note reference.",
       "source": "explore:links-cites-footnotes:after updating a footnote the caret is placed before the marker",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T03:31:52Z"
     }
   ]
 }

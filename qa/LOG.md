@@ -567,3 +567,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T03:28:05Z PUSHED main
 2026-11-25T03:28:05Z DONE qa-191 (tsc -b, npm test, smoke all green)
 2026-11-25T03:28:44Z START qa-192 on qa/qa-192-clicking-a-footnote-marker-and-typing-de: Clicking a footnote marker and typing deletes the footnote
+2026-11-25T03:31:14Z PUSHED main
+2026-11-25T03:31:14Z DONE qa-192 (tsc -b, npm test, smoke all green)
