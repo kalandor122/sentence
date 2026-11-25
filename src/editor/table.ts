@@ -82,6 +82,14 @@ export const CaptionTable = Table.extend({
           "",
         renderHTML: (attributes) => (attributes.caption ? { "data-caption": attributes.caption } : {}),
       },
+      // A table label is the target of a \ref, so it has to stay on the node.
+      // Without it the editor schema drops the attribute it was given and the
+      // next LaTeX export leaves the reference pointing at nothing.
+      label: {
+        default: "",
+        parseHTML: (element) => element.getAttribute("data-label") ?? "",
+        renderHTML: (attributes) => (attributes.label ? { "data-label": attributes.label } : {}),
+      },
     };
   },
 

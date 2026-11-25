@@ -607,3 +607,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T06:10:09Z START qa-204 on qa/qa-204-hand-written-align-environments-are-impo: Hand-written align environments are imported as literal text and escaped
 2026-11-25T06:16:31Z PUSHED main
 2026-11-25T06:16:31Z DONE qa-204 (tsc -b, npm test, smoke all green)
+2026-11-25T06:17:09Z START qa-205 on qa/qa-205-a-hand-written-table-label-is-silently-d: A hand-written table \label is silently dropped, leaving a dangling \ref
