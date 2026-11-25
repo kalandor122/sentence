@@ -3391,10 +3391,11 @@
       ],
       "hint": "Repro: In the editor click the Settings (avatar) button to open the Properties panel, click into a word in the document, then press Ctrl+K to open the Add link dialog. Press Escape once. The Properties panel closes, the Add link dialog and its backdrop stay open, and focus is moved to the avatar Settings button underneath the backdrop. Pressing Escape a second time finally closes the dialog. The find bar behaves the same way: with Properties open press Ctrl+F, then Escape \u2014 the panel closes, the find bar stays open and focus is on the Settings button.\nActual: The Inspector's window keydown handler closes the panel on Escape without checking for a dialog or find bar on top, and its effect cleanup restores focus to the Settings button. Probe counts before/after one Escape: {modal 1, inspector 1} -> {modal 1, inspector 0, focus BUTTON.avatar-button \"Settings\"}; the dialog needs a second Escape. For the find bar: {find 1, inspector 1} -> {find 1, inspector 0, focus \"Settings\"}.",
       "source": "explore:keyboard:escape closes the properties panel behind a dialog instead of the dialog in front of it, and leaves focus on the page be",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T08:03:47Z",
-      "lastAttemptAt": "2026-11-25T08:03:47Z"
+      "lastAttemptAt": "2026-11-25T08:03:47Z",
+      "doneAt": "2026-11-25T08:08:56Z"
     },
     {
       "id": "qa-214",
@@ -3406,7 +3407,9 @@
       ],
       "hint": "Repro: Home ribbon tab, focus \"Text color\" and press Enter to open the palette, then press Tab twelve times. Focus walks through the ten swatches to the neighbouring \"Highlight\" trigger and on to the Paragraph style select, but the palette remains open with its .color-backdrop (position fixed, inset 0, z-index 60) over the ribbon. Press Escape on the select: nothing happens. Shift+Tab back once to the \"Highlight\" trigger and press Escape: still nothing. elementFromPoint at a ribbon button's position returns DIV.color-backdrop, so ribbon clicks hit the backdrop instead of the control. Only Shift+Tab back onto one of the ten swatches and pressing Escape (or clicking the invisible backdrop) closes it and returns focus to the \"Text color\" button.\nActual: The palette stays mounted: popover 1 and color-backdrop 1 after the twelve Tabs and after both Escape presses; hit-test over the ribbon returns \"DIV.color-backdrop\". Only Escape while focus is inside the owning .color-menu works (Escape from the neighbouring Highlight palette is ignored because that menu's own open state is false).",
       "source": "explore:keyboard:tabbing out of the text-colour palette leaves it and its full-window backdrop open, and escape no longer closes it",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T08:09:36Z"
     },
     {
       "id": "qa-215",
