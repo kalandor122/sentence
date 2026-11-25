@@ -1141,6 +1141,62 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("textbackslash");
   });
 
+  it("imports a braced table column spec without leaking it into the first cell", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\caption{ZXPCOLCAP}",
+      "\\begin{tabular}{p{4cm}l}",
+      "\\hline",
+      "ZXPCOLNAME & Value \\\\",
+      "ZXPCOLCELL & 9 \\\\",
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(
+      table?.content?.map((row) =>
+        row.content?.map((cell) => cell.content?.[0]?.content?.[0]?.text),
+      ),
+    ).toEqual([
+      ["ZXPCOLNAME", "Value"],
+      ["ZXPCOLCELL", "9"],
+    ]);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\begin{tabular}{ll}");
+    expect(exported).not.toContain("l\\}");
+  });
+
+  it("imports a table column spec with @{} rules without corrupting the first cell", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\begin{tabular}{@{}ll@{}}",
+      "\\hline",
+      "ZXATSPEC & 12 \\\\",
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(
+      table?.content?.map((row) =>
+        row.content?.map((cell) => cell.content?.[0]?.content?.[0]?.text),
+      ),
+    ).toEqual([["ZXATSPEC", "12"]]);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\begin{tabular}{ll}");
+    expect(exported).not.toContain("ll@");
+  });
+
   it("keeps a table without a header row through a source round trip", () => {
     const document: SentenceDocument = {
       type: "doc",

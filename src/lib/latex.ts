@@ -1355,6 +1355,83 @@ function tableCellParagraphToNode(paragraph: string): DocumentNode {
   return { type: "paragraph", content };
 }
 
+// A column spec keeps its braces: p{4cm}, @{} and >{...} all wrap arguments,
+// so stopping at the first } would leave part of the spec in the first cell.
+function tabularContent(block: string): { spec: string; body: string } | null {
+  const begin = block.indexOf("\\begin{tabular}");
+  if (begin < 0) return null;
+  let index = begin + "\\begin{tabular}".length;
+  while (index < block.length && /\s/.test(block[index])) index += 1;
+  let spec = "";
+  if (block[index] === "{") {
+    const close = findMatchingBrace(block, index);
+    if (close < 0) return null;
+    spec = block.slice(index + 1, close);
+    index = close + 1;
+  }
+  const end = block.indexOf("\\end{tabular}", index);
+  if (end < 0) return null;
+  return { spec, body: block.slice(index, end) };
+}
+
+function columnSpecGroup(source: string, start: number): { content: string; end: number } | null {
+  let index = start;
+  while (index < source.length && /\s/.test(source[index])) index += 1;
+  if (source[index] !== "{") return null;
+  const close = findMatchingBrace(source, index);
+  if (close < 0) return null;
+  return { content: source.slice(index + 1, close), end: close + 1 };
+}
+
+// Column letters live at the top level of the spec; an l or c inside a braced
+// width or modifier argument (p{4cm}, >{\centering}) does not describe a column.
+function columnSpecAligns(spec: string): LatexColumnAlign[] {
+  const aligns: LatexColumnAlign[] = [];
+  let index = 0;
+  while (index < spec.length) {
+    const character = spec[index];
+    if (character === "\\") {
+      index += 2;
+      continue;
+    }
+    if (character === "{") {
+      const group = columnSpecGroup(spec, index);
+      index = group ? group.end : spec.length;
+      continue;
+    }
+    if (character === "l" || character === "c" || character === "r") {
+      aligns.push(character);
+      index += 1;
+      continue;
+    }
+    // p, m and b take a width and align to the left edge of that box.
+    if (character === "p" || character === "m" || character === "b") {
+      aligns.push("l");
+      index += 1;
+      const width = columnSpecGroup(spec, index);
+      if (width) index = width.end;
+      continue;
+    }
+    // *{n}{spec} repeats a column spec n times.
+    if (character === "*") {
+      index += 1;
+      const count = columnSpecGroup(spec, index);
+      if (!count) continue;
+      index = count.end;
+      const repeated = columnSpecGroup(spec, index);
+      if (!repeated) continue;
+      index = repeated.end;
+      const repeats = Math.min(64, Number.parseInt(count.content, 10) || 0);
+      for (let repeat = 0; repeat < repeats; repeat += 1) {
+        aligns.push(...columnSpecAligns(repeated.content));
+      }
+      continue;
+    }
+    index += 1;
+  }
+  return aligns;
+}
+
 function splitTableRow(row: string): string[] {
   const cells: string[] = [];
   let cell = "";
@@ -1912,19 +1989,17 @@ export function latexToDocument(
       continue;
     }
     if (/^\\begin\{(?:table|tabular)\}/.test(block)) {
-      const tabular = block.match(
-        /\\begin\{tabular\}(?:\s*\{([^}]*)\})?\s*([\s\S]*?)\\end\{tabular\}/,
-      );
+      const tabular = tabularContent(block);
       // Booktabs and \hline rules are row separators, not cell text: drop them
       // so a hand-written ruled table imports as its rows instead of rows that
       // begin with the rule name.
-      const tabularBody = (tabular?.[2] ?? block).replace(
+      const tabularBody = (tabular?.body ?? block).replace(
         /\\(?:toprule|midrule|bottomrule|hline|addlinespace|cmidrule)(?![a-zA-Z])(?:\([^)]*\))?(?:\{[^}]*\})?/g,
         "",
       );
-      const columnAligns = Array.from(tabular?.[1] ?? "")
-        .filter((char) => char === "l" || char === "c" || char === "r")
-        .map((char) => (char === "c" ? "center" : char === "r" ? "right" : "left"));
+      const columnAligns = columnSpecAligns(tabular?.spec ?? "").map((char) =>
+        char === "c" ? "center" : char === "r" ? "right" : "left",
+      );
       // A caption may hold escaped braces such as \{x\}, so a plain [^}]* match
       // would stop before the real closing brace and keep its backslash.
       const caption = commandArgument(block, "\\caption");
