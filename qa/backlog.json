@@ -2474,10 +2474,11 @@
       ],
       "hint": "Repro: Create a project. Open References > Insert citation, click `Enter a key manually`, type `ghost2026` and click Insert.\nActual: `[ghost2026]` is inserted silently: no toast or warning appears anywhere, and the References panel still reports `1 of 1` with no indication that the document cites an unknown key.",
       "source": "explore:links-cites-footnotes:a citation key missing from the bibliography is inserted with no warning",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T00:21:40Z",
-      "lastAttemptAt": "2026-11-25T00:21:40Z"
+      "lastAttemptAt": "2026-11-25T00:21:40Z",
+      "doneAt": "2026-11-25T00:25:04Z"
     },
     {
       "id": "qa-156",
@@ -2566,7 +2567,9 @@
       ],
       "hint": "Repro: 1. Type 'Keep this comment text'. 2. Select 'comment' and add the comment 'Comment on removed word'. 3. With tracking off, press Backspace to delete the selected word. 4. Open the Review sidebar and click the remaining comment thread.\nActual: The thread 'Comment on removed word' remains in the Review panel and still counts in the unresolved badge (1), but the editor contains zero comment highlights. Clicking the thread marks it active in the sidebar only; no text is highlighted and no indicator says the anchor is gone.",
       "source": "explore:review:deleting the text a comment is attached to leaves the thread listed with no highlight and no way to locate it",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T00:25:41Z"
     },
     {
       "id": "qa-162",
