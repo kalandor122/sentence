@@ -615,3 +615,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T06:39:11Z PUSHED main
 2026-11-25T06:39:11Z DONE qa-210 (tsc -b, npm test, smoke all green)
 2026-11-25T06:39:49Z START qa-206 on qa/qa-206-multicolumn-in-a-hand-written-table-is: \multicolumn in a hand-written table is turned into a cell's literal text
+2026-11-25T06:44:57Z PUSHED main
+2026-11-25T06:44:57Z DONE qa-206 (tsc -b, npm test, smoke all green)

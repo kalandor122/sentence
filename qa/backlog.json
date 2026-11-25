@@ -3283,10 +3283,11 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add a tabular with `\\hline`, `\\multicolumn{2}{c}{ZXMULTI HEADER} \\\\`, `ZXMULTI A & B \\\\`, `\\hline`, `\\end{tabular}` wrapped in a table environment. 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: The visual table has two rows, with the first row as an empty first cell and the second cell containing the literal string `\\multicolumn{2}{c}{ZXMULTI HEADER}`. Refresh from visual writes `\\textbackslash{}multicolumn\\{2\\}\\{c\\}\\{ZXMULTI HEADER\\}`, so the valid spanning header is destroyed. Probe cells: `[\"\", \"\\multicolumn{2}{c}{ZXMULTI HEADER}\"]`.",
       "source": "explore:source-editor:\\multicolumn in a hand-written table is turned into a cell's literal text",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T06:39:49Z",
-      "lastAttemptAt": "2026-11-25T06:39:49Z"
+      "lastAttemptAt": "2026-11-25T06:39:49Z",
+      "doneAt": "2026-11-25T06:44:55Z"
     },
     {
       "id": "qa-207",
@@ -3326,7 +3327,9 @@
       ],
       "hint": "Repro: In the same empty document, paste one 3,100-word paragraph with Ctrl+V: 100 copies of the 30-word sentence 'The visual editor keeps this sentence in the document model while the LaTeX source is generated. Measurements and observations are recorded together so that later edits remain easy to review.' joined by single spaces, with W1..W100 appended to the copies (the probe's `oneParagraph` stage builds exactly this). The status bar reads 3,100 words / 5 pages and the editor contains one paragraph whose box is 5,047px tall. The page rules sit at 1,123, 2,246, 3,369 and 4,492px in sheet coordinates. All four rules cross a line box: 1,123 vs 1,123-1,139, 2,246 vs 2,233-2,249, 3,369 vs 3,368-3,384, and 4,492 vs 4,479-4,495. Screenshot: qa/shots/probe-long-document-one-paragraph.png.\nActual: The single paragraph is not shifted at any boundary: all four painted page rules coincide with a line box (one at the top edge of a line, three through the line box), so a line of text is visually sliced at every page boundary.",
       "source": "explore:long-document:a paragraph longer than a page is cut by every page rule",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T06:45:35Z"
     },
     {
       "id": "qa-210",
