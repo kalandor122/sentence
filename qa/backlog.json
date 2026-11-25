@@ -3219,10 +3219,11 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add `\\section{ZXSEPLABEL}` on one line, `\\label{sec:seplabel}` on the next line, a blank line, `ZXSEP BODY`, a blank line, and `See \\ref{sec:seplabel}.` 3. Click Apply source. 4. View > Visual. 5. View > LaTeX and click Refresh from visual.\nActual: The heading is created, but the label becomes its own paragraph showing the raw command `\\label{sec:seplabel}` in the visual document (leakedCommands=true). Refresh from visual writes `\\textbackslash{}label\\{sec:seplabel\\}`, so the label is gone while `\\ref{sec:seplabel}` remains. Probe: labelKept=false, labelEscaped=true, refKept=true.",
       "source": "explore:source-editor:a section \\label on the line after the heading becomes literal text and is lost",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T05:27:08Z",
-      "lastAttemptAt": "2026-11-25T05:27:08Z"
+      "lastAttemptAt": "2026-11-25T05:27:08Z",
+      "doneAt": "2026-11-25T05:29:05Z"
     },
     {
       "id": "qa-203",
@@ -3282,6 +3283,32 @@
       ],
       "hint": "Repro: 1. View > LaTeX. 2. Before \\end{document}, add `ZXTILDE see Eq.~1 and Fig.~2.` 3. Click Apply source. 4. View > LaTeX and click Refresh from visual.\nActual: Refresh from visual writes `Eq.\\textasciitilde{}1 and Fig.\\textasciitilde{}2`, which renders a literal tilde instead of a non-breaking space. The visual page also shows a visible tilde. Probe: literalTildeEscape=true, nonBreakingTildeKept=false.",
       "source": "explore:source-editor:a non-breaking space written as ~ is re-exported as a literal tilde",
+      "status": "open"
+    },
+    {
+      "id": "qa-208",
+      "title": "Page text and headings overflow into the top and bottom margins",
+      "why": "Exploratory pass on long-document (visual): expected Body text and headings stay inside the configured 96px top and bottom margins of every page, so no line sits 3px from the sheet edge and no heading is rendered below the bottom margin.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read the `layout` stage, or reproduce by hand: open http://localhost:1420 at 1280x800, click 'New document', then Ctrl+A and Backspace to empty the page. Put the probe's 50-section HTML on the clipboard (50 blocks of `<h1>Heading N HDOCN</h1><p>[the probe's 69-word body] BODYN</p>`, with `<h2>` for N divisible by 5 and `<h3>` for N divisible by 11; 3,600 words total) and press Ctrl+V. The status bar reads 3,600 words / 10 pages and the sheet is 11,230px tall. The page height is 1,123px and the configured margin is 96px, so each page's text area is y=96..1027. The probe's DOM audit finds 26 text lines below the bottom margin and 22 above the top margin. On page 1 the last three line boxes end at 1,069, 1,094 and 1,120px, i.e. the final line is 3px above the page edge. Headings also sit in the margins: Heading 5 at 89px and Heading 16 at 18px from the top of pages 2 and 4, and Heading 10 at 1,093px and Heading 37 at 1,088px down pages 2 and 7 (the bottom margin starts at 1,027px). Headings 10 and 37 are followed by their body paragraph on the next page. Screenshot: qa/shots/probe-long-document-margins.png.\nActual: The probe measures 26 text lines below the bottom margin and 22 above the top margin across the 10 pages, with the last line of page 1 ending 3px above the page edge. Headings are affected too: Heading 16 is 18px below the top of page 4, and Heading 10 starts 66px below the bottom-margin line on page 2 with its paragraph starting on page 3.",
+      "source": "explore:long-document:page text and headings overflow into the top and bottom margins",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T05:50:12Z"
+    },
+    {
+      "id": "qa-209",
+      "title": "A paragraph longer than a page is cut by every page rule",
+      "why": "Exploratory pass on long-document (visual): expected A page boundary falls between two text lines, so the rule never crosses a line of text.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the same empty document, paste one 3,100-word paragraph with Ctrl+V: 100 copies of the 30-word sentence 'The visual editor keeps this sentence in the document model while the LaTeX source is generated. Measurements and observations are recorded together so that later edits remain easy to review.' joined by single spaces, with W1..W100 appended to the copies (the probe's `oneParagraph` stage builds exactly this). The status bar reads 3,100 words / 5 pages and the editor contains one paragraph whose box is 5,047px tall. The page rules sit at 1,123, 2,246, 3,369 and 4,492px in sheet coordinates. All four rules cross a line box: 1,123 vs 1,123-1,139, 2,246 vs 2,233-2,249, 3,369 vs 3,368-3,384, and 4,492 vs 4,479-4,495. Screenshot: qa/shots/probe-long-document-one-paragraph.png.\nActual: The single paragraph is not shifted at any boundary: all four painted page rules coincide with a line box (one at the top edge of a line, three through the line box), so a line of text is visually sliced at every page boundary.",
+      "source": "explore:long-document:a paragraph longer than a page is cut by every page rule",
       "status": "open"
     }
   ]
