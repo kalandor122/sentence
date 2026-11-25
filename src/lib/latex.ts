@@ -305,6 +305,14 @@ function cellAlign(cell: DocumentNode): LatexColumnAlign {
   return align === "center" ? "c" : align === "right" ? "r" : "l";
 }
 
+// LaTeX has no display-math environment that a tabular cell can hold: both
+// \[...\] and equation fail there with "Missing $ inserted". A block equation
+// in a cell is written as inline math in display style instead, and the
+// \displaystyle prefix is what the importer turns back into a block.
+function mathBlockInCellToLatex(node: DocumentNode): string {
+  return `\\(\\displaystyle ${attribute(node, "latex") ?? ""}\\)`;
+}
+
 function tableCellToLatex(
   cell: DocumentNode,
   columnAlign: LatexColumnAlign,
@@ -314,11 +322,11 @@ function tableCellToLatex(
   // A figure cannot float inside a tabular cell, so a block image is written as
   // an inline graphic that stays in its own cell.
   const body = children
-    .map((child) =>
-      child.type === "image"
-        ? inlineImageToLatex(child, settings, false)
-        : inlineContent([child], settings),
-    )
+    .map((child) => {
+      if (child.type === "image") return inlineImageToLatex(child, settings, false);
+      if (child.type === "mathBlock") return mathBlockInCellToLatex(child);
+      return inlineContent([child], settings);
+    })
     .filter(Boolean)
     .join("\\par ");
   const align = cellAlign(cell);
@@ -1045,6 +1053,20 @@ function parseList(source: string, type: "bulletList" | "orderedList"): Document
   };
 }
 
+// A cell paragraph that holds only a display-style equation is the exported
+// form of a math block, so restore the block instead of demoting it to inline
+// math. This keeps an equation placed in a cell through a source round trip.
+function tableCellParagraphToNode(paragraph: string): DocumentNode {
+  const content = parseInline(paragraph.trim()).content;
+  const only = content.length === 1 ? content[0] : undefined;
+  const latex = only?.type === "mathInline" ? attribute(only, "latex") ?? "" : "";
+  const displayMatch = latex.match(/^\\displaystyle\s+([\s\S]*)$/);
+  if (displayMatch) {
+    return { type: "mathBlock", attrs: { latex: displayMatch[1].trim(), numbered: false } };
+  }
+  return { type: "paragraph", content };
+}
+
 function splitTableRow(row: string): string[] {
   const cells: string[] = [];
   let cell = "";
@@ -1570,10 +1592,9 @@ export function latexToDocument(
               return {
                 type: rowIndex === 0 && !headerless ? "tableHeader" : "tableCell",
                 ...(align && align !== "left" ? { attrs: { align } } : {}),
-                content: cell.split(/(?<!\\)\\par\b/).map((paragraph) => ({
-                  type: "paragraph",
-                  content: parseInline(paragraph.trim()).content,
-                })),
+                content: cell.split(/(?<!\\)\\par\b/).map((paragraph) =>
+                  tableCellParagraphToNode(paragraph.trim()),
+                ),
               };
             }),
           })),

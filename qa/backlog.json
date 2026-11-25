@@ -2968,8 +2968,9 @@
       "hint": "Repro: 1. From the start screen choose 'New document' and type 'Table below.' in the editor.\n2. Open the Insert tab and click 'Insert table'; click the middle cell (second row, second column).\n3. With the caret in that cell, open the Insert tab, click 'Equation block', enter `x^2+y^2=z^2` and click Insert. The equation renders inside the cell (`[data-math-block]` with `inCell: true`, `latex: x^2+y^2=z^2`).\n4. Open the View tab and click 'LaTeX', then click 'Refresh from visual' and read document.tex.\n5. Click 'Apply source' to load that exported text back into the visual document.\nExpected: the equation is written into the tabular cell (or the editor refuses to place display math in a table cell and says so); applying the exported source must not lose it.\nActual: document.tex contains the table with three completely empty rows and no `x^2+y^2=z^2` or equation environment anywhere (the equation exists only in the visual model, because table cells export through inlineContent). After 'Apply source' the toast says 'Visual document synchronized from LaTeX.' and the visual table has no math node at all, so the equation is permanently lost.\nActual: None",
       "source": "explore:math:display equation inside a table cell is silently dropped from the latex export",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T02:50:16Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T02:50:16Z",
+      "lastAttemptAt": "2026-11-25T02:50:16Z"
     },
     {
       "id": "qa-187",

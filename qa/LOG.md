@@ -546,3 +546,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T02:33:05Z PUSHED main
 2026-11-25T02:33:05Z DONE qa-185 (tsc -b, npm test, smoke all green)
 2026-11-25T02:50:02Z EXPLORE math: 3 new items, agent exit 0
+2026-11-25T02:50:16Z START qa-186 on qa/qa-186-display-equation-inside-a-table-cell-is: Display equation inside a table cell is silently dropped from the LaTeX export

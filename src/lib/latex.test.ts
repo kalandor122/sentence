@@ -1200,6 +1200,70 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("exports a block equation inside a table cell as display-style inline math", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableHeader",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "H" }] }],
+                },
+              ],
+            },
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [
+                    { type: "paragraph", content: [{ type: "text", text: "Cell" }] },
+                    { type: "mathBlock", attrs: { latex: "x^2+y^2=z^2", numbered: false } },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).not.toContain("\\begin{equation");
+    expect(latex).toContain("Cell\\par \\(\\displaystyle x^2+y^2=z^2\\) \\\\");
+    const parsed = latexToDocument(latex, settings).document;
+    const cell = parsed.content[0]?.content?.[1]?.content?.[0];
+    expect(cell?.content?.map((node) => node.type)).toEqual(["paragraph", "mathBlock"]);
+    expect(cell?.content?.[1]?.attrs?.latex).toBe("x^2+y^2=z^2");
+    expect(documentToLatex(parsed, settings)).toBe(latex);
+  });
+
+  it("keeps an inline equation in a table cell inline on import", () => {
+    const parsed = latexToDocument(
+      [
+        "\\begin{document}",
+        "\\begin{table}[htbp]",
+        "\\centering",
+        "% Sentence table header: none",
+        "\\begin{tabular}{ll}",
+        "\\hline",
+        "a & b \\\\",
+        "c & \\(x^2+y^2=z^2\\) \\\\",
+        "\\hline",
+        "\\end{tabular}",
+        "\\end{table}",
+        "\\end{document}",
+      ].join("\n"),
+      settings,
+    ).document;
+    const cell = parsed.content[0]?.content?.[1]?.content?.[1];
+    expect(cell?.content?.[0]?.content?.[0]?.type).toBe("mathInline");
+  });
+
   it("sizes a measured image inside a table cell like the block it is in the page", () => {
     const document: SentenceDocument = {
       type: "doc",
