@@ -178,6 +178,61 @@ describe("review decorations", () => {
     ]);
   });
 
+  it("keeps unchanged blocks aligned when the editor adds default attributes", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Good tools stay close" }] },
+        {
+          type: "blockquote",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Clarity arrives." }] }],
+        },
+        { type: "paragraph", content: [{ type: "text", text: "The central model." }] },
+      ],
+    };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "paragraph", attrs: { textAlign: null }, content: [{ type: "text", text: "Good tools" }] },
+        { type: "paragraph", attrs: { textAlign: null }, content: [{ type: "text", text: " stay close" }] },
+        {
+          type: "blockquote",
+          content: [
+            {
+              type: "paragraph",
+              attrs: { textAlign: null },
+              content: [{ type: "text", text: "Clarity arrives." }],
+            },
+          ],
+        },
+        { type: "paragraph", attrs: { textAlign: null }, content: [{ type: "text", text: "The central model." }] },
+      ],
+    };
+    expect(revisionChanges(revision("r1", before, after))).toEqual([
+      {
+        kind: "text",
+        path: ["content", 0, "content", 0, "text"],
+        prefix: "Good tools",
+        removed: " stay close",
+        inserted: "",
+        suffix: "",
+        after: "Good tools",
+      },
+      {
+        kind: "value",
+        path: ["content", 0, "attrs"],
+        before: undefined,
+        after: { textAlign: null },
+      },
+      {
+        kind: "value",
+        path: ["content", 1],
+        before: undefined,
+        after: { type: "paragraph", attrs: { textAlign: null }, content: [{ type: "text", text: " stay close" }] },
+      },
+    ]);
+  });
+
   it("reports only the appended text when a comment mark splits the paragraph", () => {
     const after: SentenceDocument = {
       type: "doc",

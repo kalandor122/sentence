@@ -3796,8 +3796,9 @@
       "hint": "Repro: 1. Open http://localhost:1420 in a fresh browser profile and click New document. 2. Review tab > Track changes (the button now reads Tracking on). 3. Click inside the paragraph 'Good tools stay close to the work...', press Home, press ArrowRight 12 times, press Enter to split the paragraph. 4. Wait 2.5 s and open History in the sidebar rail.\nActual: The split pair is marked correctly, but the unchanged blockquote gets an insertion widget with its own text ('Clarity arrives when the mechanics disappear and only the thought remains.') and a deletion widget with the final paragraph's text ('The central model can be expressed compactly: meaning = structure + language.'); the final paragraph then gets the blockquote's text as a deletion plus its own text as insertions. Measured on a fresh document: BLOCKQUOTE ins ['Clarity arrives when the mechanics disappear and only the thought remains.'] del ['The central model can be expressed compactly: meaning = structure + language.']; P ins ['The central model can be expressed compactly: ','meaning = structure + language','.'] del ['Clarity arrives when the mechanics disappear and only the thought remains.']. The page therefore renders the blockquote and the last paragraph twice (real text plus widget text), showing changes that were never made. The underlying document is intact and rejecting the revision restores the original text.",
       "source": "explore:review:splitting a paragraph with track changes on marks unchanged blocks as inserted and deleted",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T13:25:19Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T13:25:19Z",
+      "lastAttemptAt": "2026-11-25T13:25:19Z"
     },
     {
       "id": "qa-240",
