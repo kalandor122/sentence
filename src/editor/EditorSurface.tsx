@@ -39,6 +39,7 @@ import {
   HighlightMark,
 } from "./textStyleMarks";
 import { CaptionTable } from "./table";
+import { commentAnchors } from "../lib/comments";
 import type {
   CommentThread,
   ProjectSettings,
@@ -52,7 +53,9 @@ interface EditorSurfaceProps {
   comments: CommentThread[];
   revisions: Revision[];
   editable?: boolean;
-  onUpdate: (document: SentenceDocument) => void;
+  // undoneComments carries the comment marks an undo removed from the
+  // document, so their threads can go with the highlight.
+  onUpdate: (document: SentenceDocument, undoneComments?: string[]) => void;
   onReady: (editor: Editor | null) => void;
   onStateChange: () => void;
   onCommentSelected: (markId: string) => void;
@@ -124,6 +127,15 @@ function editorAttributes(spellcheck: boolean) {
     "aria-label": "Document editor",
     "aria-multiline": "true",
   };
+}
+
+function commentMarkIds(document: SentenceDocument): Set<string> {
+  return new Set(commentAnchors(document).map((anchor) => anchor.markId));
+}
+
+function removedCommentIds(before: SentenceDocument, after: SentenceDocument): string[] {
+  const remaining = commentMarkIds(after);
+  return [...commentMarkIds(before)].filter((markId) => !remaining.has(markId));
 }
 
 function offsetWithin(element: HTMLElement, ancestor: HTMLElement): number {
@@ -302,8 +314,19 @@ export default function EditorSurface({
       // Tiptap defers focus from toolbar commands, so a Delete table click emits
       // a real one-step edit while the editor is still unfocused.
       if (![transaction, ...appendedTransactions].some((tr) => tr.steps.length > 0)) return;
+      // A comment whose mark an undo removed no longer has a highlight, so its
+      // thread must be dropped too instead of looking like deleted text.
+      // prosemirror-history keys its meta "history$" and records whether the
+      // transaction is an undo (redo: false) or a redo.
+      const history = transaction.getMeta("history$");
+      const undone = history?.redo === false;
       lastEmitted.current = JSON.stringify(json);
-      onUpdate(json);
+      onUpdate(
+        json,
+        undone
+          ? removedCommentIds(transaction.before.toJSON() as SentenceDocument, json)
+          : undefined,
+      );
     },
     onTransaction: () => {
       onStateChange();
