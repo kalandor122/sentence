@@ -2,7 +2,7 @@
 import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
-import { isListActive, splitListItemKeepingSublist, toggleList } from "./listToggle";
+import { isListActive, splitListItemKeepingSublist, splitOrderedListOnEmptyItem, toggleList } from "./listToggle";
 
 function createEditor(content: string): Editor {
   return new Editor({ extensions: [StarterKit], content });
@@ -123,5 +123,56 @@ describe("splitListItemKeepingSublist", () => {
     paragraph.commands.setTextSelection(7);
     expect(splitListItemKeepingSublist(paragraph)).toBe(false);
     paragraph.destroy();
+  });
+});
+
+describe("splitOrderedListOnEmptyItem", () => {
+  // Doc positions: the list starts at 0, so item i's empty paragraph sits at
+  // itemStart + 1. "one" fills the first item, so the empty second item's
+  // paragraph opens at 8.
+  it("continues the trailing items at the number they already had", () => {
+    const editor = createEditor(
+      "<ol><li><p>one</p></li><li><p></p></li><li><p>two</p></li><li><p>three</p></li></ol>",
+    );
+    editor.commands.setTextSelection(8);
+    expect(splitOrderedListOnEmptyItem(editor)).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ol><li><p>one</p></li></ol><p></p><ol start=\"2\"><li><p>two</p></li><li><p>three</p></li></ol>",
+    );
+    const { $from } = editor.state.selection;
+    expect($from.parent.type.name).toBe("paragraph");
+    expect($from.parent.content.size).toBe(0);
+    editor.destroy();
+  });
+
+  it("keeps an explicit start when continuing a list", () => {
+    const editor = createEditor(
+      "<ol start=\"4\"><li><p>four</p></li><li><p>five</p></li><li><p></p></li><li><p>seven</p></li></ol>",
+    );
+    editor.commands.setTextSelection(17);
+    expect(splitOrderedListOnEmptyItem(editor)).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ol start=\"4\"><li><p>four</p></li><li><p>five</p></li></ol><p></p><ol start=\"6\"><li><p>seven</p></li></ol>",
+    );
+    editor.destroy();
+  });
+
+  it("leaves the last empty item to the default lift", () => {
+    const editor = createEditor("<ol><li><p>one</p></li><li><p></p></li></ol>");
+    editor.commands.setTextSelection(8);
+    expect(splitOrderedListOnEmptyItem(editor)).toBe(false);
+    editor.destroy();
+  });
+
+  it("leaves bullet lists and non-empty items alone", () => {
+    const bullet = createEditor("<ul><li><p>one</p></li><li><p></p></li><li><p>two</p></li></ul>");
+    bullet.commands.setTextSelection(8);
+    expect(splitOrderedListOnEmptyItem(bullet)).toBe(false);
+    bullet.destroy();
+
+    const filled = createEditor("<ol><li><p>one</p></li><li><p>two</p></li></ol>");
+    filled.commands.setTextSelection(5);
+    expect(splitOrderedListOnEmptyItem(filled)).toBe(false);
+    filled.destroy();
   });
 });

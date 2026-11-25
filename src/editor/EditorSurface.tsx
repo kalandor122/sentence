@@ -23,7 +23,7 @@ import {
 import { FindHighlight } from "./find";
 import { focusAfterEditor } from "./focus";
 import { changeIndent, nestListItem } from "./indent";
-import { splitListItemKeepingSublist, toggleList } from "./listToggle";
+import { splitListItemKeepingSublist, splitOrderedListOnEmptyItem, toggleList } from "./listToggle";
 import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
 import {
   pageBoundaryWithin,
@@ -108,7 +108,7 @@ const ListEnter = Extension.create({
   priority: 200,
   addKeyboardShortcuts() {
     return {
-      Enter: () => splitListItemKeepingSublist(this.editor),
+      Enter: () => splitListItemKeepingSublist(this.editor) || splitOrderedListOnEmptyItem(this.editor),
     };
   },
 });
