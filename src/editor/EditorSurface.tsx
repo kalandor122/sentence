@@ -66,23 +66,17 @@ const FONT_STACKS: Record<ProjectSettings["fontFamily"], string> = {
   palatino: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
 };
 
-// Tab indents the current block one step: list items nest, paragraphs wrap in a
-// quote. An already-indented block lets the key through, so repeated presses
-// never dig deeper and focus can still leave the page; Escape always leaves it
-// and tables and verbatim blocks keep their own Tab handling.
+// Tab is focus navigation, so outside lists it leaves the page instead of
+// editing the manuscript. Lists still nest, tables keep their own cell walk and
+// Escape leaves from either, so the page never traps the keyboard. Paragraph
+// indentation has its own shortcuts because Tab must not modify text.
 const TabIndent = Extension.create({
   name: "sentenceTabIndent",
   priority: 200,
   addKeyboardShortcuts() {
     return {
-      Tab: () =>
-        this.editor.isActive("listItem")
-          ? nestListItem(this.editor, false)
-          : changeIndent(this.editor, false),
-      "Shift-Tab": () =>
-        this.editor.isActive("listItem")
-          ? nestListItem(this.editor, true)
-          : changeIndent(this.editor, true),
+      Tab: () => nestListItem(this.editor, false),
+      "Shift-Tab": () => nestListItem(this.editor, true),
       "Mod-]": () => changeIndent(this.editor, false),
       "Mod-[": () => changeIndent(this.editor, true),
       Escape: () => focusAfterEditor(this.editor),
