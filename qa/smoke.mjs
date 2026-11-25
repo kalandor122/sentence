@@ -229,7 +229,50 @@ try {
     hard("source-view round trip checks ran", false, "no View ribbon tab found — the regression block would be skipped silently");
   }
 
-  // 8. Console gate
+  // 8. Two-column setting must reach the LaTeX and come back off again
+  {
+    const layoutTab = page.getByRole("tab", { name: "Layout", exact: true })
+      .or(page.getByRole("button", { name: "Layout", exact: true })).first();
+    if (await layoutTab.count()) {
+      await layoutTab.click();
+      await page.waitForTimeout(250);
+      const columns = page.locator('select[aria-label="Columns"]').first();
+      hard("Layout tab exposes a Columns control", (await columns.count()) > 0);
+      if (await columns.count()) {
+        await columns.selectOption("two");
+        await page.waitForTimeout(400);
+        await viewTab.click();
+        await page.waitForTimeout(200);
+        await page.getByRole("tab", { name: "LaTeX", exact: true })
+          .or(page.getByRole("button", { name: "LaTeX", exact: true })).first().click();
+        await page.waitForTimeout(500);
+        const twoCol = await page.locator('textarea[aria-label="LaTeX source"]').first().inputValue();
+        hard("two columns reach the LaTeX", twoCol.includes("twocolumn"), twoCol.split("\n").find((l) => l.includes("documentclass")) ?? "");
+
+        await page.getByRole("button", { name: "Visual", exact: true })
+          .or(page.getByRole("tab", { name: "Visual", exact: true })).first().click();
+        await page.waitForTimeout(400);
+        await layoutTab.click();
+        await page.waitForTimeout(200);
+        await page.locator('select[aria-label="Columns"]').first().selectOption("one");
+        await page.waitForTimeout(400);
+        await viewTab.click();
+        await page.waitForTimeout(200);
+        await page.getByRole("tab", { name: "LaTeX", exact: true })
+          .or(page.getByRole("button", { name: "LaTeX", exact: true })).first().click();
+        await page.waitForTimeout(500);
+        const oneCol = await page.locator('textarea[aria-label="LaTeX source"]').first().inputValue();
+        hard("switching back to one column removes it", !/twocolumn/.test(oneCol), "");
+        await page.getByRole("button", { name: "Visual", exact: true })
+          .or(page.getByRole("tab", { name: "Visual", exact: true })).first().click();
+        await page.waitForTimeout(300);
+      }
+    } else {
+      hard("Layout tab present for the columns check", false, "Layout tab not found");
+    }
+  }
+
+  // 9. Console gate
   hard("no console errors", report.consoleErrors.length === 0, report.consoleErrors.slice(0, 5).join(" | "));
 } catch (e) {
   report.failures.push({ check: "harness", detail: String(e).slice(0, 500) });
