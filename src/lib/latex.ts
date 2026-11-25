@@ -615,7 +615,7 @@ export function documentToLatex(
   const typography = typographyPackages(settings);
   const usesColor =
     containsMark(content, "color") || containsMark(content, "highlight");
-  return `${arxivComments ? `% Prepared for arXiv\n${arxivComments}\n` : ""}\\documentclass[${settings.fontSize},${settings.paperSize}]{${settings.documentClass}}
+  return `${arxivComments ? `% Prepared for arXiv\n${arxivComments}\n` : ""}\\documentclass[${settings.fontSize},${settings.paperSize}${settings.columns === "two" ? ",twocolumn" : ""}]{${settings.documentClass}}
 ${typography}
 \\usepackage{amsmath,amssymb}
 \\usepackage{graphicx}
@@ -1404,11 +1404,12 @@ export function latexToDocument(
   }
   if (classMatch) {
     settings.documentClass = classMatch[2] as ProjectSettings["documentClass"];
-    const options = classMatch[1].split(",");
+    const options = classMatch[1].split(",").map((option) => option.trim());
     const size = options.find((option) => /^(10|11|12)pt$/.test(option));
     const paper = options.find((option) => option === "a4paper" || option === "letterpaper");
     if (size) settings.fontSize = size as ProjectSettings["fontSize"];
     if (paper) settings.paperSize = paper as ProjectSettings["paperSize"];
+    settings.columns = options.includes("twocolumn") ? "two" : "one";
   }
 
   const packages = Array.from(latex.matchAll(/\\usepackage(?:\[[^\]]*\])?\{([^}]*)\}/g))

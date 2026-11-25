@@ -556,3 +556,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T02:58:06Z PUSHED main
 2026-11-25T02:58:06Z DONE qa-188 (tsc -b, npm test, smoke all green)
 2026-11-25T02:58:41Z PROMOTED from roadmap: qa-189 Two-column documents: settings, preamble and round trip
+2026-11-25T02:58:41Z START qa-189 on qa/qa-189-two-column-documents-settings-preamble-a: Two-column documents: settings, preamble and round trip

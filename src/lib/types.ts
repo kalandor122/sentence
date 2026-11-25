@@ -43,6 +43,7 @@ export interface ProjectSettings {
   fontFamily: "default" | "times" | "palatino";
   lineSpacing: "single" | "onehalf" | "double";
   paragraphSpacing: "indent" | "gap";
+  columns: "one" | "two";
   includeToc: boolean;
   header: string;
   footer: string;
