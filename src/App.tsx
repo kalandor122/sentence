@@ -1602,7 +1602,15 @@ export default function App() {
           break;
         }
         if (editor.state.doc.nodeAt(position)?.type.name === "footnote") {
-          editor.chain().focus().setNodeSelection(position).updateAttributes("footnote", { text: value }).run();
+          // Updating leaves the marker selected, which puts the caret before it.
+          // Put it after the note so continuing the line types on the right side.
+          editor
+            .chain()
+            .focus()
+            .setNodeSelection(position)
+            .updateAttributes("footnote", { text: value })
+            .setTextSelection(position + 1)
+            .run();
         }
         break;
       }
