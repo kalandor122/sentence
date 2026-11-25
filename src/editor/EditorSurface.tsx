@@ -26,7 +26,6 @@ import { changeIndent, nestListItem } from "./indent";
 import { splitListItemKeepingSublist, splitOrderedListOnEmptyItem, toggleList } from "./listToggle";
 import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
 import {
-  pageBoundaryWithin,
   pageBreakFill,
   pageCountFromBottom,
   pageGeometry,
@@ -146,28 +145,6 @@ function offsetWithin(element: HTMLElement, ancestor: HTMLElement): number {
     node = node.offsetParent as HTMLElement | null;
   }
   return top;
-}
-
-// Text line boxes inside a block, relative to its border box in unscaled layout
-// pixels. The sheet and its contents are CSS-scaled by the editor zoom.
-function lineBoxes(block: HTMLElement, zoom: number): Array<{ top: number; bottom: number }> {
-  const blockTop = block.getBoundingClientRect().top;
-  const boxes: Array<{ top: number; bottom: number }> = [];
-  const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
-  while (walker.nextNode()) {
-    const node = walker.currentNode;
-    if (!node.nodeValue?.trim()) continue;
-    const range = document.createRange();
-    range.selectNodeContents(node);
-    for (const rect of Array.from(range.getClientRects())) {
-      if (rect.width < 1 || rect.height < 1) continue;
-      boxes.push({
-        top: (rect.top - blockTop) / zoom,
-        bottom: (rect.bottom - blockTop) / zoom,
-      });
-    }
-  }
-  return boxes.sort((a, b) => a.top - b.top);
 }
 
 export default function EditorSurface({
@@ -386,11 +363,10 @@ export default function EditorSurface({
       return;
     }
     let frame = 0;
-    // Blocks nudged away from a rule so the divider falls between two lines
-    // instead of across one. Body text shifts by less than a line; a heading or
-    // a first line starts on the next page. The rules live in a style element
-    // because ProseMirror re-renders text nodes and would drop inline padding,
-    // and padding is used because sibling margins collapse.
+    // Blocks nudged down when they do not fit inside a page's text area, so no
+    // line or heading is left in the top or bottom margin. The rules live in a
+    // style element because ProseMirror re-renders text nodes and would drop
+    // inline padding, and padding is used because sibling margins collapse.
     const snapStyle = window.document.createElement("style");
     window.document.head.appendChild(snapStyle);
     const snapScope = `data-page-snap-${Math.random().toString(36).slice(2)}`;
@@ -423,45 +399,52 @@ export default function EditorSurface({
       // Keep the child index so the generated :nth-child rules keep pointing at
       // the same block when page-break wrappers sit among them.
       const blocks = Array.from(dom.children) as HTMLElement[];
-      const sheetRect = sheet.getBoundingClientRect();
-      const zoom = sheet.offsetHeight ? sheetRect.height / sheet.offsetHeight : 1;
+      // A nudge is padding, so it moves the content but not the border box.
+      // Measure the content box: otherwise a shifted block still reports its
+      // old position and collects another shift on every pass.
+      const contentBox = (block: HTMLElement) => {
+        const padding = parseFloat(getComputedStyle(block).paddingTop) || 0;
+        return {
+          top: offsetWithin(block, sheet) + padding,
+          height: block.offsetHeight - padding,
+        };
+      };
+      // Bottom of the page's text area, i.e. where the bottom margin starts.
+      const contentBottomLimit = (top: number) =>
+        (Math.floor(Math.max(0, top) / geometry.height) + 1) * geometry.height - geometry.margin;
+      // Top of the text area on the page after the one that holds `top`.
+      const nextPageTopMargin = (top: number) =>
+        (Math.floor(Math.max(0, top) / geometry.height) + 1) * geometry.height + geometry.margin;
       for (let pass = 0; pass <= blocks.length * 2 + 8; pass += 1) {
         let moved = false;
         for (let index = 0; index < blocks.length; index += 1) {
           const block = blocks[index];
           if (!(block instanceof HTMLElement) || block.hasAttribute("data-page-break")) continue;
-          const top = offsetWithin(block, sheet);
-          // A nudge is padding, so it moves the content but not the border box.
-          // Measure the content box: otherwise a shifted block still straddles
-          // the same rule and collects another shift on every pass.
-          const padding = parseFloat(getComputedStyle(block).paddingTop) || 0;
-          const contentTop = top + padding;
-          const contentHeight = block.offsetHeight - padding;
-          const boundary = pageBoundaryWithin(
-            contentTop,
-            contentTop + contentHeight,
-            geometry,
-          );
-          if (boundary === null || contentHeight > geometry.contentHeight) continue;
-          let shift: number;
-          if (/^H[1-3]$/.test(block.tagName)) {
-            // A heading on a rule reads as a strikethrough; start it on the next page.
-            shift = boundary + geometry.margin - contentTop;
-          } else {
-            const boxes = lineBoxes(block, zoom);
-            const line = boxes.findIndex(
-              (box) => top + box.top < boundary && top + box.bottom > boundary,
-            );
-            if (line < 0) continue;
-            // A few pixels of clearance absorb the fractional sheet scale the
-            // rules are painted with; the line gap is wider than this.
-            shift =
-              line === 0
-                ? boundary + geometry.margin - contentTop
-                : boundary + 4 - top - boxes[line].top;
+          const box = contentBox(block);
+          // A block taller than a whole text area cannot be moved without
+          // splitting the document, so it is left alone.
+          if (box.height > geometry.contentHeight) continue;
+          // Blocks move whole: a block either fits inside the current page's
+          // text area or starts at the top margin of the next page, so no line
+          // is ever cut at a page edge or left sitting in a margin.
+          let overflow = box.top + box.height > contentBottomLimit(box.top);
+          if (!overflow && /^H[1-3]$/.test(block.tagName)) {
+            // Keep a heading on the same page as the body it introduces. An
+            // explicit page break right after the heading is left alone.
+            const next = block.nextElementSibling as HTMLElement | null;
+            const nextBox =
+              next && !next.hasAttribute("data-page-break") ? contentBox(next) : null;
+            if (nextBox && nextBox.height <= geometry.contentHeight) {
+              const pageTop = Math.floor(Math.max(0, box.top) / geometry.height) * geometry.height;
+              const nextPageTop =
+                Math.floor(Math.max(0, nextBox.top) / geometry.height) * geometry.height;
+              overflow =
+                nextPageTop !== pageTop ||
+                nextBox.top + nextBox.height > contentBottomLimit(nextBox.top);
+            }
           }
-          if (shift <= 0) continue;
-          snapBlock(block, index, shift);
+          if (!overflow) continue;
+          snapBlock(block, index, nextPageTopMargin(box.top) - box.top);
           moved = true;
           break;
         }

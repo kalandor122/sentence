@@ -2151,8 +2151,9 @@ export default function App() {
           onHeadingClick={(position) => {
             const heading = document.querySelectorAll<HTMLElement>(".sentence-editor h1, .sentence-editor h2, .sentence-editor h3")[position];
             if (!heading) return;
-            // Pagination pads a heading that starts on a page rule, so its box
-            // centre can sit a page below the text. Centre the text line itself.
+            // Pagination pads a heading that has to move past a page boundary,
+            // so its box centre can sit a page below the text. Centre the text
+            // line itself.
             const range = window.document.createRange();
             range.selectNodeContents(heading);
             const textBounds = range.getBoundingClientRect();
