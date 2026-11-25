@@ -3111,10 +3111,11 @@
       ],
       "hint": "Repro: 1. In a fresh document type 'Source track base' and let it settle. 2. Review tab > Track changes; the button now reads 'Tracking on'. 3. View tab > LaTeX, change the body text to 'Source track base revised', and click Apply source. 4. Wait 2.5 s and open the History sidebar.\nActual: History lists 0 tracked changes. The edited text is applied immediately (editor reads 'Source track base revised') while the Review tab still reports 'Tracking on', so the change silently bypasses review. Probe: revisions [], text 'Source track base revised', trackingButtonLabel 'Tracking on'.",
       "source": "explore:review:edits applied from the latex source pane while tracking is on are never recorded as revisions",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T04:08:45Z",
-      "lastAttemptAt": "2026-11-25T04:08:45Z"
+      "lastAttemptAt": "2026-11-25T04:08:45Z",
+      "doneAt": "2026-11-25T04:22:34Z"
     },
     {
       "id": "qa-196",
@@ -3126,7 +3127,9 @@
       ],
       "hint": "Repro: 1. Type 'Undo comment body'. 2. Select 'comment', open Review > New comment, enter 'Undo this comment' and click Comment. 3. Click in the editor and press Ctrl+Z.\nActual: The highlight disappears, but the thread stays in the Review panel, is marked with the note 'The text this comment was attached to was deleted, so it has no highlight in the document.' and still counts in the unresolved badge. The text was not deleted \u2014 the comment mark was undone. Probe: marks [], thread body 'Undo this comment', detached=true, detachedNote=true.",
       "source": "explore:review:undoing a comment addition leaves an orphaned thread with a false 'text was deleted' note",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T04:23:14Z"
     },
     {
       "id": "qa-197",
