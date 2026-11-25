@@ -1,5 +1,6 @@
 import { ArrowUpDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { Editor } from "@tiptap/react";
 import { paragraphSpacingAt, setParagraphSpacing } from "../editor/paragraphSpacing";
 
@@ -15,9 +16,11 @@ export default function ParagraphSpacingControl({
   editorVersion: number;
 }) {
   const [open, setOpen] = useState(false);
+  const [anchor, setAnchor] = useState({ top: 0, left: 0 });
   const [before, setBefore] = useState(0);
   const [after, setAfter] = useState(0);
   const panel = useRef<HTMLDivElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
 
   // Reflect the caret's paragraph whenever the selection moves.
   useEffect(() => {
@@ -30,7 +33,9 @@ export default function ParagraphSpacingControl({
   useEffect(() => {
     if (!open) return;
     const onDown = (event: MouseEvent) => {
-      if (!panel.current?.contains(event.target as Node)) setOpen(false);
+      const target = event.target as Node;
+      if (panel.current?.contains(target) || button.current?.contains(target)) return;
+      setOpen(false);
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
@@ -48,18 +53,30 @@ export default function ParagraphSpacingControl({
   return (
     <div className="spacing-control" ref={panel}>
       <button
+        ref={button}
         type="button"
         className="ribbon-icon-button"
         aria-label="Paragraph spacing"
         title="Paragraph spacing"
         aria-expanded={open}
-        onClick={() => setOpen((current) => !current)}
+        onClick={(event) => {
+          const rect = event.currentTarget.getBoundingClientRect();
+          setAnchor({ top: rect.bottom + 6, left: Math.min(rect.left, window.innerWidth - 230) });
+          setOpen((current) => !current);
+        }}
         disabled={!editor}
       >
         <ArrowUpDown size={15} />
       </button>
-      {open ? (
-        <div className="spacing-panel" role="dialog" aria-label="Paragraph spacing">
+      {open
+        ? createPortal(
+            <div
+              className="spacing-panel"
+              role="dialog"
+              aria-label="Paragraph spacing"
+              ref={panel}
+              style={{ position: "fixed", top: anchor.top, left: anchor.left }}
+            >
           <strong>This paragraph</strong>
           <label>
             <span>Before (pt)</span>
@@ -91,11 +108,13 @@ export default function ParagraphSpacingControl({
               }}
             />
           </label>
-          <p className="spacing-hint">
-            Applies to every paragraph you have selected. Adjacent spacing collapses, like Word.
-          </p>
-        </div>
-      ) : null}
+              <p className="spacing-hint">
+                Applies to every paragraph you have selected. Adjacent spacing collapses, like Word.
+              </p>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }
