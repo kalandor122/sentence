@@ -3875,10 +3875,11 @@
       ],
       "hint": "Repro: 1. Click View, then LaTeX. 2. Before \\end{document}, insert `\\begin{verbatim}`, the line `ZXCODE printf(\"%d\", a_b & c);`, and `\\end{verbatim}`. 3. Click Apply source. 4. Click View, then LaTeX, then Refresh from visual.\nActual: Refresh from visual writes the line as `ZXCODE printf(\"\\%d\", a\\_b \\& c);` inside `\\begin{verbatim}`. LaTeX prints those added backslashes literally, so the PDF shows different code from the source the user typed. The visual code block itself still shows the original text. Probe: verbatimSpecialChars.codeEscapedInVerbatim=true, regeneratedVerbatim=`\\begin{verbatim}\\nZXCODE printf(\"\\%d\", a\\_b \\& c);\\n\\end{verbatim}`.",
       "source": "explore:source-editor:verbatim code is latex-escaped on re-export, changing the code",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T14:05:39Z",
-      "lastAttemptAt": "2026-11-25T14:05:39Z"
+      "lastAttemptAt": "2026-11-25T14:05:39Z",
+      "doneAt": "2026-11-25T14:07:28Z"
     },
     {
       "id": "qa-245",
@@ -3890,7 +3891,9 @@
       ],
       "hint": "Repro: 1. Click View, then LaTeX. 2. Before \\end{document}, insert `\\begin{description}`, `\\item[ZXTERM] ZXTERM definition text.`, and `\\end{description}`. 3. Click Apply source. 4. Click View, then Visual. 5. Click View, then LaTeX, then Refresh from visual.\nActual: Apply reports `Visual document synchronized from LaTeX.` The visual page shows the raw lines `\\begin{description}`, `\\item[ZXTERM] ZXTERM definition text.`, `\\end{description}` as paragraph text. Refresh from visual rewrites them as `\\textbackslash{}begin\\{description\\}`, `\\textbackslash{}item[ZXTERM] ...`, `\\textbackslash{}end\\{description\\}`, so the environment no longer compiles. The same was observed for `\\begin{theorem}...\\end{theorem}`. Probe: unsupportedDescriptionEnv.leakedCommands=true, beginEscaped=true, endEscaped=true; unsupportedTheoremEnv.beginEscaped=true.",
       "source": "explore:source-editor:valid latex environments outside the supported subset are shown literally and then escaped",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T14:08:08Z"
     },
     {
       "id": "qa-246",
