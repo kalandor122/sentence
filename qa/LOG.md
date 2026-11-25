@@ -692,3 +692,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T12:36:40Z START qa-236 on qa/qa-236-clicking-a-citation-or-cross-reference-a: Clicking a citation or cross-reference and typing deletes it
 2026-11-25T12:38:48Z PUSHED main
 2026-11-25T12:38:48Z DONE qa-236 (tsc -b, npm test, smoke all green)
+2026-11-25T12:39:26Z START qa-237 on qa/qa-237-undo-after-adding-a-hyperlink-leaves-a-p: Undo after adding a hyperlink leaves a placeholder https:// link

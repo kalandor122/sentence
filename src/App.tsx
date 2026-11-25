@@ -152,6 +152,7 @@ type DialogState =
       kind: "link";
       initialValue: string;
       range?: { from: number; to: number };
+      previousSelection?: { from: number; to: number };
       insertAtCaret?: boolean;
       revertOnCancel?: boolean;
       existingLink?: boolean;
@@ -1658,7 +1659,16 @@ export default function App() {
 
   const closeDialog = () => {
     if (dialog?.kind === "link" && dialog.revertOnCancel && dialog.range && !linkSubmitted.current && editor) {
-      editor.chain().focus().undo().run();
+      // The temporary link shown while the dialog was open is not part of the
+      // document's history, so drop it instead of undoing the user's last edit.
+      editor
+        .chain()
+        .focus()
+        .setTextSelection(dialog.range)
+        .unsetMark("link")
+        .setTextSelection(dialog.previousSelection ?? dialog.range)
+        .setMeta("addToHistory", false)
+        .run();
     }
     linkSubmitted.current = false;
     setDialog(null);
@@ -1679,8 +1689,16 @@ export default function App() {
     const { selection } = editor.state;
     const range = selection.empty ? wordRangeAtCursor(editor) : { from: selection.from, to: selection.to };
     if (!existingHref && range) {
-      editor.chain().focus().setTextSelection(range).setLink({ href: "https://" }).run();
-      setDialog({ kind: "link", initialValue: "", range, revertOnCancel: true });
+      // Show the pending link immediately, but keep it out of the undo history:
+      // the address entered in the dialog is the single step undo should revert.
+      editor.chain().focus().setTextSelection(range).setLink({ href: "https://" }).setMeta("addToHistory", false).run();
+      setDialog({
+        kind: "link",
+        initialValue: "",
+        range,
+        previousSelection: { from: selection.from, to: selection.to },
+        revertOnCancel: true,
+      });
       return;
     }
     setDialog({ kind: "link", initialValue: existingHref, insertAtCaret: !existingHref && !range, existingLink: Boolean(existingHref) });
@@ -1740,6 +1758,11 @@ export default function App() {
         linkSubmitted.current = true;
         if (!editor) break;
         if (dialog.range) {
+          if (dialog.revertOnCancel) {
+            // Remove the placeholder link outside the history so that a single
+            // Ctrl+Z below removes the link instead of falling back to `https://`.
+            editor.chain().setTextSelection(dialog.range).unsetMark("link").setMeta("addToHistory", false).run();
+          }
           editor.chain().focus().setTextSelection(dialog.range).extendMarkRange("link").setLink({ href: value }).run();
         } else if (dialog.insertAtCaret) {
           editor.chain().focus().insertContent({
