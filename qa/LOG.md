@@ -735,3 +735,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T14:43:28Z PUSHED main
 2026-11-25T14:43:28Z DONE qa-249 (tsc -b, npm test, smoke all green)
 2026-11-25T14:44:06Z START qa-250 on qa/qa-250-after-pasting-a-long-document-the-view-s: After pasting a long document the view stops short of the caret at the end, and Ctrl+End does not scroll it into view
+2026-11-25T14:53:40Z PUSHED main
+2026-11-25T14:53:40Z DONE qa-250 (tsc -b, npm test, smoke all green)

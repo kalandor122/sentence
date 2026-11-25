@@ -3639,7 +3639,9 @@
       ],
       "hint": "Repro: Create a new document. Type 'outer one', click Home > Numbered list, press Enter, type 'middle one', press Tab, press Enter, type 'deep one', press Tab. Read the three markers in the editor, then open Source and read the LaTeX.\nActual: All three items render with the decimal marker '1.' (the computed list-style-type is 'decimal' for the level 0, 1 and 2 <ol> elements), giving '1. outer one / 1. middle one / 1. deep one', while the exported LaTeX is three plain nested \\begin{enumerate} blocks with no label customisation, which compile to 1., (a), i.",
       "source": "explore:lists:every level of a nested numbered list is labelled 1. in the visual editor",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T14:54:19Z"
     },
     {
       "id": "qa-229",
@@ -3967,10 +3969,11 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.paste.caretAfterPaste` and `stages.pasteScroll`, or reproduce by hand at 1280x800: open http://localhost:1420, click 'New document', press Ctrl+A then Backspace, and paste the probe's 50-heading/3,600-word document (50 blocks of `<h1|h2|h3>Heading N HDOCN</h1><p>[69-word body] BODYN</p>`, 3,600 words / 13 pages). After the paste and after waiting 2s, the editor's scrollTop is 13,220 of a maximum 14,082; the last paragraph (BODY50) occupies 843-969px inside the 627px-tall editor viewport and the caret at the end of the document is at 948px, i.e. 321px below the visible area. Pressing Ctrl+End leaves scrollTop at 13,220 and the caret still off-screen. Pasting one 3,100-word paragraph instead leaves scrollTop at 4,836 of 6,221 with the caret 1,561px down (934px below the viewport); Ctrl+End again does not move the view.\nActual: The paste scrolls only partway (13,220 of 14,082; 4,836 of 6,221) and the caret and last block stay below the viewport. Because the caret is already at the document end, Ctrl+End produces no selection change and therefore no scroll, so the view remains on the middle of the document and the end can only be reached by wheeling.",
       "source": "explore:long-document:after pasting a long document the view stops short of the caret at the end, and ctrl+end does not scroll it into view",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T14:44:06Z",
-      "lastAttemptAt": "2026-11-25T14:44:06Z"
+      "lastAttemptAt": "2026-11-25T14:44:06Z",
+      "doneAt": "2026-11-25T14:53:38Z"
     },
     {
       "id": "qa-251",
