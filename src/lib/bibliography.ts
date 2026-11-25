@@ -12,6 +12,8 @@ export interface BibliographyDraft {
   author: string;
   year: string;
   title: string;
+  /** Extra BibTeX fields (journal, doi, pages…), used by Zotero imports. */
+  fields?: BibliographyField[];
 }
 
 export interface BibliographyEntry extends BibliographyDraft {

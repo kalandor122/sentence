@@ -3,6 +3,7 @@ mod git;
 mod github;
 mod latex;
 mod project;
+mod zotero;
 
 use tauri::{WebviewUrl, WebviewWindowBuilder};
 
@@ -41,6 +42,7 @@ pub fn run() {
             arxiv::export_arxiv_package,
             latex::compile_project,
             latex::tectonic_status,
+            zotero::zotero_search,
             git::git_state,
             git::git_diff,
             git::git_commit,

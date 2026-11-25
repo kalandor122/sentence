@@ -1439,6 +1439,19 @@ export default function App() {
     }
   };
 
+  // Zotero rows land here with their full field set, so the dialog can stay open
+  // and import several references in a row.
+  const importZoteroEntry = (draft: BibliographyDraft) => {
+    const current = workspaceRef.current;
+    if (!current) return;
+    try {
+      handleBibliographyChange(addBibliographyEntry(current.bibliography, draft));
+      setToast(`Added ${draft.key}.`);
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : String(error));
+    }
+  };
+
   const applySource = () => {
     const current = workspaceRef.current;
     if (!current) return;
@@ -2572,6 +2585,7 @@ export default function App() {
         existingKeys={parseBibliography(workspace.bibliography).map((entry) => entry.key)}
         onClose={() => setBibliographyEntry(undefined)}
         onSave={saveBibliographyEntry}
+        onImport={importZoteroEntry}
       />
       <InputDialog
         open={Boolean(dialog)}

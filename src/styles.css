@@ -3754,3 +3754,64 @@ button:disabled {
   font-size: 11px;
   line-height: 1.4;
 }
+
+/* Zotero import (Bibliography dialog) */
+.zotero-panel {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--chrome);
+}
+
+.zotero-search {
+  display: flex;
+  gap: 8px;
+}
+
+.zotero-search input {
+  flex: 1;
+  min-width: 0;
+}
+
+.zotero-results {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  max-height: 190px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--paper);
+}
+
+.zotero-results button {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  background: none;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.zotero-results button:hover,
+.zotero-results button:focus-visible {
+  background: var(--accent-soft);
+  outline: none;
+}
+
+.zotero-results strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.zotero-results span {
+  font-size: 11px;
+  color: var(--muted);
+}

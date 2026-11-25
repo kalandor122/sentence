@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { BibliographyDraft, BibliographyEntry } from "../lib/bibliography";
+import { zoteroItemToDraft, zoteroSearch, type ZoteroItem } from "../lib/zotero";
 import Modal from "./Modal";
 
 interface BibliographyDialogProps {
@@ -8,6 +9,8 @@ interface BibliographyDialogProps {
   existingKeys: string[];
   onClose: () => void;
   onSave: (draft: BibliographyDraft) => void;
+  /** Zotero import: the dialog stays open so several references can be added. */
+  onImport?: (draft: BibliographyDraft) => void;
 }
 
 const ENTRY_TYPES = ["article", "book", "inproceedings", "incollection", "phdthesis", "misc"];
@@ -26,8 +29,36 @@ export default function BibliographyDialog({
   existingKeys,
   onClose,
   onSave,
+  onImport,
 }: BibliographyDialogProps) {
   const [draft, setDraft] = useState<BibliographyDraft>(emptyDraft);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<ZoteroItem[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState("");
+
+  useEffect(() => {
+    if (!open) {
+      setQuery("");
+      setResults([]);
+      setSearchError("");
+    }
+  }, [open]);
+
+  const runSearch = async () => {
+    const term = query.trim();
+    if (!term || searching) return;
+    setSearching(true);
+    setSearchError("");
+    try {
+      setResults(await zoteroSearch(term));
+    } catch (error) {
+      setResults([]);
+      setSearchError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSearching(false);
+    }
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -66,6 +97,51 @@ export default function BibliographyDialog({
         </>
       }
     >
+      {onImport ? (
+        <section className="zotero-panel" aria-label="Import from Zotero">
+          <div className="zotero-search">
+            <input
+              value={query}
+              placeholder="Search your Zotero library"
+              aria-label="Search Zotero"
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  void runSearch();
+                }
+              }}
+            />
+            <button type="button" className="secondary-button" onClick={() => void runSearch()} disabled={searching}>
+              {searching ? "Searching…" : "Search Zotero"}
+            </button>
+          </div>
+          {searchError ? <p className="bib-form-error" role="alert">{searchError}</p> : null}
+          {results.length > 0 ? (
+            <ul className="zotero-results">
+              {results.map((item) => (
+                <li key={item.key}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onImport(zoteroItemToDraft(item, existingKeys));
+                      setResults((current) => current.filter((row) => row.key !== item.key));
+                    }}
+                  >
+                    <strong>{item.title || "(untitled)"}</strong>
+                    <span>
+                      {item.creators.slice(0, 3).join("; ")}
+                      {item.creators.length > 3 ? " et al." : ""}
+                      {item.date ? ` · ${item.date}` : ""}
+                      {item.container ? ` · ${item.container}` : ""}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
+      ) : null}
       <form
         id="bibliography-form"
         className="dialog-form"

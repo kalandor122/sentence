@@ -4201,8 +4201,9 @@
       "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'inner one', press Tab, press Enter, type 'inner two'. Click at the end of 'inner one' and click Home > Bulleted list (the button is shown pressed). Open Source in the status bar, click Refresh from visual, and read the LaTeX textarea.\nActual: The editor DOM is '<ul><li><p>outer</p><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>' (two paragraph blocks), but the generated LaTeX is '\\begin{itemize}\\n\\item outer\\ninner one\\n\\begin{itemize}\\n\\item inner two\\n\\end{itemize}\\n\\end{itemize}'. The two paragraphs are joined by a single newline, which LaTeX reads as a space, so 'outer' and 'inner one' print as one paragraph in the PDF.",
       "source": "explore:lists:removing the bullet from a nested item creates a second paragraph that the latex merges into the parent item",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T17:57:44Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T17:57:44Z",
+      "lastAttemptAt": "2026-11-25T17:57:44Z"
     },
     {
       "id": "qa-266",
