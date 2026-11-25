@@ -673,3 +673,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T11:20:30Z PUSHED main
 2026-11-25T11:20:30Z DONE qa-230 (tsc -b, npm test, smoke all green)
 2026-11-25T11:21:08Z START qa-198 on qa/qa-198-history-card-preview-clips-to-the-last-1: History card preview clips to the last 180 characters, so edits near the start of a long document show identical before/
+2026-11-25T11:23:17Z PUSHED main
+2026-11-25T11:23:17Z DONE qa-198 (tsc -b, npm test, smoke all green)
+2026-11-25T11:54:38Z EXPLORE math: 4 new items, agent exit 0

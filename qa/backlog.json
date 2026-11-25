@@ -3159,10 +3159,11 @@
       ],
       "hint": "Repro: 1. Type a long paragraph of about 400 characters, for example 'start ' followed by 42 filler words and ' end'. 2. Review tab > Track changes. 3. Put the caret at the very start of the paragraph and type 'Z'. 4. Wait 2.5 s and open the History sidebar.\nActual: Both previews are the last 180 characters of the paragraph and are byte-identical, so the card shows no difference even though the document now starts with 'Zstart ...'. Probe: beforeLength 180, afterLength 180, identical=true, editorStart 'Zstart filler0 filler1 filler2'.",
       "source": "explore:review:history card preview clips to the last 180 characters, so edits near the start of a long document show identical before/",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T11:21:08Z",
-      "lastAttemptAt": "2026-11-25T11:21:08Z"
+      "lastAttemptAt": "2026-11-25T11:21:08Z",
+      "doneAt": "2026-11-25T11:23:15Z"
     },
     {
       "id": "qa-199",
@@ -3666,6 +3667,56 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table. Type 'HEAD' in the first-row middle cell and 'BODY' in the second-row middle cell. Click the HEAD cell and press the Table toolbar's 'Add row above' button. Then click the BODY row and press 'Add row above' again.\nActual: The first press leaves HEAD in row 1 and adds the blank row at row 2, directly below the header: cells become HEAD, blank, BODY, blank. The second press inserts correctly above BODY, giving HEAD, blank, blank, BODY, blank. The same button therefore does not do what its label says while the caret is in the header row.",
       "source": "explore:tables:'add row above' in the header row inserts the new row below the header instead",
+      "status": "open"
+    },
+    {
+      "id": "qa-232",
+      "title": "An equation carrying its \\label renders the label as red error text and can no longer be edited",
+      "why": "Exploratory pass on math (functional): expected None",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a new document, open View > LaTeX.\n2. Before \\end{document} add this body:\n\\begin{equation}\n\\label{eq:energy}\nE=mc^2\n\\end{equation}\n\nSee \\ref{eq:energy}.\n3. Click Apply source (the toast says 'Visual document synchronized from LaTeX.'), then switch to View > Visual.\n4. Click the rendered equation.\nExpected: the \\label is handled as the equation's reference target (the following \\ref already resolves to 'eq:energy'), the page shows E=mc^2 without error text, and the edit dialog opens with Update enabled.\nActual: the equation displays the literal \\label{eq:energy} in KaTeX's red error colour next to E=mc^2 (the math node has redErrorText true). Clicking it opens 'Edit equation', but the dialog marks the input invalid (aria-invalid true) and Update stays disabled; changing the formula to a valid expression does not enable Update. Only deleting the \\label makes it valid. The source still round-trips the \\label unchanged, but a standard labelled numbered equation cannot be rendered cleanly or edited.\nActual: None",
+      "source": "explore:math:an equation carrying its \\label renders the label as red error text and can no longer be edited",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T11:54:56Z"
+    },
+    {
+      "id": "qa-233",
+      "title": "A blank line inside a display equation is accepted from the source and re-exported as uncompilable LaTeX",
+      "why": "Exploratory pass on math (content): expected None",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a new document and open View > LaTeX.\n2. Before \\end{document} add:\n\\begin{equation}\na\n\nb\n\\end{equation}\n3. Click Apply source: the toast reports 'Visual document synchronized from LaTeX.'\n4. Switch to View > Visual: a display math block renders 'a b' with no error indicator (no katex-error, no red text).\n5. Switch back to View > LaTeX and click Refresh from visual: the exported source still contains the blank line between a and b inside \\begin{equation}...\\end{equation}.\nExpected: the blank line is rejected with the same validation the math dialog applies to `a\\n\\nb` (Insert disabled), or it is normalised to a single line, so the exported .tex remains compilable.\nActual: the document is accepted and reported as synchronised; the math node stores latex 'a\\n\\nb' and the exporter writes the blank line back verbatim. A blank line ends the paragraph before the closing environment in LaTeX, so the generated equation does not compile.\nActual: None",
+      "source": "explore:math:a blank line inside a display equation is accepted from the source and re-exported as uncompilable latex",
+      "status": "open"
+    },
+    {
+      "id": "qa-234",
+      "title": "Invalid blank-line math disables Insert with no visible error message",
+      "why": "Exploratory pass on math (ux): expected None",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open Insert > 'Inline equation'.\n2. In the LaTeX source textarea type `a`, press Enter twice, then type `b` (the value is `a\\n\\nb`).\n3. Look at the preview and try Ctrl+Enter.\nExpected: the dialog explains why the input is invalid (for example 'blank lines are not allowed in math'), the way malformed input such as `\\frac{` shows a KaTeX parse error.\nActual: the preview renders normally as 'ab' with no .katex-error, no red content and no role=alert message, while the Insert button is disabled and the textarea has aria-invalid='true'. Ctrl+Enter does nothing and no text anywhere identifies the problem, so the blocked state is unexplained.\nActual: None",
+      "source": "explore:math:invalid blank-line math disables insert with no visible error message",
+      "status": "open"
+    },
+    {
+      "id": "qa-235",
+      "title": "$$...$$ inside a paragraph is silently converted into literal dollar text",
+      "why": "Exploratory pass on math (content): expected None",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a new document and open View > LaTeX.\n2. Before \\end{document} add the single line `Before $$F=ma$$ after.`\n3. Click Apply source (the toast says 'Visual document synchronized from LaTeX.') and switch to View > Visual.\n4. Observe the page, then open View > LaTeX and click Refresh from visual.\nExpected: the display math is recognised (standalone `$$F=ma$$` becomes a math block) or at least left as `$$...$$` in the export; the formula must not become literal dollars.\nActual: the visual document contains no math node, just the paragraph text 'Before $$F=ma$$ after.', and the exported body escapes both delimiters: `Before \\$\\$F=ma\\$\\$ after.` The equation is lost and the PDF would print the dollar signs as text, although this is valid TeX display math in running text.\nActual: None",
+      "source": "explore:math:$$...$$ inside a paragraph is silently converted into literal dollar text",
       "status": "open"
     }
   ]
