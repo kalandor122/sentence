@@ -434,6 +434,19 @@ function insertPageFurniture(editor: Editor | null, type: "pageBreak" | "toc") {
       return;
     }
   }
+  // A block atom inserted at a caret inside a paragraph splits it in two, which
+  // cuts the word under the caret apart. Page furniture belongs between blocks,
+  // so put it after the top-level block that holds the caret instead.
+  if ($from.depth > 0 && $from.parent.isTextblock && $from.parentOffset > 0 && $from.parentOffset < $from.parent.content.size) {
+    const caret = $from.pos;
+    editor
+      .chain()
+      .focus()
+      .insertContentAt($from.after(1), { type })
+      .setTextSelection(caret)
+      .run();
+    return;
+  }
   insertBlockContent(editor, { type });
 }
 

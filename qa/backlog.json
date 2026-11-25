@@ -3952,8 +3952,9 @@
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.pageBreakMidWord`, or reproduce by hand: open http://localhost:1420, click 'New document', Ctrl+A then Backspace, type `The quick brown fox jumps over the lazy dog.`, press Home, press ArrowRight 12 times (the caret now sits between `br` and `own`), open the Insert tab and click 'Page break'. The status bar goes from 9 words to 10 words and the editor becomes `The quick br` / page break / `own fox jumps over the lazy dog.`. Open View > LaTeX: the source contains `The quick br`, a blank line, `\\newpage`, then `own fox jumps over the lazy dog.` Switch back to Visual, click the page break and press Backspace: the break is gone but the document remains two paragraphs (`The quick br` and `own fox jumps over the lazy dog.`) and still reports 10 words. A source-to-visual round trip also keeps the split.\nActual: The page break splits the paragraph at the caret and the word `brown` is divided into `br` and `own`, which then export as two separate words around `\\newpage` (word count 9 -> 10). Deleting the break leaves two paragraphs and does not reunite the word, so the typo persists in the document and in the LaTeX source.",
       "source": "explore:long-document:a page break inserted inside a word permanently splits the word and inflates the word count",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T14:37:48Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T14:37:48Z",
+      "lastAttemptAt": "2026-11-25T14:37:48Z"
     },
     {
       "id": "qa-250",
