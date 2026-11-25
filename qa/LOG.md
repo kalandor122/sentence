@@ -492,3 +492,5 @@ Aborting
 2026-11-25T00:04:09Z DONE qa-173 (tsc -b, npm test, smoke all green)
 2026-11-25T00:13:55Z EXPLORE keyboard: 4 new items, agent exit 0
 2026-11-25T00:14:09Z START qa-174 on qa/qa-174-tab-in-the-document-wraps-the-paragraph: Tab in the document wraps the paragraph in a block quote instead of moving focus
+2026-11-25T00:16:35Z PUSHED main
+2026-11-25T00:16:35Z DONE qa-174 (tsc -b, npm test, smoke all green)
