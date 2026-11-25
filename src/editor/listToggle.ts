@@ -1,5 +1,5 @@
 import type { Editor } from "@tiptap/core";
-import { AllSelection } from "@tiptap/pm/state";
+import { AllSelection, TextSelection } from "@tiptap/pm/state";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 
 function isAllSelected(editor: Editor): boolean {
@@ -43,6 +43,35 @@ function unwrapList(node: ProseMirrorNode, listType: "bulletList" | "orderedList
 
 function isListNode(node: ProseMirrorNode): boolean {
   return node.type.name === "bulletList" || node.type.name === "orderedList";
+}
+
+/**
+ * Enter at the end of a list item that owns a nested sublist should add a
+ * sibling item after the sublist. ProseMirror's splitListItem instead moves the
+ * sublist into the new item, silently reparenting every child. A sublist
+ * belongs to the item whose text introduces it, so insert the new item after
+ * the whole current one and leave the trailing sublist where it is.
+ */
+export function splitListItemKeepingSublist(editor: Editor): boolean {
+  if (!editor.isEditable) return false;
+  const { state } = editor;
+  const { selection } = state;
+  if (!(selection instanceof TextSelection) || !selection.empty) return false;
+  const { $from } = selection;
+  if ($from.depth < 3) return false;
+  const item = $from.node(-1);
+  if (item.type.name !== "listItem") return false;
+  if ($from.parentOffset !== $from.parent.content.size) return false;
+  const next = item.maybeChild($from.indexAfter(-1));
+  if (!next || !isListNode(next)) return false;
+
+  const paragraph = state.schema.nodes.paragraph.create();
+  const newItem = item.type.create(item.attrs, paragraph);
+  const insertAt = $from.after(-1);
+  const tr = state.tr.insert(insertAt, newItem);
+  tr.setSelection(TextSelection.create(tr.doc, insertAt + 2));
+  editor.view.dispatch(tr.scrollIntoView());
+  return true;
 }
 
 // Retag list nodes (including nested sublists) without touching their items,

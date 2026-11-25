@@ -2,7 +2,7 @@
 import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
-import { isListActive, toggleList } from "./listToggle";
+import { isListActive, splitListItemKeepingSublist, toggleList } from "./listToggle";
 
 function createEditor(content: string): Editor {
   return new Editor({ extensions: [StarterKit], content });
@@ -91,5 +91,37 @@ describe("toggleList", () => {
       "<p>intro</p><ol><li><p>one</p><ol><li><p>child</p></li></ol></li></ol>",
     );
     editor.destroy();
+  });
+});
+
+describe("splitListItemKeepingSublist", () => {
+  it("adds a sibling after the sublist instead of adopting it", () => {
+    const editor = createEditor(
+      "<ul><li><p>parent</p><ul><li><p>child</p></li></ul></li></ul>",
+    );
+    // End of the "parent" text, before its nested list.
+    editor.commands.setTextSelection(9);
+    expect(splitListItemKeepingSublist(editor)).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ul><li><p>parent</p><ul><li><p>child</p></li></ul></li><li><p></p></li></ul>",
+    );
+    const { $from } = editor.state.selection;
+    expect($from.parent.type.name).toBe("paragraph");
+    expect($from.parent.content.size).toBe(0);
+    editor.destroy();
+  });
+
+  it("leaves ordinary splits and non-list text to the default Enter", () => {
+    const midItem = createEditor(
+      "<ul><li><p>parent</p><ul><li><p>child</p></li></ul></li></ul>",
+    );
+    midItem.commands.setTextSelection(5);
+    expect(splitListItemKeepingSublist(midItem)).toBe(false);
+    midItem.destroy();
+
+    const paragraph = createEditor("<p>outside</p>");
+    paragraph.commands.setTextSelection(7);
+    expect(splitListItemKeepingSublist(paragraph)).toBe(false);
+    paragraph.destroy();
   });
 });

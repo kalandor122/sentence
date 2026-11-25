@@ -2892,8 +2892,9 @@
       "hint": "Repro: Create a new document. Type 'parent', click Home > Bulleted list, press Enter, type 'child', press Tab. Click at the end of the 'parent' line, press Enter and type 'sibling'.\nActual: The existing sublist is transferred to the new item: the DOM is '<ul><li><p>parent</p></li><li><p>sibling</p><ul><li><p>child</p></li></ul></li></ul>', exported as '\\item parent\\n\\item sibling\\n\\begin{itemize}\\n\\item child\\n\\end{itemize}'. The child item silently changes parent from 'parent' to 'sibling'.",
       "source": "explore:lists:enter at the end of a parent item moves its nested sublist to the new item",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T01:49:17Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T01:49:17Z",
+      "lastAttemptAt": "2026-11-25T01:49:17Z"
     },
     {
       "id": "qa-183",

@@ -23,7 +23,7 @@ import {
 import { FindHighlight } from "./find";
 import { focusAfterEditor } from "./focus";
 import { changeIndent, nestListItem } from "./indent";
-import { toggleList } from "./listToggle";
+import { splitListItemKeepingSublist, toggleList } from "./listToggle";
 import { LINE_HEIGHTS, LineSpacing, setLineSpacing } from "./lineSpacing";
 import {
   pageBoundaryWithin,
@@ -96,6 +96,19 @@ const ListShortcuts = Extension.create({
     return {
       "Mod-Shift-7": () => toggleList(this.editor, "orderedList"),
       "Mod-Shift-8": () => toggleList(this.editor, "bulletList"),
+    };
+  },
+});
+
+// Enter at the end of a list item with a nested sublist keeps that sublist
+// under the item it belongs to; the default split would give it to the new
+// sibling.
+const ListEnter = Extension.create({
+  name: "sentenceListEnter",
+  priority: 200,
+  addKeyboardShortcuts() {
+    return {
+      Enter: () => splitListItemKeepingSublist(this.editor),
     };
   },
 });
@@ -220,6 +233,7 @@ export default function EditorSurface({
       LineSpacing,
       TabIndent,
       ListShortcuts,
+      ListEnter,
     ],
     content: document,
     editable,
