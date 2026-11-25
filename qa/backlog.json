@@ -3159,7 +3159,9 @@
       ],
       "hint": "Repro: 1. Type a long paragraph of about 400 characters, for example 'start ' followed by 42 filler words and ' end'. 2. Review tab > Track changes. 3. Put the caret at the very start of the paragraph and type 'Z'. 4. Wait 2.5 s and open the History sidebar.\nActual: Both previews are the last 180 characters of the paragraph and are byte-identical, so the card shows no difference even though the document now starts with 'Zstart ...'. Probe: beforeLength 180, afterLength 180, identical=true, editorStart 'Zstart filler0 filler1 filler2'.",
       "source": "explore:review:history card preview clips to the last 180 characters, so edits near the start of a long document show identical before/",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T11:21:08Z"
     },
     {
       "id": "qa-199",
@@ -3647,10 +3649,11 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click the bottom-right cell, type 'b3', press Tab once, then type 'AFTER' without clicking anywhere. Read the document and then switch to View > LaTeX and read the source.\nActual: The table stays 3x3 with no new row, the empty paragraph after the table is skipped, and focus lands on the 'Visual (Ctrl+Alt+1)' view button in the bottom status bar (document.activeElement is that BUTTON, activeElement.closest('.tiptap') is false). Typing 'AFTER' produces no text anywhere in the document or in the exported LaTeX. Clicking the paragraph after the table and typing works, so the text position exists but Tab bypasses it.",
       "source": "explore:tables:tab in the last table cell jumps to the 'visual' view button and the next keystrokes are discarded",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T11:14:56Z",
-      "lastAttemptAt": "2026-11-25T11:14:57Z"
+      "lastAttemptAt": "2026-11-25T11:14:57Z",
+      "doneAt": "2026-11-25T11:20:25Z"
     },
     {
       "id": "qa-231",
