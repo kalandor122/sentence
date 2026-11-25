@@ -3591,10 +3591,11 @@
       ],
       "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'child one', press Tab, press Enter, type 'child two', press Enter, type 'child three'. Click at the end of 'child one', press Enter (an empty second child item appears), press Enter again and type 'typed'. Repeat with Home > Numbered list.\nActual: 'typed' is inserted inside the parent list item, between two split child lists: the DOM is '<ul><li><p>outer</p><ul><li><p>child one</p></li></ul><p>typed</p><ul><li><p>child two</p></li><li><p>child three</p></li></ul></li></ul>' and the LaTeX is '\\item outer\\n\\begin{itemize}\\n\\item child one\\n\\end{itemize}\\ntyped\\n\\begin{itemize}\\n\\item child two\\n\\item child three\\n\\end{itemize}', so 'typed' becomes text of the parent item rather than a list item. The numbered variant behaves the same and exports the second nested list as '\\setcounter{enumii}{1}'.",
       "source": "explore:lists:enter on an empty item in the middle of a nested list turns the new text into part of the parent item",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T11:06:46Z",
-      "lastAttemptAt": "2026-11-25T11:06:46Z"
+      "lastAttemptAt": "2026-11-25T11:06:46Z",
+      "doneAt": "2026-11-25T11:11:37Z"
     },
     {
       "id": "qa-227",
@@ -3630,7 +3631,9 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click a body cell, type 'R&D 50% {x}' into the Table toolbar's Caption field, then switch to View > LaTeX and confirm the line \\caption{R\\&D 50\\% \\{x\\}}. Add a new line containing '% check' at the end of the source and click Apply source. Look at the caption under the table and the Caption field, then switch to View > LaTeX again.\nActual: After Apply source the visible caption and the Caption field both read 'R&D 50% {x\\' - the closing brace is gone and a backslash is appended. The re-exported line is \\caption{R\\&D 50\\% \\{x\\\\}}, so the literal '}' is permanently lost and replaced by a LaTeX line break. A caption without a brace ('Simple caption') round-trips unchanged, and caption text is the only place this was observed; the same '{x}' text in a table cell survives the round trip.",
       "source": "explore:tables:a table caption containing a closing brace is silently corrupted by a latex source round trip",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T11:12:17Z"
     },
     {
       "id": "qa-230",
