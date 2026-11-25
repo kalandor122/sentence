@@ -1661,6 +1661,9 @@ describe("LaTeX generation", () => {
       ...settings,
       includeToc: true,
     });
+    // The placed block represents the contents, so the generated one must not
+    // add a second \tableofcontents and a second contents page.
+    expect(withGeneratedToc.match(/\\tableofcontents/g)).toHaveLength(1);
     const generatedParsed = latexToDocument(withGeneratedToc, {
       ...settings,
       includeToc: true,
@@ -1673,6 +1676,22 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(generatedParsed.document, generatedParsed.settings)).toBe(
       withGeneratedToc,
     );
+  });
+
+  it("generates one contents page when the document has no placed table of contents", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Intro" }] },
+        { type: "paragraph", content: [{ type: "text", text: "Body." }] },
+      ],
+    };
+    const latex = documentToLatex(document, { ...settings, includeToc: true });
+    expect(latex.match(/\\tableofcontents/g)).toHaveLength(1);
+    expect(latex).toContain("\\tableofcontents\\newpage");
+    const parsed = latexToDocument(latex, { ...settings, includeToc: true });
+    expect(parsed.document.content.map((node) => node.type)).toEqual(["heading", "paragraph"]);
+    expect(documentToLatex(parsed.document, parsed.settings)).toBe(latex);
   });
 
   it("emits and round-trips typography settings", () => {

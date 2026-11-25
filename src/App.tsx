@@ -58,6 +58,7 @@ import {
 import {
   citationKeys,
   countWords,
+  documentHasToc,
   documentPlainText,
   documentToLatex,
   hasCitations,
@@ -433,6 +434,20 @@ function insertPageFurniture(editor: Editor | null, type: "pageBreak" | "toc") {
     }
   }
   insertBlockContent(editor, { type });
+}
+
+function tocNodePosition(editor: Editor | null): number | null {
+  if (!editor) return null;
+  let position: number | null = null;
+  editor.state.doc.descendants((node, pos) => {
+    if (position !== null) return false;
+    if (node.type.name === "toc") {
+      position = pos;
+      return false;
+    }
+    return true;
+  });
+  return position;
 }
 
 // A block image inserts at a mid-text caret by splitting the paragraph. Use
@@ -1455,6 +1470,12 @@ export default function App() {
   };
 
   const handleSettingsChange = (patch: Partial<ProjectSettings>) => {
+    // An explicit contents block already exports \tableofcontents; generating
+    // another one would print a second contents page.
+    if (patch.includeToc === true && workspaceRef.current && documentHasToc(workspaceRef.current.document)) {
+      setToast("The document already has a table of contents.");
+      return;
+    }
     setWorkspace((current) => {
       if (!current) return current;
       const settings = { ...current.settings, ...patch };
@@ -1466,6 +1487,26 @@ export default function App() {
       return { ...current, settings };
     });
     markDirty();
+  };
+
+  const insertTableOfContents = () => {
+    const current = workspaceRef.current;
+    if (!editor || !current) return;
+    // Point at the contents block that is already there instead of adding a
+    // second \tableofcontents command.
+    const existing = tocNodePosition(editor);
+    if (existing !== null) {
+      editor.chain().focus().setNodeSelection(existing).scrollIntoView().run();
+      setToast("The document already has a table of contents.");
+      return;
+    }
+    if (current.settings.includeToc) {
+      // Asking for a contents block here replaces the generated one, so the
+      // page gains the block and the export still prints a single contents.
+      handleSettingsChange({ includeToc: false });
+      setToast("Table of contents moved to the cursor.");
+    }
+    insertPageFurniture(editor, "toc");
   };
 
   const handleCompile = async () => {
@@ -2116,7 +2157,7 @@ export default function App() {
         onInsertFootnote={() => setDialog({ kind: "footnote" })}
         onInsertCrossReference={() => setDialog({ kind: "cross-reference" })}
         onInsertLink={openLinkDialog}
-        onInsertToc={() => insertPageFurniture(editor, "toc")}
+        onInsertToc={insertTableOfContents}
         onInsertPageBreak={() => insertPageFurniture(editor, "pageBreak")}
         onToggleTracking={() => {
           const next = !tracking;

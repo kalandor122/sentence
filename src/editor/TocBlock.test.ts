@@ -2,7 +2,7 @@
 import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
-import { tocEntries, tocTitle, setTocTitle } from "./TocBlock";
+import { tocEntries, tocTitle, setTocTitle, setGeneratedToc } from "./TocBlock";
 import { HeadingLabel, TableOfContents } from "./extensions";
 
 describe("tocEntries", () => {
@@ -84,6 +84,48 @@ describe("tocEntries", () => {
       "Introduction",
       "Drafting with constraints",
     ]);
+    editor.destroy();
+  });
+
+  it("draws the generated contents without adding a document node", () => {
+    const editor = new Editor({
+      extensions: [StarterKit, HeadingLabel, TableOfContents],
+      content: {
+        type: "doc",
+        content: [
+          { type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Introduction" }] },
+          { type: "paragraph", content: [{ type: "text", text: "Body." }] },
+        ],
+      },
+    });
+    expect(editor.view.dom.querySelector("[data-toc]")).toBeNull();
+    setGeneratedToc(editor, true);
+    const generated = editor.view.dom.querySelector("[data-toc]");
+    expect(generated).not.toBeNull();
+    expect(generated?.textContent).toContain("1Introduction");
+    // A decoration represents the contents page; the document itself still
+    // exports exactly the nodes the user placed.
+    expect(editor.getJSON().content?.some((node) => node.type === "toc")).not.toBe(true);
+    setGeneratedToc(editor, false);
+    expect(editor.view.dom.querySelector("[data-toc]")).toBeNull();
+    editor.destroy();
+  });
+
+  it("puts the generated contents after a heading that repeats the title", () => {
+    const editor = new Editor({
+      extensions: [StarterKit, HeadingLabel, TableOfContents],
+      content: {
+        type: "doc",
+        content: [
+          { type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Introduction" }] },
+          { type: "paragraph", content: [{ type: "text", text: "Body." }] },
+        ],
+      },
+    });
+    setTocTitle(editor, "Introduction");
+    setGeneratedToc(editor, true);
+    const generated = editor.view.dom.querySelector("[data-toc]");
+    expect(generated?.previousElementSibling?.tagName).toBe("H1");
     editor.destroy();
   });
 
