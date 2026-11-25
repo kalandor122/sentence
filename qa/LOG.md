@@ -774,3 +774,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T17:11:34Z START qa-247 on qa/qa-247-a-verbatim-block-containing-end-document: A verbatim block containing \end{document} is rejected as trailing text
 2026-11-25T17:14:24Z PUSHED main
 2026-11-25T17:14:24Z DONE qa-247 (tsc -b, npm test, smoke all green)
+2026-11-25T17:15:02Z START qa-251 on qa/qa-251-a-long-heading-in-the-outline-does-not-w: A long heading in the outline does not wrap; it is clipped and forces a 1,000px horizontal scroll inside the sidebar
