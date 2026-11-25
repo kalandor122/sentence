@@ -170,7 +170,7 @@ describe("CaptionTable", () => {
     editor.destroy();
   });
 
-  it("walks the cells with Tab and releases the last one without adding a row", () => {
+  it("walks the cells with Tab and leaves the last one for the text after the table", () => {
     const editor = createSizedEditor(2, 2);
     const positions = cellPositions(editor);
     editor.commands.setTextSelection(positions[0]);
@@ -178,9 +178,28 @@ describe("CaptionTable", () => {
       expect(pressTab(editor)).toBe(true);
       expect(editor.state.selection.from).toBe(positions[index]);
     }
-    expect(pressTab(editor)).toBe(false);
-    expect(editor.state.selection.from).toBe(positions[positions.length - 1]);
+    expect(pressTab(editor)).toBe(true);
+    expect(editor.isActive("table")).toBe(false);
+    expect(editor.state.selection.$from.parent.type.name).toBe("paragraph");
     expect(rowTypes(editor)).toHaveLength(2);
+    editor.commands.insertContent("after");
+    expect(editor.state.selection.$from.parent.textContent).toBe("after");
+    const latex = documentToLatex(editor.getJSON() as SentenceDocument, DEFAULT_SETTINGS);
+    expect(latex).toMatch(/\\end\{table\}\s+after/);
+    editor.destroy();
+  });
+
+  it("uses the paragraph after the table instead of adding another", () => {
+    const editor = createSizedEditor(2, 2);
+    editor.commands.insertContentAt(editor.state.doc.content.size, {
+      type: "paragraph",
+      content: [{ type: "text", text: "next" }],
+    });
+    editor.commands.setTextSelection(cellPositions(editor)[3]);
+    expect(pressTab(editor)).toBe(true);
+    expect(editor.isActive("table")).toBe(false);
+    expect(editor.state.selection.$from.parent.textContent).toBe("next");
+    expect(editor.state.doc.childCount).toBe(2);
     editor.destroy();
   });
 
@@ -289,7 +308,7 @@ describe("CaptionTable", () => {
     editor.destroy();
   });
 
-  it("hands focus to the next control when Tab leaves the last cell", () => {
+  it("keeps typing in the document when Tab leaves the last cell", () => {
     const host = document.createElement("div");
     document.body.appendChild(host);
     const editor = createSizedEditor(2, 2, host);
@@ -298,7 +317,10 @@ describe("CaptionTable", () => {
     document.body.appendChild(button);
     editor.commands.setTextSelection(cellPositions(editor)[3]);
     expect(pressTab(editor)).toBe(true);
-    expect(document.activeElement).toBe(button);
+    expect(document.activeElement).not.toBe(button);
+    editor.commands.insertContent("AFTER");
+    expect(editor.state.selection.$from.parent.textContent).toBe("AFTER");
+    expect(editor.isActive("table")).toBe(false);
     expect(rowTypes(editor)).toHaveLength(2);
     editor.destroy();
     host.remove();
