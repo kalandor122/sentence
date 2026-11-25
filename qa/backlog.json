@@ -2679,7 +2679,9 @@
       ],
       "hint": "Repro: 1. View tab > LaTeX. 2. Before \\end{document}, add a tabular with header `Name & Value \\\\` and last row `ZXLASTROW & 99` with no trailing `\\\\`, followed by `\\hline` and `\\end{tabular}`. 3. Click Apply source, then View tab > Visual.\nActual: Apply reports success, but the last visual cell is `99 \\hline` (probe cells: `[\"ZXLASTROW\", \"99 \\\\hline\"]`). Refresh from visual writes `ZXLASTROW & 99\\n\\textbackslash{}hline \\\\`, adding a row whose second cell is the literal text `\\hline`; the rule becomes table content.",
       "source": "explore:source-editor:a table's last row without a trailing \\\\ swallows the following \\hline into a cell",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T01:05:00Z"
     },
     {
       "id": "qa-169",
@@ -2839,10 +2841,11 @@
       ],
       "hint": "Repro: In the demo document press Ctrl+End, click Insert > Image and supply a red 120x60 PNG named 'qa image #1.png'. Press Ctrl+End again and use Insert > Image with a blue 40x80 PNG that has the same file name. Click View > LaTeX: both \\includegraphics entries read assets/images/qa-image--1.png. Press Ctrl+End in the source textarea, type a space and Backspace so Apply source becomes enabled, click Apply source, then View > Visual.\nActual: Both image nodes carry data-path='assets/images/qa-image--1.png' and the LaTeX references that one path twice. After Apply source both figures show the second (blue 40x80) image (both imgs report natural 40x80); the first image is silently replaced, with the toast 'Visual document synchronized from LaTeX.' Probe: qa/probes/insert-media.mjs scenario 'image' (latexTwice, apply.info). Observed in the browser build, whose asset path comes from imageAssetPath(file.name) with no uniquifier.",
       "source": "explore:insert-media:two different images with the same file name share one asset path and become the same picture after apply source",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T01:00:55Z",
-      "lastAttemptAt": "2026-11-25T01:00:55Z"
+      "lastAttemptAt": "2026-11-25T01:00:55Z",
+      "doneAt": "2026-11-25T01:04:24Z"
     },
     {
       "id": "qa-180",
