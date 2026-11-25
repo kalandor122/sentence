@@ -537,6 +537,9 @@ export default function App() {
   // source view regenerates LaTeX from the document, which would rewrite a
   // hand-written draft (and drop its undo history) even though nothing changed.
   const appliedSourceDocument = useRef<string | null>(null);
+  // LaTeX text the clean source pane holds. Undoing a draft edit back to
+  // exactly this text leaves nothing to apply.
+  const appliedSourceText = useRef<string | null>(restoredDraft ? null : source);
   // The visual document as it was when the current LaTeX draft started. If the
   // visual pane is edited before the draft is applied, the draft is older than
   // what the user sees and applying it would silently delete those edits.
@@ -562,6 +565,10 @@ export default function App() {
   useEffect(() => {
     sourceDirtyRef.current = sourceDirty;
   }, [sourceDirty]);
+
+  useEffect(() => {
+    if (!sourceDirty) appliedSourceText.current = source;
+  }, [source, sourceDirty]);
 
   useEffect(() => {
     if (mode !== "source") return;
@@ -671,6 +678,7 @@ export default function App() {
     setSourceFile("document.tex");
     setSourceDirty(tab.sourceDirty);
     sourceDirtyRef.current = tab.sourceDirty;
+    appliedSourceText.current = tab.sourceDirty ? null : tab.source;
     sourceDraftDocument.current = tab.sourceDraftDocument;
     sourceDraftWarning.current = false;
     setDirtyState(tab.dirty);
@@ -1204,6 +1212,18 @@ export default function App() {
   const activeRevisionIds = () => pendingRevisions(workspaceRef.current?.revisions ?? []).map((revision) => revision.id);
 
   const handleSourceChange = (value: string) => {
+    if (value === appliedSourceText.current) {
+      // An edit (or Ctrl+Z) returned the draft to the applied LaTeX, so there
+      // is nothing left to synchronise.
+      setSource(value);
+      sourceRef.current = value;
+      setSourceDirty(false);
+      sourceDirtyRef.current = false;
+      sourceDraftDocument.current = null;
+      sourceDraftWarning.current = false;
+      discardSourceDraft();
+      return;
+    }
     if (!sourceDirtyRef.current) {
       // Remember the visual text this draft started from, so an edit in the
       // other pane of the split view is not mistaken for the draft's content.
