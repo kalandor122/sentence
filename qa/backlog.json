@@ -3631,10 +3631,11 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click a body cell, type 'R&D 50% {x}' into the Table toolbar's Caption field, then switch to View > LaTeX and confirm the line \\caption{R\\&D 50\\% \\{x\\}}. Add a new line containing '% check' at the end of the source and click Apply source. Look at the caption under the table and the Caption field, then switch to View > LaTeX again.\nActual: After Apply source the visible caption and the Caption field both read 'R&D 50% {x\\' - the closing brace is gone and a backslash is appended. The re-exported line is \\caption{R\\&D 50\\% \\{x\\\\}}, so the literal '}' is permanently lost and replaced by a LaTeX line break. A caption without a brace ('Simple caption') round-trips unchanged, and caption text is the only place this was observed; the same '{x}' text in a table cell survives the round trip.",
       "source": "explore:tables:a table caption containing a closing brace is silently corrupted by a latex source round trip",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T11:12:17Z",
-      "lastAttemptAt": "2026-11-25T11:12:17Z"
+      "lastAttemptAt": "2026-11-25T11:12:17Z",
+      "doneAt": "2026-11-25T11:14:17Z"
     },
     {
       "id": "qa-230",
@@ -3646,7 +3647,9 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click the bottom-right cell, type 'b3', press Tab once, then type 'AFTER' without clicking anywhere. Read the document and then switch to View > LaTeX and read the source.\nActual: The table stays 3x3 with no new row, the empty paragraph after the table is skipped, and focus lands on the 'Visual (Ctrl+Alt+1)' view button in the bottom status bar (document.activeElement is that BUTTON, activeElement.closest('.tiptap') is false). Typing 'AFTER' produces no text anywhere in the document or in the exported LaTeX. Clicking the paragraph after the table and typing works, so the text position exists but Tab bypasses it.",
       "source": "explore:tables:tab in the last table cell jumps to the 'visual' view button and the next keystrokes are discarded",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T11:14:56Z"
     },
     {
       "id": "qa-231",
