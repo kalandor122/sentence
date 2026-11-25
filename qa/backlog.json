@@ -4008,6 +4008,104 @@
       "startedAt": "2026-11-25T15:15:06Z",
       "lastAttemptAt": "2026-11-25T15:15:06Z",
       "doneAt": "2026-11-25T15:19:52Z"
+    },
+    {
+      "id": "qa-253",
+      "title": "Ctrl+Alt+1 back to Visual leaves focus on <body>, so the next keystrokes are silently discarded",
+      "why": "Exploratory pass on keyboard (functional): expected The Visual view receives keyboard focus when it becomes active, exactly as the Source textarea receives focus after Ctrl+Alt+2, so a keyboard user can keep typing after switching views.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open a project, click into the document, select all and type \"mode probe paragraph\". Press Ctrl+Alt+2 (Source): the status bar switches to Source and focus lands in the \"LaTeX source\" textarea. Press Ctrl+Alt+1 (Visual): the status bar switches to Visual, but document.activeElement is <body>, not the ProseMirror editor. Type \"QRS\": the document still reads \"mode probe paragraph\", and QRS appears nowhere on the page or in the LaTeX source. Typing only works again after clicking the page, pressing F6 or tabbing back. The same happens when leaving Split for Visual while the caret is in the source pane: Ctrl+Alt+1 from Split puts focus on <body> and the next typing is lost.\nActual: After Ctrl+Alt+1 the LaTeX textarea is gone from the DOM and activeElement is {tag: \"BODY\"}; nothing has moved focus into the visual editor. Typing QRS leaves the visual document unchanged (\"mode probe paragraph\") and bodyText does not contain QRS. Ctrl+Alt+2 works because focus lands in the source textarea; there is no equivalent handoff for visual.",
+      "source": "explore:keyboard:ctrl+alt+1 back to visual leaves focus on <body>, so the next keystrokes are silently discarded",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T15:47:12Z"
+    },
+    {
+      "id": "qa-254",
+      "title": "Escape does not leave the LaTeX source editor, contradicting the status-bar hint",
+      "why": "Exploratory pass on keyboard (functional): expected Escape leaves the source editing surface, the documented mirror of F6, matching the visual editor's Escape behaviour.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open a project and press Ctrl+Alt+2 to switch to Source. Click at the end of the \"LaTeX source\" textarea and press Escape. Focus remains on the textarea (document.activeElement is still the LaTeX source textarea). The status-bar hint's tooltip reads \"F6 moves focus into the document, Esc leaves the editing surface\"; pressing Escape in the visual editor does move focus to the status bar, while in source view it does nothing. Tab does move focus out of the textarea (to the Visual button in the status bar), so Escape is not the way out.\nActual: The source textarea has no Escape handler. Probe: focus before Escape {TEXTAREA, aria-label \"LaTeX source\"}, focus after Escape the same textarea; no focus change.",
+      "source": "explore:keyboard:escape does not leave the latex source editor, contradicting the status-bar hint",
+      "status": "open"
+    },
+    {
+      "id": "qa-255",
+      "title": "The LaTeX source textarea has no visible focus outline",
+      "why": "Exploratory pass on keyboard (visual): expected The focused source textarea shows the same visible focus indicator as the other controls, so a keyboard user can see where typing will go.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Switch to Source with Ctrl+Alt+2 (focus moves into the \"LaTeX source\" textarea) and inspect its computed style: outline-style is none and outline-width is 0px while the element matches :focus-visible. Every ribbon button, every select and the find field in the same app show the 2px solid rgb(78, 128, 103) focus outline.\nActual: Computed outline is \"none 0px\" with :focus-visible true; the textarea's caret is the only focus cue.",
+      "source": "explore:keyboard:the latex source textarea has no visible focus outline",
+      "status": "open"
+    },
+    {
+      "id": "qa-256",
+      "title": "Sidebar panel buttons do not expose which panel is open to assistive technology",
+      "why": "Exploratory pass on keyboard (ux): expected The open panel is exposed in the accessibility tree (for example aria-current=\"page\" or role=tab with aria-selected), matching the visual active styling.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open a project. The Outline panel is open and the Outline button in the sidebar rail has class \"active\". Inspect all four navigation buttons (Outline, Review, References, History): none has aria-pressed, aria-selected or aria-current, and the nav is a plain navigation landmark with no tablist/tab roles or aria-controls. Switch panels with the mouse or keyboard and the accessible state does not change; only the CSS class changes.\nActual: Probe data: [{text:\"Outline\", active:true, pressed:null, current:null, selected:null}, {text:\"Review 1\", active:false, pressed:null, current:null, selected:null}, ...]. A screen-reader user cannot tell which panel is displayed.",
+      "source": "explore:keyboard:sidebar panel buttons do not expose which panel is open to assistive technology",
+      "status": "open"
+    },
+    {
+      "id": "qa-257",
+      "title": "Undo, Redo and the indent buttons are announced as toggle buttons with aria-pressed=false",
+      "why": "Exploratory pass on keyboard (ux): expected One-shot action buttons (Undo, Redo, indent/outdent) have no aria-pressed; only real toggles carry pressed state.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: On the Home ribbon tab inspect the Undo (Ctrl+Z), Redo (Ctrl+Y), Increase indent (Ctrl+]) and Decrease indent (Ctrl+[) buttons. Each is a one-shot action but carries aria-pressed=\"false\", which makes the accessibility tree expose it as a toggle button in the not-pressed state. Bold, Italic and the list buttons are genuine toggles and use the same attribute legitimately, so the distinction is lost.\nActual: Probe read [{\"label\":\"Undo (Ctrl+Z)\",\"pressed\":\"false\"},{\"label\":\"Redo (Ctrl+Y)\",\"pressed\":\"false\"},{\"label\":\"Increase indent (Ctrl+])\",\"pressed\":\"false\"},{\"label\":\"Decrease indent (Ctrl+[)\",\"pressed\":\"false\"}] even though these are one-shot actions.",
+      "source": "explore:keyboard:undo, redo and the indent buttons are announced as toggle buttons with aria-pressed=false",
+      "status": "open"
+    },
+    {
+      "id": "qa-258",
+      "title": "Colour palettes never expose the applied text colour",
+      "why": "Exploratory pass on keyboard (ux): expected The palette exposes the current colour (aria-checked on the active swatch, or an accessible value on the trigger) so a screen-reader user can tell which colour is applied.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Select some text, go to the Home tab, focus \"Text color\", press ArrowDown twice (No color then Black) and Enter. The text turns black and focus returns to the editor. Reopen the palette with ArrowDown: none of the ten swatches has aria-checked or aria-selected, and the trigger is still named only \"Text color\" with no value or aria-valuetext. The applied colour is conveyed only by the CSS colour bar under the icon.\nActual: Probe data after applying Black: trigger {label:\"Text color\", value:null, expanded:\"true\"}; every swatch has checked:null and selected:null, including Black.",
+      "source": "explore:keyboard:colour palettes never expose the applied text colour",
+      "status": "open"
+    },
+    {
+      "id": "qa-259",
+      "title": "The Git panel ignores Escape and is an unnamed complementary region",
+      "why": "Exploratory pass on keyboard (ux): expected Escape closes the Git panel the same way it closes the Properties panel, and the panel exposes an accessible name for its complementary landmark.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open a project, click the View ribbon tab, focus \"Git history\" and press Enter. The Git panel appears, but focus remains on the Git history button inside the ribbon. Press Escape: the panel is still open and focus is still on the Git history button. The panel is an <aside> with no role, aria-label or aria-labelledby, so it is an unnamed complementary region and its close button is not focused. By contrast, the Properties panel closes on Escape (and returns focus to the Settings button).\nActual: Probe: the Git panel count is 1 before Escape and 1 after; activeElement stays on the \"Git history\" button; the panel is {tag:\"ASIDE\", role:null, label:null, labelledby:null}.",
+      "source": "explore:keyboard:the git panel ignores escape and is an unnamed complementary region",
+      "status": "open"
+    },
+    {
+      "id": "qa-260",
+      "title": "Creating a project from the start screen drops keyboard focus on <body>",
+      "why": "Exploratory pass on keyboard (ux): expected The keyboard focus follows the screen change into the new editor view (for example the writing surface or the skip link), so a keyboard or screen-reader user is placed in the new screen.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Load the start screen, focus \"New document\" with Tab and press Enter. The editor loads, but document.activeElement is <body>; the next Tab press goes to the \"Skip to writing surface\" link at the top of the new screen. Focus is not placed in the editor or on any heading of the new view.\nActual: After Enter activeElement is BODY; the probe's first Tab after the transition reaches the skip link, starting the whole page tab order again.",
+      "source": "explore:keyboard:creating a project from the start screen drops keyboard focus on <body>",
+      "status": "open"
     }
   ]
 }
