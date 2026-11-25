@@ -685,3 +685,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T12:00:29Z START qa-234 on qa/qa-234-invalid-blank-line-math-disables-insert: Invalid blank-line math disables Insert with no visible error message
 2026-11-25T12:02:25Z PUSHED main
 2026-11-25T12:02:25Z DONE qa-234 (tsc -b, npm test, smoke all green)
+2026-11-25T12:03:03Z START qa-235 on qa/qa-235-inside-a-paragraph-is-silently-converte: $$...$$ inside a paragraph is silently converted into literal dollar text

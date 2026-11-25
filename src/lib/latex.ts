@@ -1973,7 +1973,10 @@ export function latexToDocument(
         continue;
       }
     }
-    content.push({ type: "paragraph", content: parseInline(block).content });
+    // Display math can sit inside running text, e.g. "Before $$F=ma$$ after.".
+    // Splitting it out keeps the equation a block node instead of letting
+    // parseInline read the delimiters as literal dollars and escape them.
+    pushBodyParagraphs(content, block);
   }
 
   if (content.length === 0) {
