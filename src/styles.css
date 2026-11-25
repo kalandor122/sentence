@@ -1350,6 +1350,15 @@ button:disabled {
   text-align: left;
 }
 
+.sentence-editor .table-caption {
+  padding-bottom: 0.5em;
+  color: #4e5f53;
+  font-size: 0.9em;
+  line-height: 1.5;
+  text-align: center;
+  caption-side: top;
+}
+
 .sentence-editor .selectedCell::after {
   position: absolute;
   inset: 0;
