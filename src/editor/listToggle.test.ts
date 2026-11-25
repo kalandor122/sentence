@@ -20,6 +20,12 @@ function expectParagraphs(editor: Editor, ...texts: string[]) {
   expect(blocks).toEqual(paragraphs(...texts));
 }
 
+// StarterKit's trailing-node extension appends an empty paragraph when the
+// document ends with a list; ignore it when comparing the converted blocks.
+function getHTML(editor: Editor): string {
+  return editor.getHTML().replace(/<p><\/p>$/, "");
+}
+
 describe("toggleList", () => {
   it("converts a fully selected bullet list to paragraphs", () => {
     const editor = createEditor("<ul><li><p>one</p></li><li><p>two</p></li></ul>");
@@ -44,6 +50,46 @@ describe("toggleList", () => {
     editor.commands.selectAll();
     expect(toggleList(editor, "bulletList")).toBe(true);
     expectParagraphs(editor, "intro", "one");
+    editor.destroy();
+  });
+
+  it("converts a fully selected bullet list to a numbered list", () => {
+    const editor = createEditor("<ul><li><p>one</p></li><li><p>two</p></li></ul>");
+    editor.commands.selectAll();
+    expect(toggleList(editor, "orderedList")).toBe(true);
+    expect(getHTML(editor)).toBe("<ol><li><p>one</p></li><li><p>two</p></li></ol>");
+    editor.destroy();
+  });
+
+  it("converts a fully selected numbered list to a bulleted list", () => {
+    const editor = createEditor("<ol><li><p>one</p></li><li><p>two</p></li></ol>");
+    editor.commands.selectAll();
+    expect(toggleList(editor, "bulletList")).toBe(true);
+    expect(getHTML(editor)).toBe("<ul><li><p>one</p></li><li><p>two</p></li></ul>");
+    editor.destroy();
+  });
+
+  it("converts the selected list in place and leaves other blocks alone", () => {
+    const editor = createEditor(
+      "<p>intro</p><ul><li><p>one</p></li><li><p>two</p></li></ul><p>outro</p>",
+    );
+    editor.commands.selectAll();
+    expect(toggleList(editor, "orderedList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<p>intro</p><ol><li><p>one</p></li><li><p>two</p></li></ol><p>outro</p>",
+    );
+    editor.destroy();
+  });
+
+  it("keeps nested sublists when converting the whole document", () => {
+    const editor = createEditor(
+      "<p>intro</p><ul><li><p>one</p><ul><li><p>child</p></li></ul></li></ul>",
+    );
+    editor.commands.selectAll();
+    expect(toggleList(editor, "orderedList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<p>intro</p><ol><li><p>one</p><ol><li><p>child</p></li></ol></li></ol>",
+    );
     editor.destroy();
   });
 });

@@ -41,26 +41,46 @@ function unwrapList(node: ProseMirrorNode, listType: "bulletList" | "orderedList
   return blocks;
 }
 
+function isListNode(node: ProseMirrorNode): boolean {
+  return node.type.name === "bulletList" || node.type.name === "orderedList";
+}
+
+// Retag list nodes (including nested sublists) without touching their items,
+// so a full-document toggle converts lists in place instead of wrapping every
+// selected block - including paragraphs and nested lists - in a new list.
+function convertList(node: ProseMirrorNode, listType: "bulletList" | "orderedList"): ProseMirrorNode {
+  const type = isListNode(node) ? node.type.schema.nodes[listType] : node.type;
+  const children: ProseMirrorNode[] = [];
+  node.forEach((child) => {
+    children.push(isListNode(child) || child.type.name === "listItem" ? convertList(child, listType) : child);
+  });
+  return type.create(node.attrs, children, node.marks);
+}
+
 /**
- * Toggle a list type. When the entire document is selected and already inside
- * the target list type, ProseMirror's default toggle can append an empty item
- * instead of converting the list back to paragraphs. Unwrap the selected list
- * nodes directly so content becomes plain blocks.
+ * Toggle a list type. When the entire document is selected, ProseMirror's
+ * default toggle wraps every selected block in a new list, which nests existing
+ * lists under the first paragraph and can append an empty item. Instead handle
+ * the selected lists directly: unwrap lists that already have the target type
+ * and retag lists of the other type in place, leaving ordinary blocks alone.
  */
 export function toggleList(editor: Editor, listType: "bulletList" | "orderedList"): boolean {
-  if (isAllSelected(editor) && documentHasList(editor, listType)) {
+  if (isAllSelected(editor)) {
     const { state, view } = editor;
     const blocks: ProseMirrorNode[] = [];
-    let hasTarget = false;
+    let changed = false;
     state.doc.forEach((node) => {
       if (node.type.name === listType) {
-        hasTarget = true;
+        changed = true;
         blocks.push(...unwrapList(node, listType));
+      } else if (isListNode(node)) {
+        changed = true;
+        blocks.push(convertList(node, listType));
       } else {
         blocks.push(node);
       }
     });
-    if (hasTarget) {
+    if (changed) {
       const replacement =
         blocks.length > 0 ? blocks : [state.schema.nodes.paragraph.create()];
       view.dispatch(state.tr.replaceWith(0, state.doc.content.size, replacement).scrollIntoView());
