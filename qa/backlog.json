@@ -3876,8 +3876,9 @@
       "hint": "Repro: 1. Click View, then LaTeX. 2. Before \\end{document}, insert `\\begin{verbatim}`, the line `ZXCODE printf(\"%d\", a_b & c);`, and `\\end{verbatim}`. 3. Click Apply source. 4. Click View, then LaTeX, then Refresh from visual.\nActual: Refresh from visual writes the line as `ZXCODE printf(\"\\%d\", a\\_b \\& c);` inside `\\begin{verbatim}`. LaTeX prints those added backslashes literally, so the PDF shows different code from the source the user typed. The visual code block itself still shows the original text. Probe: verbatimSpecialChars.codeEscapedInVerbatim=true, regeneratedVerbatim=`\\begin{verbatim}\\nZXCODE printf(\"\\%d\", a\\_b \\& c);\\n\\end{verbatim}`.",
       "source": "explore:source-editor:verbatim code is latex-escaped on re-export, changing the code",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T14:05:39Z"
+      "attempts": 1,
+      "startedAt": "2026-11-25T14:05:39Z",
+      "lastAttemptAt": "2026-11-25T14:05:39Z"
     },
     {
       "id": "qa-245",

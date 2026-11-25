@@ -220,6 +220,25 @@ describe("LaTeX generation", () => {
     expect(exported).toContain("Second paragraph with a literal \\% sign");
   });
 
+  it("writes verbatim code exactly as typed", () => {
+    const code = 'ZXCODE printf("%d", a_b & c);';
+    const latex = [
+      "\\documentclass{article}",
+      "\\begin{document}",
+      "\\begin{verbatim}",
+      code,
+      "\\end{verbatim}",
+      "\\end{document}",
+    ].join("\n");
+    const { document } = latexToDocument(latex, DEFAULT_SETTINGS);
+    expect(documentPlainText(document)).toBe(code);
+    const exported = documentToLatex(document, DEFAULT_SETTINGS);
+    expect(exported).toContain(`\\begin{verbatim}\n${code}\n\\end{verbatim}`);
+    expect(exported).not.toContain("\\%d");
+    expect(exported).not.toContain("a\\_b");
+    expect(exported).not.toContain("\\& c");
+  });
+
   it("keeps text after a commented-out end{document}", () => {
     const latex = [
       "\\documentclass{article}",

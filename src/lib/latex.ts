@@ -188,6 +188,12 @@ function plainText(nodes: DocumentNode[] | undefined): string {
     .trim();
 }
 
+// Verbatim prints what it holds: `%`, `_`, `&` and `\` are literal there, so the
+// text is written as typed. Escaping it would add backslashes the PDF shows.
+function verbatimText(nodes: DocumentNode[] | undefined): string {
+  return (nodes ?? []).map((node) => node.text ?? verbatimText(node.content)).join("");
+}
+
 function authorToLatex(author: string): string {
   return author
     .split(/\r?\n|;/)
@@ -483,7 +489,7 @@ function blockToLatex(node: DocumentNode, settings: ProjectSettings, enumDepth =
         "\\end{quote}",
       ].join("\n");
     case "codeBlock":
-      return `\\begin{verbatim}\n${inlineContent(node.content, settings)}\n\\end{verbatim}`;
+      return `\\begin{verbatim}\n${verbatimText(node.content)}\n\\end{verbatim}`;
     case "horizontalRule":
       return "\\noindent\\rule{\\linewidth}{0.4pt}";
     case "image":
