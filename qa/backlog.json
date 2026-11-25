@@ -3095,10 +3095,11 @@
       ],
       "hint": "Repro: 1. Create a fresh document, type 'Same line', press Enter, and type 'Same line' again so two identical paragraphs exist. 2. Open the Review tab and click Track changes. 3. Put the caret at the end of the second paragraph, press Ctrl+Shift+Left to select its last word 'line', then press Backspace. 4. Wait 2.5 s and open the History sidebar. Insertion variant: start from paragraphs 'Same row' and 'Same line', tracking on, select 'line' in the second paragraph and type 'row'.\nActual: The deletion decoration is rendered inside the first, unedited paragraph, which displays 'Same lineline' with 'line' struck through, while the edited second paragraph shows only 'Same '. The insertion variant similarly highlights the inserted 'row' in the first paragraph instead of the second. Probe: deletions [{text:'line', paragraph:0, parent:'Same lineline'}], insertions [{text:'row', paragraph:0}].",
       "source": "explore:review:tracked-change decorations are drawn in the wrong paragraph when an identical line appears earlier",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T04:05:33Z",
-      "lastAttemptAt": "2026-11-25T04:05:33Z"
+      "lastAttemptAt": "2026-11-25T04:05:33Z",
+      "doneAt": "2026-11-25T04:08:05Z"
     },
     {
       "id": "qa-195",
@@ -3110,7 +3111,9 @@
       ],
       "hint": "Repro: 1. In a fresh document type 'Source track base' and let it settle. 2. Review tab > Track changes; the button now reads 'Tracking on'. 3. View tab > LaTeX, change the body text to 'Source track base revised', and click Apply source. 4. Wait 2.5 s and open the History sidebar.\nActual: History lists 0 tracked changes. The edited text is applied immediately (editor reads 'Source track base revised') while the Review tab still reports 'Tracking on', so the change silently bypasses review. Probe: revisions [], text 'Source track base revised', trackingButtonLabel 'Tracking on'.",
       "source": "explore:review:edits applied from the latex source pane while tracking is on are never recorded as revisions",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T04:08:45Z"
     },
     {
       "id": "qa-196",
