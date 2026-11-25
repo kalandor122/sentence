@@ -3359,10 +3359,85 @@
       ],
       "hint": "Repro: 1) Open http://localhost:1420 with no saved workspace so the start screen shows. 2) In the devtools console run: const orig = Storage.prototype.setItem; Storage.prototype.setItem = function (key, value) { if (key === 'sentence.workspace') throw new DOMException('The quota has been exceeded.', 'QuotaExceededError'); return orig.call(this, key, value); }; (simulates a full or blocked localStorage). 3) Click 'New document'. 4) Wait 1 s. The editor opens and the top bar reads 'Saved locally' next to a 'Retry save: The quota has been exceeded.' button and the same quota toast, while localStorage['sentence.workspace'] does not exist and no check icon is shown. 5) Restore Storage.prototype.setItem to orig and click 'Retry save': the document is then written and the indicator remains 'Saved locally'. Probe evidence: qa/probes/persistence.mjs phase 'create-with-storage-blocked'.\nActual: The header label is driven only by the dirty flag, which is set to false when a workspace is adopted, so it renders 'Saved locally' even though persistBrowser failed. The same top bar simultaneously shows 'Retry save: The quota has been exceeded.' and localStorage has no sentence.workspace key (workspaceKey false), i.e. no saved copy exists. The error UI and the saved label contradict each other.",
       "source": "explore:persistence:the save indicator says 'saved locally' while the initial workspace write has failed",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T07:00:35Z",
-      "lastAttemptAt": "2026-11-25T07:00:35Z"
+      "lastAttemptAt": "2026-11-25T07:00:35Z",
+      "doneAt": "2026-11-25T07:05:04Z"
+    },
+    {
+      "id": "qa-212",
+      "title": "Ctrl+Alt+1/2/3 change the current block's heading level on their way to switching views",
+      "why": "Exploratory pass on keyboard (functional): expected The documented view shortcut only changes the editor mode. The document, its heading levels and the generated LaTeX are unchanged.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open a project, click into a plain paragraph reading \"mode probe paragraph\" and press Ctrl+Alt+2 \u2014 the shortcut the View ribbon advertises on its \"LaTeX (Ctrl+Alt+2)\" button and the status bar repeats as \"Source (Ctrl+Alt+2)\". The app switches to the source view and the LaTeX for that line reads \\subsection{mode probe paragraph}. Switching back with the status-bar Visual button shows <h2>mode probe paragraph</h2> plus an extra empty paragraph. The same collision happens for Ctrl+Alt+1 while already in Visual (the paragraph becomes <h1> and is exported as \\section{mode probe two}; the view stays Visual) and for Ctrl+Alt+3 (<h3>, \\subsubsection). Ctrl+Alt+2 pressed with the caret in the third of three paragraphs turns only that paragraph into \\subsection and leaves the other two alone.\nActual: Tiptap also binds Mod-Alt-1/2/3 to setHeading(level 1/2/3), so one key press does both: the mode switch runs and the block under the caret is rewritten as a heading. The rewritten heading is saved and exported (\\section / \\subsection / \\subsubsection). Probe evidence: before {\"<p data-line-spacing=\\\"single\\\">mode probe paragraph</p>\", mode Visual} -> after Ctrl+Alt+2 {mode Source, visual <h2>mode probe paragraph</h2>, source line \\subsection{mode probe paragraph}}; after Ctrl+Alt+1 in Visual: <h1>mode probe two</h1>, source line \\section{mode probe two}.",
+      "source": "explore:keyboard:ctrl+alt+1/2/3 change the current block's heading level on their way to switching views",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T07:57:31Z"
+    },
+    {
+      "id": "qa-213",
+      "title": "Escape closes the Properties panel behind a dialog instead of the dialog in front of it, and leaves focus on the page be",
+      "why": "Exploratory pass on keyboard (ux): expected One Escape closes the front-most overlay (the dialog, or the find bar) and focus stays inside it; the non-modal Properties panel behind it is left alone. Navigating the page behind an open aria-modal dialog should not be possible with the keyboard.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the editor click the Settings (avatar) button to open the Properties panel, click into a word in the document, then press Ctrl+K to open the Add link dialog. Press Escape once. The Properties panel closes, the Add link dialog and its backdrop stay open, and focus is moved to the avatar Settings button underneath the backdrop. Pressing Escape a second time finally closes the dialog. The find bar behaves the same way: with Properties open press Ctrl+F, then Escape \u2014 the panel closes, the find bar stays open and focus is on the Settings button.\nActual: The Inspector's window keydown handler closes the panel on Escape without checking for a dialog or find bar on top, and its effect cleanup restores focus to the Settings button. Probe counts before/after one Escape: {modal 1, inspector 1} -> {modal 1, inspector 0, focus BUTTON.avatar-button \"Settings\"}; the dialog needs a second Escape. For the find bar: {find 1, inspector 1} -> {find 1, inspector 0, focus \"Settings\"}.",
+      "source": "explore:keyboard:escape closes the properties panel behind a dialog instead of the dialog in front of it, and leaves focus on the page be",
+      "status": "open"
+    },
+    {
+      "id": "qa-214",
+      "title": "Tabbing out of the text-colour palette leaves it and its full-window backdrop open, and Escape no longer closes it",
+      "why": "Exploratory pass on keyboard (functional): expected Leaving the palette with Tab closes it (or Escape closes it from anywhere), so a keyboard user can keep using the ribbon.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Home ribbon tab, focus \"Text color\" and press Enter to open the palette, then press Tab twelve times. Focus walks through the ten swatches to the neighbouring \"Highlight\" trigger and on to the Paragraph style select, but the palette remains open with its .color-backdrop (position fixed, inset 0, z-index 60) over the ribbon. Press Escape on the select: nothing happens. Shift+Tab back once to the \"Highlight\" trigger and press Escape: still nothing. elementFromPoint at a ribbon button's position returns DIV.color-backdrop, so ribbon clicks hit the backdrop instead of the control. Only Shift+Tab back onto one of the ten swatches and pressing Escape (or clicking the invisible backdrop) closes it and returns focus to the \"Text color\" button.\nActual: The palette stays mounted: popover 1 and color-backdrop 1 after the twelve Tabs and after both Escape presses; hit-test over the ribbon returns \"DIV.color-backdrop\". Only Escape while focus is inside the owning .color-menu works (Escape from the neighbouring Highlight palette is ignored because that menu's own open state is false).",
+      "source": "explore:keyboard:tabbing out of the text-colour palette leaves it and its full-window backdrop open, and escape no longer closes it",
+      "status": "open"
+    },
+    {
+      "id": "qa-215",
+      "title": "Existing equations cannot be opened from the keyboard; Enter on the selected math node does nothing",
+      "why": "Exploratory pass on keyboard (ux): expected Enter opens the equation editor for the selected equation, the same way Enter opens the footnote editor for a selected footnote marker, so editing an existing equation has a keyboard path.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Insert ribbon tab, focus \"Inline equation\", press Enter, type x^2 and press Ctrl+Enter. Click into the document, press Ctrl+End and then ArrowLeft once: the equation is selected (selection constructor NodeSelection, node mathInline, class ProseMirror-selectednode). Press Enter: no dialog opens and the document is unchanged. A single mouse click on the equation opens the \"Edit inline equation\" dialog. The footnote control behaves as intended: arrow-select its marker and Enter opens \"Edit footnote\".\nActual: The editor's handleKeyDown only handles a NodeSelection whose node type is \"footnote\"; math nodes are edited solely through handleClick. Probe evidence: selection {type NodeSelection, node mathInline}, Enter -> modal 0; click -> modal 1, title \"Edit inline equation\".",
+      "source": "explore:keyboard:existing equations cannot be opened from the keyboard; enter on the selected math node does nothing",
+      "status": "open"
+    },
+    {
+      "id": "qa-216",
+      "title": "The writing surface is 34 Tab presses from the top of the page, with no skip link or focus shortcut",
+      "why": "Exploratory pass on keyboard (ux): expected A keyboard user can jump to the writing surface (a skip link, F6-style pane cycle, or a documented focus shortcut) instead of walking every ribbon and sidebar control.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Load the app, press New document, then press Tab repeatedly without clicking: Save, branch pill, Settings, the selected Home ribbon tab, roughly two dozen ribbon controls, Compile, the four sidebar panel tabs, the three outline entries, and only then the Document editor. With the caret nowhere else, focus reaches .sentence-editor on the 34th Tab press. No F6-style pane key, skip link, or Ctrl+Alt shortcut moves focus to the document.\nActual: Reaching the editor requires 34 sequential Tab presses from the top of the page; the probe measured tabsToEditor = {count: 34, reached: true} and the status bar only documents \"Esc leaves the page\" (the opposite direction).",
+      "source": "explore:keyboard:the writing surface is 34 tab presses from the top of the page, with no skip link or focus shortcut",
+      "status": "open"
+    },
+    {
+      "id": "qa-217",
+      "title": "Dialog text fields drop the 2px focus outline and show only a 1px border-colour change",
+      "why": "Exploratory pass on keyboard (visual): expected Text fields in dialogs show the same clearly visible 2px focus outline as the buttons next to them.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Press Ctrl+K in the editor to open the Add link dialog and Tab to the link input. Computed style of the focused input: outline-style none (the global input:focus-visible outline is overridden by .dialog-field input:focus), border-color rgb(124, 156, 136) against rgb(209, 205, 196) at rest (1.9:1 between the two border colours; 2.99:1 against the #fffefa field background), plus a rgba(76, 124, 97, 0.12) 0 0 0 2px shadow. The Cancel and Close buttons in the same dialog show the solid 2px focus outline.\nActual: Focus on dialog inputs is indicated only by a thin border-colour swap plus a 12%-alpha shadow (outline: none), so the focus ring disappears on the field a keyboard user has just tabbed into while every button keeps its outline.",
+      "source": "explore:keyboard:dialog text fields drop the 2px focus outline and show only a 1px border-colour change",
+      "status": "open"
     }
   ]
 }
