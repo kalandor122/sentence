@@ -3727,10 +3727,49 @@
       ],
       "hint": "Repro: 1. Create a new document and open View > LaTeX.\n2. Before \\end{document} add the single line `Before $$F=ma$$ after.`\n3. Click Apply source (the toast says 'Visual document synchronized from LaTeX.') and switch to View > Visual.\n4. Observe the page, then open View > LaTeX and click Refresh from visual.\nExpected: the display math is recognised (standalone `$$F=ma$$` becomes a math block) or at least left as `$$...$$` in the export; the formula must not become literal dollars.\nActual: the visual document contains no math node, just the paragraph text 'Before $$F=ma$$ after.', and the exported body escapes both delimiters: `Before \\$\\$F=ma\\$\\$ after.` The equation is lost and the PDF would print the dollar signs as text, although this is valid TeX display math in running text.\nActual: None",
       "source": "explore:math:$$...$$ inside a paragraph is silently converted into literal dollar text",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-25T12:03:03Z",
-      "lastAttemptAt": "2026-11-25T12:03:03Z"
+      "lastAttemptAt": "2026-11-25T12:03:03Z",
+      "doneAt": "2026-11-25T12:04:59Z"
+    },
+    {
+      "id": "qa-236",
+      "title": "Clicking a citation or cross-reference and typing deletes it",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected Typing after clicking an inline citation or cross-reference should not discard it; text should go beside the atom (as clicking a footnote marker and typing now does), or removal should require an explicit Backspace/Delete.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. At the end type `ClickCite ` (with a trailing space), open References > Insert citation, click `Enter a key manually`, enter `sentence2026`, click Insert. Click the `[sentence2026]` in the text once, then type `X`. Repeat with `ClickRef ` (trailing space), References > Cross-reference, label `fig:click`, then click `ref: fig:click` and type `X`.\nActual: The click selects the atom (`.ProseMirror-selectednode` is set) and the next keystroke replaces it. `ClickCite [sentence2026]` becomes `ClickCite X` and the exported LaTeX contains no `\\cite`; `ClickRef ref: fig:click` becomes `ClickRef X` and the export contains no `\\ref`. Both references are silently lost.",
+      "source": "explore:links-cites-footnotes:clicking a citation or cross-reference and typing deletes it",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-25T12:36:40Z"
+    },
+    {
+      "id": "qa-237",
+      "title": "Undo after adding a hyperlink leaves a placeholder https:// link",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected One undo removes the hyperlink completely and leaves plain `UndoLink word` in the document and the generated LaTeX.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. At the end type `UndoLink word`, select `word`, press Ctrl+K, enter `https://undo.example.org`, click Insert, then press Ctrl+Z once and open View > LaTeX.\nActual: The word remains linked with the placeholder href `https://` after the first undo; the generated source reads `UndoLink \\href{https://}{word}`. A second Ctrl+Z is required to remove the link. Adding the link is split into two history steps (the temporary `https://` link applied when the dialog opens, then the entered address), so undo stops on the placeholder.",
+      "source": "explore:links-cites-footnotes:undo after adding a hyperlink leaves a placeholder https:// link",
+      "status": "open"
+    },
+    {
+      "id": "qa-238",
+      "title": "Cancelling the insert dialogs drops the next typed characters",
+      "why": "Exploratory pass on links-cites-footnotes (ux): expected After cancelling footnote, citation or cross-reference insertion, focus returns to the editor at the previous caret so typing continues the sentence, as it already does after cancelling Add link and the footnote edit dialog.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Type `CancelFoot ` (with a trailing space), open Insert > Footnote, enter `Will cancel`, press Escape, then type `F`. Repeat with References > Insert citation > `Enter a key manually` (press Escape, then type `C`) and References > Cross-reference (press Escape, then type `R`).\nActual: Focus returns to the control that opened the dialog (`BUTTON:Footnote`, `BUTTON:Enter a key manually`, `BUTTON:Cross-reference`), so the typed characters are discarded; the paragraphs remain `CancelFoot `, `CancelCite ` and `CancelRef ` with no `F`, `C` or `R`.",
+      "source": "explore:links-cites-footnotes:cancelling the insert dialogs drops the next typed characters",
+      "status": "open"
     }
   ]
 }

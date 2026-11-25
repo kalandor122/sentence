@@ -686,3 +686,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T12:02:25Z PUSHED main
 2026-11-25T12:02:25Z DONE qa-234 (tsc -b, npm test, smoke all green)
 2026-11-25T12:03:03Z START qa-235 on qa/qa-235-inside-a-paragraph-is-silently-converte: $$...$$ inside a paragraph is silently converted into literal dollar text
+2026-11-25T12:05:01Z PUSHED main
+2026-11-25T12:05:01Z DONE qa-235 (tsc -b, npm test, smoke all green)
+2026-11-25T12:36:22Z EXPLORE links-cites-footnotes: 3 new items, agent exit 0
