@@ -646,3 +646,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T09:33:52Z START qa-220 on qa/qa-220-the-toc-preview-shows-the-full-heading-t: The TOC preview shows the full heading text for \section[Short]{Long} instead of the short title the PDF contents will p
 2026-11-25T09:40:36Z PUSHED main
 2026-11-25T09:40:36Z DONE qa-220 (tsc -b, npm test, smoke all green)
+2026-11-25T09:41:13Z START qa-221 on qa/qa-221-the-toc-preview-numbers-a-starred-unnumb: The TOC preview numbers a starred (unnumbered) heading and shifts the numbering of later headings

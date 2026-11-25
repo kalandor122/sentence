@@ -31,4 +31,31 @@ describe("tocEntries", () => {
     ]);
     editor.destroy();
   });
+
+  it("omits a starred heading and does not step the section counter", () => {
+    const editor = new Editor({
+      extensions: [StarterKit, HeadingLabel],
+      content: {
+        type: "doc",
+        content: [
+          { type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Introduction" }] },
+          {
+            type: "heading",
+            attrs: { level: 1, unnumbered: true },
+            content: [{ type: "text", text: "Unnumbered Appendix" }],
+          },
+          {
+            type: "heading",
+            attrs: { level: 1 },
+            content: [{ type: "text", text: "After The Appendix" }],
+          },
+        ],
+      },
+    });
+    expect(tocEntries(editor)).toEqual([
+      { level: 1, number: "1", text: "Introduction" },
+      { level: 1, number: "2", text: "After The Appendix" },
+    ]);
+    editor.destroy();
+  });
 });

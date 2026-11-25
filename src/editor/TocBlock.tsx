@@ -17,6 +17,9 @@ export function tocEntries(editor: Editor): TocEntry[] {
   const entries: TocEntry[] = [];
   editor.state.doc.descendants((node: ProseMirrorNode) => {
     if (node.type.name !== "heading") return;
+    // \section*{...} is left out of the contents and does not step the section
+    // counter, so the next numbered heading keeps the number it would have had.
+    if (node.attrs.unnumbered === true) return;
     const level = Math.min(3, Math.max(1, Number(node.attrs.level ?? 1)));
     counters[level - 1] += 1;
     for (let deeper = level; deeper < counters.length; deeper += 1) counters[deeper] = 0;
