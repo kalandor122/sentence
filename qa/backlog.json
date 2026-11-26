@@ -4151,8 +4151,9 @@
       "hint": "Repro: Load the start screen, focus \"New document\" with Tab and press Enter. The editor loads, but document.activeElement is <body>; the next Tab press goes to the \"Skip to writing surface\" link at the top of the new screen. Focus is not placed in the editor or on any heading of the new view.\nActual: After Enter activeElement is BODY; the probe's first Tab after the transition reaches the skip link, starting the whole page tab order again.",
       "source": "explore:keyboard:creating a project from the start screen drops keyboard focus on <body>",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T16:58:25Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T16:58:25Z",
+      "lastAttemptAt": "2026-11-26T16:58:25Z"
     },
     {
       "id": "qa-261",
