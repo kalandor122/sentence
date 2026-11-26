@@ -848,3 +848,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T17:30:59Z START qa-276 on qa/qa-276-inserted-citations-and-cross-references: Inserted citations and cross-references cannot be edited in the visual editor; they can only be deleted and reinserted
 2026-11-26T17:35:11Z PUSHED main
 2026-11-26T17:35:11Z DONE qa-276 (tsc -b, npm test, smoke all green)
+2026-11-26T17:35:50Z START qa-279 on qa/qa-279-track-changes-has-no-live-feedback-no-pe: Track changes has no live feedback: no persistent indicator and no insertion marks while typing

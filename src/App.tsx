@@ -1258,6 +1258,20 @@ export default function App() {
     };
   };
 
+  // The pending edit, shown as tracked marks while the debounce is still
+  // gathering it: waiting 1.8 s would leave the freshly typed text looking
+  // unmarked even though tracking is on.
+  const liveRevision = useMemo(
+    () => (tracking && workspace
+      ? trackedRevisionFor(revisionBaseline.current ?? workspace.document, workspace.document)
+      : null),
+    [tracking, workspace?.document, workspace?.revisions, gitAuthor.name],
+  );
+  const editorRevisions = useMemo(
+    () => (liveRevision ? [liveRevision, ...(workspace?.revisions ?? [])] : workspace?.revisions ?? []),
+    [liveRevision, workspace?.revisions],
+  );
+
   // Fold everything edited since the baseline into a revision before the
   // workspace is written. Saves happen on a shorter debounce than the revision
   // timer, and leaving on pagehide saves immediately, so either can land in
@@ -2496,7 +2510,7 @@ export default function App() {
                     document={workspace.document}
                     settings={workspace.settings}
                     comments={workspace.comments}
-                    revisions={workspace.revisions}
+                    revisions={editorRevisions}
                     editable
                     onUpdate={handleDocumentUpdate}
                     onReady={setEditor}
@@ -2618,6 +2632,7 @@ export default function App() {
         pages={pages}
         mode={mode}
         branch={branch}
+        tracking={tracking}
         zoom={zoom}
         compileState={compiling ? "compiling" : compileResult?.success ? "success" : compileResult ? "error" : "idle"}
         onZoomChange={setZoom}
