@@ -10,7 +10,7 @@ import {
   RefreshCw,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { GitAuthor, GitState, GitHubAccount } from "../lib/types";
 import GitGraph from "./GitGraph";
 
@@ -79,22 +79,42 @@ export default function GitPanel({
   const [privateRepository, setPrivateRepository] = useState(true);
   const [showDiff, setShowDiff] = useState(false);
   const [showBranches, setShowBranches] = useState(false);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     setRemoteUrl(git.status.remoteUrl ?? "");
   }, [git.status.remoteUrl]);
 
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      // The panel is not modal: an overlay in front of it (a dialog or the find bar) owns Escape.
+      if (document.querySelector(".modal-backdrop, .find-bar")) return;
+      onCloseRef.current();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      previous?.focus();
+    };
+  }, [open]);
+
   if (!open) return null;
   const conflicts = git.status.changes.filter((change) => change.status === "conflicted");
 
   return (
-    <aside className="git-panel">
+    <aside className="git-panel" aria-label="Source control">
       <header className="git-header">
         <div>
           <span className="eyebrow">Source control</span>
           <h2><GitBranch size={18} /> {git.status.branch}</h2>
         </div>
-        <button className="icon-button" type="button" onClick={onClose} aria-label="Close Git panel"><X size={16} /></button>
+        <button ref={closeRef} className="icon-button" type="button" onClick={onClose} aria-label="Close Git panel"><X size={16} /></button>
       </header>
       <div className="git-scroll">
         {account ? (
