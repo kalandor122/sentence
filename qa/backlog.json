@@ -4467,8 +4467,9 @@
       "hint": "Repro: Open a project and switch to Source from the status bar. Before \\end{document} insert: \\section{Writing \\LaTeX{} with Sentence} and A caf\\'e typed with \\TeX{} and \\ldots{} more. Click Apply source, then Visual. The heading reads 'Writing \\LaTeX{} with Sentence' and the paragraph reads 'A caf\\'e typed with \\TeX{} and \\ldots{} more' with visible backslashes. Switch back to Source and click Refresh from visual (a page reload does the same): the heading line becomes \\section{Writing \\textbackslash{}LaTeX\\{\\} with Sentence} and the paragraph becomes A caf\\textbackslash{}'e typed with \\textbackslash{}TeX\\{\\} and \\textbackslash{}ldots\\{\\} more.\nActual: Apply source reports 'Visual document synchronized from LaTeX.' but the visual document shows the control sequences literally, and regenerating the source (Refresh from visual or reload) escapes them to \\textbackslash{}LaTeX\\{\\}, \\textbackslash{}TeX\\{\\}, \\textbackslash{}ldots\\{\\} and \\textbackslash{}'e, so the compiled paper would print the backslash text instead of the accent or symbol.",
       "source": "explore:source-editor:standard latex commands and accents typed in the source render as literal backslashes and are escaped permanently on the",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T17:23:06Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T17:23:06Z",
+      "lastAttemptAt": "2026-11-26T17:23:06Z"
     },
     {
       "id": "qa-282",

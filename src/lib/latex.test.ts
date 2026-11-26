@@ -45,6 +45,25 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("\\textasciitilde{}");
   });
 
+  it("reads text commands and accents as the text they print", () => {
+    const latex = [
+      "\\documentclass{article}",
+      "\\begin{document}",
+      "\\section{Writing \\LaTeX{} with Sentence}",
+      "",
+      "A caf\\'e typed with \\TeX{} and \\ldots{} more, \\c{c}a va.",
+      "\\end{document}",
+    ].join("\n");
+    const { document } = latexToDocument(latex, DEFAULT_SETTINGS);
+    expect(documentPlainText(document)).toBe(
+      "Writing LaTeX with Sentence\n\nA café typed with TeX and … more, ça va.",
+    );
+    const exported = documentToLatex(document, DEFAULT_SETTINGS);
+    expect(exported).toContain("\\section{Writing LaTeX with Sentence}");
+    expect(exported).toContain("A café typed with TeX and … more, ça va.");
+    expect(exported).not.toContain("\\textbackslash{}");
+  });
+
   it("keeps a tilde in a link URL part of the address", () => {
     const { document } = latexToDocument(
       [
