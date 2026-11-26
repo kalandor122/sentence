@@ -2512,6 +2512,7 @@ export default function App() {
                     comments={workspace.comments}
                     revisions={editorRevisions}
                     editable
+                    zoom={zoom}
                     onUpdate={handleDocumentUpdate}
                     onReady={setEditor}
                     onStateChange={() => setEditorVersion((version) => version + 1)}
