@@ -839,3 +839,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T17:23:06Z START qa-281 on qa/qa-281-standard-latex-commands-and-accents-type: Standard LaTeX commands and accents typed in the source render as literal backslashes and are escaped permanently on the
 2026-11-26T17:25:45Z PUSHED main
 2026-11-26T17:25:45Z DONE qa-281 (tsc -b, npm test, smoke all green)
+2026-11-26T17:26:24Z START qa-269 on qa/qa-269-turning-off-the-header-row-of-a-one-row: Turning off the header row of a one-row table leaves its first cell as a header

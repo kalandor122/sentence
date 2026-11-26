@@ -3,7 +3,7 @@ import { Table, TableView } from "@tiptap/extension-table";
 import type { DOMOutputSpec, Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { TextSelection } from "@tiptap/pm/state";
 import type { Transaction } from "@tiptap/pm/state";
-import { TableMap, addRow, deleteColumn, deleteRow, isInTable, selectedRect } from "@tiptap/pm/tables";
+import { TableMap, addRow, deleteColumn, deleteRow, isInTable, selectedRect, tableNodeTypes } from "@tiptap/pm/tables";
 import type { TableRect } from "@tiptap/pm/tables";
 import type { EditorView } from "@tiptap/pm/view";
 import { focusBeforeEditor } from "./focus";
@@ -181,6 +181,39 @@ export const CaptionTable = Table.extend({
         if (rect.left === 0 && rect.right === rect.map.width) return false;
         if (!deleteColumn(state, dispatch)) return false;
         if (dispatch) keepSelectionInTable(tr, rect, rect.top, rect.left);
+        return true;
+      },
+
+      // The stock command leaves the first column alone when every cell in it
+      // is a header cell, which is the case for a one-row table: turning the
+      // header off would only clear columns 2 and up and keep the row a header.
+      // Only row 1 can be the header here, so toggle the whole first row from
+      // its first cell, the same cell the toolbar and the LaTeX export read.
+      toggleHeaderRow: () => ({ state, dispatch }) => {
+        if (!isInTable(state)) return false;
+        const rect = selectedRect(state);
+        const types = tableNodeTypes(state.schema);
+        const cells = rect.map.cellsInRect({
+          left: 0,
+          top: 0,
+          right: rect.map.width,
+          bottom: 1,
+        });
+        const nodes = cells.map((pos) => rect.table.nodeAt(pos));
+        const makeHeader = nodes[0]?.type !== types.header_cell;
+        if (dispatch) {
+          const tr = state.tr;
+          for (let index = 0; index < cells.length; index += 1) {
+            const node = nodes[index];
+            if (!node) continue;
+            tr.setNodeMarkup(
+              rect.tableStart + cells[index],
+              makeHeader ? types.header_cell : types.cell,
+              node.attrs,
+            );
+          }
+          dispatch(tr);
+        }
         return true;
       },
     };
