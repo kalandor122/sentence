@@ -806,3 +806,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T15:45:23Z START qa-274 on qa/qa-274-add-edit-link-silently-discards-addresse: Add/Edit link silently discards addresses with an unsupported scheme (doi:, javascript:)
 2026-11-26T15:49:01Z PUSHED main
 2026-11-26T15:49:01Z DONE qa-274 (tsc -b, npm test, smoke all green)
+2026-11-26T15:49:40Z START qa-254 on qa/qa-254-escape-does-not-leave-the-latex-source-e: Escape does not leave the LaTeX source editor, contradicting the status-bar hint

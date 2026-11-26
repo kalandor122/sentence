@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, type RefObject } from "react";
+import { focusAfterElement } from "../editor/focus";
 
 interface SourceEditorProps {
   value: string;
@@ -287,6 +288,10 @@ export default function SourceEditor({
           boundary.current = true;
         }}
         onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            if (focusAfterElement(event.currentTarget)) event.preventDefault();
+            return;
+          }
           if (!(event.ctrlKey || event.metaKey) || event.altKey || readOnly) return;
           const key = event.key.toLowerCase();
           if (key === "z" && !event.shiftKey) {
