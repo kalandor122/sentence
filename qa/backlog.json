@@ -4863,8 +4863,9 @@
       "hint": "Repro: Open the demo project. Click the text of the blockquote ('Clarity arrives when the mechanics disappear...'), press End, then click Insert > Page break. The page-break band is drawn inside the quote at y=1621..1685 on a 1123 px page: its centre is 530 px away from the page edge, the quote's own text is pushed to y=1220 (page 2), and the following paragraph is at y=1824, so the break does not separate anything (probe: break node parent BLOCKQUOTE, band 1621..1685, quote first child 1220..1249). View > LaTeX shows the command inside the environment: '\\begin{quote} ... \\newpage \\end{quote}'. Make any source edit and click Apply source, then View > Visual: there are 0 [data-page-break] nodes and the quote now shows the literal text '\\newpage'. Type one character in the quote and read View > LaTeX again: the block is '\\\\\\textbackslash{}newpageX', so the command is now escaped prose. Repeating the repro with References > Table of contents instead of Page break gives the same result: the TOC is nested in the quote and, after Apply source, becomes the literal text '\\tableofcontents' (0 [data-toc] nodes), re-exported as '\\textbackslash{}tableofcontents'.\nActual: The page break/TOC node is a child of BLOCKQUOTE. The page-break band sits mid-page (band 1621..1685, page edge 1123), the quote text is moved to page 2, and the exported source puts the command inside \\begin{quote}. Apply source then drops the block atom: the visual document contains 0 page-break/0 TOC nodes and shows '\\newpage' or '\\tableofcontents' as ordinary quote text (probe quoteText after sync: '... remains. \\\\newpage'), and re-exporting escapes it to '\\textbackslash{}newpage'. Probe qa/probes/insert-media.mjs scenarios 'quote-page-break-roundtrip' and 'quote-toc-roundtrip'.",
       "source": "explore:insert-media:page break or table of contents inserted at the end of a blockquote is nested in the quote and becomes literal text afte",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T20:39:21Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T20:39:21Z",
+      "lastAttemptAt": "2026-11-26T20:39:21Z"
     },
     {
       "id": "qa-309",

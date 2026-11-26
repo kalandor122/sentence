@@ -909,3 +909,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T20:16:12Z DONE qa-294 (tsc -b, npm test, smoke all green)
 2026-11-26T20:39:02Z EXPLORE insert-media: 4 new items, agent exit 0
 2026-11-26T20:39:21Z IMPORTED 1 tester findings into the backlog
+2026-11-26T20:39:21Z START qa-308 on qa/qa-308-page-break-or-table-of-contents-inserted: Page break or table of contents inserted at the end of a blockquote is nested in the quote and becomes literal text afte
