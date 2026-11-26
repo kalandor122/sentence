@@ -791,3 +791,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T14:52:00Z PUSHED main
 2026-11-26T14:52:00Z DONE qa-265 (tsc -b, npm test, smoke all green)
 2026-11-26T14:52:40Z START qa-267 on qa/qa-267-column-resizing-stops-working-and-throws: Column resizing stops working and throws a TypeError on a table with a caption
+2026-11-26T14:58:13Z PUSHED main
+2026-11-26T14:58:13Z DONE qa-267 (tsc -b, npm test, smoke all green)

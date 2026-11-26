@@ -4232,10 +4232,11 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click a body cell and type 'Captioned table' in the Table toolbar's Caption field. Hover the border between the first and second columns until the resize cursor appears, then drag it 80px to the right.\nActual: The drag changes no column width (200/200/200 before and after) and the page throws 'TypeError: Cannot read properties of undefined (reading 'width')' from updateColumnsOnResize -> displayColumnWidth -> handleMouseDown. The table's first child is the CAPTION element ahead of COLGROUP, and the resizing code passes that caption where it expects the column group. Repeating the same drag on the same table before the caption is added widens the first column from 200px to 280px with no error.",
       "source": "explore:tables:column resizing stops working and throws a typeerror on a table with a caption",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T14:52:40Z",
-      "lastAttemptAt": "2026-11-26T14:52:40Z"
+      "lastAttemptAt": "2026-11-26T14:52:40Z",
+      "doneAt": "2026-11-26T14:58:10Z"
     },
     {
       "id": "qa-268",
@@ -4247,7 +4248,9 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click the top-middle header cell, type 'one', press Shift+Enter, type 'two'. Switch to View > LaTeX and read the tabular.\nActual: The header row is exported as ' & one\\\\two &  \\\\'. '\\\\' is a tabular row terminator, so compiling the exported block with the bundled Tectonic binary prints 'one' and 'two' on separate table rows even though the visual editor shows both lines in one cell.",
       "source": "explore:tables:shift+enter in a table cell exports a row terminator, so the cell is split into two rows in the pdf",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T14:58:52Z"
     },
     {
       "id": "qa-269",
