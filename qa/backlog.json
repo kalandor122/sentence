@@ -4686,10 +4686,11 @@
       ],
       "hint": "Repro: 1) Open http://localhost:1420 with a fresh profile, click 'New document' and wait for the top bar to read 'Saved locally'. 2) In the devtools console run: const orig = Storage.prototype.setItem; Storage.prototype.setItem = function (key, value) { if (key === 'sentence.gitAuthor') throw new DOMException('The quota has been exceeded.', 'QuotaExceededError'); return orig.call(this, key, value); }; (this simulates a full or blocked localStorage for that one key). 3) Click 'Settings' and type a name into the 'Name' field under Git author. The app instantly goes blank. 4) Reload once: the override is gone, so the editor returns. 5) Re-apply the same override before the document loads (Playwright page.addInitScript, or CDP Page.addScriptToEvaluateOnNewDocument) and reload: the app is blank again on boot. Probe evidence: qa/probes/persistence.mjs phase 'git-author-storage-crash' (afterEdit bodyLength 0, editor false; afterLoad bodyLength 0, editor false; pageErrors 'The quota has been exceeded.' twice at startup).\nActual: document.body.innerText has length 0, with no editor, start screen or inspector. The console records 'pageerror: The quota has been exceeded.' (twice on startup because the effect runs in StrictMode). The useEffect at src/App.tsx:697 calls localStorage.setItem('sentence.gitAuthor', ...) with no try/catch (unlike saveBrowserWorkspace and rememberProject) and there is no error boundary, so React unmounts the whole tree. The document is still in localStorage but is unreachable through the UI.",
       "source": "explore:persistence:a failed git-author localstorage write blanks the entire app",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T20:15:05Z",
-      "lastAttemptAt": "2026-11-26T20:15:05Z"
+      "lastAttemptAt": "2026-11-26T20:15:05Z",
+      "doneAt": "2026-11-26T20:16:10Z"
     },
     {
       "id": "qa-295",
@@ -4841,6 +4842,68 @@
     },
     {
       "id": "qa-307",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-308",
+      "title": "Page break or table of contents inserted at the end of a blockquote is nested in the quote and becomes literal text afte",
+      "why": "Exploratory pass on insert-media (functional): expected Page furniture placed at the end of a blockquote is inserted after the quote, like it already is when the caret is in the middle of the quote; it renders at the page boundary, exports outside \\begin{quote}, and round-trips through Apply source without turning \\newpage or \\tableofcontents into text.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the demo project. Click the text of the blockquote ('Clarity arrives when the mechanics disappear...'), press End, then click Insert > Page break. The page-break band is drawn inside the quote at y=1621..1685 on a 1123 px page: its centre is 530 px away from the page edge, the quote's own text is pushed to y=1220 (page 2), and the following paragraph is at y=1824, so the break does not separate anything (probe: break node parent BLOCKQUOTE, band 1621..1685, quote first child 1220..1249). View > LaTeX shows the command inside the environment: '\\begin{quote} ... \\newpage \\end{quote}'. Make any source edit and click Apply source, then View > Visual: there are 0 [data-page-break] nodes and the quote now shows the literal text '\\newpage'. Type one character in the quote and read View > LaTeX again: the block is '\\\\\\textbackslash{}newpageX', so the command is now escaped prose. Repeating the repro with References > Table of contents instead of Page break gives the same result: the TOC is nested in the quote and, after Apply source, becomes the literal text '\\tableofcontents' (0 [data-toc] nodes), re-exported as '\\textbackslash{}tableofcontents'.\nActual: The page break/TOC node is a child of BLOCKQUOTE. The page-break band sits mid-page (band 1621..1685, page edge 1123), the quote text is moved to page 2, and the exported source puts the command inside \\begin{quote}. Apply source then drops the block atom: the visual document contains 0 page-break/0 TOC nodes and shows '\\newpage' or '\\tableofcontents' as ordinary quote text (probe quoteText after sync: '... remains. \\\\newpage'), and re-exporting escapes it to '\\textbackslash{}newpage'. Probe qa/probes/insert-media.mjs scenarios 'quote-page-break-roundtrip' and 'quote-toc-roundtrip'.",
+      "source": "explore:insert-media:page break or table of contents inserted at the end of a blockquote is nested in the quote and becomes literal text afte",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T20:39:21Z"
+    },
+    {
+      "id": "qa-309",
+      "title": "The table-of-contents preview numbers sections from 1 in report/book documents while the compiled PDF prints 0.1",
+      "why": "Exploratory pass on insert-media (content): expected The contents preview uses the numbering the chosen document class prints (0.1, 0.1.1 for report/book with no chapters) and reflects that \\tableofcontents starts a new page, so the visual contents match the compiled PDF.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the demo project. On the Layout tab set Document class to Report. Press Ctrl+End and click References > Table of contents. The preview entries read '1 Introduction' and '1.1 Drafting with constraints', and the status bar says '1 page'. View > LaTeX contains '\\documentclass[11pt,a4paper]{report}', '\\section{Introduction}', '\\subsection{Drafting with constraints}' and '\\tableofcontents'. Compile that exported source with the bundled engine, e.g. 'src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu --untrusted main.tex'; pdftotext shows the contents as '0.1 Introduction' and '0.1.1 Drafting with constraints', and pdfinfo reports 4 pages (the report class starts a title page and a contents page, which the visual page and status bar do not show).\nActual: The preview numbers the same headings as 1 and 1.1 and keeps the TOC block on the single visual page; the exact exported source, compiled with Tectonic, prints 0.1 and 0.1.1 and is 4 pages (probe entries: ['1 Introduction', '1.1 Drafting with constraints'], documentClass report, tocCount 1, status '1 page'). Probe qa/probes/insert-media.mjs scenario 'toc-report-class'.",
+      "source": "explore:insert-media:the table-of-contents preview numbers sections from 1 in report/book documents while the compiled pdf prints 0.1",
+      "status": "open"
+    },
+    {
+      "id": "qa-310",
+      "title": "A wide image inserted into a table cell exports at the full text width, so the compiled table overflows the page margin",
+      "why": "Exploratory pass on insert-media (visual): expected An image placed in a table cell is sized to that cell (as it is displayed in the editor) or the source uses a width that keeps the tabular inside the text block, so the compiled PDF matches the visual table width.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the demo project press Ctrl+End, click Insert > Insert table, click the first cell, then Insert > Image and choose a 2400x600 PNG. The picture renders 438x111 px inside the 459 px cell and the table stays 600 px wide, the text width. View > LaTeX exports '\\includegraphics[width=\\linewidth,height=\\textheight,keepaspectratio]{assets/images/wide-cell.png}' inside the '\\begin{tabular}{lll}' block. Copy that asset to assets/images/wide-cell.png and compile the exported source with the bundled Tectonic; the log reports 'Overfull \\hbox (35.96829pt too wide) in paragraph at lines 62--70', so the table extends 35.97 pt beyond the text block.\nActual: The cell is an 'l' column, so 'width=\\linewidth' resolves to the full A4 text width, not the cell width. The table is centred with column padding and becomes 35.97 pt wider than the text block in the compiled PDF, while the visual page shows the 438 px image fitting a 459 px cell inside the 600 px table. Probe qa/probes/insert-media.mjs scenario 'wide-image-in-table-cell'.",
+      "source": "explore:insert-media:a wide image inserted into a table cell exports at the full text width, so the compiled table overflows the page margin",
+      "status": "open"
+    },
+    {
+      "id": "qa-311",
+      "title": "An unreadable image file is inserted as a broken figure with no warning and an unsized \\includegraphics",
+      "why": "Exploratory pass on insert-media (functional): expected A file that cannot be decoded is rejected with a visible error, or the editor at least warns that the image could not be read, instead of adding a broken figure and a LaTeX reference with no usable graphic.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the demo project press Ctrl+End and click Insert > Image. Choose a file named not-an-image.png whose bytes are plain text ('this is not a PNG file') rather than a PNG. The editor inserts one figure whose img has naturalWidth/naturalHeight 0x0 and displays only the alt text; no toast appears. View > LaTeX contains '\\includegraphics{assets/images/not-an-image.png}% Sentence alt: not-an-image.png' with no width or height.\nActual: The picker completes without an error: the visual document gains 1 figure with an undecodable data URL (natural 0x0), toast is null, and the exported source references assets/images/not-an-image.png with no size, which cannot produce the intended picture in the PDF. Probe qa/probes/insert-media.mjs scenario 'corrupt-image-file'.",
+      "source": "explore:insert-media:an unreadable image file is inserted as a broken figure with no warning and an unsized \\includegraphics",
+      "status": "open"
+    },
+    {
+      "id": "qa-312",
       "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
       "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
       "severity": "medium",
