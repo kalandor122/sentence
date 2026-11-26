@@ -1109,7 +1109,11 @@ button:disabled {
   position: absolute;
   top: 8px;
   left: 50%;
-  width: min(var(--paper-width, 794px), calc(100% - 52px));
+  /* The stage is already scaled by the fit and zoom factors, so the backdrop
+     takes the sheet's unscaled fitted width and only applies the zoom here.
+     Otherwise it is scaled twice in a narrow pane and sticks out past the
+     sheet, extending the horizontal scroll range beyond the page. */
+  width: calc(var(--paper-width, 794px) * var(--paper-fit-scale, 1));
   height: var(--paper-height, 1053px);
   transform: translateX(-50%) scale(var(--editor-zoom));
   transform-origin: top center;
