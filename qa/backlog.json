@@ -4471,8 +4471,9 @@
       "hint": "Repro: 1. New document. 2. Select some text and add a comment with a two-line body: 'First line of the comment.' newline 'Second line of the comment.' 3. Inspect the comment card in the Review panel. 4. Click Reply, submit 'Reply line one.' newline 'Reply line two.', and inspect the reply.\nActual: Both are rendered as a single line: the card shows 'First line of the comment. Second line of the comment.' and the reply shows 'Reply line one. Reply line two.' The stored text still contains the newline (textContent includes \\n), but the computed white-space is 'normal' for .comment-thread > p and .comment-reply p, so the line break collapses.",
       "source": "explore:review:multi-line comment and reply bodies lose their line breaks when displayed",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T17:40:15Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T17:40:15Z",
+      "lastAttemptAt": "2026-11-26T17:40:15Z"
     },
     {
       "id": "qa-281",
