@@ -7,6 +7,7 @@ import {
   pageGeometry,
   pageLineGaps,
   pageRowShifts,
+  scrollTopForZoom,
 } from "./pagination";
 
 describe("pageGeometry", () => {
@@ -61,6 +62,17 @@ describe("pageBreakFill", () => {
     const height = 148;
     const fill = pageBreakFill(top, height, geometry);
     expect(top + fill + height).toBe(geometry.height + geometry.margin);
+  });
+});
+
+describe("scrollTopForZoom", () => {
+  it("keeps the point under the viewport centre while zooming out at the end", () => {
+    expect(scrollTopForZoom(13558, 627, 30, 1, 0.7, 9702)).toBeCloseTo(9406, 0);
+  });
+
+  it("clamps to the scaled scroll range instead of scrolling past the sheet", () => {
+    expect(scrollTopForZoom(14082, 627, 30, 1, 0.7, 9702)).toBe(9702);
+    expect(scrollTopForZoom(0, 627, 30, 1, 0.7, 9702)).toBe(0);
   });
 });
 
