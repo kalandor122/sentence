@@ -904,3 +904,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T20:14:26Z DONE qa-293 (tsc -b, npm test, smoke all green)
 2026-11-26T20:15:05Z IMPORTED 1 tester findings into the backlog
 2026-11-26T20:15:05Z RECOVERED qa-294 (in_progress for 70 min)
+2026-11-26T20:15:05Z START qa-294 on qa/qa-294-a-failed-git-author-localstorage-write-b: A failed Git-author localStorage write blanks the entire app
