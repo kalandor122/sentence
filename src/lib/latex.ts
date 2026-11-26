@@ -60,7 +60,9 @@ function escapeLatexUrl(value: string): string {
 // Citation keys and cross-reference labels are written verbatim into a `{...}`
 // argument and cannot be escaped there: a `\{` would become part of the key.
 // So anything that would end the group or break the line has to be refused.
-const REFERENCE_TARGET_PATTERN = /^[^\s{},%\\#()]+$/;
+// `~` is an active character in the \csname lookup LaTeX uses for `\ref` and
+// `\cite`, so it fails there even though it looks harmless.
+const REFERENCE_TARGET_PATTERN = /^[^\s{},%\\#()~]+$/;
 
 export function isLatexReferenceTarget(value: string): boolean {
   return REFERENCE_TARGET_PATTERN.test(value);
@@ -83,7 +85,7 @@ export function citationKeys(value: string): string[] {
 // Keys still arrive from imported LaTeX or a hand-edited .bib, so the exporter
 // removes the characters that would break the command instead of trusting them.
 export function latexReferenceTarget(value: string): string {
-  return value.replace(/[\s{},%\\#()]+/g, "");
+  return value.replace(/[\s{},%\\#()~]+/g, "");
 }
 
 // The comma is the separator between keys in a multi-key citation, so it has to

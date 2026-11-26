@@ -842,3 +842,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T17:26:24Z START qa-269 on qa/qa-269-turning-off-the-header-row-of-a-one-row: Turning off the header row of a one-row table leaves its first cell as a header
 2026-11-26T17:28:11Z PUSHED main
 2026-11-26T17:28:11Z DONE qa-269 (tsc -b, npm test, smoke all green)
+2026-11-26T17:28:50Z START qa-275 on qa/qa-275-a-citation-key-or-cross-reference-label: A citation key or cross-reference label containing ~ is accepted but makes the exported LaTeX fail to compile

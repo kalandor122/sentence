@@ -88,6 +88,7 @@ describe("LaTeX generation", () => {
     expect(isLatexReferenceTarget("a{b")).toBe(false);
     expect(isLatexReferenceTarget("a%b")).toBe(false);
     expect(isLatexReferenceTarget("a,b")).toBe(false);
+    expect(isLatexReferenceTarget("a~b")).toBe(false);
   });
 
   it("keeps exported citation keys and labels syntactically valid", () => {
@@ -101,6 +102,10 @@ describe("LaTeX generation", () => {
             { type: "citation", attrs: { key: "bad key}" } },
             { type: "text", text: " BadRef " },
             { type: "crossReference", attrs: { label: "fig}" } },
+            { type: "text", text: " TildeCite " },
+            { type: "citation", attrs: { key: "a~b" } },
+            { type: "text", text: " TildeRef " },
+            { type: "crossReference", attrs: { label: "fig~one" } },
           ],
         },
       ],
@@ -109,6 +114,8 @@ describe("LaTeX generation", () => {
     expect(latex).toContain("BadCite \\cite{badkey}");
     expect(latex).toContain("BadRef \\ref{fig}");
     expect(latex).not.toContain("bad key}}");
+    expect(latex).toContain("TildeCite \\cite{ab}");
+    expect(latex).toContain("TildeRef \\ref{figone}");
   });
 
   it("keeps the keys of a multi-key citation separate", () => {
