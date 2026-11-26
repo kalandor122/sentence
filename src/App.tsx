@@ -146,9 +146,9 @@ interface WorkspaceTab extends WorkspaceTabInfo {
 }
 
 type DialogState =
-  | { kind: "citation" }
+  | { kind: "citation"; initialValue?: string; position?: number }
   | { kind: "footnote"; initialValue?: string; position?: number }
-  | { kind: "cross-reference" }
+  | { kind: "cross-reference"; initialValue?: string; position?: number }
   | {
       kind: "link";
       initialValue: string;
@@ -1440,9 +1440,7 @@ export default function App() {
     setSidebarPanel("references");
   };
 
-  const insertCitation = (key: string) => {
-    if (!editor) return;
-    editor.chain().focus().insertContent({ type: "citation", attrs: { key } }).run();
+  const warnMissingCitations = (key: string) => {
     const current = workspaceRef.current;
     if (!current) return;
     const bibliography = parseBibliography(current.bibliography);
@@ -1454,6 +1452,12 @@ export default function App() {
     } else if (missing.length > 1) {
       setToast(`Citation keys ${missing.map((part) => `“${part}”`).join(", ")} are not in the bibliography. Add entries for them to resolve the references.`);
     }
+  };
+
+  const insertCitation = (key: string) => {
+    if (!editor) return;
+    editor.chain().focus().insertContent({ type: "citation", attrs: { key } }).run();
+    warnMissingCitations(key);
   };
 
   const saveBibliographyEntry = (draft: BibliographyDraft) => {
@@ -1795,8 +1799,34 @@ export default function App() {
     editor?.commands.focus();
   };
 
+  // Ctrl+K targets the word under the caret, but a citation, cross-reference
+  // or footnote marker is a whole atom with nothing to link. Editing the atom
+  // is the useful meaning of the shortcut there.
+  const openAtomEditor = (): boolean => {
+    if (!editor) return false;
+    const { selection } = editor.state;
+    if (!(selection instanceof NodeSelection)) return false;
+    const { attrs } = selection.node;
+    const name = selection.node.type.name;
+    const position = selection.from;
+    if (name === "citation") {
+      setDialog({ kind: "citation", initialValue: typeof attrs.key === "string" ? attrs.key : "", position });
+      return true;
+    }
+    if (name === "crossReference") {
+      setDialog({ kind: "cross-reference", initialValue: typeof attrs.label === "string" ? attrs.label : "", position });
+      return true;
+    }
+    if (name === "footnote") {
+      setDialog({ kind: "footnote", initialValue: typeof attrs.text === "string" ? attrs.text : "", position });
+      return true;
+    }
+    return false;
+  };
+
   const openLinkDialog = () => {
     if (!editor) return;
+    if (openAtomEditor()) return;
     linkSubmitted.current = false;
     const href = editor.getAttributes("link").href;
     const existingHref = typeof href === "string" ? href : "";
@@ -1846,32 +1876,43 @@ export default function App() {
 
   const handleDialogSubmit = (value: string) => {
     if (!dialog) return;
+    // An inline atom has no text to edit in place, so its dialog rewrites the
+    // node's attribute. Leave the caret after the atom so typing continues the
+    // line instead of landing before the marker.
+    const updateInlineAtom = (nodeName: string, position: number, attrs: Record<string, string>) => {
+      if (!editor || editor.state.doc.nodeAt(position)?.type.name !== nodeName) return;
+      editor
+        .chain()
+        .focus()
+        .setNodeSelection(position)
+        .updateAttributes(nodeName, attrs)
+        .setTextSelection(position + 1)
+        .run();
+    };
     switch (dialog.kind) {
       case "citation":
-        insertCitation(value);
-        break;
-      case "footnote": {
-        if (!editor) break;
-        const position = dialog.position;
-        if (position === undefined) {
-          editor.chain().focus().insertContent({ type: "footnote", attrs: { text: value } }).run();
+        if (dialog.position === undefined) {
+          insertCitation(value);
           break;
         }
-        if (editor.state.doc.nodeAt(position)?.type.name === "footnote") {
-          // Updating leaves the marker selected, which puts the caret before it.
-          // Put it after the note so continuing the line types on the right side.
-          editor
-            .chain()
-            .focus()
-            .setNodeSelection(position)
-            .updateAttributes("footnote", { text: value })
-            .setTextSelection(position + 1)
-            .run();
+        updateInlineAtom("citation", dialog.position, { key: value });
+        warnMissingCitations(value);
+        break;
+      case "footnote": {
+        const position = dialog.position;
+        if (position === undefined) {
+          editor?.chain().focus().insertContent({ type: "footnote", attrs: { text: value } }).run();
+          break;
         }
+        updateInlineAtom("footnote", position, { text: value });
         break;
       }
       case "cross-reference":
-        editor?.chain().focus().insertContent({ type: "crossReference", attrs: { label: value } }).run();
+        if (dialog.position === undefined) {
+          editor?.chain().focus().insertContent({ type: "crossReference", attrs: { label: value } }).run();
+          break;
+        }
+        updateInlineAtom("crossReference", dialog.position, { label: value });
         break;
       case "link": {
         linkSubmitted.current = true;
@@ -1922,13 +1963,17 @@ export default function App() {
   const dialogProps = useMemo(() => {
     switch (dialog?.kind) {
       case "citation":
-        return { title: "Insert citation", label: "BibTeX key", placeholder: "einstein1905" };
+        return dialog.position === undefined
+          ? { title: "Insert citation", label: "BibTeX key", placeholder: "einstein1905" }
+          : { title: "Edit citation", label: "BibTeX key", placeholder: "einstein1905", confirmLabel: "Update" };
       case "footnote":
         return dialog.position === undefined
           ? { title: "Insert footnote", label: "Note", placeholder: "A useful note" }
           : { title: "Edit footnote", label: "Note", placeholder: "A useful note", confirmLabel: "Update" };
       case "cross-reference":
-        return { title: "Insert cross-reference", label: "Label", placeholder: "fig:architecture" };
+        return dialog.position === undefined
+          ? { title: "Insert cross-reference", label: "Label", placeholder: "fig:architecture" }
+          : { title: "Edit cross-reference", label: "Label", placeholder: "fig:architecture", confirmLabel: "Update" };
       case "link":
         return dialog.existingLink
           ? { title: "Edit link", label: "Address", placeholder: "https://example.com" }
@@ -2465,6 +2510,8 @@ export default function App() {
                       setMathEditor({ display, environment, latex, editing: true })
                     }
                     onEditFootnote={(text, position) => setDialog({ kind: "footnote", initialValue: text, position })}
+                    onEditCitation={(key, position) => setDialog({ kind: "citation", initialValue: key, position })}
+                    onEditCrossReference={(label, position) => setDialog({ kind: "cross-reference", initialValue: label, position })}
                     onPageCountChange={setVisualPages}
                   />
                 </Suspense>
@@ -2629,7 +2676,14 @@ export default function App() {
         title={dialogProps.title}
         description={"description" in dialogProps ? dialogProps.description : undefined}
         label={dialogProps.label}
-        initialValue={dialog?.kind === "link" || dialog?.kind === "footnote" ? dialog.initialValue : undefined}
+        initialValue={
+          dialog?.kind === "link" ||
+          dialog?.kind === "footnote" ||
+          dialog?.kind === "citation" ||
+          dialog?.kind === "cross-reference"
+            ? dialog.initialValue
+            : undefined
+        }
         placeholder={"placeholder" in dialogProps ? dialogProps.placeholder : undefined}
         multiline={"multiline" in dialogProps ? dialogProps.multiline : false}
         confirmLabel={"confirmLabel" in dialogProps ? dialogProps.confirmLabel : "Insert"}

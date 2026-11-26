@@ -4407,8 +4407,9 @@
       "hint": "Repro: Create a project. Type `NoEditCite ` and insert a citation with key `sentence2026` via References > Insert citation > Enter a key manually. Click the `[sentence2026]` atom, double-click it, then press Enter, then press Ctrl+K. Repeat with a cross-reference inserted with label `fig:noedit`.\nActual: Clicking selects the atom but no editor opens: `afterDoubleClick` and `afterEnter` report `{open:false}` for both atoms, and the nodes keep their old keys/labels. Ctrl+K opens the unrelated `Add link` dialog instead of editing the citation/reference. In the visual editor the only way to change either is Backspace/Delete and insert a new one (editing the LaTeX source also works, but the visual document then has to be re-synchronised).",
       "source": "explore:links-cites-footnotes:inserted citations and cross-references cannot be edited in the visual editor; they can only be deleted and reinserted",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T17:30:59Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T17:30:59Z",
+      "lastAttemptAt": "2026-11-26T17:30:59Z"
     },
     {
       "id": "qa-277",
