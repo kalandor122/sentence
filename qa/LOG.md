@@ -922,3 +922,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T20:57:16Z DONE qa-297 (tsc -b, npm test, smoke all green)
 2026-11-26T20:57:55Z IMPORTED 1 tester findings into the backlog
 2026-11-26T20:57:55Z START qa-299 on qa/qa-299-paragraph-spacing-popover-takes-no-focus: Paragraph spacing popover takes no focus on open and drops focus on <body> when Escape closes it
+2026-11-26T20:59:02Z PUSHED main
+2026-11-26T20:59:02Z DONE qa-299 (tsc -b, npm test, smoke all green)
+2026-11-26T20:59:41Z IMPORTED 1 tester findings into the backlog
