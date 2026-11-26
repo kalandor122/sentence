@@ -4150,10 +4150,11 @@
       ],
       "hint": "Repro: Load the start screen, focus \"New document\" with Tab and press Enter. The editor loads, but document.activeElement is <body>; the next Tab press goes to the \"Skip to writing surface\" link at the top of the new screen. Focus is not placed in the editor or on any heading of the new view.\nActual: After Enter activeElement is BODY; the probe's first Tab after the transition reaches the skip link, starting the whole page tab order again.",
       "source": "explore:keyboard:creating a project from the start screen drops keyboard focus on <body>",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T16:58:25Z",
-      "lastAttemptAt": "2026-11-26T16:58:25Z"
+      "lastAttemptAt": "2026-11-26T16:58:25Z",
+      "doneAt": "2026-11-26T17:01:22Z"
     },
     {
       "id": "qa-261",
@@ -4213,7 +4214,9 @@
       ],
       "hint": "Repro: Open View > LaTeX and insert '\\section{The \\(x^2\\) model}' before \\end{document}; click Apply source. Place the caret at the end of the document and click References > Table of contents.\nActual: The preview entry reads '2 The model' (the formula is missing), while the exported source still contains '\\section{The \\(x^2\\) model}', so the visual contents and the PDF contents disagree. Probe qa/probes/insert-media.mjs scenario 'toc-math-heading'.",
       "source": "explore:insert-media:the toc preview drops inline math from a heading, so its entry does not match the printed contents",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T17:02:03Z"
     },
     {
       "id": "qa-265",
