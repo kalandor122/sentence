@@ -4622,7 +4622,9 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T19:33:18Z"
     },
     {
       "id": "qa-291",
@@ -4721,10 +4723,11 @@
       ],
       "hint": "Repro: Open a project with body text and put the caret inside a word (Ctrl+Home, then ArrowRight). Go to the Home ribbon tab, focus \"Add link\", press Enter. The \"Add link\" dialog opens, but document.activeElement remains the ProseMirror \"Document editor\" behind it (modal count 1, focus inEditor true, sampled 0-1000 ms). Type \"example.com\": the dialog's Address field stays empty and the word under the caret in the manuscript is replaced with \"example.com\". Press Tab once and focus jumps into the dialog (on its Close button); Escape closes it and removes the temporary link, but the typed text remains in the document.\nActual: Probe data: dialog open (modal 1, backdrop 1), activeElement = DIV .tiptap.ProseMirror.sentence-editor with aria-label \"Document editor\", inEditor true, inDialog false. After typing, the modal input value is \"\" and the document text changes from \"alpha beta gamma delta QRS...\" to \"example.com beta gamma delta QRS...\" (the linked word is replaced; inDocument true, and the text is still there after Escape closes the dialog). One Tab moves focus to the dialog Close button, so the modal trap can recover, but the first keystrokes have already modified the document.",
       "source": "explore:keyboard:add link from the ribbon opens the dialog with focus still in the document, so typing edits the manuscript behind the mo",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T19:29:18Z",
-      "lastAttemptAt": "2026-11-26T19:29:18Z"
+      "lastAttemptAt": "2026-11-26T19:29:18Z",
+      "doneAt": "2026-11-26T19:32:36Z"
     },
     {
       "id": "qa-299",
@@ -4764,6 +4767,18 @@
     },
     {
       "id": "qa-302",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-303",
       "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
       "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
       "severity": "medium",
