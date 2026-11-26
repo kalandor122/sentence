@@ -136,6 +136,45 @@ describe("scrollTopForZoomPoint", () => {
     expect(30 + 14029 - target).toBeCloseTo(148.5, 6);
     expect(target).toBeCloseTo(13910.5, 6);
   });
+
+  // qa-302: the 3,600-word probe document is 13 A4 pages tall. The stage must
+  // reserve the scaled height, so the scroll range at 70% ends at the scaled
+  // sheet bottom instead of the 100% layout, and the last line stays on screen.
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetHeight = 1123 * 13;
+  const maxScrollAt70 = Math.round(
+    paddingTop + sheetHeight * 0.7 + paddingBottom - viewportHeight,
+  );
+
+  it("ends the zoomed-out scroll range at the scaled sheet height", () => {
+    expect(maxScrollAt70).toBe(9702);
+    expect(maxScrollAt70).toBeLessThan(
+      sheetHeight + paddingTop + paddingBottom - viewportHeight,
+    );
+  });
+
+  it("keeps the end of the document in view after zooming out at the end", () => {
+    const at70 = scrollTopForZoomPoint(
+      14029,
+      13558,
+      viewportHeight,
+      paddingTop,
+      1,
+      0.7,
+      maxScrollAt70,
+    );
+    expect(at70).toBeLessThanOrEqual(maxScrollAt70);
+    const screenTop = paddingTop + 14029 * 0.7 - at70;
+    expect(screenTop).toBeGreaterThanOrEqual(0);
+    expect(screenTop).toBeLessThanOrEqual(viewportHeight);
+
+    // Zooming back to 100% returns to the reading position it started from.
+    expect(
+      scrollTopForZoomPoint(14029, at70, viewportHeight, paddingTop, 0.7, 1, 14082),
+    ).toBeCloseTo(13558, 6);
+  });
 });
 
 describe("pageLineGaps", () => {
