@@ -913,3 +913,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T20:42:19Z PUSHED main
 2026-11-26T20:42:19Z DONE qa-308 (tsc -b, npm test, smoke all green)
 2026-11-26T20:42:59Z IMPORTED 1 tester findings into the backlog
+2026-11-26T20:42:59Z START qa-295 on qa/qa-295-a-source-draft-is-deleted-before-the-wor: A source draft is deleted before the workspace write succeeds, so a failed save loses the edit on reload
