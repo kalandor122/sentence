@@ -566,10 +566,20 @@ function blockToLatex(node: DocumentNode, settings: ProjectSettings, enumDepth =
 }
 
 function listItemToLatex(node: DocumentNode, settings: ProjectSettings, enumDepth: number): string {
-  const content = (node.content ?? [])
-    .map((child) => blockToLatex(child, settings, enumDepth))
-    .filter(Boolean)
-    .join("\n");
+  const blocks = (node.content ?? [])
+    .map((child) => ({ type: child.type, latex: blockToLatex(child, settings, enumDepth) }))
+    .filter((block) => block.latex);
+  // Two paragraphs in one item are two paragraphs in the PDF. A single newline
+  // is just a space to LaTeX, so the blank line that ends a paragraph is needed
+  // or the second paragraph joins the first one.
+  const content = blocks
+    .map((block, index) => {
+      const previous = blocks[index - 1];
+      const sameParagraphs = previous?.type === "paragraph" && block.type === "paragraph";
+      const separator = index === 0 ? "" : sameParagraphs ? "\n\n" : "\n";
+      return `${separator}${block.latex}`;
+    })
+    .join("");
   // LaTeX reads a bracket right after \item as the optional label that replaces
   // the bullet or number, so `[draft] note` would silently lose its brackets.
   // A group in front of the bracket keeps it as printed text.
@@ -1304,9 +1314,13 @@ function pushBodyParagraphs(content: DocumentNode[], text: string): void {
 function parseListItemContent(body: string): DocumentNode[] {
   const content: DocumentNode[] = [];
   let cursor = 0;
+  // A blank line inside an item ends a paragraph, exactly as it does in the
+  // body: without the split the two paragraphs collapse into one on import.
   const pushParagraph = (text: string) => {
-    assertSupportedEnvironment(text);
-    pushBodyParagraphs(content, text);
+    for (const paragraph of text.split(/\n[ \t]*\n/)) {
+      assertSupportedEnvironment(paragraph);
+      pushBodyParagraphs(content, paragraph);
+    }
   };
   for (const span of nestedListSpans(body)) {
     pushParagraph(body.slice(cursor, span.start));
