@@ -1804,6 +1804,11 @@ export default function App() {
     if (dialog?.kind === "cross-reference" && !isLatexReferenceTarget(value)) {
       return "A label cannot contain spaces, braces, parentheses or LaTeX special characters.";
     }
+    if (dialog?.kind === "link" && editor && !editor.can().setLink({ href: value })) {
+      // Tiptap's setLink silently refuses schemes outside its allow-list, which
+      // left the dialog closing as if the address had been applied.
+      return "A link address must use a supported scheme such as http:, https: or mailto:.";
+    }
     return null;
   };
 

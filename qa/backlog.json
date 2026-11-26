@@ -4341,8 +4341,9 @@
       "hint": "Repro: Create a project. Type `BadScheme word`, select `word`, press Ctrl+K, enter `javascript:alert(1)` and click Insert. Then type `DoiTarget word`, select `word`, press Ctrl+K, enter `doi:10.1000/xyz123` and click Insert. Finally type `EditScheme word`, select `word`, press Ctrl+K, enter `https://good.example.org/one` and click Insert; click the linked word, press Ctrl+K, replace the address with `javascript:alert(1)` and press Insert.\nActual: For both additions the dialog closes with no alert and no toast, the word stays unlinked (`links: []`, no \\href in the source) and the next typed character appends to the paragraph. For the edit, the dialog also closes with no error and the old address is silently kept: `afterEditLinks` is still `https://good.example.org/one` and the source still reads `EditScheme \\href{https://good.example.org/one}{word}`. Tiptap's setLink returns false for any scheme outside its allow-list, and the app swallows that result.",
       "source": "explore:links-cites-footnotes:add/edit link silently discards addresses with an unsupported scheme (doi:, javascript:)",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T15:45:23Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T15:45:23Z",
+      "lastAttemptAt": "2026-11-26T15:45:23Z"
     },
     {
       "id": "qa-275",
