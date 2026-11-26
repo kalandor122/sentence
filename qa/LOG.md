@@ -871,3 +871,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T18:29:30Z DONE qa-286 (tsc -b, npm test, smoke all green)
 2026-11-26T18:30:10Z IMPORTED 1 tester findings into the backlog
 2026-11-26T18:30:10Z START qa-287 on qa/qa-287-find-never-scrolls-the-current-match-int: Find never scrolls the current match into view in a long document
+2026-11-26T18:35:04Z PUSHED main
+2026-11-26T18:35:04Z DONE qa-287 (tsc -b, npm test, smoke all green)
+2026-11-26T18:35:44Z IMPORTED 1 tester findings into the backlog
