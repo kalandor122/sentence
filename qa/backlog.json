@@ -4575,8 +4575,9 @@
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.find`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: press Ctrl+Home in the page (scrollTop 413, editor viewport y=149-776), then Ctrl+F and type `BODY50`. The bar reports 1/1, but scrollTop stays 413 and the highlighted match sits at y=13,900-13,916, far below the viewport. Pressing Enter or clicking Next match leaves it at 1/1, scrollTop 413 and the match at 13,900. Replace the query with `Heading`: 1/50 with the first match visible; press Enter three times to 4/50. ScrollTop stays 413 while the current match moves to y=987-1,022, below the 776px viewport bottom.\nActual: The match is highlighted in the document model but the editor is never scrolled: a unique match 13,000px below the viewport stays hidden, and after three Next presses the 4/50 match is already 211px below the viewport while scrollTop remains unchanged at 413.",
       "source": "explore:long-document:find never scrolls the current match into view in a long document",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T18:30:10Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T18:30:10Z",
+      "lastAttemptAt": "2026-11-26T18:30:10Z"
     },
     {
       "id": "qa-288",

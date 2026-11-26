@@ -110,6 +110,20 @@ export const FindHighlight = Extension.create({
   },
 });
 
+// ProseMirror's scrollIntoView follows the browser's DOM selection, which sits
+// in the find input while the bar has focus, so it never reveals a match. Scroll
+// the paginated page directly, centring the match when it is outside the view.
+export function revealFindMatch(editor: Editor, range: FindRange): void {
+  if (editor.isDestroyed) return;
+  const scroller = editor.view.dom.closest<HTMLElement>(".visual-editor-scroll");
+  if (!scroller) return;
+  const bounds = scroller.getBoundingClientRect();
+  const coords = editor.view.coordsAtPos(range.from);
+  const height = coords.bottom - coords.top;
+  if (coords.top >= bounds.top && coords.bottom <= bounds.bottom) return;
+  scroller.scrollTop += coords.top - bounds.top - Math.max(0, (bounds.height - height) / 2);
+}
+
 export function setFindHighlight(editor: Editor, query: string, current: number): void {
   if (editor.isDestroyed) return;
   editor.view.dispatch(
