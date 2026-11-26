@@ -4527,8 +4527,9 @@
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.longTable`, or reproduce by hand at 1280x800: open http://localhost:1420, click 'New document', press Ctrl+A then Backspace, put a 61-row HTML table on the clipboard (`<table><thead><tr><th>Name</th><th>Value</th><th>Notes</th></tr></thead><tbody>` followed by 60 rows whose cells are `Row N alpha`, `Row N beta content`, `Row N gamma content`) and press Ctrl+V. The status bar reads 663 words / 4 pages and the editor contains one 61-row table, but the page audit of its 183 text line boxes finds 15 lines above a page's 96px top margin, 21 lines below the 96px bottom margin, and 3 line boxes crossing a page rule: on page 3 the box 3368-3383px runs through `Row 56 alpha`, `Row 56 beta content` and `Row 56 gamma content` at the rule at y=3369.\nActual: The pagination pass only adjusts top-level P, H1-H3, UL, OL and BLOCKQUOTE blocks. ProseMirror wraps the table in a DIV, which is skipped, so the whole table is left as one continuous flow: 36 lines end up inside page margins and Row 56 is drawn across the page boundary.",
       "source": "explore:long-document:a table taller than a page is never paginated: page rules cut through rows and rows sit in the margins",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T18:04:42Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T18:04:42Z",
+      "lastAttemptAt": "2026-11-26T18:04:42Z"
     },
     {
       "id": "qa-285",
