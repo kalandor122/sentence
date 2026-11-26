@@ -143,3 +143,20 @@ export function pageBreakFill(top: number, height: number, geometry: PageGeometr
   const nextPageTop = (pageIndex + 1) * geometry.height + geometry.margin;
   return Math.max(0, Math.round(nextPageTop - top - height));
 }
+
+// The sheet is scaled from its top, so changing the zoom has to rescale the
+// scroll offset with it: the document point under the viewport centre stays
+// there instead of drifting, and the new offset is clamped to the scaled scroll
+// range so zooming out at the end cannot leave the viewport past the sheet.
+export function scrollTopForZoom(
+  scrollTop: number,
+  viewportHeight: number,
+  paddingTop: number,
+  previousZoom: number,
+  zoom: number,
+  maxScrollTop: number,
+): number {
+  const anchor = (scrollTop + viewportHeight / 2 - paddingTop) / previousZoom;
+  const target = paddingTop + anchor * zoom - viewportHeight / 2;
+  return Math.max(0, Math.min(maxScrollTop, target));
+}

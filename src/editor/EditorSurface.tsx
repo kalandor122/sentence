@@ -34,6 +34,7 @@ import {
   pageGeometry,
   pageLineGaps,
   pageRowShifts,
+  scrollTopForZoom,
 } from "./pagination";
 import { RevisionMarks, setRevisionMarks } from "./revisions";
 import {
@@ -374,11 +375,13 @@ export default function EditorSurface({
     previousZoomRef.current = zoom;
     if (!scroller || previousZoom === zoom) return;
     const paddingTop = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
-    const anchor = (scrollTopRef.current + scroller.clientHeight / 2 - paddingTop) / previousZoom;
-    const max = scroller.scrollHeight - scroller.clientHeight;
-    scroller.scrollTop = Math.max(
-      0,
-      Math.min(max, paddingTop + anchor * zoom - scroller.clientHeight / 2),
+    scroller.scrollTop = scrollTopForZoom(
+      scrollTopRef.current,
+      scroller.clientHeight,
+      paddingTop,
+      previousZoom,
+      zoom,
+      scroller.scrollHeight - scroller.clientHeight,
     );
     scrollTopRef.current = scroller.scrollTop;
   }, [zoom]);
