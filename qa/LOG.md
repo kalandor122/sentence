@@ -809,3 +809,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T15:49:40Z START qa-254 on qa/qa-254-escape-does-not-leave-the-latex-source-e: Escape does not leave the LaTeX source editor, contradicting the status-bar hint
 2026-11-26T15:51:20Z PUSHED main
 2026-11-26T15:51:20Z DONE qa-254 (tsc -b, npm test, smoke all green)
+2026-11-26T15:52:00Z START qa-255 on qa/qa-255-the-latex-source-textarea-has-no-visible: The LaTeX source textarea has no visible focus outline
