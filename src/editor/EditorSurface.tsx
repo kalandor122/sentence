@@ -34,6 +34,7 @@ import {
   pageGeometry,
   pageLineGaps,
   pageRowShifts,
+  scrollLeftForZoom,
   scrollTopForZoom,
   scrollTopForZoomPoint,
 } from "./pagination";
@@ -360,6 +361,7 @@ export default function EditorSurface({
   const lastEmitted = useRef("");
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const scrollTopRef = useRef(0);
+  const scrollLeftRef = useRef(0);
   const previousZoomRef = useRef(zoom);
   const [pageCount, setPageCount] = useState(1);
   const geometry = pageGeometry(settings);
@@ -389,6 +391,8 @@ export default function EditorSurface({
   // Scaling happens around the top of the sheet, so the scroll position has to
   // be rescaled with it: otherwise zooming out at the end leaves the viewport
   // past the last page, and zooming in drifts away from the text being read.
+  // A page that is wider than the pane keeps its horizontal reading position
+  // the same way instead of snapping back to the left edge.
   useLayoutEffect(() => {
     const scroller = scrollRef.current;
     const previousZoom = previousZoomRef.current;
@@ -415,7 +419,14 @@ export default function EditorSurface({
           zoom,
           maxScrollTop,
         );
+    scroller.scrollLeft = scrollLeftForZoom(
+      scrollLeftRef.current,
+      previousZoom,
+      zoom,
+      scroller.scrollWidth - scroller.clientWidth,
+    );
     scrollTopRef.current = scroller.scrollTop;
+    scrollLeftRef.current = scroller.scrollLeft;
   }, [zoom]);
   const editor = useEditor({
     extensions: [
@@ -962,6 +973,7 @@ export default function EditorSurface({
       ref={scrollRef}
       onScroll={() => {
         scrollTopRef.current = scrollRef.current?.scrollTop ?? 0;
+        scrollLeftRef.current = scrollRef.current?.scrollLeft ?? 0;
       }}
     >
       <div className="paper-stage">

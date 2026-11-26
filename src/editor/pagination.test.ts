@@ -7,6 +7,7 @@ import {
   pageGeometry,
   pageLineGaps,
   pageRowShifts,
+  scrollLeftForZoom,
   scrollTopForZoom,
   scrollTopForZoomPoint,
 } from "./pagination";
@@ -80,6 +81,22 @@ describe("scrollTopForZoom", () => {
     const zoomedIn = scrollTopForZoom(5000, 627, 30, 1, 1.5, 30000);
     expect(zoomedIn).toBeCloseTo(7642, 0);
     expect(scrollTopForZoom(zoomedIn, 627, 30, 1.5, 1, 20000)).toBeCloseTo(5000, 6);
+  });
+});
+
+describe("scrollLeftForZoom", () => {
+  it("keeps a sideways-scrolled position proportional to the zoom", () => {
+    expect(scrollLeftForZoom(200, 1, 1.5, 400)).toBe(300);
+    expect(scrollLeftForZoom(300, 1.5, 0.7, 400)).toBeCloseTo(140, 6);
+  });
+
+  it("leaves the page at its left edge when it was not scrolled", () => {
+    expect(scrollLeftForZoom(0, 1, 1.5, 400)).toBe(0);
+  });
+
+  it("clamps to the new horizontal range", () => {
+    expect(scrollLeftForZoom(200, 1.5, 1, 0)).toBe(0);
+    expect(scrollLeftForZoom(200, 1, 2, 300)).toBe(300);
   });
 });
 
