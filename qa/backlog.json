@@ -4406,10 +4406,11 @@
       ],
       "hint": "Repro: Create a project. Type `NoEditCite ` and insert a citation with key `sentence2026` via References > Insert citation > Enter a key manually. Click the `[sentence2026]` atom, double-click it, then press Enter, then press Ctrl+K. Repeat with a cross-reference inserted with label `fig:noedit`.\nActual: Clicking selects the atom but no editor opens: `afterDoubleClick` and `afterEnter` report `{open:false}` for both atoms, and the nodes keep their old keys/labels. Ctrl+K opens the unrelated `Add link` dialog instead of editing the citation/reference. In the visual editor the only way to change either is Backspace/Delete and insert a new one (editing the LaTeX source also works, but the visual document then has to be re-synchronised).",
       "source": "explore:links-cites-footnotes:inserted citations and cross-references cannot be edited in the visual editor; they can only be deleted and reinserted",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T17:30:59Z",
-      "lastAttemptAt": "2026-11-26T17:30:59Z"
+      "lastAttemptAt": "2026-11-26T17:30:59Z",
+      "doneAt": "2026-11-26T17:35:09Z"
     },
     {
       "id": "qa-277",
@@ -4453,7 +4454,9 @@
       ],
       "hint": "Repro: 1. New document; Review tab > Track changes. 2. Wait 4.5 s for the 'Tracked changes is on.' toast to clear, then switch to the View (or Home) tab. 3. Inspect the ribbon, status bar and document, then start a new paragraph and type 'ZZIMMEDIATE with tracking on.' and inspect the text immediately, before 1.8 s have passed.\nActual: Outside the Review tab nothing indicates that tracking is on: the status bar has no tracking text, no visible control has an aria-pressed/title mentioning tracking, and the editor looks completely normal. Immediately after typing there are 0 .sentence-revision-insertion elements; the insertion marks appear only after the 1.8 s revision debounce (they are present after 2.4 s).",
       "source": "explore:review:track changes has no live feedback: no persistent indicator and no insertion marks while typing",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T17:35:50Z"
     },
     {
       "id": "qa-280",
