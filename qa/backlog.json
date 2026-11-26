@@ -4120,7 +4120,9 @@
       ],
       "hint": "Repro: Select some text, go to the Home tab, focus \"Text color\", press ArrowDown twice (No color then Black) and Enter. The text turns black and focus returns to the editor. Reopen the palette with ArrowDown: none of the ten swatches has aria-checked or aria-selected, and the trigger is still named only \"Text color\" with no value or aria-valuetext. The applied colour is conveyed only by the CSS colour bar under the icon.\nActual: Probe data after applying Black: trigger {label:\"Text color\", value:null, expanded:\"true\"}; every swatch has checked:null and selected:null, including Black.",
       "source": "explore:keyboard:colour palettes never expose the applied text colour",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T16:50:29Z"
     },
     {
       "id": "qa-259",
@@ -4412,10 +4414,11 @@
       ],
       "hint": "Repro: 1. New document; Review tab > Track changes. 2. At the end of the document type 'ZZREJECTUNDO rejected.' and wait 2.5 s. 3. Open History and click Reject; the words disappear. 4. On the Review tab click 'Tracking on' to turn tracking off. 5. Click into the document and press Ctrl+Z. 6. For the accept case, repeat the same steps with 'ZZACCEPTUNDO accepted.' but click Accept in History.\nActual: After Reject + Ctrl+Z the rejected sentence 'ZZREJECTUNDO rejected.' reappears in the document while History still shows 0 tracked changes; after a reload the rejected words are still there and History is still empty. After Accept + Ctrl+Z the accepted sentence 'ZZACCEPTUNDO accepted.' disappears, History shows 0 changes, and it stays gone after a reload.",
       "source": "explore:review:ctrl+z after accept or reject silently reverses the review decision outside history",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T16:40:45Z",
-      "lastAttemptAt": "2026-11-26T16:40:45Z"
+      "lastAttemptAt": "2026-11-26T16:40:45Z",
+      "doneAt": "2026-11-26T16:49:47Z"
     },
     {
       "id": "qa-279",
