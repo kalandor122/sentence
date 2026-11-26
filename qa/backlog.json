@@ -4391,8 +4391,9 @@
       "hint": "Repro: Create a project. Type `TildeCite ` at the end, open References > Insert citation > Enter a key manually, enter `a~b` and click Insert: the dialog accepts it and the visual editor shows `[a~b]`. Repeat with References > Cross-reference, label `fig~one`: it is accepted and shows `ref: fig~one`. Open View > LaTeX. Then compile the exported source (or a minimal article+hyperref document containing that line) with the bundled Tectonic engine.\nActual: Both values are accepted and exported verbatim as `TildeCite \\cite{a~b}` and `TildeRef \\ref{fig~one}`. Tectonic rejects either line with `! Missing \\endcsname inserted.` and produces no PDF, because ~ is an active character inside the \\csname lookup. The same dialogs do reject `a{b`/`fig}` with the special-characters error, so the validation list is incomplete.",
       "source": "explore:links-cites-footnotes:a citation key or cross-reference label containing ~ is accepted but makes the exported latex fail to compile",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T17:28:50Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T17:28:50Z",
+      "lastAttemptAt": "2026-11-26T17:28:50Z"
     },
     {
       "id": "qa-276",
