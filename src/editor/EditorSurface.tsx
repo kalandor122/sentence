@@ -69,6 +69,8 @@ interface EditorSurfaceProps {
   onCommentSelected: (markId: string) => void;
   onEditMath: (latex: string, display: boolean, environment: string) => void;
   onEditFootnote: (text: string, position: number) => void;
+  onEditCitation: (key: string, position: number) => void;
+  onEditCrossReference: (label: string, position: number) => void;
   onPageCountChange: (pages: number) => void;
 }
 
@@ -270,12 +272,43 @@ export default function EditorSurface({
   onCommentSelected,
   onEditMath,
   onEditFootnote,
+  onEditCitation,
+  onEditCrossReference,
   onPageCountChange,
 }: EditorSurfaceProps) {
   const editFootnoteRef = useRef(onEditFootnote);
   useEffect(() => {
     editFootnoteRef.current = onEditFootnote;
   }, [onEditFootnote]);
+  const editCitationRef = useRef(onEditCitation);
+  useEffect(() => {
+    editCitationRef.current = onEditCitation;
+  }, [onEditCitation]);
+  const editCrossReferenceRef = useRef(onEditCrossReference);
+  useEffect(() => {
+    editCrossReferenceRef.current = onEditCrossReference;
+  }, [onEditCrossReference]);
+  // Citations, cross-references and notes are atoms with no text to type over,
+  // so they are corrected in their dialog rather than replaced by a keystroke.
+  const editAtom = (view: Editor["view"], element: HTMLElement): boolean => {
+    const position = view.posAtDOM(element, 0);
+    const node = view.state.doc.nodeAt(position);
+    if (!node) return false;
+    const { attrs } = node;
+    if (node.type.name === "footnote") {
+      editFootnoteRef.current(typeof attrs.text === "string" ? attrs.text : "", position);
+      return true;
+    }
+    if (node.type.name === "citation") {
+      editCitationRef.current(typeof attrs.key === "string" ? attrs.key : "", position);
+      return true;
+    }
+    if (node.type.name === "crossReference") {
+      editCrossReferenceRef.current(typeof attrs.label === "string" ? attrs.label : "", position);
+      return true;
+    }
+    return false;
+  };
   const firstNode = document.content[0];
   const repeatsTitle =
     firstNode?.type === "heading" &&
@@ -359,18 +392,15 @@ export default function EditorSurface({
         }
         return false;
       },
-      // Editing a note mirrors math: the atom itself is not editable in place,
-      // so double-clicking its marker opens the note for correction. Typing
-      // while the atom is selected would otherwise replace the note with text.
+      // Editing a note, citation or cross-reference mirrors math: the atom
+      // itself is not editable in place, so double-clicking its marker opens it
+      // for correction. Typing while the atom is selected would otherwise
+      // replace the reference with text.
       handleDoubleClick(view, _position, event) {
         const target = event.target as HTMLElement;
-        const marker = target.closest<HTMLElement>("[data-footnote]");
+        const marker = target.closest<HTMLElement>("[data-footnote],[data-citation],[data-cross-reference]");
         if (!marker) return false;
-        const position = view.posAtDOM(marker, 0);
-        const node = view.state.doc.nodeAt(position);
-        if (node?.type.name !== "footnote") return false;
-        editFootnoteRef.current(typeof node.attrs.text === "string" ? node.attrs.text : "", position);
-        return true;
+        return editAtom(view, marker);
       },
       // A citation, cross-reference or footnote marker is an atom, so clicking
       // it selects the whole node and the next keystroke would replace it with
@@ -404,9 +434,19 @@ export default function EditorSurface({
           );
           return true;
         }
-        if (name !== "footnote") return false;
+        if (name !== "footnote" && name !== "citation" && name !== "crossReference") return false;
         event.preventDefault();
-        const text = selection.node.attrs.text;
+        if (name === "citation") {
+          const key = attrs.key;
+          editCitationRef.current(typeof key === "string" ? key : "", selection.from);
+          return true;
+        }
+        if (name === "crossReference") {
+          const label = attrs.label;
+          editCrossReferenceRef.current(typeof label === "string" ? label : "", selection.from);
+          return true;
+        }
+        const text = attrs.text;
         editFootnoteRef.current(typeof text === "string" ? text : "", selection.from);
         return true;
       },

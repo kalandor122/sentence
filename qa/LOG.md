@@ -845,3 +845,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T17:28:50Z START qa-275 on qa/qa-275-a-citation-key-or-cross-reference-label: A citation key or cross-reference label containing ~ is accepted but makes the exported LaTeX fail to compile
 2026-11-26T17:30:20Z PUSHED main
 2026-11-26T17:30:20Z DONE qa-275 (tsc -b, npm test, smoke all green)
+2026-11-26T17:30:59Z START qa-276 on qa/qa-276-inserted-citations-and-cross-references: Inserted citations and cross-references cannot be edited in the visual editor; they can only be deleted and reinserted
