@@ -1297,6 +1297,49 @@ describe("LaTeX generation", () => {
     expect(exported).not.toContain("textbackslash");
   });
 
+  it("keeps a Shift+Enter line break inside a table cell", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableHeader",
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [
+                        { type: "text", text: "one" },
+                        { type: "hardBreak" },
+                        { type: "text", text: "two" },
+                      ],
+                    },
+                  ],
+                },
+                { type: "tableHeader", content: [{ type: "paragraph" }] },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    // A bare \\ here would end the tabular row instead of breaking the line.
+    expect(latex).toContain("\\shortstack[l]{one\\\\two} &  \\\\");
+    const parsed = latexToDocument(latex, settings).document;
+    const table = parsed.content[0];
+    expect(table?.content).toHaveLength(1);
+    expect(table?.content?.[0]?.content).toHaveLength(2);
+    expect(
+      table?.content?.[0]?.content?.[0]?.content?.[0]?.content?.map((node) => node.type),
+    ).toEqual(["text", "hardBreak", "text"]);
+    expect(documentToLatex(parsed, settings)).toContain("\\shortstack[l]{one\\\\two}");
+  });
+
   it("imports a single-row tabular that has no row break at all", () => {
     const source = [
       "\\begin{document}",

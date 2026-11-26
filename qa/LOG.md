@@ -793,3 +793,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T14:52:40Z START qa-267 on qa/qa-267-column-resizing-stops-working-and-throws: Column resizing stops working and throws a TypeError on a table with a caption
 2026-11-26T14:58:13Z PUSHED main
 2026-11-26T14:58:13Z DONE qa-267 (tsc -b, npm test, smoke all green)
+2026-11-26T14:58:52Z START qa-268 on qa/qa-268-shift-enter-in-a-table-cell-exports-a-ro: Shift+Enter in a table cell exports a row terminator, so the cell is split into two rows in the PDF

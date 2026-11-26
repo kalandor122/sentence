@@ -390,23 +390,31 @@ function tableCellSpan(cell: DocumentNode): number {
   return Number.isFinite(span) && span > 1 ? Math.floor(span) : 1;
 }
 
+function containsHardBreak(node: DocumentNode): boolean {
+  return (node.content ?? []).some(
+    (child) => child.type === "hardBreak" || containsHardBreak(child),
+  );
+}
+
 function tableCellToLatex(
   cell: DocumentNode,
   columnAlign: LatexColumnAlign,
   settings: ProjectSettings,
 ): string {
   const children = cell.content ?? [];
-  // A figure cannot float inside a tabular cell, so a block image is written as
-  // an inline graphic that stays in its own cell.
+  const align = cellAlign(cell);
+  // `\\` ends the tabular row, so a Shift+Enter line break cannot be written
+  // inside a cell that way. A \shortstack stacks the lines within the cell and
+  // is valid in an l, c or r column, so the break stays where the page shows it.
   const body = children
     .map((child) => {
       if (child.type === "image") return imageInCellToLatex(child, settings);
       if (child.type === "mathBlock") return mathBlockInCellToLatex(child);
-      return inlineContent([child], settings);
+      const inline = inlineContent([child], settings);
+      return containsHardBreak(child) ? `\\shortstack[${align}]{${inline}}` : inline;
     })
     .filter(Boolean)
     .join("\\par ");
-  const align = cellAlign(cell);
   const span = tableCellSpan(cell);
   if (span > 1) return `\\multicolumn{${span}}{${align}}{${body}}`;
   return align === columnAlign ? body : `\\multicolumn{1}{${align}}{${body}}`;
@@ -1540,6 +1548,14 @@ function tableCellParagraphToNode(paragraph: string): DocumentNode {
         caption: captionText,
       },
     };
+  }
+  // A line break in a cell is exported as a \shortstack, so read the stack
+  // back as the paragraph's own line breaks instead of literal text.
+  const shortstack = paragraph
+    .trim()
+    .match(/^\\shortstack(?:\[[lcr]\])?\{([\s\S]*)\}$/);
+  if (shortstack) {
+    return { type: "paragraph", content: parseInline(shortstack[1]).content };
   }
   const content = parseInline(paragraph.trim()).content;
   const only = content.length === 1 ? content[0] : undefined;
