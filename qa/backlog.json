@@ -4105,8 +4105,9 @@
       "hint": "Repro: On the Home ribbon tab inspect the Undo (Ctrl+Z), Redo (Ctrl+Y), Increase indent (Ctrl+]) and Decrease indent (Ctrl+[) buttons. Each is a one-shot action but carries aria-pressed=\"false\", which makes the accessibility tree expose it as a toggle button in the not-pressed state. Bold, Italic and the list buttons are genuine toggles and use the same attribute legitimately, so the distinction is lost.\nActual: Probe read [{\"label\":\"Undo (Ctrl+Z)\",\"pressed\":\"false\"},{\"label\":\"Redo (Ctrl+Y)\",\"pressed\":\"false\"},{\"label\":\"Increase indent (Ctrl+])\",\"pressed\":\"false\"},{\"label\":\"Decrease indent (Ctrl+[)\",\"pressed\":\"false\"}] even though these are one-shot actions.",
       "source": "explore:keyboard:undo, redo and the indent buttons are announced as toggle buttons with aria-pressed=false",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T15:55:56Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T15:55:56Z",
+      "lastAttemptAt": "2026-11-26T15:55:56Z"
     },
     {
       "id": "qa-258",
