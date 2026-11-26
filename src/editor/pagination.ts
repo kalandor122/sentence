@@ -102,6 +102,40 @@ export function pageLineGaps(
   return gaps;
 }
 
+export interface RowShift {
+  row: number;
+  shift: number;
+}
+
+// A table taller than a page is split between rows: the row that would cross a
+// page's bottom margin starts at the top margin of the next page, so the rule
+// falls in blank cell space instead of across the row's text. The
+// shift is padding inside the row's cells, so the row keeps its place in the
+// model and the text after it moves with it. `rows` are unscaled sheet
+// coordinates of the row border boxes.
+export function pageRowShifts(rows: LineSpan[], geometry: PageGeometry): RowShift[] {
+  const shifts: RowShift[] = [];
+  let shift = 0;
+  for (let index = 0; index < rows.length; index += 1) {
+    const top = rows[index].top + shift;
+    const bottom = rows[index].bottom + shift;
+    // A row taller than the text area cannot fit any page, so shifting it
+    // would only repeat on every pass.
+    if (bottom - top > geometry.contentHeight) continue;
+    const pageTop = Math.floor(Math.max(0, top) / geometry.height) * geometry.height;
+    const topMargin = pageTop + geometry.margin;
+    const bottomMargin = pageTop + geometry.height - geometry.margin;
+    let needed = 0;
+    if (top < topMargin) needed = topMargin - top;
+    else if (bottom > bottomMargin) needed = pageTop + geometry.height + geometry.margin - top;
+    if (needed <= 0.5) continue;
+    const height = Math.ceil(needed);
+    shifts.push({ row: index, shift: height });
+    shift += height;
+  }
+  return shifts;
+}
+
 // An explicit break fills the rest of its page so the following block starts at
 // the top margin of the next one. `top` and `height` are unscaled layout pixels.
 export function pageBreakFill(top: number, height: number, geometry: PageGeometry): number {

@@ -33,6 +33,7 @@ import {
   pageCountFromBottom,
   pageGeometry,
   pageLineGaps,
+  pageRowShifts,
 } from "./pagination";
 import { RevisionMarks, setRevisionMarks } from "./revisions";
 import {
@@ -181,6 +182,15 @@ function offsetWithin(element: HTMLElement, ancestor: HTMLElement): number {
     node = node.offsetParent as HTMLElement | null;
   }
   return top;
+}
+
+// A table row moved down so it starts inside the next page's text area. `base`
+// is the cell's own top padding, which the page shift is added to.
+interface RowSnap {
+  shift: number;
+  base: number;
+  section: string;
+  row: number;
 }
 
 interface TextLine {
@@ -564,6 +574,9 @@ export default function EditorSurface({
     const snapSelector = `.sentence-editor[${snapScope}]`;
     const basePadding = new Map<number, number>();
     const snapShifts = new Map<number, number>();
+    // Row padding that starts a table row on the next page. Keyed by the table
+    // wrapper's child index, then by the row's index among its section's rows.
+    const tableShifts = new Map<number, Map<number, RowSnap>>();
     // Picture heights in layout pixels, lowered so a captioned figure still
     // fits one page's text area and can be moved as a unit.
     const imageCaps = new Map<number, number>();
@@ -577,12 +590,19 @@ export default function EditorSurface({
           ([index, cap]) =>
             `${snapSelector} > :nth-child(${index + 1}) img { max-height: ${cap}px; }`,
         ),
+        ...Array.from(tableShifts).flatMap(([index, rows]) =>
+          Array.from(rows.values()).map(
+            (row) =>
+              `${snapSelector} > :nth-child(${index + 1}) ${row.section} > tr:nth-child(${row.row + 1}) > * { padding-top: ${row.base + row.shift}px; }`,
+          ),
+        ),
       ].join("\n");
     };
     const resetSnap = () => {
       basePadding.clear();
       snapShifts.clear();
       imageCaps.clear();
+      tableShifts.clear();
       snapStyle.textContent = "";
     };
     const snapBlock = (block: HTMLElement, index: number, shift: number) => {
@@ -591,6 +611,55 @@ export default function EditorSurface({
       }
       snapShifts.set(index, (snapShifts.get(index) ?? 0) + shift);
       applySnap();
+    };
+    // ProseMirror's table node view wraps the table in a DIV, so a table taller
+    // than a page is not a text block that could be moved or split by line. Pad
+    // the rows that would cross a page edge instead, which keeps every row's
+    // text inside its page and the rule in the blank space above the row.
+    const snapTableRows = (block: HTMLElement, index: number) => {
+      const table = block.querySelector("table");
+      if (!table) return false;
+      const rows = Array.from(table.querySelectorAll("tr")) as HTMLElement[];
+      if (rows.length === 0) return false;
+      const sheetRect = sheet.getBoundingClientRect();
+      const zoom = sheet.offsetHeight ? sheetRect.height / sheet.offsetHeight : 1;
+      const planned = pageRowShifts(
+        rows.map((row) => {
+          const rect = row.getBoundingClientRect();
+          return {
+            top: (rect.top - sheetRect.top) / zoom,
+            bottom: (rect.bottom - sheetRect.top) / zoom,
+          };
+        }),
+        geometry,
+      );
+      if (planned.length === 0) return false;
+      let shifted = false;
+      for (const { row, shift } of planned) {
+        const element = rows[row];
+        const section = element.parentElement;
+        const cell = element.firstElementChild as HTMLElement | null;
+        if (!section || !cell) continue;
+        let snaps = tableShifts.get(index);
+        if (!snaps) {
+          snaps = new Map();
+          tableShifts.set(index, snaps);
+        }
+        const existing = snaps.get(row);
+        if (existing) {
+          existing.shift += shift;
+        } else {
+          snaps.set(row, {
+            shift,
+            base: parseFloat(getComputedStyle(cell).paddingTop) || 0,
+            section: section.tagName.toLowerCase(),
+            row: Array.from(section.children).indexOf(element),
+          });
+        }
+        shifted = true;
+      }
+      if (shifted) applySnap();
+      return shifted;
     };
     const snapToPages = () => {
       resetSnap();
@@ -673,6 +742,15 @@ export default function EditorSurface({
           gapsApplied = true;
         }
         let moved = false;
+        // Tables are wrapped in a DIV by ProseMirror's table node view, so they
+        // are not split by line gaps: move their rows to the next page instead.
+        for (let index = 0; index < blocks.length; index += 1) {
+          const block = blocks[index];
+          if (!(block instanceof HTMLElement) || block.hasAttribute("data-page-break")) continue;
+          if (block.offsetHeight <= geometry.contentHeight) continue;
+          if (snapTableRows(block, index)) moved = true;
+        }
+        if (moved) break;
         for (let index = 0; index < blocks.length; index += 1) {
           const block = blocks[index];
           if (!(block instanceof HTMLElement) || block.hasAttribute("data-page-break")) continue;

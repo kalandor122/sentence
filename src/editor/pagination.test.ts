@@ -6,6 +6,7 @@ import {
   pageCountFromBottom,
   pageGeometry,
   pageLineGaps,
+  pageRowShifts,
 } from "./pagination";
 
 describe("pageGeometry", () => {
@@ -94,6 +95,31 @@ describe("pageLineGaps", () => {
       );
     });
     expect(gapIndex).toBe(gaps.length);
+  });
+
+  it("starts the row crossing a page edge at the next page's top margin", () => {
+    const geometry = pageGeometry(DEFAULT_SETTINGS);
+    const rows = Array.from({ length: 120 }, (_, index) => ({
+      top: geometry.margin + index * 36,
+      bottom: geometry.margin + index * 36 + 36,
+    }));
+    const shifts = pageRowShifts(rows, geometry);
+    expect(shifts.length).toBeGreaterThan(1);
+
+    let shift = 0;
+    let shiftIndex = 0;
+    rows.forEach((row, index) => {
+      if (shiftIndex < shifts.length && shifts[shiftIndex].row === index) {
+        shift += shifts[shiftIndex].shift;
+        shiftIndex += 1;
+      }
+      const top = row.top + shift;
+      const bottom = row.bottom + shift;
+      const pageTop = Math.floor(top / geometry.height) * geometry.height;
+      expect(top).toBeGreaterThanOrEqual(pageTop + geometry.margin);
+      expect(bottom).toBeLessThanOrEqual(pageTop + geometry.height - geometry.margin);
+    });
+    expect(shiftIndex).toBe(shifts.length);
   });
 
   it("moves trailing lines out of a bottom margin even before the next page edge", () => {
