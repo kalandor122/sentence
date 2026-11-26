@@ -4397,8 +4397,9 @@
       "hint": "Repro: 1. Open http://localhost:1420 in a fresh browser profile and click New document. 2. On the Review tab click Track changes. 3. Select the phrase 'A sentence is not ' at the start of the first body paragraph, choose New comment, enter 'ZZSTRUCTCOMMENT' and submit. 4. Click at the very start of that same paragraph (immediately before 'A sentence...') and press Backspace so the paragraph merges into the 'Introduction' heading above it. 5. Wait 2.5 s until History shows one tracked change. 6. Open Review in the sidebar and click Delete comment on 'ZZSTRUCTCOMMENT'. 7. Open History and click Reject on the tracked change.\nActual: The merge is only partly undone. The heading keeps the body text and the paragraph is restored too, so the text is duplicated: the document starts 'IntroductionA sentence is not ' followed by a blank line and the full 'A sentence is not merely a container for information...' paragraph ('A sentence is not ' occurs twice instead of once). The deleted comment's highlight ('A sentence is not ') also reappears in the document with no thread in the Comments panel, and both the duplicated text and the threadless highlight are still present after a reload. At this point there are 0 inline revision decorations and 0 History cards, so the app reports a clean review state.",
       "source": "explore:review:rejecting a tracked paragraph merge after deleting its comment corrupts the text and resurrects the deleted highlight",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T16:29:40Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T16:29:40Z",
+      "lastAttemptAt": "2026-11-26T16:29:40Z"
     },
     {
       "id": "qa-278",
