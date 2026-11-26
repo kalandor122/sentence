@@ -4104,10 +4104,11 @@
       ],
       "hint": "Repro: On the Home ribbon tab inspect the Undo (Ctrl+Z), Redo (Ctrl+Y), Increase indent (Ctrl+]) and Decrease indent (Ctrl+[) buttons. Each is a one-shot action but carries aria-pressed=\"false\", which makes the accessibility tree expose it as a toggle button in the not-pressed state. Bold, Italic and the list buttons are genuine toggles and use the same attribute legitimately, so the distinction is lost.\nActual: Probe read [{\"label\":\"Undo (Ctrl+Z)\",\"pressed\":\"false\"},{\"label\":\"Redo (Ctrl+Y)\",\"pressed\":\"false\"},{\"label\":\"Increase indent (Ctrl+])\",\"pressed\":\"false\"},{\"label\":\"Decrease indent (Ctrl+[)\",\"pressed\":\"false\"}] even though these are one-shot actions.",
       "source": "explore:keyboard:undo, redo and the indent buttons are announced as toggle buttons with aria-pressed=false",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T15:55:56Z",
-      "lastAttemptAt": "2026-11-26T15:55:56Z"
+      "lastAttemptAt": "2026-11-26T15:55:56Z",
+      "doneAt": "2026-11-26T15:57:17Z"
     },
     {
       "id": "qa-258",
@@ -4383,6 +4384,56 @@
       ],
       "hint": "Repro: Create a project. Type `NoEditCite ` and insert a citation with key `sentence2026` via References > Insert citation > Enter a key manually. Click the `[sentence2026]` atom, double-click it, then press Enter, then press Ctrl+K. Repeat with a cross-reference inserted with label `fig:noedit`.\nActual: Clicking selects the atom but no editor opens: `afterDoubleClick` and `afterEnter` report `{open:false}` for both atoms, and the nodes keep their old keys/labels. Ctrl+K opens the unrelated `Add link` dialog instead of editing the citation/reference. In the visual editor the only way to change either is Backspace/Delete and insert a new one (editing the LaTeX source also works, but the visual document then has to be re-synchronised).",
       "source": "explore:links-cites-footnotes:inserted citations and cross-references cannot be edited in the visual editor; they can only be deleted and reinserted",
+      "status": "open"
+    },
+    {
+      "id": "qa-277",
+      "title": "Rejecting a tracked paragraph merge after deleting its comment corrupts the text and resurrects the deleted highlight",
+      "why": "Exploratory pass on review (functional): expected Rejecting the change restores the original two blocks: the 'Introduction' heading followed by the untouched paragraph. The deleted comment stays deleted and its highlight does not come back.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open http://localhost:1420 in a fresh browser profile and click New document. 2. On the Review tab click Track changes. 3. Select the phrase 'A sentence is not ' at the start of the first body paragraph, choose New comment, enter 'ZZSTRUCTCOMMENT' and submit. 4. Click at the very start of that same paragraph (immediately before 'A sentence...') and press Backspace so the paragraph merges into the 'Introduction' heading above it. 5. Wait 2.5 s until History shows one tracked change. 6. Open Review in the sidebar and click Delete comment on 'ZZSTRUCTCOMMENT'. 7. Open History and click Reject on the tracked change.\nActual: The merge is only partly undone. The heading keeps the body text and the paragraph is restored too, so the text is duplicated: the document starts 'IntroductionA sentence is not ' followed by a blank line and the full 'A sentence is not merely a container for information...' paragraph ('A sentence is not ' occurs twice instead of once). The deleted comment's highlight ('A sentence is not ') also reappears in the document with no thread in the Comments panel, and both the duplicated text and the threadless highlight are still present after a reload. At this point there are 0 inline revision decorations and 0 History cards, so the app reports a clean review state.",
+      "source": "explore:review:rejecting a tracked paragraph merge after deleting its comment corrupts the text and resurrects the deleted highlight",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T16:29:40Z"
+    },
+    {
+      "id": "qa-278",
+      "title": "Ctrl+Z after Accept or Reject silently reverses the review decision outside History",
+      "why": "Exploratory pass on review (functional): expected Ctrl+Z must not put the review state and the document out of sync: rejected text must not return behind an empty History, and accepted text must not disappear without a tracked change. Undoing a review decision should bring the pending change back into History.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. New document; Review tab > Track changes. 2. At the end of the document type 'ZZREJECTUNDO rejected.' and wait 2.5 s. 3. Open History and click Reject; the words disappear. 4. On the Review tab click 'Tracking on' to turn tracking off. 5. Click into the document and press Ctrl+Z. 6. For the accept case, repeat the same steps with 'ZZACCEPTUNDO accepted.' but click Accept in History.\nActual: After Reject + Ctrl+Z the rejected sentence 'ZZREJECTUNDO rejected.' reappears in the document while History still shows 0 tracked changes; after a reload the rejected words are still there and History is still empty. After Accept + Ctrl+Z the accepted sentence 'ZZACCEPTUNDO accepted.' disappears, History shows 0 changes, and it stays gone after a reload.",
+      "source": "explore:review:ctrl+z after accept or reject silently reverses the review decision outside history",
+      "status": "open"
+    },
+    {
+      "id": "qa-279",
+      "title": "Track changes has no live feedback: no persistent indicator and no insertion marks while typing",
+      "why": "Exploratory pass on review (ux): expected While tracking is on, a persistent indicator (status bar or tab) shows it on every ribbon tab, and newly typed text is visibly marked as a tracked insertion as it is typed.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. New document; Review tab > Track changes. 2. Wait 4.5 s for the 'Tracked changes is on.' toast to clear, then switch to the View (or Home) tab. 3. Inspect the ribbon, status bar and document, then start a new paragraph and type 'ZZIMMEDIATE with tracking on.' and inspect the text immediately, before 1.8 s have passed.\nActual: Outside the Review tab nothing indicates that tracking is on: the status bar has no tracking text, no visible control has an aria-pressed/title mentioning tracking, and the editor looks completely normal. Immediately after typing there are 0 .sentence-revision-insertion elements; the insertion marks appear only after the 1.8 s revision debounce (they are present after 2.4 s).",
+      "source": "explore:review:track changes has no live feedback: no persistent indicator and no insertion marks while typing",
+      "status": "open"
+    },
+    {
+      "id": "qa-280",
+      "title": "Multi-line comment and reply bodies lose their line breaks when displayed",
+      "why": "Exploratory pass on review (visual): expected The two lines stay two lines in the comment card and in the reply, as typed into the multi-line fields.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. New document. 2. Select some text and add a comment with a two-line body: 'First line of the comment.' newline 'Second line of the comment.' 3. Inspect the comment card in the Review panel. 4. Click Reply, submit 'Reply line one.' newline 'Reply line two.', and inspect the reply.\nActual: Both are rendered as a single line: the card shows 'First line of the comment. Second line of the comment.' and the reply shows 'Reply line one. Reply line two.' The stored text still contains the newline (textContent includes \\n), but the computed white-space is 'normal' for .comment-thread > p and .comment-reply p, so the line break collapses.",
+      "source": "explore:review:multi-line comment and reply bodies lose their line breaks when displayed",
       "status": "open"
     }
   ]
