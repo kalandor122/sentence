@@ -6,6 +6,7 @@ interface StatusBarProps {
   pages: number;
   mode: EditorMode;
   branch: string;
+  tracking: boolean;
   zoom: number;
   compileState: "idle" | "compiling" | "success" | "error";
   onZoomChange: (zoom: number) => void;
@@ -23,6 +24,7 @@ export default function StatusBar({
   pages,
   mode,
   branch,
+  tracking,
   zoom,
   compileState,
   onZoomChange,
@@ -33,6 +35,11 @@ export default function StatusBar({
       <span>{words.toLocaleString()} words</span>
       <span>{pages} {pages === 1 ? "page" : "pages"}</span>
       <span>English (US)</span>
+      {tracking ? (
+        <span className="status-tracking" role="status" title="New edits are recorded as tracked changes">
+          Track changes on
+        </span>
+      ) : null}
       <span className={`compile-status ${compileState}`}>
         {compileState === "compiling" ? "Typesetting" : compileState === "success" ? <><Check size={12} /> PDF up to date</> : compileState === "error" ? "Compilation error" : "PDF not built"}
       </span>

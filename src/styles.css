@@ -3379,6 +3379,11 @@ button:disabled {
   gap: 4px;
 }
 
+.status-tracking {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .compile-status.success {
   color: #3d7052;
 }

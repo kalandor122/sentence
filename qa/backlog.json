@@ -4455,8 +4455,9 @@
       "hint": "Repro: 1. New document; Review tab > Track changes. 2. Wait 4.5 s for the 'Tracked changes is on.' toast to clear, then switch to the View (or Home) tab. 3. Inspect the ribbon, status bar and document, then start a new paragraph and type 'ZZIMMEDIATE with tracking on.' and inspect the text immediately, before 1.8 s have passed.\nActual: Outside the Review tab nothing indicates that tracking is on: the status bar has no tracking text, no visible control has an aria-pressed/title mentioning tracking, and the editor looks completely normal. Immediately after typing there are 0 .sentence-revision-insertion elements; the insertion marks appear only after the 1.8 s revision debounce (they are present after 2.4 s).",
       "source": "explore:review:track changes has no live feedback: no persistent indicator and no insertion marks while typing",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T17:35:50Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T17:35:50Z",
+      "lastAttemptAt": "2026-11-26T17:35:50Z"
     },
     {
       "id": "qa-280",
