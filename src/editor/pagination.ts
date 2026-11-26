@@ -160,3 +160,26 @@ export function scrollTopForZoom(
   const target = paddingTop + anchor * zoom - viewportHeight / 2;
   return Math.max(0, Math.min(maxScrollTop, target));
 }
+
+// Centre-anchoring alone loses the caret when it sits below the middle of the
+// viewport (at the end of a document, for example): scaling its distance from
+// the centre can push it off-screen. When the caret was visible before the
+// zoom, hold its exact screen position instead and fall back to the viewport
+// centre only when it was already out of view. `pointTop` is the caret's
+// unscaled document offset from the top of the sheet.
+export function scrollTopForZoomPoint(
+  pointTop: number,
+  scrollTop: number,
+  viewportHeight: number,
+  paddingTop: number,
+  previousZoom: number,
+  zoom: number,
+  maxScrollTop: number,
+): number {
+  const previousScreen = pointTop * previousZoom + paddingTop - scrollTop;
+  if (previousScreen < 0 || previousScreen > viewportHeight) {
+    return scrollTopForZoom(scrollTop, viewportHeight, paddingTop, previousZoom, zoom, maxScrollTop);
+  }
+  const target = paddingTop + pointTop * zoom - previousScreen;
+  return Math.max(0, Math.min(maxScrollTop, target));
+}
