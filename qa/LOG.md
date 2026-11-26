@@ -852,3 +852,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T17:39:35Z PUSHED main
 2026-11-26T17:39:35Z DONE qa-279 (tsc -b, npm test, smoke all green)
 2026-11-26T17:40:15Z PROMOTED from roadmap: qa-283 Start screen: replace the remaining hard-coded colours with tokens
+2026-11-26T17:40:15Z START qa-280 on qa/qa-280-multi-line-comment-and-reply-bodies-lose: Multi-line comment and reply bodies lose their line breaks when displayed

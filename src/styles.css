@@ -2321,6 +2321,8 @@ button:disabled {
   color: #4d524b;
   font-size: 11px;
   line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .comment-detached {
@@ -2356,6 +2358,8 @@ button:disabled {
 .comment-reply p {
   margin: 4px 0 0;
   font-size: 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .comment-reply-toggle {
