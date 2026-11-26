@@ -966,6 +966,113 @@ function expandPreambleMacros(source: string, macros: Map<string, string>): stri
     .join("");
 }
 
+// Text-mode commands that print a word or character. Reading them as the text
+// they print keeps the visual document free of control sequences and stops the
+// exporter from escaping the leading backslash into \textbackslash{}.
+const LATEX_TEXT_COMMANDS: Record<string, string> = {
+  LaTeX: "LaTeX",
+  TeX: "TeX",
+  ldots: "\u2026",
+  dots: "\u2026",
+  textellipsis: "\u2026",
+  textemdash: "\u2014",
+  textendash: "\u2013",
+  textquoteleft: "\u2018",
+  textquoteright: "\u2019",
+  textquotedblleft: "\u201c",
+  textquotedblright: "\u201d",
+  copyright: "\u00a9",
+  textcopyright: "\u00a9",
+  textregistered: "\u00ae",
+  texttrademark: "\u2122",
+  textdegree: "\u00b0",
+  textmu: "\u00b5",
+  textbullet: "\u2022",
+  textdagger: "\u2020",
+  textdaggerdbl: "\u2021",
+  textperiodcentered: "\u00b7",
+  textsection: "\u00a7",
+  textparagraph: "\u00b6",
+  textunderscore: "_",
+  textless: "<",
+  textgreater: ">",
+  textbar: "|",
+  textbraceleft: "{",
+  textbraceright: "}",
+  S: "\u00a7",
+  P: "\u00b6",
+  ae: "\u00e6",
+  AE: "\u00c6",
+  oe: "\u0153",
+  OE: "\u0152",
+  aa: "\u00e5",
+  AA: "\u00c5",
+  o: "\u00f8",
+  O: "\u00d8",
+  ss: "\u00df",
+  l: "\u0142",
+  L: "\u0141",
+  i: "\u0131",
+  j: "\u0237",
+  pounds: "\u00a3",
+  textsterling: "\u00a3",
+  texteuro: "\u20ac",
+  textyen: "\u00a5",
+  textcent: "\u00a2",
+};
+
+// An accent is a combining mark in Unicode, so it applies to whatever base
+// character follows and NFC puts the pair back together as one letter.
+const LATEX_ACCENTS: Record<string, string> = {
+  "'": "\u0301",
+  "`": "\u0300",
+  "^": "\u0302",
+  '"': "\u0308",
+  "~": "\u0303",
+  "=": "\u0304",
+  ".": "\u0307",
+  u: "\u0306",
+  v: "\u030c",
+  H: "\u030b",
+  c: "\u0327",
+  k: "\u0328",
+  r: "\u030a",
+  b: "\u0331",
+  d: "\u0323",
+};
+
+function latexAccent(source: string, index: number): { text: string; end: number } | null {
+  const accent = source[index + 1];
+  const mark = LATEX_ACCENTS[accent];
+  if (!mark) return null;
+  let cursor = index + 2;
+  // `\v s` and `\c c` name the accent with a letter, so the space that ends the
+  // control word is not the argument and has to be skipped.
+  if (/[a-zA-Z]/.test(accent)) {
+    while (cursor < source.length && /[ \t]/.test(source[cursor])) cursor += 1;
+  }
+  let base: string;
+  if (source[cursor] === "{") {
+    const close = findMatchingBrace(source, cursor);
+    if (close < 0) return null;
+    base = source.slice(cursor + 1, close);
+    cursor = close + 1;
+  } else if (source.startsWith("\\i", cursor) && !/[a-zA-Z]/.test(source[cursor + 2] ?? "")) {
+    base = "\u0131";
+    cursor += 2;
+  } else if (source.startsWith("\\j", cursor) && !/[a-zA-Z]/.test(source[cursor + 2] ?? "")) {
+    base = "\u0237";
+    cursor += 2;
+  } else {
+    base = source[cursor] ?? "";
+    cursor += 1;
+  }
+  if (!base) return null;
+  if (base === "\\i") base = "\u0131";
+  if (base === "\\j") base = "\u0237";
+  return { text: (base + mark).normalize("NFC"), end: cursor };
+}
+
 function decodeLatexVerbatim(value: string): string {
   return value
     .replace(/\\csname @backslashchar\\endcsname ?/g, "\\")
@@ -1228,6 +1335,24 @@ function parseInline(source: string): InlineParseResult {
       content.push({ type: "hardBreak" });
       index += 2;
       continue;
+    }
+
+    if (source[index] === "\\") {
+      const accent = latexAccent(source, index);
+      if (accent) {
+        buffer += accent.text;
+        index = accent.end;
+        continue;
+      }
+      const commandMatch = remainder.match(/^\\([a-zA-Z]+)/);
+      const printed = commandMatch ? LATEX_TEXT_COMMANDS[commandMatch[1]] : undefined;
+      if (commandMatch && printed !== undefined) {
+        let cursor = index + commandMatch[0].length;
+        if (source.startsWith("{}", cursor)) cursor += 2;
+        buffer += printed;
+        index = cursor;
+        continue;
+      }
     }
 
     buffer += source[index];
