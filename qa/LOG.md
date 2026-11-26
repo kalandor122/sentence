@@ -787,3 +787,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T14:47:28Z START qa-271 on qa/qa-271-a-line-break-inside-inline-math-is-accep: A line break inside $...$ inline math is accepted but the formula is rewritten as literal dollars
 2026-11-26T14:49:06Z PUSHED main
 2026-11-26T14:49:06Z DONE qa-271 (tsc -b, npm test, smoke all green)
+2026-11-26T14:49:46Z START qa-265 on qa/qa-265-removing-the-bullet-from-a-nested-item-c: Removing the bullet from a nested item creates a second paragraph that the LaTeX merges into the parent item

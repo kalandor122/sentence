@@ -783,6 +783,49 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(parsed, settings)).toContain(nestedLatex);
   });
 
+  it("keeps two paragraphs of one list item as two paragraphs", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "bulletList",
+          content: [
+            {
+              type: "listItem",
+              content: [
+                { type: "paragraph", content: [{ type: "text", text: "outer" }] },
+                { type: "paragraph", content: [{ type: "text", text: "inner one" }] },
+                {
+                  type: "bulletList",
+                  content: [
+                    {
+                      type: "listItem",
+                      content: [
+                        { type: "paragraph", content: [{ type: "text", text: "inner two" }] },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    // A single newline is a space in LaTeX, so the paragraphs need a blank line
+    // between them or "outer" and "inner one" print as one paragraph.
+    expect(latex).toContain(
+      "\\begin{itemize}\n\\item outer\n\ninner one\n\\begin{itemize}\n\\item inner two\n\\end{itemize}\n\\end{itemize}",
+    );
+
+    const parsed = latexToDocument(latex, settings).document;
+    const item = parsed.content[0]?.content?.[0];
+    expect(item?.content?.map((child) => child.type)).toEqual(["paragraph", "paragraph", "bulletList"]);
+    expect(item?.content?.[1]?.content?.[0]?.text).toBe("inner one");
+    expect(documentToLatex(parsed, settings)).toContain("\\item outer\n\ninner one");
+  });
+
   it("exports ordered list start numbers and round-trips them", () => {
     const document: SentenceDocument = {
       type: "doc",
