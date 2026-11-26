@@ -862,3 +862,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T18:14:47Z PUSHED main
 2026-11-26T18:14:47Z DONE qa-284 (tsc -b, npm test, smoke all green)
 2026-11-26T18:15:27Z IMPORTED 1 tester findings into the backlog
+2026-11-26T18:15:27Z START qa-285 on qa/qa-285-the-status-bar-page-count-follows-the-pa: The status-bar page count follows the pane width: Split reports 26 pages and Document properties 23 for the same 13-page

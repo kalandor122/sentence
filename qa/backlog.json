@@ -4543,8 +4543,9 @@
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.pageCountVsPane`, or reproduce by hand at 1280x800: create a new document, clear it, and paste the probe's 50-heading/3,600-word document. The full visual view reports 13 pages with a 794px-wide, 14,599px-tall sheet. Click the 'Split' button in the status bar: the same document now reports 26 pages, the sheet shrinks to 448px wide and grows to 29,198px tall, and the text rewraps. Click 'Visual': 13 pages again. Open Layout > Document properties: it reports 23 pages with a 488px-wide, 25,829px-tall sheet; close the panel: 13 pages again. No document text or page-setup setting changes in any of these steps.\nActual: The sheet is sized to `min(paper width, available pane width)`, so opening a side pane reflows the text at a narrower measure. The reported page count and sheet height inflate from 13/14,599 to 26/29,198 in Split and 23/25,829 with the inspector open, then return to 13 when the pane closes.",
       "source": "explore:long-document:the status-bar page count follows the pane width: split reports 26 pages and document properties 23 for the same 13-page",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T18:15:27Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T18:15:27Z",
+      "lastAttemptAt": "2026-11-26T18:15:27Z"
     },
     {
       "id": "qa-286",
