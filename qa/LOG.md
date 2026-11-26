@@ -801,3 +801,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T15:05:54Z DONE qa-272 (tsc -b, npm test, smoke all green)
 2026-11-26T15:39:30Z EXPLORE links-cites-footnotes: 4 new items, agent exit 0
 2026-11-26T15:39:50Z START qa-273 on qa/qa-273-link-addresses-with-or-are-text-escaped: Link addresses with ~, ^, $ or \ are text-escaped, corrupting the PDF hyperlink target
+2026-11-26T15:44:43Z PUSHED main
+2026-11-26T15:44:43Z DONE qa-273 (tsc -b, npm test, smoke all green)

@@ -4324,10 +4324,11 @@
       ],
       "hint": "Repro: Create a project. Type `TildeLink word0`, select `word0`, press Ctrl+K, enter `https://tilde.example.org/~user/page` and click Insert. Repeat on new words with `https://caret.example.org/a^b`, `https://dollar.example.org/a$b` and `https://back.example.org/a\\b`. Open View > LaTeX and read the four \\href arguments. Then compile a minimal article+hyperref document containing the exported tilde \\href line with the bundled Tectonic engine (`src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu -X compile`) and read the PDF link annotations (`qpdf --qdf` and grep `/URI`).\nActual: The visual editor keeps the correct hrefs, but the exporter runs the address through the text escaper: the source reads `\\href{https://tilde.example.org/\\textasciitilde{}user/page}{word0}`, `\\href{https://caret.example.org/a\\textasciicircum{}b}{word1}`, `\\href{https://dollar.example.org/a\\$b}{word2}` and `\\href{https://back.example.org/a\\textbackslash{}b}{word3}`. Compiled with Tectonic, the PDF link annotations become `https://tilde.example.org/~{}user/page`, `https://caret.example.org/a\\TU\\textasciicircum {}b`, `https://dollar.example.org/a\\protect \\TU\\textdollar b` and `https://back.example.org/a\\TU\\textbackslash {}b` \u2014 none is the URL the user entered. Addresses with #, %, & and _ do export correctly.",
       "source": "explore:links-cites-footnotes:link addresses with ~, ^, $ or \\ are text-escaped, corrupting the pdf hyperlink target",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T15:39:50Z",
-      "lastAttemptAt": "2026-11-26T15:39:50Z"
+      "lastAttemptAt": "2026-11-26T15:39:50Z",
+      "doneAt": "2026-11-26T15:44:41Z"
     },
     {
       "id": "qa-274",
@@ -4339,7 +4340,9 @@
       ],
       "hint": "Repro: Create a project. Type `BadScheme word`, select `word`, press Ctrl+K, enter `javascript:alert(1)` and click Insert. Then type `DoiTarget word`, select `word`, press Ctrl+K, enter `doi:10.1000/xyz123` and click Insert. Finally type `EditScheme word`, select `word`, press Ctrl+K, enter `https://good.example.org/one` and click Insert; click the linked word, press Ctrl+K, replace the address with `javascript:alert(1)` and press Insert.\nActual: For both additions the dialog closes with no alert and no toast, the word stays unlinked (`links: []`, no \\href in the source) and the next typed character appends to the paragraph. For the edit, the dialog also closes with no error and the old address is silently kept: `afterEditLinks` is still `https://good.example.org/one` and the source still reads `EditScheme \\href{https://good.example.org/one}{word}`. Tiptap's setLink returns false for any scheme outside its allow-list, and the app swallows that result.",
       "source": "explore:links-cites-footnotes:add/edit link silently discards addresses with an unsupported scheme (doi:, javascript:)",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T15:45:23Z"
     },
     {
       "id": "qa-275",
