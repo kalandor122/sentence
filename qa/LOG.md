@@ -820,3 +820,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T15:57:19Z DONE qa-257 (tsc -b, npm test, smoke all green)
 2026-11-26T16:29:20Z EXPLORE review: 4 new items, agent exit 0
 2026-11-26T16:29:40Z START qa-277 on qa/qa-277-rejecting-a-tracked-paragraph-merge-afte: Rejecting a tracked paragraph merge after deleting its comment corrupts the text and resurrects the deleted highlight
+2026-11-26T16:40:04Z PUSHED main
+2026-11-26T16:40:04Z DONE qa-277 (tsc -b, npm test, smoke all green)
