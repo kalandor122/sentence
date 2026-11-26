@@ -796,3 +796,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T14:58:52Z START qa-268 on qa/qa-268-shift-enter-in-a-table-cell-exports-a-ro: Shift+Enter in a table cell exports a row terminator, so the cell is split into two rows in the PDF
 2026-11-26T15:02:42Z PUSHED main
 2026-11-26T15:02:42Z DONE qa-268 (tsc -b, npm test, smoke all green)
+2026-11-26T15:03:21Z START qa-272 on qa/qa-272-unclosed-or-paragraph-split-display-math: Unclosed or paragraph-split $$ display math is reported as synchronized and exported as escaped literal dollars

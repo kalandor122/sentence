@@ -4309,8 +4309,9 @@
       "hint": "Repro: 1. Create a project and open View > LaTeX.\n2. Replace the body before \\end{document} with:\nBefore $$F=ma\n(there is no closing $$)\n3. Click Apply source: the toast says 'Visual document synchronized from LaTeX.' (no error).\n4. Switch to View > Visual: the paragraph reads 'Before $$F=ma' with no math node.\n5. Open View > LaTeX and click Refresh from visual: the body is 'Before \\$\\$F=ma'.\nThe same happens with '$$\na\n\nb\n$$' (a blank line inside the display math): Apply reports synchronized, the visual document has two paragraphs, and the export is '\\$\\$\na\n\nb\n\\$\\$'.\nActual: Both inputs are accepted and silently rewritten with escaped dollar signs; no error is shown and the display equation is lost.",
       "source": "explore:math:unclosed or paragraph-split $$ display math is reported as synchronized and exported as escaped literal dollars",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T15:03:21Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T15:03:21Z",
+      "lastAttemptAt": "2026-11-26T15:03:21Z"
     }
   ]
 }
