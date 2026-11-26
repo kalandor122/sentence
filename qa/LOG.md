@@ -826,3 +826,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T16:49:49Z PUSHED main
 2026-11-26T16:49:49Z DONE qa-278 (tsc -b, npm test, smoke all green)
 2026-11-26T16:54:57Z BLOCKED qa-258 after 2 attempts — branch qa/qa-258-colour-palettes-never-expose-the-applied kept
+2026-11-26T16:56:07Z START qa-259 on qa/qa-259-the-git-panel-ignores-escape-and-is-an-u: The Git panel ignores Escape and is an unnamed complementary region

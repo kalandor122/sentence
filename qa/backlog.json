@@ -4135,8 +4135,9 @@
       "hint": "Repro: Open a project, click the View ribbon tab, focus \"Git history\" and press Enter. The Git panel appears, but focus remains on the Git history button inside the ribbon. Press Escape: the panel is still open and focus is still on the Git history button. The panel is an <aside> with no role, aria-label or aria-labelledby, so it is an unnamed complementary region and its close button is not focused. By contrast, the Properties panel closes on Escape (and returns focus to the Settings button).\nActual: Probe: the Git panel count is 1 before Escape and 1 after; activeElement stays on the \"Git history\" button; the panel is {tag:\"ASIDE\", role:null, label:null, labelledby:null}.",
       "source": "explore:keyboard:the git panel ignores escape and is an unnamed complementary region",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T16:56:07Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T16:56:07Z",
+      "lastAttemptAt": "2026-11-26T16:56:07Z"
     },
     {
       "id": "qa-260",
