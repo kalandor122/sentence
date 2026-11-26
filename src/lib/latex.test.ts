@@ -731,6 +731,50 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(parsed, settings)).toContain(expected);
   });
 
+  it("exports link addresses as typed so hyperref keeps the URL intact", () => {
+    const hrefs = [
+      "https://tilde.example.org/~user/page",
+      "https://caret.example.org/a^b",
+      "https://dollar.example.org/a$b",
+      "https://back.example.org/a\\b",
+    ];
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: hrefs.map((href, index) => ({
+            type: "text",
+            text: `word${index}`,
+            marks: [{ type: "link", attrs: { href } }],
+          })),
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    // The text escaper's \textasciitilde{}, \textasciicircum{} and \textdollar
+    // forms leak into the PDF link annotation, so URL arguments skip them.
+    expect(latex).toContain(
+      "\\href{https://tilde.example.org/~user/page}{word0}",
+    );
+    expect(latex).toContain("\\href{https://caret.example.org/a^b}{word1}");
+    expect(latex).toContain("\\href{https://dollar.example.org/a$b}{word2}");
+    expect(latex).toContain(
+      "\\href{https://back.example.org/a\\csname @backslashchar\\endcsname b}{word3}",
+    );
+    expect(latex).not.toContain("\\textasciitilde{}");
+    expect(latex).not.toContain("\\textasciicircum{}");
+    expect(latex).not.toContain("\\textbackslash{}");
+
+    const parsed = latexToDocument(latex, DEFAULT_SETTINGS).document;
+    for (const [index, href] of hrefs.entries()) {
+      expect(parsed.content[0]?.content?.[index]?.marks).toContainEqual({
+        type: "link",
+        attrs: { href },
+      });
+    }
+  });
+
   it("keeps a bracket that starts a list item as printed text", () => {
     const item = (text: string, listType: "bulletList" | "orderedList"): DocumentNode => ({
       type: listType,

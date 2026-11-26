@@ -37,6 +37,26 @@ export function escapeLatex(value: string): string {
     .replace(/\u00a0/g, "~");
 }
 
+// An address goes into \href's first argument, which hyperref reads as a URL,
+// not as running text. The text escaper's replacements for ~ ^ $ \ then end up
+// inside the PDF link annotation instead of the address, so only the characters
+// that would break the argument are escaped. A backslash still starts a control
+// sequence; LaTeX's expandable \@backslashchar is spelled via \csname so it
+// works outside \makeatletter and hyperref turns it back into one character.
+const URL_ESCAPES: Record<string, string> = {
+  "\\": "\\csname @backslashchar\\endcsname ",
+  "&": "\\&",
+  "%": "\\%",
+  "#": "\\#",
+  "_": "\\_",
+  "{": "\\{",
+  "}": "\\}",
+};
+
+function escapeLatexUrl(value: string): string {
+  return value.replace(/[\\&%#_{}]/g, (character) => URL_ESCAPES[character]);
+}
+
 // Citation keys and cross-reference labels are written verbatim into a `{...}`
 // argument and cannot be escaped there: a `\{` would become part of the key.
 // So anything that would end the group or break the line has to be refused.
@@ -266,7 +286,7 @@ function applyMarks(text: string, marks: DocumentMark[] | undefined): string {
         break;
       case "link": {
         const href = typeof mark.attrs?.href === "string" ? mark.attrs.href : "";
-        rendered = `\\href{${escapeLatex(href)}}{${rendered}}`;
+        rendered = `\\href{${escapeLatexUrl(href)}}{${rendered}}`;
         break;
       }
       case "fontFamily": {
@@ -948,6 +968,7 @@ function expandPreambleMacros(source: string, macros: Map<string, string>): stri
 
 function decodeLatexVerbatim(value: string): string {
   return value
+    .replace(/\\csname @backslashchar\\endcsname ?/g, "\\")
     .replace(/\\textbackslash\{\}/g, "\\")
     .replace(/\\textasciitilde\{\}/g, "~")
     .replace(/\\textasciicircum\{\}/g, "^")
@@ -1826,6 +1847,14 @@ function assertBalancedMath(source: string): void {
       }
       if (line[index] !== "\\" || precedingBackslashes(line, index) % 2 === 1) continue;
       const command = line[index + 1];
+      if (command === "h" && line.startsWith("\\href", index)) {
+        // The URL argument may hold a literal `$` (an address with a dollar
+        // sign), which is part of the link and not a math delimiter.
+        const urlOpen = line.indexOf("{", index + 5);
+        const urlClose = urlOpen >= 0 ? findMatchingBrace(line, urlOpen) : -1;
+        if (urlClose > 0) index = urlClose;
+        continue;
+      }
       if (command === "(" || command === ")") {
         if (command === "(" && parenOpen) {
           throw new Error('Invalid LaTeX: unclosed math delimiter "\\(".');
