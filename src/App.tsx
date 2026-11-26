@@ -420,9 +420,22 @@ function insertBlockContent(
 
 function insertPageFurniture(editor: Editor | null, type: "pageBreak" | "toc") {
   if (!editor) return;
+  const { $from } = editor.state.selection;
+  // Page furniture belongs between top-level blocks. Nested in a quote or a
+  // list it exports inside the environment and comes back from source sync as
+  // literal text, so put it after the outermost block that holds the caret.
+  if ($from.depth > 1) {
+    const caret = $from.pos;
+    editor
+      .chain()
+      .focus()
+      .insertContentAt($from.after(1), { type })
+      .setTextSelection(caret)
+      .run();
+    return;
+  }
   // A block atom inserted mid-heading would split the heading in two. Page
   // furniture belongs between blocks, so put it after the heading instead.
-  const { $from } = editor.state.selection;
   for (let depth = $from.depth; depth > 0; depth -= 1) {
     if ($from.node(depth).type.name === "heading") {
       const caret = $from.pos;
