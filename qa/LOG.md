@@ -883,3 +883,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T18:49:10Z DONE qa-289 (tsc -b, npm test, smoke all green)
 2026-11-26T19:04:43Z EXPLORE persistence: 3 new items, agent exit 0
 2026-11-26T19:05:03Z IMPORTED 1 tester findings into the backlog
+2026-11-26T19:29:18Z START qa-298 on qa/qa-298-add-link-from-the-ribbon-opens-the-dialo: Add link from the ribbon opens the dialog with focus still in the document, so typing edits the manuscript behind the mo
