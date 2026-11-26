@@ -4200,10 +4200,11 @@
       ],
       "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'inner one', press Tab, press Enter, type 'inner two'. Click at the end of 'inner one' and click Home > Bulleted list (the button is shown pressed). Open Source in the status bar, click Refresh from visual, and read the LaTeX textarea.\nActual: The editor DOM is '<ul><li><p>outer</p><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>' (two paragraph blocks), but the generated LaTeX is '\\begin{itemize}\\n\\item outer\\ninner one\\n\\begin{itemize}\\n\\item inner two\\n\\end{itemize}\\n\\end{itemize}'. The two paragraphs are joined by a single newline, which LaTeX reads as a space, so 'outer' and 'inner one' print as one paragraph in the PDF.",
       "source": "explore:lists:removing the bullet from a nested item creates a second paragraph that the latex merges into the parent item",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T14:49:46Z",
-      "lastAttemptAt": "2026-11-26T14:49:46Z"
+      "lastAttemptAt": "2026-11-26T14:49:46Z",
+      "doneAt": "2026-11-26T14:51:58Z"
     },
     {
       "id": "qa-266",
@@ -4231,9 +4232,9 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click a body cell and type 'Captioned table' in the Table toolbar's Caption field. Hover the border between the first and second columns until the resize cursor appears, then drag it 80px to the right.\nActual: The drag changes no column width (200/200/200 before and after) and the page throws 'TypeError: Cannot read properties of undefined (reading 'width')' from updateColumnsOnResize -> displayColumnWidth -> handleMouseDown. The table's first child is the CAPTION element ahead of COLGROUP, and the resizing code passes that caption where it expects the column group. Repeating the same drag on the same table before the caption is added widens the first column from 200px to 280px with no error.",
       "source": "explore:tables:column resizing stops working and throws a typeerror on a table with a caption",
-      "status": "open",
+      "status": "in_progress",
       "attempts": 2,
-      "startedAt": "2026-11-25T18:36:38Z",
+      "startedAt": "2026-11-26T14:52:40Z",
       "lastAttemptAt": "2026-11-25T18:39:26Z"
     },
     {
