@@ -3,7 +3,7 @@ import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
 import { tocEntries, tocTitle, setTocTitle, setGeneratedToc } from "./TocBlock";
-import { HeadingLabel, TableOfContents } from "./extensions";
+import { HeadingLabel, MathInline, TableOfContents } from "./extensions";
 
 describe("tocEntries", () => {
   it("uses an optional short title the way the PDF contents does", () => {
@@ -29,6 +29,28 @@ describe("tocEntries", () => {
       "Short Intro",
       "Plain Subsection",
     ]);
+    editor.destroy();
+  });
+
+  it("keeps inline math in a heading, the way the PDF contents prints it", () => {
+    const editor = new Editor({
+      extensions: [StarterKit, HeadingLabel, MathInline],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "heading",
+            attrs: { level: 2 },
+            content: [
+              { type: "text", text: "The " },
+              { type: "mathInline", attrs: { latex: "x^2" } },
+              { type: "text", text: " model" },
+            ],
+          },
+        ],
+      },
+    });
+    expect(tocEntries(editor)).toEqual([{ level: 2, number: "0.1", text: "The x^2 model" }]);
     editor.destroy();
   });
 

@@ -4215,8 +4215,9 @@
       "hint": "Repro: Open View > LaTeX and insert '\\section{The \\(x^2\\) model}' before \\end{document}; click Apply source. Place the caret at the end of the document and click References > Table of contents.\nActual: The preview entry reads '2 The model' (the formula is missing), while the exported source still contains '\\section{The \\(x^2\\) model}', so the visual contents and the PDF contents disagree. Probe qa/probes/insert-media.mjs scenario 'toc-math-heading'.",
       "source": "explore:insert-media:the toc preview drops inline math from a heading, so its entry does not match the printed contents",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T17:02:03Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T17:02:03Z",
+      "lastAttemptAt": "2026-11-26T17:02:03Z"
     },
     {
       "id": "qa-265",
