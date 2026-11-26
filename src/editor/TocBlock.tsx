@@ -92,6 +92,17 @@ function tocEntriesFromHeadings(headings: TocHeading[], title: string): TocEntry
   return entries;
 }
 
+// textContent drops atom nodes, which is where inline math keeps its source.
+// The PDF contents prints the formula, so the preview has to read the latex.
+function headingText(node: ProseMirrorNode): string {
+  return node
+    .textBetween(0, node.content.size, "", (leaf) => {
+      if (leaf.type.name !== "mathInline") return "";
+      return typeof leaf.attrs.latex === "string" ? leaf.attrs.latex : "";
+    })
+    .trim();
+}
+
 function headingsIn(doc: ProseMirrorNode): TocHeading[] {
   const firstNode = doc.firstChild;
   const headings: TocHeading[] = [];
@@ -101,7 +112,7 @@ function headingsIn(doc: ProseMirrorNode): TocHeading[] {
       level: Number(node.attrs.level ?? 1),
       unnumbered: node.attrs.unnumbered === true,
       shortTitle: typeof node.attrs.shortTitle === "string" ? node.attrs.shortTitle.trim() : "",
-      text: node.textContent.trim(),
+      text: headingText(node),
       first: node === firstNode,
     });
   });
