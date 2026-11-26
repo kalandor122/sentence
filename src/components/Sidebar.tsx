@@ -482,27 +482,51 @@ export default function Sidebar({
   return (
     <aside className="sidebar">
       <nav className="sidebar-rail" aria-label="Navigation panels">
-        <button type="button" className={panel === "outline" ? "active" : ""} onClick={() => onPanelChange("outline")}>
+        <button
+          type="button"
+          className={panel === "outline" ? "active" : ""}
+          aria-pressed={panel === "outline"}
+          aria-controls="sidebar-panel"
+          onClick={() => onPanelChange("outline")}
+        >
           <ListTree size={18} />
           <span>Outline</span>
         </button>
-        <button type="button" className={panel === "comments" ? "active" : ""} onClick={() => onPanelChange("comments")}>
+        <button
+          type="button"
+          className={panel === "comments" ? "active" : ""}
+          aria-pressed={panel === "comments"}
+          aria-controls="sidebar-panel"
+          onClick={() => onPanelChange("comments")}
+        >
           <MessageSquareText size={18} />
           <span>Review</span>
           {unresolved.length > 0 ? <b>{unresolved.length}</b> : null}
         </button>
-        <button type="button" className={panel === "references" ? "active" : ""} onClick={() => onPanelChange("references")}>
+        <button
+          type="button"
+          className={panel === "references" ? "active" : ""}
+          aria-pressed={panel === "references"}
+          aria-controls="sidebar-panel"
+          onClick={() => onPanelChange("references")}
+        >
           <BookMarked size={18} />
           <span>References</span>
           {bibliographyCount > 0 ? <b>{bibliographyCount}</b> : null}
         </button>
-        <button type="button" className={panel === "history" ? "active" : ""} onClick={() => onPanelChange("history")}>
+        <button
+          type="button"
+          className={panel === "history" ? "active" : ""}
+          aria-pressed={panel === "history"}
+          aria-controls="sidebar-panel"
+          onClick={() => onPanelChange("history")}
+        >
           <GitCommitHorizontal size={18} />
           <span>History</span>
           {pending.length > 0 ? <b>{pending.length}</b> : null}
         </button>
       </nav>
-      <section className="sidebar-panel">
+      <section className="sidebar-panel" id="sidebar-panel" aria-label="Navigation panel content">
         {panel === "outline" ? (
           <>
             <header className="panel-heading">

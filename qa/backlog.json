@@ -4089,8 +4089,9 @@
       "hint": "Repro: Open a project. The Outline panel is open and the Outline button in the sidebar rail has class \"active\". Inspect all four navigation buttons (Outline, Review, References, History): none has aria-pressed, aria-selected or aria-current, and the nav is a plain navigation landmark with no tablist/tab roles or aria-controls. Switch panels with the mouse or keyboard and the accessible state does not change; only the CSS class changes.\nActual: Probe data: [{text:\"Outline\", active:true, pressed:null, current:null, selected:null}, {text:\"Review 1\", active:false, pressed:null, current:null, selected:null}, ...]. A screen-reader user cannot tell which panel is displayed.",
       "source": "explore:keyboard:sidebar panel buttons do not expose which panel is open to assistive technology",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T15:53:55Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T15:53:55Z",
+      "lastAttemptAt": "2026-11-26T15:53:55Z"
     },
     {
       "id": "qa-257",
