@@ -4671,8 +4671,9 @@
       "hint": "Repro: 1) Open http://localhost:1420 with a fresh profile, click 'New document' and wait for the top bar to read 'Saved locally'. 2) In the devtools console run: const orig = Storage.prototype.setItem; Storage.prototype.setItem = function (key, value) { if (key === 'sentence.gitAuthor') throw new DOMException('The quota has been exceeded.', 'QuotaExceededError'); return orig.call(this, key, value); }; (this simulates a full or blocked localStorage for that one key). 3) Click 'Settings' and type a name into the 'Name' field under Git author. The app instantly goes blank. 4) Reload once: the override is gone, so the editor returns. 5) Re-apply the same override before the document loads (Playwright page.addInitScript, or CDP Page.addScriptToEvaluateOnNewDocument) and reload: the app is blank again on boot. Probe evidence: qa/probes/persistence.mjs phase 'git-author-storage-crash' (afterEdit bodyLength 0, editor false; afterLoad bodyLength 0, editor false; pageErrors 'The quota has been exceeded.' twice at startup).\nActual: document.body.innerText has length 0, with no editor, start screen or inspector. The console records 'pageerror: The quota has been exceeded.' (twice on startup because the effect runs in StrictMode). The useEffect at src/App.tsx:697 calls localStorage.setItem('sentence.gitAuthor', ...) with no try/catch (unlike saveBrowserWorkspace and rememberProject) and there is no error boundary, so React unmounts the whole tree. The document is still in localStorage but is unreachable through the UI.",
       "source": "explore:persistence:a failed git-author localstorage write blanks the entire app",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T19:05:03Z"
+      "attempts": 2,
+      "startedAt": "2026-11-26T19:05:03Z",
+      "lastAttemptAt": "2026-11-26T19:06:31Z"
     },
     {
       "id": "qa-295",
@@ -4700,6 +4701,69 @@
     },
     {
       "id": "qa-297",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-298",
+      "title": "Add link from the ribbon opens the dialog with focus still in the document, so typing edits the manuscript behind the mo",
+      "why": "Exploratory pass on keyboard (functional): expected The dialog's Address field receives focus when the dialog opens, exactly as it does when the same dialog is opened with Ctrl+K from the already-focused editor, so typed characters go into the address and never into the manuscript.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open a project with body text and put the caret inside a word (Ctrl+Home, then ArrowRight). Go to the Home ribbon tab, focus \"Add link\", press Enter. The \"Add link\" dialog opens, but document.activeElement remains the ProseMirror \"Document editor\" behind it (modal count 1, focus inEditor true, sampled 0-1000 ms). Type \"example.com\": the dialog's Address field stays empty and the word under the caret in the manuscript is replaced with \"example.com\". Press Tab once and focus jumps into the dialog (on its Close button); Escape closes it and removes the temporary link, but the typed text remains in the document.\nActual: Probe data: dialog open (modal 1, backdrop 1), activeElement = DIV .tiptap.ProseMirror.sentence-editor with aria-label \"Document editor\", inEditor true, inDialog false. After typing, the modal input value is \"\" and the document text changes from \"alpha beta gamma delta QRS...\" to \"example.com beta gamma delta QRS...\" (the linked word is replaced; inDocument true, and the text is still there after Escape closes the dialog). One Tab moves focus to the dialog Close button, so the modal trap can recover, but the first keystrokes have already modified the document.",
+      "source": "explore:keyboard:add link from the ribbon opens the dialog with focus still in the document, so typing edits the manuscript behind the mo",
+      "status": "in_progress",
+      "attempts": 1,
+      "startedAt": "2026-11-26T19:29:18Z",
+      "lastAttemptAt": "2026-11-26T19:29:18Z"
+    },
+    {
+      "id": "qa-299",
+      "title": "Paragraph spacing popover takes no focus on open and drops focus on <body> when Escape closes it",
+      "why": "Exploratory pass on keyboard (ux): expected Focus moves into the popover when it opens (as with the equation and link dialogs), and Escape returns focus to the Paragraph spacing button (as the Text color palette does), so a keyboard user can type the value and then keep navigating from the ribbon.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open a project, go to Home, focus \"Paragraph spacing\" and press Enter. The popover opens, but focus stays on the ribbon button; the next Tab goes to \"Add link\" and the Before/After inputs are only reached after tabbing through the rest of the page (the popover is portalled to the end of <body>: 17 Tab presses in the probe; the count grows with sidebar content). Put focus in the Before field and press Escape: the popover closes and document.activeElement becomes BODY instead of the Paragraph spacing button.\nActual: Probe data: after Enter, focus is BUTTON.ribbon-icon-button \"Paragraph spacing\" with aria-expanded true; after one Tab focus is the \"Add link\" button; tabsToPanel = 17. After focusing the Before input and pressing Escape the panel count is 0 and activeElement is BODY.",
+      "source": "explore:keyboard:paragraph spacing popover takes no focus on open and drops focus on <body> when escape closes it",
+      "status": "open"
+    },
+    {
+      "id": "qa-300",
+      "title": "Split view renders two find bars and always returns find focus to the visual pane",
+      "why": "Exploratory pass on keyboard (ux): expected A single find bar for the document (one search landmark and one Find field), and Escape returns focus to the pane the find was opened from, so a keyboard user continues exactly where they were.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open a project, press Ctrl+Alt+3 for Split, then press Ctrl+F from the visual page. Two identical find bars appear, one in each pane: the probe counts 2 .find-bar elements, 2 role=search landmarks and 2 inputs named \"Find\"; focus lands in the source pane's copy (barParent source-column). After typing a query and pressing Escape, focus goes to the visual editor. Repeat with the caret in the LaTeX textarea: Ctrl+F focuses the source-pane bar, but Escape still returns focus to the visual editor instead of the textarea.\nActual: Probe data in Split mode: find 2, findInputs 2, searchLandmarks 2; the Ctrl+F ref points at the source-column bar even when the caret was in the visual pane; Escape from a find opened over the LaTeX textarea sets activeElement to DIV .sentence-editor (visual) rather than the LaTeX textarea.",
+      "source": "explore:keyboard:split view renders two find bars and always returns find focus to the visual pane",
+      "status": "open"
+    },
+    {
+      "id": "qa-301",
+      "title": "Colour palettes never expose the applied text colour to assistive technology",
+      "why": "Exploratory pass on keyboard (ux): expected The palette exposes the current colour, for example aria-checked on the active swatch or an accessible value on the trigger, so a screen-reader user can tell which colour is applied.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Select some text, go to Home, focus \"Text color\", press ArrowDown twice (No color, then Black) and Enter. The selection turns black and focus returns to the editor. Reopen the palette with ArrowDown: inspect the trigger and the swatches. The trigger is still named only \"Text color\" with no aria-valuetext/value, and none of the ten swatches has aria-checked or aria-selected, including Black. The colour is shown only by the CSS colour bar under the icon.\nActual: Probe data after applying Black: trigger {label: \"Text color\", value: \"Text color\", expanded: \"true\"}; all swatches including Black have checked:null and selected:null.",
+      "source": "explore:keyboard:colour palettes never expose the applied text colour to assistive technology",
+      "status": "open"
+    },
+    {
+      "id": "qa-302",
       "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
       "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
       "severity": "medium",

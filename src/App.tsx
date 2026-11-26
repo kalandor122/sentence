@@ -1849,7 +1849,11 @@ export default function App() {
     if (!existingHref && range) {
       // Show the pending link immediately, but keep it out of the undo history:
       // the address entered in the dialog is the single step undo should revert.
-      editor.chain().focus().setTextSelection(range).setLink({ href: "https://" }).setMeta("addToHistory", false).run();
+      // Focus stays with the dialog: Tiptap's focus command defers a focus call
+      // to the next frame, which would otherwise steal the address field's
+      // focus when the dialog is opened from a ribbon button (Ctrl+K opens it
+      // while the editor is already focused, so this only bit the ribbon).
+      editor.chain().setTextSelection(range).setLink({ href: "https://" }).setMeta("addToHistory", false).run();
       setDialog({
         kind: "link",
         initialValue: "",
