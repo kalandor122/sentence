@@ -4073,8 +4073,9 @@
       "hint": "Repro: Switch to Source with Ctrl+Alt+2 (focus moves into the \"LaTeX source\" textarea) and inspect its computed style: outline-style is none and outline-width is 0px while the element matches :focus-visible. Every ribbon button, every select and the find field in the same app show the 2px solid rgb(78, 128, 103) focus outline.\nActual: Computed outline is \"none 0px\" with :focus-visible true; the textarea's caret is the only focus cue.",
       "source": "explore:keyboard:the latex source textarea has no visible focus outline",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T15:52:00Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T15:52:00Z",
+      "lastAttemptAt": "2026-11-26T15:52:00Z"
     },
     {
       "id": "qa-256",

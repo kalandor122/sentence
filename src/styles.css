@@ -1858,6 +1858,11 @@ button:disabled {
   white-space: pre;
 }
 
+.source-editor textarea:focus-visible {
+  outline: 2px solid #4e8067;
+  outline-offset: -2px;
+}
+
 /* Preview */
 
 .preview-column {
