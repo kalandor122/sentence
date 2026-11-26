@@ -584,6 +584,29 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("rejects an unpaired display math delimiter instead of escaping it", () => {
+    const inline = [
+      "\\begin{document}",
+      "Before $$F=ma",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(inline, DEFAULT_SETTINGS)).toThrow(
+      'Invalid LaTeX: unclosed math delimiter "$$".',
+    );
+    const blankLine = [
+      "\\begin{document}",
+      "$$",
+      "a",
+      "",
+      "b",
+      "$$",
+      "\\end{document}",
+    ].join("\n");
+    expect(() => latexToDocument(blankLine, DEFAULT_SETTINGS)).toThrow(
+      'Invalid LaTeX: unclosed math delimiter "$$".',
+    );
+  });
+
   it("accepts balanced and escaped math delimiters", () => {
     const source = [
       "\\begin{document}",

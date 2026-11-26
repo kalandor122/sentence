@@ -1797,6 +1797,10 @@ function assertBalancedBraces(source: string): void {
 // way back out. Report it like an unbalanced brace instead.
 function assertBalancedMath(source: string): void {
   let dollars = 0;
+  // `$$` opens display math as one delimiter, not as two inline dollars, so it
+  // needs a partner of its own. Counting the two `$` separately makes a lone
+  // opening `$$` look balanced and the formula is then read as text.
+  let displayOpen = false;
   let parenOpen = false;
   let bracketOpen = false;
   let verbatim: string | null = null;
@@ -1811,7 +1815,13 @@ function assertBalancedMath(source: string): void {
     }
     for (let index = 0; index < line.length; index += 1) {
       if (line[index] === "$") {
-        if (precedingBackslashes(line, index) % 2 === 0) dollars += 1;
+        if (precedingBackslashes(line, index) % 2 === 1) continue;
+        if (line[index + 1] === "$") {
+          displayOpen = !displayOpen;
+          index += 1;
+          continue;
+        }
+        dollars += 1;
         continue;
       }
       if (line[index] !== "\\" || precedingBackslashes(line, index) % 2 === 1) continue;
@@ -1851,6 +1861,9 @@ function assertBalancedMath(source: string): void {
     // Math mode cannot cross a paragraph break, so every delimiter still open
     // there is unbalanced rather than a formula continuing on the next line.
     if (!line.trim()) {
+      if (displayOpen) {
+        throw new Error('Invalid LaTeX: unclosed math delimiter "$$".');
+      }
       if (dollars % 2 === 1) {
         throw new Error('Invalid LaTeX: unclosed math delimiter "$".');
       }
@@ -1865,6 +1878,9 @@ function assertBalancedMath(source: string): void {
   }
   if (dollars % 2 === 1) {
     throw new Error('Invalid LaTeX: unclosed math delimiter "$".');
+  }
+  if (displayOpen) {
+    throw new Error('Invalid LaTeX: unclosed math delimiter "$$".');
   }
   if (parenOpen) {
     throw new Error('Invalid LaTeX: unclosed math delimiter "\\(".');
