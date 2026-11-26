@@ -63,9 +63,23 @@ export default function StatusBar({
       </div>
       <span>{branch}</span>
       <div className="zoom-control" aria-label="Zoom">
-        <button type="button" onClick={() => onZoomChange(Math.max(70, zoom - 10))} aria-label="Zoom out"><Minus size={12} /></button>
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => onZoomChange(Math.max(70, zoom - 10))}
+          aria-label="Zoom out"
+        >
+          <Minus size={12} />
+        </button>
         <span>{zoom}%</span>
-        <button type="button" onClick={() => onZoomChange(Math.min(150, zoom + 10))} aria-label="Zoom in"><Plus size={12} /></button>
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => onZoomChange(Math.min(150, zoom + 10))}
+          aria-label="Zoom in"
+        >
+          <Plus size={12} />
+        </button>
       </div>
     </footer>
   );

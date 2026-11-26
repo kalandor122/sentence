@@ -35,6 +35,7 @@ import {
   pageLineGaps,
   pageRowShifts,
   scrollTopForZoom,
+  scrollTopForZoomPoint,
 } from "./pagination";
 import { RevisionMarks, setRevisionMarks } from "./revisions";
 import {
@@ -254,6 +255,25 @@ function textLines(block: HTMLElement, zoom: number): TextLine[] {
   return lines;
 }
 
+// The caret's position in unscaled document pixels, measured after the zoom
+// has been applied so the value is independent of the current scroll offset.
+// Returns null when the selection is outside the page (or has no layout box).
+function caretDocumentTop(scroller: HTMLElement, paddingTop: number, zoom: number): number | null {
+  const selection = window.getSelection();
+  const node = selection?.focusNode;
+  if (!selection || !node || !scroller.contains(node)) return null;
+  try {
+    const range = document.createRange();
+    range.setStart(node, selection.focusOffset);
+    range.collapse(true);
+    const rect = range.getBoundingClientRect();
+    if (rect.height <= 0) return null;
+    return (rect.top - scroller.getBoundingClientRect().top + scroller.scrollTop - paddingTop) / zoom;
+  } catch {
+    return null;
+  }
+}
+
 // The document position at the start of a line, used to put a page gap before
 // the first character that belongs on the next page.
 function lineStartPosition(view: Editor["view"], line: TextLine): number | null {
@@ -375,14 +395,26 @@ export default function EditorSurface({
     previousZoomRef.current = zoom;
     if (!scroller || previousZoom === zoom) return;
     const paddingTop = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
-    scroller.scrollTop = scrollTopForZoom(
-      scrollTopRef.current,
-      scroller.clientHeight,
-      paddingTop,
-      previousZoom,
-      zoom,
-      scroller.scrollHeight - scroller.clientHeight,
-    );
+    const maxScrollTop = scroller.scrollHeight - scroller.clientHeight;
+    const caretTop = caretDocumentTop(scroller, paddingTop, zoom);
+    scroller.scrollTop = caretTop === null
+      ? scrollTopForZoom(
+          scrollTopRef.current,
+          scroller.clientHeight,
+          paddingTop,
+          previousZoom,
+          zoom,
+          maxScrollTop,
+        )
+      : scrollTopForZoomPoint(
+          caretTop,
+          scrollTopRef.current,
+          scroller.clientHeight,
+          paddingTop,
+          previousZoom,
+          zoom,
+          maxScrollTop,
+        );
     scrollTopRef.current = scroller.scrollTop;
   }, [zoom]);
   const editor = useEditor({

@@ -8,6 +8,7 @@ import {
   pageLineGaps,
   pageRowShifts,
   scrollTopForZoom,
+  scrollTopForZoomPoint,
 } from "./pagination";
 
 describe("pageGeometry", () => {
@@ -79,6 +80,28 @@ describe("scrollTopForZoom", () => {
     const zoomedIn = scrollTopForZoom(5000, 627, 30, 1, 1.5, 30000);
     expect(zoomedIn).toBeCloseTo(7642, 0);
     expect(scrollTopForZoom(zoomedIn, 627, 30, 1.5, 1, 20000)).toBeCloseTo(5000, 6);
+  });
+});
+
+describe("scrollTopForZoomPoint", () => {
+  it("keeps the caret at the same screen position while zooming out at the end", () => {
+    const pointTop = 14029;
+    const target = scrollTopForZoomPoint(pointTop, 13558, 627, 30, 1, 0.7, 9702);
+    expect(target).toBeCloseTo(9349, 0);
+    expect(30 + pointTop * 0.7 - target).toBeCloseTo(501, 6);
+  });
+
+  it("falls back to the viewport centre when the caret was out of view", () => {
+    expect(scrollTopForZoomPoint(0, 13558, 627, 30, 1, 0.7, 9702)).toBe(
+      scrollTopForZoom(13558, 627, 30, 1, 0.7, 9702),
+    );
+    expect(scrollTopForZoomPoint(20000, 13558, 627, 30, 1, 0.7, 9702)).toBe(
+      scrollTopForZoom(13558, 627, 30, 1, 0.7, 9702),
+    );
+  });
+
+  it("clamps the target to the scaled scroll range", () => {
+    expect(scrollTopForZoomPoint(14029, 13558, 627, 30, 1, 0.7, 9000)).toBe(9000);
   });
 });
 
