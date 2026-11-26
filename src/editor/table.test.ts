@@ -129,6 +129,32 @@ describe("CaptionTable", () => {
     editor.destroy();
   });
 
+  it("turns the header row off on a one-row table", () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const editor = new Editor({
+      element: host,
+      extensions: [StarterKit, TableKit.configure({ table: false }), CaptionTable],
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "table",
+            content: [{ type: "tableRow", content: [cell(true), cell(true), cell(true)] }],
+          },
+        ],
+      },
+    });
+    editor.commands.setTextSelection(cellPositions(editor)[0]);
+    expect(editor.commands.toggleHeaderRow()).toBe(true);
+    expect(rowTypes(editor)).toEqual([["tableCell", "tableCell", "tableCell"]]);
+    expect(editor.isActive("tableHeader")).toBe(false);
+    const latex = documentToLatex(editor.getJSON() as SentenceDocument, DEFAULT_SETTINGS);
+    expect(latex).toContain("% Sentence table header: none");
+    editor.destroy();
+    host.remove();
+  });
+
   it("reports deleting the last column as unavailable", () => {
     const editor = createSizedEditor(3, 2);
     editor.commands.setTextSelection(cellPositions(editor)[0]);

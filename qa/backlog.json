@@ -4295,8 +4295,9 @@
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click the first cell of the second row and press 'Delete row'. Click the first cell of the (now last) second row and press 'Delete row' again. With one 3-column row left, press 'Header row' once.\nActual: Only the second and third cells become TD. The first cell stays TH with the header background and 650 font weight, and 'Header row' still reports aria-pressed='true'. The re-exported tabular is unchanged, so applying it back turns all three cells into headers again.",
       "source": "explore:tables:turning off the header row of a one-row table leaves its first cell as a header",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T17:26:24Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T17:26:24Z",
+      "lastAttemptAt": "2026-11-26T17:26:24Z"
     },
     {
       "id": "qa-270",
