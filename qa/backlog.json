@@ -4056,7 +4056,9 @@
       ],
       "hint": "Repro: Open a project and press Ctrl+Alt+2 to switch to Source. Click at the end of the \"LaTeX source\" textarea and press Escape. Focus remains on the textarea (document.activeElement is still the LaTeX source textarea). The status-bar hint's tooltip reads \"F6 moves focus into the document, Esc leaves the editing surface\"; pressing Escape in the visual editor does move focus to the status bar, while in source view it does nothing. Tab does move focus out of the textarea (to the Visual button in the status bar), so Escape is not the way out.\nActual: The source textarea has no Escape handler. Probe: focus before Escape {TEXTAREA, aria-label \"LaTeX source\"}, focus after Escape the same textarea; no focus change.",
       "source": "explore:keyboard:escape does not leave the latex source editor, contradicting the status-bar hint",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T15:49:40Z"
     },
     {
       "id": "qa-255",
@@ -4340,10 +4342,11 @@
       ],
       "hint": "Repro: Create a project. Type `BadScheme word`, select `word`, press Ctrl+K, enter `javascript:alert(1)` and click Insert. Then type `DoiTarget word`, select `word`, press Ctrl+K, enter `doi:10.1000/xyz123` and click Insert. Finally type `EditScheme word`, select `word`, press Ctrl+K, enter `https://good.example.org/one` and click Insert; click the linked word, press Ctrl+K, replace the address with `javascript:alert(1)` and press Insert.\nActual: For both additions the dialog closes with no alert and no toast, the word stays unlinked (`links: []`, no \\href in the source) and the next typed character appends to the paragraph. For the edit, the dialog also closes with no error and the old address is silently kept: `afterEditLinks` is still `https://good.example.org/one` and the source still reads `EditScheme \\href{https://good.example.org/one}{word}`. Tiptap's setLink returns false for any scheme outside its allow-list, and the app swallows that result.",
       "source": "explore:links-cites-footnotes:add/edit link silently discards addresses with an unsupported scheme (doi:, javascript:)",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T15:45:23Z",
-      "lastAttemptAt": "2026-11-26T15:45:23Z"
+      "lastAttemptAt": "2026-11-26T15:45:23Z",
+      "doneAt": "2026-11-26T15:48:59Z"
     },
     {
       "id": "qa-275",
