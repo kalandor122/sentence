@@ -30,7 +30,10 @@ class CaptionTableView extends TableView {
     caption.className = "table-caption";
     caption.contentEditable = "false";
     caption.textContent = text;
-    this.table.insertBefore(caption, this.table.firstChild);
+    // Column resizing reads the table's first child as the colgroup, so the
+    // caption goes after it. caption-side: top still paints it above the rows,
+    // and the exported HTML keeps the caption first.
+    this.table.insertBefore(caption, this.colgroup.nextSibling);
   }
 }
 
