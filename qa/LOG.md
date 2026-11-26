@@ -859,3 +859,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T18:04:42Z IMPORTED 1 tester findings into the backlog
 2026-11-26T18:04:42Z RECOVERED qa-258 (in_progress for 74 min)
 2026-11-26T18:04:42Z START qa-284 on qa/qa-284-a-table-taller-than-a-page-is-never-pagi: A table taller than a page is never paginated: page rules cut through rows and rows sit in the margins
+2026-11-26T18:14:47Z PUSHED main
+2026-11-26T18:14:47Z DONE qa-284 (tsc -b, npm test, smoke all green)
+2026-11-26T18:15:27Z IMPORTED 1 tester findings into the backlog
