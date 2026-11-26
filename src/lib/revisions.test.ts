@@ -284,6 +284,91 @@ describe("reviewing tracked changes", () => {
     expect(rejectRevisions(withEmpty, [revision("r2", before, withEmpty)], ["r2"]).document).toEqual(before);
   });
 
+  it("rejects a paragraph merge even after a comment split its text and was deleted", () => {
+    const mark = { type: "comment", attrs: { markId: "c1" } };
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Introduction" }] },
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "A sentence is not ", marks: [mark] },
+            { type: "text", text: "merely a container." },
+          ],
+        },
+      ],
+    };
+    const merged: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "heading",
+          attrs: { level: 1 },
+          content: [
+            { type: "text", text: "Introduction" },
+            { type: "text", text: "A sentence is not ", marks: [mark] },
+            { type: "text", text: "merely a container." },
+          ],
+        },
+      ],
+    };
+    // Deleting the comment leaves the merged heading as plain runs, and the
+    // editor may join them again, so reject against both shapes.
+    const split: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "heading",
+          attrs: { level: 1 },
+          content: [
+            { type: "text", text: "Introduction" },
+            { type: "text", text: "A sentence is not " },
+            { type: "text", text: "merely a container." },
+          ],
+        },
+      ],
+    };
+    const joined: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "heading",
+          attrs: { level: 1 },
+          content: [{ type: "text", text: "IntroductionA sentence is not merely a container." }],
+        },
+      ],
+    };
+    const expected: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Introduction" }] },
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "A sentence is not " },
+            { type: "text", text: "merely a container." },
+          ],
+        },
+      ],
+    };
+    for (const current of [split, joined]) {
+      expect(rejectRevisions(current, [revision("r1", before, merged)], ["r1"]).document).toEqual(expected);
+    }
+  });
+
+  it("keeps formatting when rejecting the deletion of a formatted paragraph", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Keep" }] },
+        { type: "paragraph", content: [{ type: "text", text: "Bold text", marks: [{ type: "bold" }] }] },
+      ],
+    };
+    const after: SentenceDocument = { type: "doc", content: [before.content[0]] };
+    expect(rejectRevisions(after, [revision("r1", before, after)], ["r1"]).document).toEqual(before);
+  });
+
   it("rejects several changes newest first without leaving review state in the document", () => {
     const first = doc("alpha");
     const second = doc("alpha beta");

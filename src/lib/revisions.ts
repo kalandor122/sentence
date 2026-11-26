@@ -202,6 +202,57 @@ function equalValue(left: unknown, right: unknown): boolean {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
+// A mark (a comment, a link, bold) splits one run of text into several nodes, so
+// the changed characters can live in a different node from the one the stored
+// path names. Undo the change on the block's joined text, then rebuild the runs
+// around it, so rejecting a merge still finds the inserted body text instead of
+// leaving it in the merged block and restoring the paragraph beside it.
+function undoBlockText(root: unknown, change: TextChange): boolean {
+  const length = change.path.length;
+  if (
+    length < 5 ||
+    change.path[length - 1] !== "text" ||
+    change.path[length - 3] !== "content" ||
+    typeof change.path[length - 2] !== "number"
+  ) {
+    return false;
+  }
+  const block = getAt(root, change.path.slice(0, -3));
+  if (!isObject(block) || !Array.isArray(block.content)) return false;
+  const nodes = block.content;
+  if (!nodes.every((node) => isObject(node) && node.type === "text" && typeof node.text === "string")) return false;
+  const text = nodes.map((node) => node.text as string).join("");
+  const undone = undoText(text, change);
+  if (undone === text) return false;
+  let start = 0;
+  while (start < text.length && start < undone.length && text[start] === undone[start]) start += 1;
+  let before = text.length;
+  let after = undone.length;
+  while (before > start && after > start && text[before - 1] === undone[after - 1]) {
+    before -= 1;
+    after -= 1;
+  }
+  const characters: Array<{ char: string; marks: DocumentNode["marks"] }> = [];
+  for (const node of nodes) {
+    for (let index = 0; index < (node.text as string).length; index += 1) {
+      characters.push({ char: (node.text as string)[index], marks: node.marks });
+    }
+  }
+  const anchor = characters[start] ?? characters[characters.length - 1];
+  const inserted = Array.from(undone.slice(start, after)).map((char) => ({ char, marks: anchor?.marks }));
+  const result: DocumentNode[] = [];
+  for (const item of [...characters.slice(0, start), ...inserted, ...characters.slice(before)]) {
+    const previous = result[result.length - 1];
+    if (previous && equalValue(previous.marks, item.marks)) {
+      previous.text = `${previous.text ?? ""}${item.char}`;
+    } else {
+      result.push({ type: "text", text: item.char, ...(item.marks ? { marks: item.marks } : {}) });
+    }
+  }
+  block.content = result;
+  return true;
+}
+
 function undoValue(root: unknown, change: ValueChange): void {
   if (change.path.length === 0) return;
   const parent = getAt(root, change.path.slice(0, -1));
@@ -228,16 +279,20 @@ function undoValue(root: unknown, change: ValueChange): void {
 // This mirrors documentPlainText but keeps trailing whitespace: typing a space
 // is still a real edit that the revision must be able to undo.
 export function trackedText(document: SentenceDocument): string {
-  const visit = (node: DocumentNode): string => {
-    if (typeof node.text === "string") return node.text;
-    if (node.type === "hardBreak") return "\n";
-    if (node.type === "footnote") {
-      const text = node.attrs?.text;
-      return typeof text === "string" ? text : "";
-    }
-    return (node.content ?? []).map(visit).join("");
-  };
-  return (document.content ?? []).map(visit).join("");
+  return (document.content ?? []).map(plainNodeText).join("");
+}
+
+function plainNodeText(node: unknown): string {
+  if (typeof node === "string") return node;
+  if (!isObject(node)) return "";
+  if (typeof node.text === "string") return node.text;
+  if (node.type === "hardBreak") return "\n";
+  if (node.type === "footnote") {
+    const text = node.attrs;
+    const value = isObject(text) ? text.text : undefined;
+    return typeof value === "string" ? value : "";
+  }
+  return Array.isArray(node.content) ? node.content.map(plainNodeText).join("") : "";
 }
 
 // Structural edits need their own signature: splitting a paragraph or adding an
@@ -286,6 +341,7 @@ export function undoDocumentChanges(document: SentenceDocument, changes: Change[
   const next = JSON.parse(JSON.stringify(document)) as SentenceDocument;
   for (const change of changes) {
     if (change.kind === "text") {
+      if (undoBlockText(next, change)) continue;
       const current = getAt(next, change.path);
       if (typeof current === "string") setValue(next, change.path, undoText(current, change));
     } else {
@@ -295,10 +351,67 @@ export function undoDocumentChanges(document: SentenceDocument, changes: Change[
   return next;
 }
 
+// Merge runs only for alignment: a restored block keeps the marks it had, or
+// rejecting the deletion of a formatted paragraph would strip its formatting.
+// A comment whose thread was deleted must not come back with the text, though.
+function commentMarkIds(document: SentenceDocument): Set<string> {
+  const ids = new Set<string>();
+  const visit = (node: DocumentNode) => {
+    for (const mark of node.marks ?? []) {
+      if (mark.type === "comment" && typeof mark.attrs?.markId === "string") ids.add(mark.attrs.markId);
+    }
+    for (const child of node.content ?? []) visit(child);
+  };
+  visit(document);
+  return ids;
+}
+
+function withoutDeletedComments(node: unknown, live: Set<string>): unknown {
+  if (Array.isArray(node)) return node.map((item) => withoutDeletedComments(item, live));
+  if (!isObject(node)) return node;
+  const result: Record<string, unknown> = { ...node };
+  if (Array.isArray(node.marks)) {
+    const marks = node.marks.filter((mark) => {
+      if (!isObject(mark) || mark.type !== "comment") return true;
+      const attrs = mark.attrs;
+      return isObject(attrs) && typeof attrs.markId === "string" && live.has(attrs.markId);
+    });
+    if (marks.length > 0) result.marks = marks;
+    else delete result.marks;
+  }
+  if (Array.isArray(node.content)) result.content = node.content.map((item) => withoutDeletedComments(item, live));
+  return result;
+}
+
+function rawRestoration(before: SentenceDocument, change: Change): Change {
+  if (change.kind !== "value" || change.after !== undefined || !isObject(change.before)) return change;
+  if (typeof change.before.type !== "string") return change;
+  const raw = getAt(before, change.path);
+  if (
+    !isObject(raw) ||
+    raw.type !== change.before.type ||
+    JSON.stringify(raw.attrs) !== JSON.stringify(change.before.attrs) ||
+    plainNodeText(raw) !== plainNodeText(change.before)
+  ) {
+    return change;
+  }
+  return { ...change, before: raw };
+}
+
 // Rejection rewrites the document, so the next tracked edit must be measured
 // from that result rather than from the snapshot that still held the rejected text.
 export function applyRejection(document: SentenceDocument, revision: Revision): { document: SentenceDocument; changes: Change[] } {
-  const changes = documentChanges(revision.beforeDocument ?? document, revision.afterDocument ?? document);
+  const beforeDocument = revision.beforeDocument ?? document;
+  const liveComments = commentMarkIds(document);
+  const changes = documentChanges(
+    mergeTextRuns(beforeDocument),
+    mergeTextRuns(revision.afterDocument ?? document),
+  ).map((change) => {
+    const restored = rawRestoration(beforeDocument, change);
+    return restored.kind === "value" && isObject(restored.before)
+      ? { ...restored, before: withoutDeletedComments(restored.before, liveComments) }
+      : restored;
+  });
   return { document: undoDocumentChanges(document, changes), changes };
 }
 
