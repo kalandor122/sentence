@@ -4294,7 +4294,9 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click the first cell of the second row and press 'Delete row'. Click the first cell of the (now last) second row and press 'Delete row' again. With one 3-column row left, press 'Header row' once.\nActual: Only the second and third cells become TD. The first cell stays TH with the header background and 650 font weight, and 'Header row' still reports aria-pressed='true'. The re-exported tabular is unchanged, so applying it back turns all three cells into headers again.",
       "source": "explore:tables:turning off the header row of a one-row table leaves its first cell as a header",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T17:26:24Z"
     },
     {
       "id": "qa-270",
@@ -4466,10 +4468,11 @@
       ],
       "hint": "Repro: Open a project and switch to Source from the status bar. Before \\end{document} insert: \\section{Writing \\LaTeX{} with Sentence} and A caf\\'e typed with \\TeX{} and \\ldots{} more. Click Apply source, then Visual. The heading reads 'Writing \\LaTeX{} with Sentence' and the paragraph reads 'A caf\\'e typed with \\TeX{} and \\ldots{} more' with visible backslashes. Switch back to Source and click Refresh from visual (a page reload does the same): the heading line becomes \\section{Writing \\textbackslash{}LaTeX\\{\\} with Sentence} and the paragraph becomes A caf\\textbackslash{}'e typed with \\textbackslash{}TeX\\{\\} and \\textbackslash{}ldots\\{\\} more.\nActual: Apply source reports 'Visual document synchronized from LaTeX.' but the visual document shows the control sequences literally, and regenerating the source (Refresh from visual or reload) escapes them to \\textbackslash{}LaTeX\\{\\}, \\textbackslash{}TeX\\{\\}, \\textbackslash{}ldots\\{\\} and \\textbackslash{}'e, so the compiled paper would print the backslash text instead of the accent or symbol.",
       "source": "explore:source-editor:standard latex commands and accents typed in the source render as literal backslashes and are escaped permanently on the",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T17:23:06Z",
-      "lastAttemptAt": "2026-11-26T17:23:06Z"
+      "lastAttemptAt": "2026-11-26T17:23:06Z",
+      "doneAt": "2026-11-26T17:25:42Z"
     },
     {
       "id": "qa-282",

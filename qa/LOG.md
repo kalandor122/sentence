@@ -837,3 +837,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T17:04:04Z DONE qa-264 (tsc -b, npm test, smoke all green)
 2026-11-26T17:22:46Z EXPLORE source-editor: 2 new items, agent exit 0
 2026-11-26T17:23:06Z START qa-281 on qa/qa-281-standard-latex-commands-and-accents-type: Standard LaTeX commands and accents typed in the source render as literal backslashes and are escaped permanently on the
+2026-11-26T17:25:45Z PUSHED main
+2026-11-26T17:25:45Z DONE qa-281 (tsc -b, npm test, smoke all green)
