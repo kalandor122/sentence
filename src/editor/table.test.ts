@@ -320,6 +320,18 @@ describe("CaptionTable", () => {
     editor.destroy();
   });
 
+  it("keeps a Shift+Enter line break inside the cell it was typed in", () => {
+    const editor = createSizedEditor(2, 2);
+    editor.commands.setTextSelection(cellPositions(editor)[0]);
+    editor.commands.insertContent("one");
+    editor.commands.setHardBreak();
+    editor.commands.insertContent("two");
+    const latex = documentToLatex(editor.getJSON() as SentenceDocument, DEFAULT_SETTINGS);
+    expect(latex).toContain("\\shortstack[l]{one\\\\two} &  \\\\");
+    expect(rowTypes(editor)).toHaveLength(2);
+    editor.destroy();
+  });
+
   it("moves the caret back with Shift-Tab", () => {
     const editor = createSizedEditor(2, 2);
     const positions = cellPositions(editor);

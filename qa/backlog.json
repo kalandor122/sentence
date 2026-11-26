@@ -4249,8 +4249,9 @@
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click the top-middle header cell, type 'one', press Shift+Enter, type 'two'. Switch to View > LaTeX and read the tabular.\nActual: The header row is exported as ' & one\\\\two &  \\\\'. '\\\\' is a tabular row terminator, so compiling the exported block with the bundled Tectonic binary prints 'one' and 'two' on separate table rows even though the visual editor shows both lines in one cell.",
       "source": "explore:tables:shift+enter in a table cell exports a row terminator, so the cell is split into two rows in the pdf",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T14:58:52Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T14:58:52Z",
+      "lastAttemptAt": "2026-11-26T14:58:52Z"
     },
     {
       "id": "qa-269",
