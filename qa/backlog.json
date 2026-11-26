@@ -4214,10 +4214,11 @@
       ],
       "hint": "Repro: Open View > LaTeX and insert '\\section{The \\(x^2\\) model}' before \\end{document}; click Apply source. Place the caret at the end of the document and click References > Table of contents.\nActual: The preview entry reads '2 The model' (the formula is missing), while the exported source still contains '\\section{The \\(x^2\\) model}', so the visual contents and the PDF contents disagree. Probe qa/probes/insert-media.mjs scenario 'toc-math-heading'.",
       "source": "explore:insert-media:the toc preview drops inline math from a heading, so its entry does not match the printed contents",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T17:02:03Z",
-      "lastAttemptAt": "2026-11-26T17:02:03Z"
+      "lastAttemptAt": "2026-11-26T17:02:03Z",
+      "doneAt": "2026-11-26T17:04:03Z"
     },
     {
       "id": "qa-265",
@@ -4453,6 +4454,32 @@
       ],
       "hint": "Repro: 1. New document. 2. Select some text and add a comment with a two-line body: 'First line of the comment.' newline 'Second line of the comment.' 3. Inspect the comment card in the Review panel. 4. Click Reply, submit 'Reply line one.' newline 'Reply line two.', and inspect the reply.\nActual: Both are rendered as a single line: the card shows 'First line of the comment. Second line of the comment.' and the reply shows 'Reply line one. Reply line two.' The stored text still contains the newline (textContent includes \\n), but the computed white-space is 'normal' for .comment-thread > p and .comment-reply p, so the line break collapses.",
       "source": "explore:review:multi-line comment and reply bodies lose their line breaks when displayed",
+      "status": "open"
+    },
+    {
+      "id": "qa-281",
+      "title": "Standard LaTeX commands and accents typed in the source render as literal backslashes and are escaped permanently on the",
+      "why": "Exploratory pass on source-editor (content): expected Standard LaTeX commands render as their text (LaTeX, TeX, an ellipsis, an accented e) or at minimum stay byte-for-byte unchanged in the exported LaTeX.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open a project and switch to Source from the status bar. Before \\end{document} insert: \\section{Writing \\LaTeX{} with Sentence} and A caf\\'e typed with \\TeX{} and \\ldots{} more. Click Apply source, then Visual. The heading reads 'Writing \\LaTeX{} with Sentence' and the paragraph reads 'A caf\\'e typed with \\TeX{} and \\ldots{} more' with visible backslashes. Switch back to Source and click Refresh from visual (a page reload does the same): the heading line becomes \\section{Writing \\textbackslash{}LaTeX\\{\\} with Sentence} and the paragraph becomes A caf\\textbackslash{}'e typed with \\textbackslash{}TeX\\{\\} and \\textbackslash{}ldots\\{\\} more.\nActual: Apply source reports 'Visual document synchronized from LaTeX.' but the visual document shows the control sequences literally, and regenerating the source (Refresh from visual or reload) escapes them to \\textbackslash{}LaTeX\\{\\}, \\textbackslash{}TeX\\{\\}, \\textbackslash{}ldots\\{\\} and \\textbackslash{}'e, so the compiled paper would print the backslash text instead of the accent or symbol.",
+      "source": "explore:source-editor:standard latex commands and accents typed in the source render as literal backslashes and are escaped permanently on the",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T17:23:06Z"
+    },
+    {
+      "id": "qa-282",
+      "title": "Parse-error toast stays on screen after the corrected source autosaves successfully",
+      "why": "Exploratory pass on source-editor (ux): expected The error notice clears or updates as soon as the corrected draft parses and the autosave succeeds.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Switch to Source and insert 'Text with { a missing closing brace' before \\end{document}. Wait about 1.2s for autosave: the toast 'Invalid LaTeX: missing closing brace.' and the Retry save button appear. Change the line to 'Text with a repaired brace' and wait for the next autosave (about 1.2s). The Retry save button clears and the document saves, but the error toast still shows the old 'Invalid LaTeX: missing closing brace.' message until its original 4s timeout expires.\nActual: After the successful save the save-error control is gone and the word count advances (111 to 116), yet the toast keeps displaying the stale parse error 'Invalid LaTeX: missing closing brace.'; no success path clears it early.",
+      "source": "explore:source-editor:parse-error toast stays on screen after the corrected source autosaves successfully",
       "status": "open"
     }
   ]

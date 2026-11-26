@@ -833,3 +833,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T17:01:24Z PUSHED main
 2026-11-26T17:01:24Z DONE qa-260 (tsc -b, npm test, smoke all green)
 2026-11-26T17:02:03Z START qa-264 on qa/qa-264-the-toc-preview-drops-inline-math-from-a: The TOC preview drops inline math from a heading, so its entry does not match the printed contents
+2026-11-26T17:04:04Z PUSHED main
+2026-11-26T17:04:04Z DONE qa-264 (tsc -b, npm test, smoke all green)
+2026-11-26T17:22:46Z EXPLORE source-editor: 2 new items, agent exit 0
