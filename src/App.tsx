@@ -919,6 +919,7 @@ export default function App() {
     const pathAtStart = current.path;
     const stillActive = () => workspaceRef.current?.path === pathAtStart;
     let draftError: string | null = null;
+    let draftApplied = false;
     // A visual edit made after the draft started is newer than the draft.
     // Applying the draft here would drop the visible text on the next autosave,
     // so the draft waits for the explicit Apply source.
@@ -939,16 +940,20 @@ export default function App() {
           workspaceRef.current = current;
           setWorkspace(current);
         }
-        setSourceDirty(false);
-        sourceDirtyRef.current = false;
-        sourceDraftDocument.current = null;
-        sourceDraftWarning.current = false;
-        // Autosave commits the draft without the Apply button, so the next key
-        // still has to start a new undo step rather than extend the old one.
-        setSourceUndoBoundary((value) => value + 1);
-        // The pagehide flush can run this far and then never render again, so
-        // drop the stored draft here rather than waiting for the effect.
-        if (!isDesktop) saveBrowserDraft(null);
+        // The browser keeps the stored draft until the workspace write has
+        // actually succeeded, so a blocked write cannot delete the only copy
+        // of the edit. Desktop has no stored draft to clear.
+        if (isDesktop) {
+          setSourceDirty(false);
+          sourceDirtyRef.current = false;
+          sourceDraftDocument.current = null;
+          sourceDraftWarning.current = false;
+          // Autosave commits the draft without the Apply button, so the next key
+          // still has to start a new undo step rather than extend the old one.
+          setSourceUndoBoundary((value) => value + 1);
+        } else {
+          draftApplied = true;
+        }
         setSaveError(null);
       } catch (error) {
         // An unapplied draft can be hidden behind the visual editor. Letting
@@ -981,6 +986,16 @@ export default function App() {
       : documentSource(current.document, current.settings);
     if (!isDesktop) {
       if (!persistBrowser(current)) return null;
+      if (draftApplied) {
+        setSourceDirty(false);
+        sourceDirtyRef.current = false;
+        sourceDraftDocument.current = null;
+        sourceDraftWarning.current = false;
+        // Autosave commits the draft without the Apply button, so the next key
+        // still has to start a new undo step rather than extend the old one.
+        setSourceUndoBoundary((value) => value + 1);
+        saveBrowserDraft(null);
+      }
       const recentError = rememberProject(current);
       setSaveError(recentError ?? draftError);
       if (draftError || draftConflict || recentError) {
