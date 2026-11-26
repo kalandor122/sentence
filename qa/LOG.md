@@ -781,3 +781,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-25T18:33:36Z START qa-266 on qa/qa-266-list-item-text-that-starts-with-a-square: List item text that starts with a square bracket is written as an \item optional label and loses its brackets
 2026-11-25T18:35:59Z PUSHED main
 2026-11-25T18:35:59Z DONE qa-266 (tsc -b, npm test, smoke all green)
+2026-11-26T14:45:23Z START qa-270 on qa/qa-270-an-escaped-dollar-inside-inline-math-is: An escaped dollar inside $...$ inline math is read as the closing delimiter and corrupts the formula
