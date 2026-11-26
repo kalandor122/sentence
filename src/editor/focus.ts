@@ -4,8 +4,7 @@ import type { Editor } from "@tiptap/react";
 // edge of a table). Controls are looked up on demand so panels and dialogs
 // that appear later are still reachable, and wrapping keeps the page from
 // stranding the keyboard when nothing sits on one side of it.
-function controlsAround(editor: Editor): HTMLElement[] {
-  const dom = editor.view.dom;
+function controlsAround(dom: HTMLElement): HTMLElement[] {
   return Array.from(
     document.querySelectorAll<HTMLElement>(
       'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
@@ -19,9 +18,8 @@ function controlsAround(editor: Editor): HTMLElement[] {
   );
 }
 
-function focusControl(editor: Editor, forward: boolean): boolean {
-  const dom = editor.view.dom;
-  const controls = controlsAround(editor);
+function focusControl(dom: HTMLElement, forward: boolean): boolean {
+  const controls = controlsAround(dom);
   const ordered = forward ? controls : [...controls].reverse();
   const next =
     ordered.find(
@@ -37,9 +35,15 @@ function focusControl(editor: Editor, forward: boolean): boolean {
 // Hand focus to the next control after the page, wrapping to the first one, so
 // Escape from the editing surface always lands on something the keyboard can use.
 export function focusAfterEditor(editor: Editor): boolean {
-  return focusControl(editor, true);
+  return focusControl(editor.view.dom, true);
 }
 
 export function focusBeforeEditor(editor: Editor): boolean {
-  return focusControl(editor, false);
+  return focusControl(editor.view.dom, false);
+}
+
+// The LaTeX source pane is a plain textarea, so it uses the same rule to leave
+// on Escape as the visual page does.
+export function focusAfterElement(element: HTMLElement): boolean {
+  return focusControl(element, true);
 }
