@@ -33,7 +33,7 @@ import WorkspaceTabs, {
   workspaceTabId,
   type WorkspaceTabInfo,
 } from "./components/WorkspaceTabs";
-import { findDocumentMatches, findTextRanges, setFindHighlight } from "./editor/find";
+import { findDocumentMatches, findTextRanges, revealFindMatch, setFindHighlight } from "./editor/find";
 import { resetEditorHistory } from "./editor/history";
 import { toggleList } from "./editor/listToggle";
 import {
@@ -2118,7 +2118,11 @@ export default function App() {
   useEffect(() => {
     if (!editor || (!find.open && !find.query)) return;
     setFindHighlight(editor, find.open ? find.query : "", find.open ? activeFindIndex : 0);
-  }, [editor, find.open, find.query, activeFindIndex]);
+    if (find.open && mode !== "source") {
+      const range = visualFindMatches[activeFindIndex]?.ranges[0];
+      if (range) revealFindMatch(editor, range);
+    }
+  }, [editor, find.open, find.query, activeFindIndex, mode]);
 
   const openFind = (withReplace: boolean) => {
     let selected = "";
@@ -2181,6 +2185,7 @@ export default function App() {
         .setSelection(TextSelection.create(editor.state.doc, ranges[0].from, ranges[ranges.length - 1].to))
         .scrollIntoView(),
     );
+    revealFindMatch(editor, ranges[0]);
   };
 
   const replaceFind = (all: boolean) => {
