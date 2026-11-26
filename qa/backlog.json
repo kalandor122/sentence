@@ -4702,10 +4702,11 @@
       ],
       "hint": "Repro: 1) Open http://localhost:1420, click 'New document' and wait for 'Saved locally'. 2) In the devtools console run: const orig = Storage.prototype.setItem; Storage.prototype.setItem = function (key, value) { if (key === 'sentence.workspace') throw new DOMException('The quota has been exceeded.', 'QuotaExceededError'); return orig.call(this, key, value); }; . 3) Switch to Source, insert a valid sentence such as 'Victim paragraph.' before \\end{document}, and wait 1.8 s. The autosave parses the draft and the top bar shows 'Editing' with 'Retry save: The quota has been exceeded.' At this point localStorage['sentence.workspace.draft'] is gone (it was present immediately after the edit). 4) Reload without restoring Storage.prototype.setItem, then read the visual editor and View > LaTeX. Probe evidence: qa/probes/persistence.mjs phase 'draft-lost-on-failed-workspace-write' (draftExistsRightAfterEdit true; after the failed autosave draftExists false and the workspace has no victim text; after reload draftExists false, editor and LaTeX have no victim text, indicator 'Saved locally').\nActual: The draft key is removed at src/App.tsx:932 (saveBrowserDraft(null)) before persistBrowser runs at line 964. When the workspace write then throws, the only recoverable copy of the source edit is already gone. After the reload the edit is absent from the visual editor, the LaTeX textarea and localStorage, and the reloaded app reports 'Saved locally' with a check icon.",
       "source": "explore:persistence:a source draft is deleted before the workspace write succeeds, so a failed save loses the edit on reload",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T20:42:59Z",
-      "lastAttemptAt": "2026-11-26T20:42:59Z"
+      "lastAttemptAt": "2026-11-26T20:42:59Z",
+      "doneAt": "2026-11-26T20:46:25Z"
     },
     {
       "id": "qa-296",
@@ -4729,7 +4730,9 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T20:47:06Z"
     },
     {
       "id": "qa-298",
@@ -4921,6 +4924,18 @@
     },
     {
       "id": "qa-313",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-314",
       "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
       "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
       "severity": "medium",
