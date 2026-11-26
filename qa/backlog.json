@@ -4558,10 +4558,11 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T18:22:18Z",
-      "lastAttemptAt": "2026-11-26T18:22:18Z"
+      "lastAttemptAt": "2026-11-26T18:22:18Z",
+      "doneAt": "2026-11-26T18:29:28Z"
     },
     {
       "id": "qa-287",
@@ -4573,7 +4574,9 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.find`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: press Ctrl+Home in the page (scrollTop 413, editor viewport y=149-776), then Ctrl+F and type `BODY50`. The bar reports 1/1, but scrollTop stays 413 and the highlighted match sits at y=13,900-13,916, far below the viewport. Pressing Enter or clicking Next match leaves it at 1/1, scrollTop 413 and the match at 13,900. Replace the query with `Heading`: 1/50 with the first match visible; press Enter three times to 4/50. ScrollTop stays 413 while the current match moves to y=987-1,022, below the 776px viewport bottom.\nActual: The match is highlighted in the document model but the editor is never scrolled: a unique match 13,000px below the viewport stays hidden, and after three Next presses the 4/50 match is already 211px below the viewport while scrollTop remains unchanged at 413.",
       "source": "explore:long-document:find never scrolls the current match into view in a long document",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T18:30:10Z"
     },
     {
       "id": "qa-288",
@@ -4601,6 +4604,18 @@
     },
     {
       "id": "qa-290",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-291",
       "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
       "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
       "severity": "medium",
