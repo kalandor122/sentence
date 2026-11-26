@@ -4763,8 +4763,9 @@
       "hint": "Repro: Open a project, go to Home, focus \"Paragraph spacing\" and press Enter. The popover opens, but focus stays on the ribbon button; the next Tab goes to \"Add link\" and the Before/After inputs are only reached after tabbing through the rest of the page (the popover is portalled to the end of <body>: 17 Tab presses in the probe; the count grows with sidebar content). Put focus in the Before field and press Escape: the popover closes and document.activeElement becomes BODY instead of the Paragraph spacing button.\nActual: Probe data: after Enter, focus is BUTTON.ribbon-icon-button \"Paragraph spacing\" with aria-expanded true; after one Tab focus is the \"Add link\" button; tabsToPanel = 17. After focusing the Before input and pressing Escape the panel count is 0 and activeElement is BODY.",
       "source": "explore:keyboard:paragraph spacing popover takes no focus on open and drops focus on <body> when escape closes it",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T20:57:55Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T20:57:55Z",
+      "lastAttemptAt": "2026-11-26T20:57:55Z"
     },
     {
       "id": "qa-300",
