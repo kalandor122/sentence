@@ -1090,9 +1090,24 @@ button:disabled {
   font-size: 11px;
 }
 
+.paper-stage {
+  position: relative;
+  /* The sheet is drawn with a transform, which does not change layout, so the
+     stage reserves the scaled size. That keeps the scroll range ending at the
+     bottom of the zoomed sheet and makes a zoomed-in page fully scrollable. */
+  width: max(
+    100%,
+    calc(var(--paper-width, 794px) * var(--paper-fit-scale, 1) * var(--editor-zoom, 1))
+  );
+  height: calc(
+    var(--paper-height, 1053px) * var(--sentence-page-count, 1) *
+      var(--paper-fit-scale, 1) * var(--editor-zoom, 1)
+  );
+}
+
 .paper-stack {
   position: absolute;
-  top: 38px;
+  top: 8px;
   left: 50%;
   width: min(var(--paper-width, 794px), calc(100% - 52px));
   height: var(--paper-height, 1053px);

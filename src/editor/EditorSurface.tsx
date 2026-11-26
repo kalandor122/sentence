@@ -62,6 +62,7 @@ interface EditorSurfaceProps {
   comments: CommentThread[];
   revisions: Revision[];
   editable?: boolean;
+  zoom: number;
   // undoneComments carries the comment marks an undo removed from the
   // document, so their threads can go with the highlight.
   onUpdate: (document: SentenceDocument, undoneComments?: string[]) => void;
@@ -280,6 +281,7 @@ export default function EditorSurface({
   comments,
   revisions,
   editable = true,
+  zoom,
   onUpdate,
   onReady,
   onStateChange,
@@ -336,6 +338,8 @@ export default function EditorSurface({
     .filter(Boolean);
   const lastEmitted = useRef("");
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const scrollTopRef = useRef(0);
+  const previousZoomRef = useRef(zoom);
   const [pageCount, setPageCount] = useState(1);
   const geometry = pageGeometry(settings);
 
@@ -360,6 +364,24 @@ export default function EditorSurface({
     observer.observe(scroller);
     return () => observer.disconnect();
   }, [geometry.width]);
+
+  // Scaling happens around the top of the sheet, so the scroll position has to
+  // be rescaled with it: otherwise zooming out at the end leaves the viewport
+  // past the last page, and zooming in drifts away from the text being read.
+  useLayoutEffect(() => {
+    const scroller = scrollRef.current;
+    const previousZoom = previousZoomRef.current;
+    previousZoomRef.current = zoom;
+    if (!scroller || previousZoom === zoom) return;
+    const paddingTop = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
+    const anchor = (scrollTopRef.current + scroller.clientHeight / 2 - paddingTop) / previousZoom;
+    const max = scroller.scrollHeight - scroller.clientHeight;
+    scroller.scrollTop = Math.max(
+      0,
+      Math.min(max, paddingTop + anchor * zoom - scroller.clientHeight / 2),
+    );
+    scrollTopRef.current = scroller.scrollTop;
+  }, [zoom]);
   const editor = useEditor({
     extensions: [
       ParagraphSpacing,
@@ -899,12 +921,20 @@ export default function EditorSurface({
   } as CSSProperties;
 
   return (
-    <div className="visual-editor-scroll" style={paperStyle} ref={scrollRef}>
-      <div className="paper-stack" aria-hidden="true" />
-      <article
-        className="paper-sheet"
-        style={paperStyle}
-      >
+    <div
+      className="visual-editor-scroll"
+      style={paperStyle}
+      ref={scrollRef}
+      onScroll={() => {
+        scrollTopRef.current = scrollRef.current?.scrollTop ?? 0;
+      }}
+    >
+      <div className="paper-stage">
+        <div className="paper-stack" aria-hidden="true" />
+        <article
+          className="paper-sheet"
+          style={paperStyle}
+        >
         {showFrontMatter ? (
           <header className="paper-frontmatter">
             <h1>{settings.title}</h1>
@@ -926,7 +956,8 @@ export default function EditorSurface({
           </header>
         ) : null}
         <EditorContent editor={editor} className="paper-editor-content" />
-      </article>
+        </article>
+      </div>
     </div>
   );
 }
