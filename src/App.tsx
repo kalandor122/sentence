@@ -695,7 +695,13 @@ export default function App() {
   }, [dirty]);
 
   useEffect(() => {
-    localStorage.setItem("sentence.gitAuthor", JSON.stringify(gitAuthor));
+    // Best effort: the Git author is an auxiliary setting, so a blocked or
+    // full storage must not take the editor and the saved document down.
+    try {
+      localStorage.setItem("sentence.gitAuthor", JSON.stringify(gitAuthor));
+    } catch {
+      // The name stays in state for this session.
+    }
   }, [gitAuthor]);
 
   useEffect(() => {
