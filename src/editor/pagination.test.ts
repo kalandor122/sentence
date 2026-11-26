@@ -74,6 +74,12 @@ describe("scrollTopForZoom", () => {
     expect(scrollTopForZoom(14082, 627, 30, 1, 0.7, 9702)).toBe(9702);
     expect(scrollTopForZoom(0, 627, 30, 1, 0.7, 9702)).toBe(0);
   });
+
+  it("holds the reading position across zoom in and back out", () => {
+    const zoomedIn = scrollTopForZoom(5000, 627, 30, 1, 1.5, 30000);
+    expect(zoomedIn).toBeCloseTo(7642, 0);
+    expect(scrollTopForZoom(zoomedIn, 627, 30, 1.5, 1, 20000)).toBeCloseTo(5000, 6);
+  });
 });
 
 describe("pageLineGaps", () => {
