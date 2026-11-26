@@ -21,6 +21,7 @@ export default function ParagraphSpacingControl({
   const [after, setAfter] = useState(0);
   const panel = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
+  const beforeInput = useRef<HTMLInputElement>(null);
 
   // Reflect the caret's paragraph whenever the selection moves.
   useEffect(() => {
@@ -30,6 +31,12 @@ export default function ParagraphSpacingControl({
     setAfter(current.after);
   }, [editor, editorVersion, open]);
 
+  // The popover is portalled to the end of <body>, so move focus into it
+  // explicitly; otherwise Tab continues from the ribbon button.
+  useEffect(() => {
+    if (open) beforeInput.current?.focus();
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const onDown = (event: MouseEvent) => {
@@ -38,7 +45,10 @@ export default function ParagraphSpacingControl({
       setOpen(false);
     };
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setOpen(false);
+      button.current?.focus();
     };
     window.addEventListener("mousedown", onDown);
     window.addEventListener("keydown", onKey);
@@ -81,6 +91,7 @@ export default function ParagraphSpacingControl({
           <label>
             <span>Before (pt)</span>
             <input
+              ref={beforeInput}
               type="number"
               min={0}
               max={96}
