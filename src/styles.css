@@ -1106,7 +1106,10 @@ button:disabled {
 .paper-sheet {
   position: relative;
   box-shadow: var(--shadow-sheet);
-  width: min(var(--paper-width, 794px), calc(100% - 52px));
+  /* The page keeps its real paper width; a narrow pane scales it down instead
+     of rewrapping the text at a different measure. */
+  width: var(--paper-width, 794px);
+  zoom: var(--paper-fit-scale, 1);
   min-height: calc(var(--paper-height, 1053px) * var(--sentence-page-count, 1));
   margin: 0 auto;
   transform: scale(var(--editor-zoom));

@@ -6,7 +6,7 @@ import Superscript from "@tiptap/extension-superscript";
 import { TableKit } from "@tiptap/extension-table";
 import TextAlign from "@tiptap/extension-text-align";
 import { NodeSelection, Selection, TextSelection } from "@tiptap/pm/state";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import {
   Citation,
   CommentMark,
@@ -74,6 +74,10 @@ interface EditorSurfaceProps {
   onEditCrossReference: (label: string, position: number) => void;
   onPageCountChange: (pages: number) => void;
 }
+
+// Breathing room left on each side of a page that had to be scaled down to fit
+// the pane, matching the sheet gutter in the stylesheet.
+const PAPER_GUTTER = 52;
 
 const FONT_STACKS: Record<ProjectSettings["fontFamily"], string> = {
   default: '"Palatino Linotype", "Book Antiqua", Georgia, serif',
@@ -331,8 +335,31 @@ export default function EditorSurface({
     .map((name) => name.trim())
     .filter(Boolean);
   const lastEmitted = useRef("");
+  const scrollRef = useRef<HTMLDivElement | null>(null);
   const [pageCount, setPageCount] = useState(1);
   const geometry = pageGeometry(settings);
+
+  // A page is laid out at its real paper width and only scaled down when the
+  // pane is narrower, so opening Split or the inspector never reflows the text
+  // or moves the page boundaries.
+  useLayoutEffect(() => {
+    const scroller = scrollRef.current;
+    if (!scroller) return;
+    const fit = () => {
+      const styles = getComputedStyle(scroller);
+      const padding = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+      const available = scroller.clientWidth - padding - PAPER_GUTTER;
+      if (available <= 0) return;
+      scroller.style.setProperty(
+        "--paper-fit-scale",
+        String(Math.min(1, available / geometry.width)),
+      );
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(scroller);
+    return () => observer.disconnect();
+  }, [geometry.width]);
   const editor = useEditor({
     extensions: [
       ParagraphSpacing,
@@ -872,7 +899,7 @@ export default function EditorSurface({
   } as CSSProperties;
 
   return (
-    <div className="visual-editor-scroll" style={paperStyle}>
+    <div className="visual-editor-scroll" style={paperStyle} ref={scrollRef}>
       <div className="paper-stack" aria-hidden="true" />
       <article
         className="paper-sheet"
