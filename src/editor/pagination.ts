@@ -161,6 +161,20 @@ export function scrollTopForZoom(
   return Math.max(0, Math.min(maxScrollTop, target));
 }
 
+// A zoomed-in sheet can be wider than the pane, so the horizontal offset has to
+// be rescaled with it too. Keeping the offset proportional holds the part of the
+// page being read in view instead of snapping back to the left edge, while a
+// page that is not scrolled (or no longer wider than the pane) stays left-aligned.
+export function scrollLeftForZoom(
+  scrollLeft: number,
+  previousZoom: number,
+  zoom: number,
+  maxScrollLeft: number,
+): number {
+  if (scrollLeft <= 0) return 0;
+  return Math.max(0, Math.min(maxScrollLeft, scrollLeft * (zoom / previousZoom)));
+}
+
 // Centre-anchoring alone loses the caret when it sits below the middle of the
 // viewport (at the end of a document, for example): scaling its distance from
 // the centre can push it off-screen. When the caret was visible before the
