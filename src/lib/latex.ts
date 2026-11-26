@@ -1123,7 +1123,10 @@ function parseInline(source: string): InlineParseResult {
       continue;
     }
 
-    const dollarMathMatch = remainder.match(/^\$((?:\\.|[^$\\\n])+)\$(?!\$)/);
+    // Math may continue on the next line (a block never contains a blank line),
+    // so a dollar-delimited formula must not stop at the line break the way
+    // running text does.
+    const dollarMathMatch = remainder.match(/^\$((?:\\.|[^$\\])+)\$(?!\$)/s);
     if (dollarMathMatch) {
       flush();
       content.push({ type: "mathInline", attrs: { latex: dollarMathMatch[1] } });

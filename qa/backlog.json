@@ -4287,8 +4287,9 @@
       "hint": "Repro: 1. Create a project and open View > LaTeX.\n2. Replace the body before \\end{document} with:\nCosts $a\n+ b$ total.\n(the line break is inside the dollar delimiters; there is no blank line)\n3. Click Apply source: the toast says 'Visual document synchronized from LaTeX.'\n4. Switch to View > Visual: the paragraph reads 'Costs $a + b$ total.' and contains no math node.\n5. Open View > LaTeX and click Refresh from visual: the body is 'Costs \\$a\n+ b\\$ total.'.\nFor comparison, the same input with the paren form, Costs \\(a\n+ b\\) total., imports as one math node and round-trips as \\(a\n+ b\\).\nActual: No math node is created. The dollar delimiters are kept as ordinary paragraph text and the export escapes them to \\$a ... b\\$, so the formula is lost and the exported source contains literal dollar signs instead of math.",
       "source": "explore:math:a line break inside $...$ inline math is accepted but the formula is rewritten as literal dollars",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T14:47:28Z"
+      "attempts": 1,
+      "startedAt": "2026-11-26T14:47:28Z",
+      "lastAttemptAt": "2026-11-26T14:47:28Z"
     },
     {
       "id": "qa-272",

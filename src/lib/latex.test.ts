@@ -607,6 +607,19 @@ describe("LaTeX generation", () => {
     expect(documentToLatex(parsed, settings)).toContain("Price \\(a\\$b\\) today.");
   });
 
+  it("keeps a line break inside dollar-delimited inline math", () => {
+    const source = "\\begin{document}\nCosts $a\n+ b$ total.\n\\end{document}";
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const paragraph = parsed.content[0];
+    expect(paragraph?.content?.map((node) => node.type)).toEqual([
+      "text",
+      "mathInline",
+      "text",
+    ]);
+    expect(paragraph?.content?.[1]?.attrs).toEqual({ latex: "a\n+ b" });
+    expect(documentToLatex(parsed, settings)).toContain("Costs \\(a\n+ b\\) total.");
+  });
+
   it("imports hand-authored \\href as an editable link and re-exports it", () => {
     const source = [
       "\\begin{document}",
