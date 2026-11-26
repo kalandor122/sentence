@@ -853,3 +853,8 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T17:39:35Z DONE qa-279 (tsc -b, npm test, smoke all green)
 2026-11-26T17:40:15Z PROMOTED from roadmap: qa-283 Start screen: replace the remaining hard-coded colours with tokens
 2026-11-26T17:40:15Z START qa-280 on qa/qa-280-multi-line-comment-and-reply-bodies-lose: Multi-line comment and reply bodies lose their line breaks when displayed
+2026-11-26T17:41:27Z PUSHED main
+2026-11-26T17:41:27Z DONE qa-280 (tsc -b, npm test, smoke all green)
+2026-11-26T18:04:22Z EXPLORE long-document: 4 new items, agent exit 0
+2026-11-26T18:04:42Z IMPORTED 1 tester findings into the backlog
+2026-11-26T18:04:42Z RECOVERED qa-258 (in_progress for 74 min)

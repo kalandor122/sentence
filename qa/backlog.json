@@ -4120,7 +4120,7 @@
       ],
       "hint": "Repro: Select some text, go to the Home tab, focus \"Text color\", press ArrowDown twice (No color then Black) and Enter. The text turns black and focus returns to the editor. Reopen the palette with ArrowDown: none of the ten swatches has aria-checked or aria-selected, and the trigger is still named only \"Text color\" with no value or aria-valuetext. The applied colour is conveyed only by the CSS colour bar under the icon.\nActual: Probe data after applying Black: trigger {label:\"Text color\", value:null, expanded:\"true\"}; every swatch has checked:null and selected:null, including Black.",
       "source": "explore:keyboard:colour palettes never expose the applied text colour",
-      "status": "in_progress",
+      "status": "open",
       "attempts": 0,
       "startedAt": "2026-11-26T16:50:29Z"
     },
@@ -4470,10 +4470,11 @@
       ],
       "hint": "Repro: 1. New document. 2. Select some text and add a comment with a two-line body: 'First line of the comment.' newline 'Second line of the comment.' 3. Inspect the comment card in the Review panel. 4. Click Reply, submit 'Reply line one.' newline 'Reply line two.', and inspect the reply.\nActual: Both are rendered as a single line: the card shows 'First line of the comment. Second line of the comment.' and the reply shows 'Reply line one. Reply line two.' The stored text still contains the newline (textContent includes \\n), but the computed white-space is 'normal' for .comment-thread > p and .comment-reply p, so the line break collapses.",
       "source": "explore:review:multi-line comment and reply bodies lose their line breaks when displayed",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T17:40:15Z",
-      "lastAttemptAt": "2026-11-26T17:40:15Z"
+      "lastAttemptAt": "2026-11-26T17:40:15Z",
+      "doneAt": "2026-11-26T17:41:25Z"
     },
     {
       "id": "qa-281",
@@ -4513,6 +4514,68 @@
       ],
       "hint": "src/styles.css: the .start-* block (from `/* Start screen */` to `.start-card`) still hard-codes warm colours. Replace each literal with the matching token from docs/DESIGN.md (--chrome, --chrome-strong, --paper, --ink, --muted, --accent, --accent-soft, --line) and keep the grid pattern but derived from --ink at low alpha. No layout changes. Acceptance: no #rrggbb literals inside the .start-* block except transparent/rgba; gate still green.",
       "source": "roadmap:start screen: replace the remaining hard-coded colours with tokens",
+      "status": "open"
+    },
+    {
+      "id": "qa-284",
+      "title": "A table taller than a page is never paginated: page rules cut through rows and rows sit in the margins",
+      "why": "Exploratory pass on long-document (visual): expected Every table row stays inside the 96px top and bottom margins of its page, and each page rule falls in the blank gap between rows, exactly as the 3,600-word paragraph/heading document in `stages.layout` does (0 margin lines and 0 rule crossings).",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.longTable`, or reproduce by hand at 1280x800: open http://localhost:1420, click 'New document', press Ctrl+A then Backspace, put a 61-row HTML table on the clipboard (`<table><thead><tr><th>Name</th><th>Value</th><th>Notes</th></tr></thead><tbody>` followed by 60 rows whose cells are `Row N alpha`, `Row N beta content`, `Row N gamma content`) and press Ctrl+V. The status bar reads 663 words / 4 pages and the editor contains one 61-row table, but the page audit of its 183 text line boxes finds 15 lines above a page's 96px top margin, 21 lines below the 96px bottom margin, and 3 line boxes crossing a page rule: on page 3 the box 3368-3383px runs through `Row 56 alpha`, `Row 56 beta content` and `Row 56 gamma content` at the rule at y=3369.\nActual: The pagination pass only adjusts top-level P, H1-H3, UL, OL and BLOCKQUOTE blocks. ProseMirror wraps the table in a DIV, which is skipped, so the whole table is left as one continuous flow: 36 lines end up inside page margins and Row 56 is drawn across the page boundary.",
+      "source": "explore:long-document:a table taller than a page is never paginated: page rules cut through rows and rows sit in the margins",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T18:04:42Z"
+    },
+    {
+      "id": "qa-285",
+      "title": "The status-bar page count follows the pane width: Split reports 26 pages and Document properties 23 for the same 13-page",
+      "why": "Exploratory pass on long-document (functional): expected Opening Split or Document properties must not change the paper width or pagination of the document; the status bar keeps reporting the document's 13 pages, scaling the sheet to fit the narrower pane if necessary.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.pageCountVsPane`, or reproduce by hand at 1280x800: create a new document, clear it, and paste the probe's 50-heading/3,600-word document. The full visual view reports 13 pages with a 794px-wide, 14,599px-tall sheet. Click the 'Split' button in the status bar: the same document now reports 26 pages, the sheet shrinks to 448px wide and grows to 29,198px tall, and the text rewraps. Click 'Visual': 13 pages again. Open Layout > Document properties: it reports 23 pages with a 488px-wide, 25,829px-tall sheet; close the panel: 13 pages again. No document text or page-setup setting changes in any of these steps.\nActual: The sheet is sized to `min(paper width, available pane width)`, so opening a side pane reflows the text at a narrower measure. The reported page count and sheet height inflate from 13/14,599 to 26/29,198 in Split and 23/25,829 with the inspector open, then return to 13 when the pane closes.",
+      "source": "explore:long-document:the status-bar page count follows the pane width: split reports 26 pages and document properties 23 for the same 13-page",
+      "status": "open"
+    },
+    {
+      "id": "qa-286",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-287",
+      "title": "Find never scrolls the current match into view in a long document",
+      "why": "Exploratory pass on long-document (functional): expected Typing a query and pressing Enter/Next match brings the current match into the visible editor area (scrolling the visual page as needed), so the highlighted text can actually be read.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.find`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: press Ctrl+Home in the page (scrollTop 413, editor viewport y=149-776), then Ctrl+F and type `BODY50`. The bar reports 1/1, but scrollTop stays 413 and the highlighted match sits at y=13,900-13,916, far below the viewport. Pressing Enter or clicking Next match leaves it at 1/1, scrollTop 413 and the match at 13,900. Replace the query with `Heading`: 1/50 with the first match visible; press Enter three times to 4/50. ScrollTop stays 413 while the current match moves to y=987-1,022, below the 776px viewport bottom.\nActual: The match is highlighted in the document model but the editor is never scrolled: a unique match 13,000px below the viewport stays hidden, and after three Next presses the 4/50 match is already 211px below the viewport while scrollTop remains unchanged at 413.",
+      "source": "explore:long-document:find never scrolls the current match into view in a long document",
+      "status": "open"
+    },
+    {
+      "id": "qa-288",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
       "status": "open"
     }
   ]
