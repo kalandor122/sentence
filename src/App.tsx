@@ -34,6 +34,7 @@ import WorkspaceTabs, {
   type WorkspaceTabInfo,
 } from "./components/WorkspaceTabs";
 import { findDocumentMatches, findTextRanges, setFindHighlight } from "./editor/find";
+import { resetEditorHistory } from "./editor/history";
 import { toggleList } from "./editor/listToggle";
 import {
   createWelcomeDocument,
@@ -1345,6 +1346,10 @@ export default function App() {
     const next: Workspace = { ...current, revisions: acceptRevisions(current.revisions, ids) };
     workspaceRef.current = next;
     setWorkspace(next);
+    // Reviewing is a decision about an edit, not another edit. Keep the typing
+    // that produced it out of the undo stack so Ctrl+Z cannot delete accepted
+    // text while History still says the change was accepted.
+    if (editor) resetEditorHistory(editor);
     markDirty();
   };
 
@@ -1362,6 +1367,9 @@ export default function App() {
       setSource(latex);
       sourceRef.current = latex;
     }
+    // Rejecting rewrote the document. Ctrl+Z must not undo that rewrite behind
+    // an empty History and bring the rejected text back.
+    if (editor) resetEditorHistory(editor);
     markDirty();
   };
 

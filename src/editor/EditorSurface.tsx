@@ -451,7 +451,13 @@ export default function EditorSurface({
       return;
     }
     lastEmitted.current = incoming;
-    editor.commands.setContent(document, { emitUpdate: false });
+    // Document sync mirrors state that is already saved, such as a rejected
+    // revision. It is not an edit, so it must not become an undo step.
+    editor
+      .chain()
+      .setContent(document, { emitUpdate: false })
+      .setMeta("addToHistory", false)
+      .run();
   }, [document, editor]);
 
   useEffect(() => {
