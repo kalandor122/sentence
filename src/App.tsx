@@ -617,6 +617,12 @@ export default function App() {
   // A switch back to the visual view remounts the editor, which starts without
   // keyboard focus. Ask the effect below to hand it back once it is mounted.
   const focusVisualOnSwitch = useRef(false);
+  // Opening the first document unmounts the start screen (or a dialog) and the
+  // focused control with it, so the keyboard would restart at the skip link.
+  // The writing surface only mounts after the editor chunk loads, so remember
+  // that this screen change still owes the keyboard a focus destination.
+  const focusOnWorkspaceOpen = useRef(false);
+  const hadWorkspace = useRef(workspace !== null);
   const linkSubmitted = useRef(false);
   const changeVersion = useRef(0);
   const revisionBaseline = useRef<SentenceDocument | null>(null);
@@ -628,6 +634,24 @@ export default function App() {
   useEffect(() => {
     workspaceRef.current = workspace;
   }, [workspace]);
+
+  useEffect(() => {
+    if (workspace && !hadWorkspace.current) focusOnWorkspaceOpen.current = true;
+    hadWorkspace.current = workspace !== null;
+  }, [workspace]);
+
+  useEffect(() => {
+    if (!workspace || !focusOnWorkspaceOpen.current) return;
+    if (!editor && mode !== "source") return;
+    // A user who already tabbed into the new screen keeps their place.
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && active.isConnected && active !== document.body && active !== document.documentElement) {
+      return;
+    }
+    focusOnWorkspaceOpen.current = false;
+    if (mode === "source") sourceTextarea.current?.focus();
+    else editor?.commands.focus();
+  }, [workspace, editor, mode]);
 
   useEffect(() => {
     sourceRef.current = source;
