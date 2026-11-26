@@ -71,7 +71,7 @@ export default function StatusBar({
         >
           <Minus size={12} />
         </button>
-        <span>{zoom}%</span>
+        <span aria-live="polite">{zoom}%</span>
         <button
           type="button"
           onMouseDown={(event) => event.preventDefault()}

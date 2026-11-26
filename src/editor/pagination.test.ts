@@ -103,6 +103,22 @@ describe("scrollTopForZoomPoint", () => {
   it("clamps the target to the scaled scroll range", () => {
     expect(scrollTopForZoomPoint(14029, 13558, 627, 30, 1, 0.7, 9000)).toBe(9000);
   });
+
+  it("keeps the end of the document on screen across the full zoom range", () => {
+    const end = 14029;
+    const at70 = scrollTopForZoomPoint(end, 13558, 627, 30, 1, 0.7, 9702);
+    const at150 = scrollTopForZoomPoint(end, at70, 627, 30, 0.7, 1.5, 21382);
+    expect(30 + end * 1.5 - at150).toBeCloseTo(501, 6);
+    expect(scrollTopForZoomPoint(end, at150, 627, 30, 1.5, 1, 14082)).toBeCloseTo(13558, 6);
+  });
+
+  it("uses the pre-zoom offset when the new zoom clamped it before the effect ran", () => {
+    // The end sat at 20925 at 150%; switching to 100% clamps the DOM offset to
+    // 14082 first, but the caret's unscaled top 14029 was on screen at 148.5.
+    const target = scrollTopForZoomPoint(14029, 20925, 627, 30, 1.5, 1, 14082);
+    expect(30 + 14029 - target).toBeCloseTo(148.5, 6);
+    expect(target).toBeCloseTo(13910.5, 6);
+  });
 });
 
 describe("pageLineGaps", () => {
