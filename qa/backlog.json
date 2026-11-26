@@ -4454,10 +4454,11 @@
       ],
       "hint": "Repro: 1. New document; Review tab > Track changes. 2. Wait 4.5 s for the 'Tracked changes is on.' toast to clear, then switch to the View (or Home) tab. 3. Inspect the ribbon, status bar and document, then start a new paragraph and type 'ZZIMMEDIATE with tracking on.' and inspect the text immediately, before 1.8 s have passed.\nActual: Outside the Review tab nothing indicates that tracking is on: the status bar has no tracking text, no visible control has an aria-pressed/title mentioning tracking, and the editor looks completely normal. Immediately after typing there are 0 .sentence-revision-insertion elements; the insertion marks appear only after the 1.8 s revision debounce (they are present after 2.4 s).",
       "source": "explore:review:track changes has no live feedback: no persistent indicator and no insertion marks while typing",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T17:35:50Z",
-      "lastAttemptAt": "2026-11-26T17:35:50Z"
+      "lastAttemptAt": "2026-11-26T17:35:50Z",
+      "doneAt": "2026-11-26T17:39:33Z"
     },
     {
       "id": "qa-280",
@@ -4469,7 +4470,9 @@
       ],
       "hint": "Repro: 1. New document. 2. Select some text and add a comment with a two-line body: 'First line of the comment.' newline 'Second line of the comment.' 3. Inspect the comment card in the Review panel. 4. Click Reply, submit 'Reply line one.' newline 'Reply line two.', and inspect the reply.\nActual: Both are rendered as a single line: the card shows 'First line of the comment. Second line of the comment.' and the reply shows 'Reply line one. Reply line two.' The stored text still contains the newline (textContent includes \\n), but the computed white-space is 'normal' for .comment-thread > p and .comment-reply p, so the line break collapses.",
       "source": "explore:review:multi-line comment and reply bodies lose their line breaks when displayed",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T17:40:15Z"
     },
     {
       "id": "qa-281",
@@ -4497,6 +4500,18 @@
       ],
       "hint": "Repro: Switch to Source and insert 'Text with { a missing closing brace' before \\end{document}. Wait about 1.2s for autosave: the toast 'Invalid LaTeX: missing closing brace.' and the Retry save button appear. Change the line to 'Text with a repaired brace' and wait for the next autosave (about 1.2s). The Retry save button clears and the document saves, but the error toast still shows the old 'Invalid LaTeX: missing closing brace.' message until its original 4s timeout expires.\nActual: After the successful save the save-error control is gone and the word count advances (111 to 116), yet the toast keeps displaying the stale parse error 'Invalid LaTeX: missing closing brace.'; no success path clears it early.",
       "source": "explore:source-editor:parse-error toast stays on screen after the corrected source autosaves successfully",
+      "status": "open"
+    },
+    {
+      "id": "qa-283",
+      "title": "Start screen: replace the remaining hard-coded colours with tokens",
+      "why": "The editor is Word-styled now, but the start screen still has ~30 literal greens/creams, so the first screen a user sees is off-brand.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "src/styles.css: the .start-* block (from `/* Start screen */` to `.start-card`) still hard-codes warm colours. Replace each literal with the matching token from docs/DESIGN.md (--chrome, --chrome-strong, --paper, --ink, --muted, --accent, --accent-soft, --line) and keep the grid pattern but derived from --ink at low alpha. No layout changes. Acceptance: no #rrggbb literals inside the .start-* block except transparent/rgba; gate still green.",
+      "source": "roadmap:start screen: replace the remaining hard-coded colours with tokens",
       "status": "open"
     }
   ]
