@@ -4200,7 +4200,7 @@
       ],
       "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'inner one', press Tab, press Enter, type 'inner two'. Click at the end of 'inner one' and click Home > Bulleted list (the button is shown pressed). Open Source in the status bar, click Refresh from visual, and read the LaTeX textarea.\nActual: The editor DOM is '<ul><li><p>outer</p><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>' (two paragraph blocks), but the generated LaTeX is '\\begin{itemize}\\n\\item outer\\ninner one\\n\\begin{itemize}\\n\\item inner two\\n\\end{itemize}\\n\\end{itemize}'. The two paragraphs are joined by a single newline, which LaTeX reads as a space, so 'outer' and 'inner one' print as one paragraph in the PDF.",
       "source": "explore:lists:removing the bullet from a nested item creates a second paragraph that the latex merges into the parent item",
-      "status": "in_progress",
+      "status": "open",
       "attempts": 1,
       "startedAt": "2026-11-25T17:57:44Z",
       "lastAttemptAt": "2026-11-25T17:57:44Z"
@@ -4231,9 +4231,10 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click a body cell and type 'Captioned table' in the Table toolbar's Caption field. Hover the border between the first and second columns until the resize cursor appears, then drag it 80px to the right.\nActual: The drag changes no column width (200/200/200 before and after) and the page throws 'TypeError: Cannot read properties of undefined (reading 'width')' from updateColumnsOnResize -> displayColumnWidth -> handleMouseDown. The table's first child is the CAPTION element ahead of COLGROUP, and the resizing code passes that caption where it expects the column group. Repeating the same drag on the same table before the caption is added widens the first column from 200px to 280px with no error.",
       "source": "explore:tables:column resizing stops working and throws a typeerror on a table with a caption",
-      "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-25T18:36:38Z"
+      "status": "open",
+      "attempts": 2,
+      "startedAt": "2026-11-25T18:36:38Z",
+      "lastAttemptAt": "2026-11-25T18:39:26Z"
     },
     {
       "id": "qa-268",
@@ -4257,6 +4258,45 @@
       ],
       "hint": "Repro: Create a new project. Insert tab > Insert table. Click the first cell of the second row and press 'Delete row'. Click the first cell of the (now last) second row and press 'Delete row' again. With one 3-column row left, press 'Header row' once.\nActual: Only the second and third cells become TD. The first cell stays TH with the header background and 650 font weight, and 'Header row' still reports aria-pressed='true'. The re-exported tabular is unchanged, so applying it back turns all three cells into headers again.",
       "source": "explore:tables:turning off the header row of a one-row table leaves its first cell as a header",
+      "status": "open"
+    },
+    {
+      "id": "qa-270",
+      "title": "An escaped dollar inside $...$ inline math is read as the closing delimiter and corrupts the formula",
+      "why": "Exploratory pass on math (content): expected One inline math node with latex a\\$b rendered as a$b, and the exported body Price \\(a\\$b\\) today.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and open View > LaTeX.\n2. Replace the body before \\end{document} with:\nPrice $a\\$b$ today.\n3. Click Apply source: the toast says 'Visual document synchronized from LaTeX.'\n4. Switch to View > Visual: there is one inline math node whose data-latex is 'a\\' (a followed by one backslash), and KaTeX shows the red error 'Unexpected character: \\' at position 2.\n5. Open View > LaTeX and click Refresh from visual: the body now reads Price \\(a\\\\)b\\$ today.\nThe same input using the paren form, Price \\(a\\$b\\) today., imports correctly as one math node with latex a\\$b.\nActual: The source is reported as synchronized but split at the escaped dollar: the math node holds only 'a\\' and renders a KaTeX parse error, the rest ('b$ today.') becomes paragraph text, and the re-exported body is Price \\(a\\\\)b\\$ today.",
+      "source": "explore:math:an escaped dollar inside $...$ inline math is read as the closing delimiter and corrupts the formula",
+      "status": "in_progress",
+      "attempts": 1,
+      "startedAt": "2026-11-26T14:45:23Z",
+      "lastAttemptAt": "2026-11-26T14:45:23Z"
+    },
+    {
+      "id": "qa-271",
+      "title": "A line break inside $...$ inline math is accepted but the formula is rewritten as literal dollars",
+      "why": "Exploratory pass on math (content): expected One inline math node with latex 'a\n+ b' rendered as a+b, exported as \\(a\n+ b\\), matching the behaviour of the paren-delimited form.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and open View > LaTeX.\n2. Replace the body before \\end{document} with:\nCosts $a\n+ b$ total.\n(the line break is inside the dollar delimiters; there is no blank line)\n3. Click Apply source: the toast says 'Visual document synchronized from LaTeX.'\n4. Switch to View > Visual: the paragraph reads 'Costs $a + b$ total.' and contains no math node.\n5. Open View > LaTeX and click Refresh from visual: the body is 'Costs \\$a\n+ b\\$ total.'.\nFor comparison, the same input with the paren form, Costs \\(a\n+ b\\) total., imports as one math node and round-trips as \\(a\n+ b\\).\nActual: No math node is created. The dollar delimiters are kept as ordinary paragraph text and the export escapes them to \\$a ... b\\$, so the formula is lost and the exported source contains literal dollar signs instead of math.",
+      "source": "explore:math:a line break inside $...$ inline math is accepted but the formula is rewritten as literal dollars",
+      "status": "open"
+    },
+    {
+      "id": "qa-272",
+      "title": "Unclosed or paragraph-split $$ display math is reported as synchronized and exported as escaped literal dollars",
+      "why": "Exploratory pass on math (content): expected The source is rejected the way other unclosed math is: applying 'Inline \\(x and more.' shows 'Invalid LaTeX: unclosed math delimiter \"\\(\".' and leaves the document unchanged.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and open View > LaTeX.\n2. Replace the body before \\end{document} with:\nBefore $$F=ma\n(there is no closing $$)\n3. Click Apply source: the toast says 'Visual document synchronized from LaTeX.' (no error).\n4. Switch to View > Visual: the paragraph reads 'Before $$F=ma' with no math node.\n5. Open View > LaTeX and click Refresh from visual: the body is 'Before \\$\\$F=ma'.\nThe same happens with '$$\na\n\nb\n$$' (a blank line inside the display math): Apply reports synchronized, the visual document has two paragraphs, and the export is '\\$\\$\na\n\nb\n\\$\\$'.\nActual: Both inputs are accepted and silently rewritten with escaped dollar signs; no error is shown and the display equation is lost.",
+      "source": "explore:math:unclosed or paragraph-split $$ display math is reported as synchronized and exported as escaped literal dollars",
       "status": "open"
     }
   ]

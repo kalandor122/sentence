@@ -1123,7 +1123,7 @@ function parseInline(source: string): InlineParseResult {
       continue;
     }
 
-    const dollarMathMatch = remainder.match(/^\$([^$\n]+)\$(?!\$)/);
+    const dollarMathMatch = remainder.match(/^\$((?:\\.|[^$\\\n])+)\$(?!\$)/);
     if (dollarMathMatch) {
       flush();
       content.push({ type: "mathInline", attrs: { latex: dollarMathMatch[1] } });
