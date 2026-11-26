@@ -4308,10 +4308,61 @@
       ],
       "hint": "Repro: 1. Create a project and open View > LaTeX.\n2. Replace the body before \\end{document} with:\nBefore $$F=ma\n(there is no closing $$)\n3. Click Apply source: the toast says 'Visual document synchronized from LaTeX.' (no error).\n4. Switch to View > Visual: the paragraph reads 'Before $$F=ma' with no math node.\n5. Open View > LaTeX and click Refresh from visual: the body is 'Before \\$\\$F=ma'.\nThe same happens with '$$\na\n\nb\n$$' (a blank line inside the display math): Apply reports synchronized, the visual document has two paragraphs, and the export is '\\$\\$\na\n\nb\n\\$\\$'.\nActual: Both inputs are accepted and silently rewritten with escaped dollar signs; no error is shown and the display equation is lost.",
       "source": "explore:math:unclosed or paragraph-split $$ display math is reported as synchronized and exported as escaped literal dollars",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-26T15:03:21Z",
-      "lastAttemptAt": "2026-11-26T15:03:21Z"
+      "lastAttemptAt": "2026-11-26T15:03:21Z",
+      "doneAt": "2026-11-26T15:05:52Z"
+    },
+    {
+      "id": "qa-273",
+      "title": "Link addresses with ~, ^, $ or \\ are text-escaped, corrupting the PDF hyperlink target",
+      "why": "Exploratory pass on links-cites-footnotes (content): expected The exported \\href target and the PDF link annotation keep the address exactly as typed, so the PDF link opens https://tilde.example.org/~user/page, https://caret.example.org/a^b, https://dollar.example.org/a$b and https://back.example.org/a\\b.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Type `TildeLink word0`, select `word0`, press Ctrl+K, enter `https://tilde.example.org/~user/page` and click Insert. Repeat on new words with `https://caret.example.org/a^b`, `https://dollar.example.org/a$b` and `https://back.example.org/a\\b`. Open View > LaTeX and read the four \\href arguments. Then compile a minimal article+hyperref document containing the exported tilde \\href line with the bundled Tectonic engine (`src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu -X compile`) and read the PDF link annotations (`qpdf --qdf` and grep `/URI`).\nActual: The visual editor keeps the correct hrefs, but the exporter runs the address through the text escaper: the source reads `\\href{https://tilde.example.org/\\textasciitilde{}user/page}{word0}`, `\\href{https://caret.example.org/a\\textasciicircum{}b}{word1}`, `\\href{https://dollar.example.org/a\\$b}{word2}` and `\\href{https://back.example.org/a\\textbackslash{}b}{word3}`. Compiled with Tectonic, the PDF link annotations become `https://tilde.example.org/~{}user/page`, `https://caret.example.org/a\\TU\\textasciicircum {}b`, `https://dollar.example.org/a\\protect \\TU\\textdollar b` and `https://back.example.org/a\\TU\\textbackslash {}b` \u2014 none is the URL the user entered. Addresses with #, %, & and _ do export correctly.",
+      "source": "explore:links-cites-footnotes:link addresses with ~, ^, $ or \\ are text-escaped, corrupting the pdf hyperlink target",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-26T15:39:50Z"
+    },
+    {
+      "id": "qa-274",
+      "title": "Add/Edit link silently discards addresses with an unsupported scheme (doi:, javascript:)",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected The dialog either rejects the unsupported address with an error (as it does for a key containing braces) or accepts it; in both cases the user must not be left believing the address was applied.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Type `BadScheme word`, select `word`, press Ctrl+K, enter `javascript:alert(1)` and click Insert. Then type `DoiTarget word`, select `word`, press Ctrl+K, enter `doi:10.1000/xyz123` and click Insert. Finally type `EditScheme word`, select `word`, press Ctrl+K, enter `https://good.example.org/one` and click Insert; click the linked word, press Ctrl+K, replace the address with `javascript:alert(1)` and press Insert.\nActual: For both additions the dialog closes with no alert and no toast, the word stays unlinked (`links: []`, no \\href in the source) and the next typed character appends to the paragraph. For the edit, the dialog also closes with no error and the old address is silently kept: `afterEditLinks` is still `https://good.example.org/one` and the source still reads `EditScheme \\href{https://good.example.org/one}{word}`. Tiptap's setLink returns false for any scheme outside its allow-list, and the app swallows that result.",
+      "source": "explore:links-cites-footnotes:add/edit link silently discards addresses with an unsupported scheme (doi:, javascript:)",
+      "status": "open"
+    },
+    {
+      "id": "qa-275",
+      "title": "A citation key or cross-reference label containing ~ is accepted but makes the exported LaTeX fail to compile",
+      "why": "Exploratory pass on links-cites-footnotes (content): expected The dialog refuses characters that the generated command cannot carry (it already refuses braces, parentheses, %, #, backslash and spaces with the message \"...or LaTeX special characters\") or the exporter escapes/encodes the value so \\cite{...} and \\ref{...} stay valid.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Type `TildeCite ` at the end, open References > Insert citation > Enter a key manually, enter `a~b` and click Insert: the dialog accepts it and the visual editor shows `[a~b]`. Repeat with References > Cross-reference, label `fig~one`: it is accepted and shows `ref: fig~one`. Open View > LaTeX. Then compile the exported source (or a minimal article+hyperref document containing that line) with the bundled Tectonic engine.\nActual: Both values are accepted and exported verbatim as `TildeCite \\cite{a~b}` and `TildeRef \\ref{fig~one}`. Tectonic rejects either line with `! Missing \\endcsname inserted.` and produces no PDF, because ~ is an active character inside the \\csname lookup. The same dialogs do reject `a{b`/`fig}` with the special-characters error, so the validation list is incomplete.",
+      "source": "explore:links-cites-footnotes:a citation key or cross-reference label containing ~ is accepted but makes the exported latex fail to compile",
+      "status": "open"
+    },
+    {
+      "id": "qa-276",
+      "title": "Inserted citations and cross-references cannot be edited in the visual editor; they can only be deleted and reinserted",
+      "why": "Exploratory pass on links-cites-footnotes (ux): expected Clicking/double-clicking a citation or cross-reference (or pressing Enter on it) opens a small editor for its key/label, as double-clicking a footnote marker opens the note editor, so a typo can be corrected in place.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Type `NoEditCite ` and insert a citation with key `sentence2026` via References > Insert citation > Enter a key manually. Click the `[sentence2026]` atom, double-click it, then press Enter, then press Ctrl+K. Repeat with a cross-reference inserted with label `fig:noedit`.\nActual: Clicking selects the atom but no editor opens: `afterDoubleClick` and `afterEnter` report `{open:false}` for both atoms, and the nodes keep their old keys/labels. Ctrl+K opens the unrelated `Add link` dialog instead of editing the citation/reference. In the visual editor the only way to change either is Backspace/Delete and insert a new one (editing the LaTeX source also works, but the visual document then has to be re-synchronised).",
+      "source": "explore:links-cites-footnotes:inserted citations and cross-references cannot be edited in the visual editor; they can only be deleted and reinserted",
+      "status": "open"
     }
   ]
 }

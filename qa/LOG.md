@@ -797,3 +797,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-26T15:02:42Z PUSHED main
 2026-11-26T15:02:42Z DONE qa-268 (tsc -b, npm test, smoke all green)
 2026-11-26T15:03:21Z START qa-272 on qa/qa-272-unclosed-or-paragraph-split-display-math: Unclosed or paragraph-split $$ display math is reported as synchronized and exported as escaped literal dollars
+2026-11-26T15:05:54Z PUSHED main
+2026-11-26T15:05:54Z DONE qa-272 (tsc -b, npm test, smoke all green)
+2026-11-26T15:39:30Z EXPLORE links-cites-footnotes: 4 new items, agent exit 0
