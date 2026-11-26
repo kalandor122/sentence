@@ -226,6 +226,18 @@ describe("CaptionTable", () => {
     editor.destroy();
   });
 
+  it("keeps the colgroup first so a caption cannot break column resizing", () => {
+    const editor = createSizedEditor(2, 2);
+    editor.commands.setTextSelection(cellPositions(editor)[0]);
+    editor.commands.updateAttributes("table", { caption: "Captioned table" });
+    const table = editor.view.dom.querySelector("table");
+    // Dragging a column border passes table.firstChild to the resize helper as
+    // the colgroup, so a caption placed ahead of it throws instead of resizing.
+    expect(table?.firstChild?.nodeName).toBe("COLGROUP");
+    expect(table?.querySelector(":scope > caption")?.textContent).toBe("Captioned table");
+    editor.destroy();
+  });
+
   it("keeps the caption in its HTML form", () => {
     const editor = createSizedEditor(2, 2);
     editor.commands.setTextSelection(cellPositions(editor)[0]);
