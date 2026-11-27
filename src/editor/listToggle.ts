@@ -46,7 +46,14 @@ export function isListActive(editor: Editor, listType: "bulletList" | "orderedLi
   if (selection instanceof NodeSelection && isListNode(selection.node)) {
     return selection.node.type.name === listType;
   }
-  if (!selection.empty) return editor.isActive(listType);
+  // A selection inside one block belongs to that block, so it is no more
+  // bulleted than the same block with a collapsed caret.
+  if (!selection.empty) {
+    if (selection instanceof TextSelection && selection.$from.sameParent(selection.$to)) {
+      return markerListType(selection.$from) === listType;
+    }
+    return editor.isActive(listType);
+  }
   return markerListType(selection.$from) === listType;
 }
 
@@ -392,8 +399,10 @@ function restoreListItem(
   if (!editor.isEditable) return false;
   const { state } = editor;
   const { selection } = state;
-  if (!(selection instanceof TextSelection) || !selection.empty) return false;
-  const { $from } = selection;
+  if (!(selection instanceof TextSelection)) return false;
+  const { $from, $to } = selection;
+  // The toggle applies to this one block, so the selection must stay inside it.
+  if (!$from.sameParent($to)) return false;
   if ($from.depth < 3) return false;
   const item = $from.node(-1);
   if (item.type.name !== "listItem") return false;
@@ -404,25 +413,32 @@ function restoreListItem(
 
   const blockStart = $from.before();
   const blockEnd = $from.after();
+  const contentStart = blockStart + 1;
+  const fromOffset = $from.pos - contentStart;
+  const toOffset = $to.pos - contentStart;
   const newItem = item.type.create(item.attrs, block);
   const next = item.maybeChild(index + 1);
   const previous = item.maybeChild(index - 1);
   let tr = state.tr.delete(blockStart, blockEnd);
-  let caret = $from.pos;
+  // Where the paragraph's own text now starts, relative to contentStart.
+  let shift: number;
   if (next && next.type.name === listType) {
     tr.insert(blockStart + 1, newItem);
-    caret += 2;
+    shift = 2;
   } else if (previous && previous.type.name === listType) {
     tr.insert(blockStart - 1, newItem);
+    shift = 0;
   } else {
     tr = state.tr.replaceWith(
       blockStart,
       blockEnd,
       state.schema.nodes[listType].create(null, newItem),
     );
-    caret += 2;
+    shift = 2;
   }
-  tr.setSelection(TextSelection.create(tr.doc, caret));
+  tr.setSelection(
+    TextSelection.create(tr.doc, contentStart + shift + fromOffset, contentStart + shift + toOffset),
+  );
   editor.view.dispatch(tr.scrollIntoView());
   editor.commands.focus();
   return true;

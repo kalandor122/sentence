@@ -1024,3 +1024,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-27T21:03:54Z PUSHED main
 2026-11-27T21:03:54Z DONE qa-327 (tsc -b, npm test, smoke all green)
 2026-11-27T21:04:33Z IMPORTED 1 tester findings into the backlog
+2026-11-27T21:04:33Z START qa-328 on qa/qa-328-the-bullet-button-stays-pressed-on-a-par: The bullet button stays pressed on a paragraph that has no bullet, and clicking it again removes the parent item's bulle
