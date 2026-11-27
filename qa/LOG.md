@@ -988,3 +988,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-27T19:32:06Z DONE qa-318 (tsc -b, npm test, smoke all green)
 2026-11-27T19:32:46Z IMPORTED 1 tester findings into the backlog
 2026-11-27T19:32:46Z START qa-319 on qa/qa-319-turning-bullets-off-for-a-selection-that: Turning bullets off for a selection that spans a parent and its nested child leaves the selected child bulleted
+2026-11-27T19:36:37Z PUSHED main
+2026-11-27T19:36:37Z DONE qa-319 (tsc -b, npm test, smoke all green)
+2026-11-27T19:37:16Z IMPORTED 1 tester findings into the backlog
