@@ -189,6 +189,22 @@ export function scrollLeftForZoom(
   return Math.max(0, Math.min(maxScrollLeft, scrollLeft * (zoom / previousZoom)));
 }
 
+// The pane can also rescale the sheet without the zoom changing (a side panel
+// opening or closing). That changes the scroll range the same way, so the offset
+// has to follow it, but it holds the document point at the top of the viewport
+// rather than its centre: a reader at the start of the page must stay there when
+// the pane widens instead of being scrolled down by half a viewport.
+export function scrollTopForFit(
+  scrollTop: number,
+  paddingTop: number,
+  previousFit: number,
+  fit: number,
+  maxScrollTop: number,
+): number {
+  const target = paddingTop + (scrollTop - paddingTop) * (fit / previousFit);
+  return Math.max(0, Math.min(maxScrollTop, target));
+}
+
 // Zooming in grows the page around its centre, so a caret that sits near a
 // line's right margin can leave the pane even though the vertical correction
 // keeps its line on screen. That leaves the reader typing at a caret they cannot
