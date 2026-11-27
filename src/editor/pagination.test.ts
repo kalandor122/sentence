@@ -83,6 +83,23 @@ describe("scrollTopForZoom", () => {
     expect(zoomedIn).toBeCloseTo(7642, 0);
     expect(scrollTopForZoom(zoomedIn, 627, 30, 1.5, 1, 20000)).toBeCloseTo(5000, 6);
   });
+
+  // qa-322: wheeling to the maximum and then zooming out used to leave 3,833px
+  // of blank scroll below the sheet because the range still used the 100% layout.
+  it("stops at the scaled bottom when zooming out from the end of the range", () => {
+    const viewportHeight = 627;
+    const paddingTop = 30;
+    const paddingBottom = 80;
+    const sheetHeight = 1123 * 13;
+    const maxAt100 = sheetScrollMax(paddingTop + sheetHeight, paddingBottom, viewportHeight);
+    const maxAt70 = sheetScrollMax(paddingTop + sheetHeight * 0.7, paddingBottom, viewportHeight);
+    expect(maxAt100).toBe(14082);
+    expect(maxAt70).toBe(9702);
+
+    const top = scrollTopForZoom(maxAt100, viewportHeight, paddingTop, 1, 0.7, maxAt70);
+    expect(top).toBe(maxAt70);
+    expect(paddingTop + sheetHeight * 0.7 + paddingBottom - top).toBeCloseTo(viewportHeight, 0);
+  });
 });
 
 describe("sheetScrollMax", () => {
@@ -123,6 +140,20 @@ describe("scrollLeftForZoom", () => {
   it("clamps to the new horizontal range", () => {
     expect(scrollLeftForZoom(200, 1.5, 1, 0)).toBe(0);
     expect(scrollLeftForZoom(200, 1, 2, 300)).toBe(300);
+  });
+
+  // qa-322: at 150% the 794px sheet is 1,191px wide in a 950px pane with 34px
+  // of side padding, so the range has to cover the whole page instead of the
+  // 121px the transformed sheet used to add past the centred stage.
+  it("reaches both edges of a page that is wider than the pane", () => {
+    const sheetWidth = (794 * 150) / 100;
+    const maxScrollLeft = sheetScrollMax(sheetWidth + 34, 34, 950);
+    expect(maxScrollLeft).toBe(309);
+
+    // The left edge is visible at the start of the range and the right edge at
+    // the end, so no part of the sheet is clipped out of reach.
+    expect(scrollLeftForZoom(0, 1, 1.5, maxScrollLeft)).toBe(0);
+    expect(34 + sheetWidth - maxScrollLeft).toBeLessThanOrEqual(950);
   });
 });
 
