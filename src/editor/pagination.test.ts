@@ -130,6 +130,50 @@ describe("zooming out from the end of a long document", () => {
   });
 });
 
+describe("qa-327: zooming a long document keeps the sheet reachable", () => {
+  // The 3,600-word probe document is 13 A4 pages. From the end of the document
+  // three zoom-out clicks must keep the last line on screen, and wheeling to the
+  // new maximum must stop at the scaled sheet bottom instead of the 100% layout.
+  const pane = 950;
+  const padding = 34;
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetHeight = 1123 * 13;
+  const maxAt = (zoom: number) =>
+    sheetScrollMax(paddingTop + sheetHeight * zoom, paddingBottom, viewportHeight);
+
+  it("keeps the end line on screen through every zoom-out step", () => {
+    let top = 13558;
+    let previous = 1;
+    for (const percent of [90, 80, 70]) {
+      const zoom = percent / 100;
+      top = scrollTopForZoomPoint(14029, top, viewportHeight, paddingTop, previous, zoom, maxAt(zoom), 16);
+      expect(top).toBeLessThanOrEqual(maxAt(zoom));
+      const lineTop = paddingTop + 14029 * zoom - top;
+      expect(lineTop).toBeGreaterThanOrEqual(0);
+      expect(lineTop + 16 * zoom).toBeLessThanOrEqual(viewportHeight);
+      previous = zoom;
+    }
+
+    // Wheeling to the bottom at 70% ends the range at the scaled sheet, so the
+    // viewport is never left below the last page with blank space past it.
+    expect(paddingTop + sheetHeight * 0.7 + paddingBottom - maxAt(0.7)).toBeCloseTo(
+      viewportHeight,
+      0,
+    );
+  });
+
+  it("reaches both edges of the 150% sheet in the pane", () => {
+    const maxScrollLeft = sheetScrollMax(padding + (794 * 150) / 100, padding, pane);
+    expect(maxScrollLeft).toBe(309);
+    expect(scrollLeftForZoom(0, 1, 1.5, maxScrollLeft)).toBe(0);
+    // The right edge is visible at the maximum and the left edge at zero.
+    expect(padding + (794 * 150) / 100 - maxScrollLeft).toBeLessThanOrEqual(pane);
+    expect(scrollLeftForZoom(maxScrollLeft, 1.5, 1, 0)).toBe(0);
+  });
+});
+
 describe("sheetScrollMax", () => {
   // qa-312: the 13-page A4 sheet ends at 14,629px and the scroller has 30px of
   // top and 80px of bottom padding, so the zoomed-out range must stop at the
