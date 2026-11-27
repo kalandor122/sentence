@@ -5306,7 +5306,9 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-27T23:27:08Z"
     },
     {
       "id": "qa-335",
@@ -5650,10 +5652,11 @@
       ],
       "hint": "Repro: 1. Open http://localhost:1420, create a project, and put the caret at the end of the last paragraph. 2. With tracking off, insert a citation (References tab > Insert citation > Enter a key manually > sentence2026 > Insert) and an inline equation (Insert tab > Inline equation > x^2 > Insert). 3. Open the Review tab and click Track changes. 4. Double-click the [sentence2026] citation, change the key to otherKey2026, click Update and wait 2 s. 5. Click the rendered x^2 equation, change it to y^3, click Update and wait 2 s. 6. Open History in the sidebar.\nActual: History stays at 0 with the empty-state text after both edits: no revision card exists for either change. The document and the LaTeX already show \\cite{otherKey2026} and \\(y^3\\). Both edits therefore bypass review entirely, so they cannot be rejected or even seen.",
       "source": "explore:review:editing a citation key or an equation with track changes on is never recorded in history",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-27T23:19:12Z",
-      "lastAttemptAt": "2026-11-27T23:19:12Z"
+      "lastAttemptAt": "2026-11-27T23:19:12Z",
+      "doneAt": "2026-11-27T23:26:27Z"
     },
     {
       "id": "qa-363",
@@ -5717,6 +5720,30 @@
     },
     {
       "id": "qa-368",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-369",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-370",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
