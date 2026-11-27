@@ -244,6 +244,83 @@ describe("re-bulleting a paragraph left inside an item", () => {
     expect(isListActive(editor, "bulletList")).toBe(true);
     editor.destroy();
   });
+
+  it("treats a selection inside the unbulleted paragraph as unbulleted", () => {
+    const editor = createEditor(
+      "<ul><li><p>outer</p><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>",
+    );
+    let start = -1;
+    editor.state.doc.descendants((node, offset) => {
+      if (start >= 0) return false;
+      if (node.isText && node.text === "inner one") start = offset;
+      return start < 0;
+    });
+    editor.commands.setTextSelection({ from: start, to: start + 5 });
+    expect(isListActive(editor, "bulletList")).toBe(false);
+    expect(isListActive(editor, "orderedList")).toBe(false);
+    editor.destroy();
+  });
+
+  it("re-bullets the paragraph a selection belongs to and keeps the selection", () => {
+    const editor = createEditor(
+      "<ul><li><p>outer</p><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>",
+    );
+    let start = -1;
+    editor.state.doc.descendants((node, offset) => {
+      if (start >= 0) return false;
+      if (node.isText && node.text === "inner one") start = offset;
+      return start < 0;
+    });
+    editor.commands.setTextSelection({ from: start, to: start + 5 });
+    expect(toggleList(editor, "bulletList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ul><li><p>outer</p><ul><li><p>inner one</p></li><li><p>inner two</p></li></ul></li></ul>",
+    );
+    expect(editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)).toBe(
+      "inner",
+    );
+    editor.destroy();
+  });
+
+  it("joins a selected paragraph to the sublist above it", () => {
+    const editor = createEditor(
+      "<ul><li><p>outer</p><ul><li><p>inner two</p></li></ul><p>inner one</p></li></ul>",
+    );
+    let start = -1;
+    editor.state.doc.descendants((node, offset) => {
+      if (start >= 0) return false;
+      if (node.isText && node.text === "inner one") start = offset;
+      return start < 0;
+    });
+    editor.commands.setTextSelection({ from: start, to: start + 5 });
+    expect(toggleList(editor, "bulletList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ul><li><p>outer</p><ul><li><p>inner two</p></li><li><p>inner one</p></li></ul></li></ul>",
+    );
+    expect(editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)).toBe(
+      "inner",
+    );
+    editor.destroy();
+  });
+
+  it("wraps a selected paragraph that has no sublist next to it", () => {
+    const editor = createEditor("<ul><li><p>outer</p><p>inner one</p></li></ul>");
+    let start = -1;
+    editor.state.doc.descendants((node, offset) => {
+      if (start >= 0) return false;
+      if (node.isText && node.text === "inner one") start = offset;
+      return start < 0;
+    });
+    editor.commands.setTextSelection({ from: start, to: start + 5 });
+    expect(toggleList(editor, "bulletList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ul><li><p>outer</p><ul><li><p>inner one</p></li></ul></li></ul>",
+    );
+    expect(editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)).toBe(
+      "inner",
+    );
+    editor.destroy();
+  });
 });
 
 describe("removing one numbered item", () => {
