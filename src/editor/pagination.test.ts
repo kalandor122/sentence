@@ -8,6 +8,7 @@ import {
   pageGeometry,
   pageLineGaps,
   pageRowShifts,
+  scrollLeftForCaret,
   scrollLeftForZoom,
   scrollTopForZoom,
   scrollTopForZoomPoint,
@@ -227,6 +228,26 @@ describe("scrollLeftForZoom", () => {
     // the end, so no part of the sheet is clipped out of reach.
     expect(scrollLeftForZoom(0, 1, 1.5, maxScrollLeft)).toBe(0);
     expect(34 + sheetWidth - maxScrollLeft).toBeLessThanOrEqual(950);
+  });
+});
+
+describe("scrollLeftForCaret", () => {
+  // qa-331: zooming the probe document to 150% left a caret at x=1,038 in a
+  // 965px pane while scrollLeft stayed 0, so the caret was off screen and the
+  // right part of every line could not be typed into or seen.
+  it("brings a caret that left the pane back to its inner edge", () => {
+    expect(scrollLeftForCaret(1038, 965, 0, 294)).toBe(81);
+    expect(scrollLeftForCaret(3, 965, 100, 294)).toBe(95);
+  });
+
+  it("clamps to the horizontal scroll range", () => {
+    expect(scrollLeftForCaret(1300, 965, 294, 294)).toBe(294);
+    expect(scrollLeftForCaret(0, 965, 4, 294)).toBe(0);
+  });
+
+  it("leaves a caret that is already inside the pane alone", () => {
+    expect(scrollLeftForCaret(400, 965, 0, 294)).toBe(0);
+    expect(scrollLeftForCaret(794, 950, 0, 0)).toBe(0);
   });
 });
 
