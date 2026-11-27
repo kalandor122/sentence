@@ -594,6 +594,71 @@ describe("qa-330: the zoomed-out end of a long document stays on the sheet", () 
   });
 });
 
+describe("qa-332: zooming out at the end holds the reading line and the sheet", () => {
+  // The probe document at 1280x800 sits at 13,558 of a 14,082 maximum after
+  // Ctrl+End. Each of the three zoom-out clicks has to hold the end line at the
+  // same screen position (it was at y=501) while the sheet's scaled bottom stays
+  // below the pane, so neither the document above the page nor blank scroll past
+  // it can appear. Wheeling to the new maximum still ends at the page's bottom.
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetHeight = 1123 * 13;
+  const endLine = 14029;
+  const lineHeight = 16;
+  const maxAt = (zoom: number) =>
+    sheetScrollMax(paddingTop + sheetHeight * zoom, paddingBottom, viewportHeight);
+
+  it("holds the end line on screen without lifting the page off the viewport", () => {
+    let top = 13558;
+    let zoom = 1;
+    for (const percent of [90, 80, 70]) {
+      const next = percent / 100;
+      top = scrollTopForZoomPoint(
+        endLine,
+        top,
+        viewportHeight,
+        paddingTop,
+        zoom,
+        next,
+        maxAt(next),
+        lineHeight,
+      );
+      zoom = next;
+      expect(top).toBeLessThanOrEqual(maxAt(zoom));
+      // The same reading position: the end line keeps its pre-zoom screen top.
+      expect(paddingTop + endLine * zoom - top).toBeCloseTo(501, 6);
+      expect(paddingTop + (endLine + lineHeight) * zoom - top).toBeLessThanOrEqual(
+        viewportHeight,
+      );
+      // Only the scroller's own bottom padding may sit below the scaled page.
+      expect(paddingTop + sheetHeight * zoom - top).toBeGreaterThan(
+        viewportHeight - paddingBottom,
+      );
+    }
+
+    // Wheeling to the 70% maximum leaves exactly the page plus its padding.
+    expect(maxAt(0.7)).toBe(9702);
+    expect(paddingTop + sheetHeight * 0.7 + paddingBottom - maxAt(0.7)).toBeCloseTo(
+      viewportHeight,
+      0,
+    );
+  });
+
+  it("keeps both horizontal edges reachable after following the caret in", () => {
+    const pane = 950;
+    const padding = 34;
+    const maxScrollLeft = sheetScrollMax(padding + (794 * 150) / 100, padding, pane);
+    // The caret correction can move the page sideways when zooming in; both
+    // ends of the range still have to expose the page's edges.
+    const caretOffset = scrollLeftForCaret(1038, pane, 0, maxScrollLeft);
+    expect(caretOffset).toBeGreaterThan(0);
+    expect(caretOffset).toBeLessThanOrEqual(maxScrollLeft);
+    expect(padding + (794 * 150) / 100 - maxScrollLeft).toBeLessThanOrEqual(pane);
+    expect(scrollLeftForZoom(0, 1, 1.5, maxScrollLeft)).toBe(0);
+  });
+});
+
 describe("pageLineGaps", () => {
   it("moves the line crossing a page edge to the next page's text area", () => {
     const geometry = pageGeometry(DEFAULT_SETTINGS);
