@@ -157,6 +157,48 @@ describe("scrollLeftForZoom", () => {
   });
 });
 
+describe("zoom keeps the scroll range on the rendered sheet", () => {
+  // qa-323: a page that fits at 100% must stay inside the pane after the zoom
+  // cycle, and a page that is wider at 150% has to keep both edges reachable.
+  it("returns a zoomed-in page to the pane across a full horizontal cycle", () => {
+    const sheetWidth = (794 * 150) / 100;
+    const maxAt100 = sheetScrollMax(794 + 34, 34, 950);
+    const maxAt150 = sheetScrollMax(sheetWidth + 34, 34, 950);
+    expect(maxAt100).toBe(0);
+    expect(maxAt150).toBe(309);
+
+    expect(scrollLeftForZoom(0, 1, 1.5, maxAt150)).toBe(0);
+    expect(scrollLeftForZoom(maxAt150, 1.5, 1, maxAt100)).toBe(0);
+    expect(34 + sheetWidth - maxAt150).toBeLessThanOrEqual(950);
+  });
+
+  it("stops at the scaled bottom when the reader wheeled to the end at 150%", () => {
+    const viewportHeight = 627;
+    const paddingTop = 30;
+    const paddingBottom = 80;
+    const sheetHeight = 1123 * 13;
+    const maxAt150 = sheetScrollMax(
+      paddingTop + sheetHeight * 1.5,
+      paddingBottom,
+      viewportHeight,
+    );
+    const maxAt70 = sheetScrollMax(
+      paddingTop + sheetHeight * 0.7,
+      paddingBottom,
+      viewportHeight,
+    );
+    expect(maxAt150).toBe(21381);
+    expect(maxAt70).toBe(9702);
+
+    const top = scrollTopForZoom(maxAt150, viewportHeight, paddingTop, 1.5, 0.7, maxAt70);
+    expect(top).toBe(maxAt70);
+    expect(paddingTop + sheetHeight * 0.7 + paddingBottom - top).toBeCloseTo(
+      viewportHeight,
+      0,
+    );
+  });
+});
+
 describe("scrollTopForZoomPoint", () => {
   it("keeps the caret at the same screen position while zooming out at the end", () => {
     const pointTop = 14029;
