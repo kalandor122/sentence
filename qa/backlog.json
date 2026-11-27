@@ -5290,10 +5290,11 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-27T22:41:48Z",
-      "lastAttemptAt": "2026-11-27T22:41:48Z"
+      "lastAttemptAt": "2026-11-27T22:41:48Z",
+      "doneAt": "2026-11-27T22:57:07Z"
     },
     {
       "id": "qa-334",
@@ -5637,6 +5638,92 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-362",
+      "title": "Editing a citation key or an equation with Track changes on is never recorded in History",
+      "why": "Exploratory pass on review (functional): expected Each atom edit changes the document and the exported LaTeX, so History should list a pending tracked change for the citation-key edit and another for the equation edit (with before/after values and Accept/Reject buttons), just as it does for text edits.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open http://localhost:1420, create a project, and put the caret at the end of the last paragraph. 2. With tracking off, insert a citation (References tab > Insert citation > Enter a key manually > sentence2026 > Insert) and an inline equation (Insert tab > Inline equation > x^2 > Insert). 3. Open the Review tab and click Track changes. 4. Double-click the [sentence2026] citation, change the key to otherKey2026, click Update and wait 2 s. 5. Click the rendered x^2 equation, change it to y^3, click Update and wait 2 s. 6. Open History in the sidebar.\nActual: History stays at 0 with the empty-state text after both edits: no revision card exists for either change. The document and the LaTeX already show \\cite{otherKey2026} and \\(y^3\\). Both edits therefore bypass review entirely, so they cannot be rejected or even seen.",
+      "source": "explore:review:editing a citation key or an equation with track changes on is never recorded in history",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-27T23:19:12Z"
+    },
+    {
+      "id": "qa-363",
+      "title": "Rejecting a tracked deletion of commented text permanently drops the comment highlight and leaves a false 'text was dele",
+      "why": "Exploratory pass on review (functional): expected Rejecting the deletion restores the commented phrase together with its comment highlight, and the thread is anchored again.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document. 2. Select the leading phrase 'A sentence is not ' of the first body paragraph, click Review > New comment, enter 'PROBEREJECTCOMMENT' and submit. 3. On the Review tab click Track changes. 4. Select the same phrase again and press Backspace. 5. Wait about 2 s until the deleted phrase is struck through and History shows one tracked change. 6. Open History and click Reject on that change. 7. Inspect the Review panel and the paragraph, then reload the page.\nActual: The phrase is restored but the comment stays in the detached state with the note 'The text this comment was attached to was deleted, so it has no highlight in the document.' There is no highlight on the restored phrase, the thread is still detached after a reload, and there is no UI to reattach it. The warning is false because the text exists again.",
+      "source": "explore:review:rejecting a tracked deletion of commented text permanently drops the comment highlight and leaves a false 'text was dele",
+      "status": "open"
+    },
+    {
+      "id": "qa-364",
+      "title": "Rejecting a tracked change while a newer tracked edit is still uncommitted silently folds that edit into the review base",
+      "why": "Exploratory pass on review (functional): expected Rejecting AAA removes it from the document, while BBB remains a pending tracked change that can still be accepted or rejected on its own.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document, put the caret at the end, press Enter and type 'BASE' with tracking off. 2. Review tab > Track changes, then type 'AAA' at the end and wait about 2.5 s so History shows one tracked change. 3. Type 'BBB' at the same position and immediately (inside the roughly 1.8 s revision debounce) click Reject on the AAA card. 4. Wait 2.5 s, then type 'CCC' at the end and wait for History to settle.\nActual: The document becomes 'BASEBBB' but History shows 0 tracked changes, so BBB is no longer reviewable. The next tracked edit 'CCC' produces one card whose before preview already contains 'BASEBBB' and whose after preview is 'BASEBBBCCC', proving BBB was absorbed into the revision baseline without ever appearing in History.",
+      "source": "explore:review:rejecting a tracked change while a newer tracked edit is still uncommitted silently folds that edit into the review base",
+      "status": "open"
+    },
+    {
+      "id": "qa-365",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-366",
+      "title": "A tracked deletion is struck through at the start of the paragraph when the deleted text's trailing context repeats earl",
+      "why": "Exploratory pass on review (visual): expected The deleted 'X ' is drawn where it was removed, between the two occurrences of 'tail': 'tail [X ]tail'.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document. 2. Triple-click the first body paragraph to select it and type 'tail X tail' to replace it. 3. Review tab > Track changes. 4. Click at the start of that paragraph, press ArrowRight five times, then hold Shift and press ArrowRight twice to select 'X '. 5. Press Backspace and wait about 2.5 s; open History to confirm one tracked change.\nActual: The strike-through is rendered before all of the paragraph text: the paragraph reads '[X ]tail tail' and the deletion widget's offset in the paragraph is 0 instead of 5. The review mark therefore points at the start of the paragraph rather than at the deletion point, and a reviewer checking a repeated phrase sees the wrong location.",
+      "source": "explore:review:a tracked deletion is struck through at the start of the paragraph when the deleted text's trailing context repeats earl",
+      "status": "open"
+    },
+    {
+      "id": "qa-367",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-368",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
       "status": "open"
     }
   ]
