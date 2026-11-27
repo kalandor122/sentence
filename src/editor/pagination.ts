@@ -189,6 +189,28 @@ export function scrollLeftForZoom(
   return Math.max(0, Math.min(maxScrollLeft, scrollLeft * (zoom / previousZoom)));
 }
 
+// Zooming in grows the page around its centre, so a caret that sits near a
+// line's right margin can leave the pane even though the vertical correction
+// keeps its line on screen. That leaves the reader typing at a caret they cannot
+// see. `caretLeft` is the caret's screen position after the offset has already
+// been rescaled: when it falls outside the pane, move just enough to bring it
+// back inside (or to the edge when the page cannot scroll any further).
+export function scrollLeftForCaret(
+  caretLeft: number,
+  viewportWidth: number,
+  scrollLeft: number,
+  maxScrollLeft: number,
+  edge = 8,
+): number {
+  if (caretLeft > viewportWidth - edge) {
+    return Math.min(maxScrollLeft, scrollLeft + caretLeft - (viewportWidth - edge));
+  }
+  if (caretLeft < edge) {
+    return Math.min(maxScrollLeft, Math.max(0, scrollLeft + caretLeft - edge));
+  }
+  return scrollLeft;
+}
+
 // Centre-anchoring alone loses the caret when it sits below the middle of the
 // viewport (at the end of a document, for example): scaling its distance from
 // the centre can push it off-screen. When the caret was visible before the

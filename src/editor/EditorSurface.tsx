@@ -34,6 +34,7 @@ import {
   pageGeometry,
   pageLineGaps,
   pageRowShifts,
+  scrollLeftForCaret,
   scrollLeftForZoom,
   scrollTopForZoom,
   scrollTopForZoomPoint,
@@ -259,6 +260,27 @@ function textLines(block: HTMLElement, zoom: number): TextLine[] {
   return lines;
 }
 
+// The collapsed caret's client box for the current editor selection, shared by
+// the vertical zoom anchor and the sideways caret check so both read the same
+// selection. Returns null when the selection is outside the page (or has no
+// layout box).
+function caretScreenBox(
+  scroller: HTMLElement,
+): { rect: DOMRect; node: Node } | null {
+  const selection = window.getSelection();
+  const node = selection?.focusNode;
+  if (!selection || !node || !scroller.contains(node)) return null;
+  try {
+    const range = document.createRange();
+    range.setStart(node, selection.focusOffset);
+    range.collapse(true);
+    const rect = range.getBoundingClientRect();
+    return rect.height > 0 ? { rect, node } : null;
+  } catch {
+    return null;
+  }
+}
+
 // The caret's position and line height in unscaled document pixels, measured
 // after the zoom has been applied so the values are independent of the current
 // scroll offset. Returns null when the selection is outside the page (or has no
@@ -268,26 +290,17 @@ function caretDocumentBox(
   paddingTop: number,
   zoom: number,
 ): { top: number; height: number } | null {
-  const selection = window.getSelection();
-  const node = selection?.focusNode;
-  if (!selection || !node || !scroller.contains(node)) return null;
-  try {
-    const range = document.createRange();
-    range.setStart(node, selection.focusOffset);
-    range.collapse(true);
-    const rect = range.getBoundingClientRect();
-    if (rect.height <= 0) return null;
-    // A collapsed range reports the glyph box, which is shorter than the line
-    // box. Use the line height so zooming in does not clip the foot of the line.
-    const element = node.nodeType === Node.ELEMENT_NODE ? (node as HTMLElement) : node.parentElement;
-    const lineHeight = element ? parseFloat(getComputedStyle(element).lineHeight) : 0;
-    return {
-      top: (rect.top - scroller.getBoundingClientRect().top + scroller.scrollTop - paddingTop) / zoom,
-      height: Math.max(rect.height / zoom, Number.isFinite(lineHeight) ? lineHeight : 0),
-    };
-  } catch {
-    return null;
-  }
+  const box = caretScreenBox(scroller);
+  if (!box) return null;
+  const { rect, node } = box;
+  // A collapsed range reports the glyph box, which is shorter than the line
+  // box. Use the line height so zooming in does not clip the foot of the line.
+  const element = node.nodeType === Node.ELEMENT_NODE ? (node as HTMLElement) : node.parentElement;
+  const lineHeight = element ? parseFloat(getComputedStyle(element).lineHeight) : 0;
+  return {
+    top: (rect.top - scroller.getBoundingClientRect().top + scroller.scrollTop - paddingTop) / zoom,
+    height: Math.max(rect.height / zoom, Number.isFinite(lineHeight) ? lineHeight : 0),
+  };
 }
 
 // The document position at the start of a line, used to put a page gap before
@@ -474,6 +487,27 @@ export default function EditorSurface({
       scale,
       maxScrollLeft,
     );
+    // A caret near a line's right margin moves out of the pane as the page
+    // grows, even though its line stays on screen vertically. When the caret is
+    // still on its line but clipped sideways, scroll just enough to show it
+    // (clamped to the same range, so the page can never be scrolled past its
+    // edges). A caret the vertical anchor already left off screen is not
+    // followed, since the reader is looking elsewhere in the document.
+    const caretBox = caretScreenBox(scroller);
+    if (caretBox) {
+      const caretBounds = scroller.getBoundingClientRect();
+      const caretTop = caretBox.rect.top - caretBounds.top;
+      if (caretTop >= 0 && caretTop <= scroller.clientHeight) {
+        const caretLeft = caretBox.rect.left - caretBounds.left;
+        const corrected = scrollLeftForCaret(
+          caretLeft,
+          scroller.clientWidth,
+          scroller.scrollLeft,
+          maxScrollLeft,
+        );
+        if (corrected !== scroller.scrollLeft) scroller.scrollLeft = corrected;
+      }
+    }
     scrollTopRef.current = scroller.scrollTop;
     scrollLeftRef.current = scroller.scrollLeft;
   }, [zoom]);
