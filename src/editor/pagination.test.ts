@@ -819,6 +819,75 @@ describe("qa-334: the whole probe zoom trace stays on the sheet", () => {
   });
 });
 
+describe("qa-335: switching zoom at the wheeled end stays on the sheet", () => {
+  // The probe continues past qa-334: after wheeling to the 70% maximum it zooms
+  // to 150%, wheels to that maximum and zooms back out to 70%. Every step has
+  // to keep the scaled page inside the scroll range, and the 150% page must be
+  // reachable from both of its horizontal edges.
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetHeight = 1123 * 13;
+  const endLine = 14029;
+  const lineHeight = 16;
+  const maxAt = (zoom: number) =>
+    sheetScrollMax(paddingTop + sheetHeight * zoom, paddingBottom, viewportHeight);
+
+  it("keeps the page under the viewport through the wheel and zoom-out", () => {
+    const wheeled70 = maxAt(0.7);
+    const at150 = scrollTopForZoomPoint(
+      endLine,
+      wheeled70,
+      viewportHeight,
+      paddingTop,
+      0.7,
+      1.5,
+      maxAt(1.5),
+      lineHeight,
+    );
+    expect(at150).toBeLessThanOrEqual(maxAt(1.5));
+    expect(paddingTop + sheetHeight * 1.5 - at150).toBeGreaterThan(
+      viewportHeight - paddingBottom,
+    );
+
+    // Wheeled to the 150% maximum only the scroller padding sits below the page.
+    const wheeled150 = maxAt(1.5);
+    const below150 = paddingTop + sheetHeight * 1.5 + paddingBottom - wheeled150;
+    expect(below150).toBeGreaterThanOrEqual(viewportHeight);
+    expect(below150).toBeLessThan(viewportHeight + 1);
+
+    // The end line is above the viewport there, so the fallback anchors on the
+    // centre and the 70% maximum still ends exactly at the scaled page.
+    const back70 = scrollTopForZoom(
+      wheeled150,
+      viewportHeight,
+      paddingTop,
+      1.5,
+      0.7,
+      maxAt(0.7),
+    );
+    expect(back70).toBe(wheeled70);
+    const below70 = paddingTop + sheetHeight * 0.7 + paddingBottom - back70;
+    expect(below70).toBeGreaterThanOrEqual(viewportHeight);
+    expect(below70).toBeLessThan(viewportHeight + 1);
+  });
+
+  it("reaches both horizontal edges of the 150% page", () => {
+    const pane = 950;
+    const padding = 34;
+    const width = 794 * 1.5;
+    const maxScrollLeft = sheetScrollMax(padding + width, padding, pane);
+    expect(maxScrollLeft).toBeGreaterThan(0);
+    // At the left end the page's left edge has its gutter on screen, and at the
+    // right end the whole page fits up to the right gutter.
+    expect(padding).toBeLessThan(pane);
+    const rightEdgeAtEnd = padding + width - maxScrollLeft;
+    expect(rightEdgeAtEnd).toBeGreaterThan(0);
+    expect(rightEdgeAtEnd).toBeLessThanOrEqual(pane);
+    expect(scrollLeftForZoom(maxScrollLeft, 1.5, 0.7, 0)).toBe(0);
+  });
+});
+
 describe("pageLineGaps", () => {
   it("moves the line crossing a page edge to the next page's text area", () => {
     const geometry = pageGeometry(DEFAULT_SETTINGS);
