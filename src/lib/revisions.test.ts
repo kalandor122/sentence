@@ -125,6 +125,59 @@ describe("tracked text comparison", () => {
     expect(revisionText(single)).toBe("Only paragraph");
     expect(revisionText(appended)).toBe("Only paragraph\n¶");
   });
+
+  it("treats a citation key or equation body edit as a tracked edit", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "See " },
+            { type: "citation", attrs: { key: "sentence2026" } },
+            { type: "text", text: " for " },
+            { type: "mathInline", attrs: { latex: "x^2" } },
+          ],
+        },
+      ],
+    };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "See " },
+            { type: "citation", attrs: { key: "otherKey2026" } },
+            { type: "text", text: " for " },
+            { type: "mathInline", attrs: { latex: "y^3" } },
+          ],
+        },
+      ],
+    };
+    expect(trackedShape(after)).not.toBe(trackedShape(before));
+    expect(revisionText(before)).toContain("[sentence2026]");
+    expect(revisionText(after)).toContain("[otherKey2026]");
+    expect(revisionText(before)).toContain("x^2");
+    expect(revisionText(after)).toContain("y^3");
+  });
+
+  it("does not track a materialised atom default", () => {
+    const stored: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "mathBlock", attrs: { latex: "x" } }] }],
+    };
+    const materialised: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [{ type: "mathBlock", attrs: { latex: "x", numbered: false, environment: "" } }],
+        },
+      ],
+    };
+    expect(trackedShape(materialised)).toBe(trackedShape(stored));
+  });
 });
 
 describe("review decorations", () => {
@@ -387,5 +440,67 @@ describe("reviewing tracked changes", () => {
     const revisions = [revision("r1", before, after), revision("r2", after, doc("alpha beta gamma"))];
     const reviewed = acceptRevisions(revisions, ["r2"]);
     expect(reviewed.map((item) => item.accepted)).toEqual([false, true]);
+  });
+
+  it("restores a citation key and an equation body when their revision is rejected", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "citation", attrs: { key: "sentence2026" } },
+            { type: "text", text: " and " },
+            { type: "mathInline", attrs: { latex: "x^2" } },
+          ],
+        },
+      ],
+    };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "citation", attrs: { key: "otherKey2026" } },
+            { type: "text", text: " and " },
+            { type: "mathInline", attrs: { latex: "y^3" } },
+          ],
+        },
+      ],
+    };
+    expect(rejectRevisions(after, [revision("r1", before, after)], ["r1"]).document).toEqual(before);
+  });
+
+  it("rejects an atom edit that follows runs merged for the diff", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "See " },
+            { type: "text", text: "the", marks: [{ type: "comment", attrs: { markId: "c1" } }] },
+            { type: "text", text: " note " },
+            { type: "citation", attrs: { key: "sentence2026" } },
+          ],
+        },
+      ],
+    };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "See " },
+            { type: "text", text: "the", marks: [{ type: "comment", attrs: { markId: "c1" } }] },
+            { type: "text", text: " note " },
+            { type: "citation", attrs: { key: "otherKey2026" } },
+          ],
+        },
+      ],
+    };
+    expect(rejectRevisions(after, [revision("r1", before, after)], ["r1"]).document).toEqual(before);
   });
 });

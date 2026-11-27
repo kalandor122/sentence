@@ -188,6 +188,10 @@ export const RevisionMarks = Extension.create({
               for (const change of revisionChanges(revision)) {
                 const key = change.path.join(".");
                 if (change.kind === "text") {
+                  // An atom's content is an attribute (a citation key, an
+                  // equation body). Its value is not a run in the document, so
+                  // there is nothing to underline; History lists the change.
+                  if (change.path.includes("attrs")) continue;
                   markInsertion(decorations, state.doc, change.after, revision, colorClass, change.path, change.prefix.length, change.inserted.length);
                   if (change.removed) {
                     markDeletion(decorations, state.doc, change.removed, revision, colorClass, key, change.path, change.prefix, change.suffix);

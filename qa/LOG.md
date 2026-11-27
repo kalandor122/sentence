@@ -1054,3 +1054,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-27T22:57:08Z DONE qa-333 (tsc -b, npm test, smoke all green)
 2026-11-27T23:18:53Z EXPLORE review: 5 new items, agent exit 0
 2026-11-27T23:19:12Z IMPORTED 2 tester findings into the backlog
+2026-11-27T23:19:12Z START qa-362 on qa/qa-362-editing-a-citation-key-or-an-equation-wi: Editing a citation key or an equation with Track changes on is never recorded in History
