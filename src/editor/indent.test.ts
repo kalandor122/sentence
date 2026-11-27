@@ -16,6 +16,17 @@ function listEditor(html: string, caret: number) {
   return editor;
 }
 
+// Caret at the end of the given text, found by content so the tests do not
+// depend on hand-counted positions.
+function selectEnd(editor: Editor, text: string) {
+  let pos = -1;
+  editor.state.doc.descendants((node, offset) => {
+    if (pos < 0 && node.isText && node.text === text) pos = offset + node.nodeSize - 1;
+    return pos < 0;
+  });
+  editor.commands.setTextSelection(pos);
+}
+
 describe("changeIndent", () => {
   it("indents a paragraph once and never nests quote inside quote", () => {
     const editor = paragraphEditor();
@@ -57,6 +68,49 @@ describe("nestListItem", () => {
   it("leaves the key alone outside lists", () => {
     const editor = paragraphEditor();
     expect(nestListItem(editor, false)).toBe(false);
+    editor.destroy();
+  });
+
+  it("outdents only the middle item and leaves its siblings in the sublist", () => {
+    const editor = new Editor({
+      extensions: [StarterKit],
+      content:
+        "<ul><li><p>outer</p><ul><li><p>child one</p></li><li><p>child two</p></li><li><p>child three</p></li></ul></li></ul>",
+    });
+    selectEnd(editor, "child two");
+    expect(nestListItem(editor, true)).toBe(true);
+    expect(editor.getHTML()).toContain(
+      "<li><p>outer</p><ul><li><p>child one</p></li><li><p>child three</p></li></ul></li><li><p>child two</p></li>",
+    );
+    expect(editor.state.selection.$from.parent.textContent).toBe("child two");
+    editor.destroy();
+  });
+
+  it("outdents the first item without taking the rest of the sublist", () => {
+    const editor = new Editor({
+      extensions: [StarterKit],
+      content:
+        "<ul><li><p>outer</p><ul><li><p>child one</p></li><li><p>child two</p></li><li><p>child three</p></li></ul></li></ul>",
+    });
+    selectEnd(editor, "child one");
+    expect(nestListItem(editor, true)).toBe(true);
+    expect(editor.getHTML()).toContain(
+      "<li><p>outer</p><ul><li><p>child two</p></li><li><p>child three</p></li></ul></li><li><p>child one</p></li>",
+    );
+    editor.destroy();
+  });
+
+  it("keeps a numbered sublist together when outdenting an item", () => {
+    const editor = new Editor({
+      extensions: [StarterKit],
+      content:
+        "<ol><li><p>outer</p><ol><li><p>child one</p></li><li><p>child two</p></li><li><p>child three</p></li></ol></li></ol>",
+    });
+    selectEnd(editor, "child two");
+    expect(nestListItem(editor, true)).toBe(true);
+    expect(editor.getHTML()).toContain(
+      "<li><p>outer</p><ol><li><p>child one</p></li><li><p>child three</p></li></ol></li><li><p>child two</p></li>",
+    );
     editor.destroy();
   });
 });

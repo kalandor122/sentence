@@ -5055,8 +5055,9 @@
       "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'child one', press Tab, press Enter, type 'child two', press Enter, type 'child three'. Click at the end of 'child two' and press Shift+Tab. Open Source in the status bar, click Refresh from visual and read the LaTeX textarea.\nActual: The outdented item adopts the following sibling. After outdenting 'child two' the DOM is '<ul><li>outer<ul>child one</ul></li><li>child two<ul>child three</ul></li></ul>' and the LaTeX is '\\begin{itemize}\\n\\item outer\\n\\begin{itemize}\\n\\item child one\\n\\end{itemize}\\n\\item child two\\n\\begin{itemize}\\n\\item child three\\n\\end{itemize}\\n\\end{itemize}', so 'child three' becomes a child of 'child two' visually and in the PDF. Outdenting 'child one' instead moves both child two and child three under it. The same thing happens with a numbered sublist and when Enter exits an empty nested item in the middle of a sublist (probe scenarios outdentMiddleNumberedNested and nestedEmptyMiddle).",
       "source": "explore:lists:shift+tab on a nested item in the middle of a sublist reparents every following sibling under it",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-27T19:27:49Z"
+      "attempts": 1,
+      "startedAt": "2026-11-27T19:27:49Z",
+      "lastAttemptAt": "2026-11-27T19:27:49Z"
     },
     {
       "id": "qa-319",

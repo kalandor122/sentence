@@ -983,3 +983,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-27T19:27:10Z PUSHED main
 2026-11-27T19:27:10Z DONE qa-317 (tsc -b, npm test, smoke all green)
 2026-11-27T19:27:49Z IMPORTED 1 tester findings into the backlog
+2026-11-27T19:27:49Z START qa-318 on qa/qa-318-shift-tab-on-a-nested-item-in-the-middle: Shift+Tab on a nested item in the middle of a sublist reparents every following sibling under it
