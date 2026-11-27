@@ -955,3 +955,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-27T17:45:59Z EXPLORE lists: 1 new items, agent exit 1
 2026-11-27T17:46:18Z IMPORTED 1 tester findings into the backlog
 2026-11-27T17:46:18Z START qa-310 on qa/qa-310-a-wide-image-inserted-into-a-table-cell: A wide image inserted into a table cell exports at the full text width, so the compiled table overflows the page margin
+2026-11-27T17:50:53Z PUSHED main
+2026-11-27T17:50:53Z DONE qa-310 (tsc -b, npm test, smoke all green)
+2026-11-27T17:51:33Z IMPORTED 1 tester findings into the backlog

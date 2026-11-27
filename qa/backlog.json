@@ -4930,10 +4930,11 @@
       ],
       "hint": "Repro: In the demo project press Ctrl+End, click Insert > Insert table, click the first cell, then Insert > Image and choose a 2400x600 PNG. The picture renders 438x111 px inside the 459 px cell and the table stays 600 px wide, the text width. View > LaTeX exports '\\includegraphics[width=\\linewidth,height=\\textheight,keepaspectratio]{assets/images/wide-cell.png}' inside the '\\begin{tabular}{lll}' block. Copy that asset to assets/images/wide-cell.png and compile the exported source with the bundled Tectonic; the log reports 'Overfull \\hbox (35.96829pt too wide) in paragraph at lines 62--70', so the table extends 35.97 pt beyond the text block.\nActual: The cell is an 'l' column, so 'width=\\linewidth' resolves to the full A4 text width, not the cell width. The table is centred with column padding and becomes 35.97 pt wider than the text block in the compiled PDF, while the visual page shows the 438 px image fitting a 459 px cell inside the 600 px table. Probe qa/probes/insert-media.mjs scenario 'wide-image-in-table-cell'.",
       "source": "explore:insert-media:a wide image inserted into a table cell exports at the full text width, so the compiled table overflows the page margin",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-27T17:46:18Z",
-      "lastAttemptAt": "2026-11-27T17:46:18Z"
+      "lastAttemptAt": "2026-11-27T17:46:18Z",
+      "doneAt": "2026-11-27T17:50:51Z"
     },
     {
       "id": "qa-311",
@@ -4957,7 +4958,9 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-27T17:51:33Z"
     },
     {
       "id": "qa-313",
@@ -5153,6 +5156,18 @@
     },
     {
       "id": "qa-329",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-330",
       "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
       "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
       "severity": "medium",
