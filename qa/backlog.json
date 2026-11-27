@@ -5351,8 +5351,9 @@
       "hint": "Repro: 1. Create a project and type 'Speed ' in the editor.\n2. Open Insert > Equation block, enter E=mc^2 and click Insert.\n3. Without clicking anywhere else, type the word 'next'.\n4. Open View > LaTeX and click Refresh from visual.\nThe same happens to an existing equation: click it to open the editor, press Escape to dismiss it, then type any character (e.g. inline 'Before [x+1] after' -> Escape -> 'Z').\nActual: The equation is replaced by the typed text. After step 3 the DOM has zero [data-math-block] nodes and two paragraphs 'Speed' and 'next'; the exported body is 'Speed\\n\\nnext' with no equation. In the Escape case the source becomes 'Before Z after' and the inline math node is gone.",
       "source": "explore:math:typing while an equation is selected silently replaces the equation",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-27T20:26:45Z"
+      "attempts": 1,
+      "startedAt": "2026-11-27T20:26:45Z",
+      "lastAttemptAt": "2026-11-27T20:26:45Z"
     },
     {
       "id": "qa-342",
