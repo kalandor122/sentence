@@ -518,6 +518,61 @@ describe("qa-329: the probe zoom sequence stays on the sheet", () => {
   });
 });
 
+describe("qa-330: the zoomed-out end of a long document stays on the sheet", () => {
+  // qa-330 repeated the same probe report at 1280x800: Ctrl+End sits at 13,558
+  // of a 14,082 maximum, three zoom-out clicks reach 70%, and wheeling to the
+  // new maximum has to stop at the scaled sheet rather than the 100% range.
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetHeight = 1123 * 13;
+  const maxAt = (zoom: number) =>
+    sheetScrollMax(paddingTop + sheetHeight * zoom, paddingBottom, viewportHeight);
+
+  it("keeps the last line in the viewport through every zoom-out click", () => {
+    let top = 13558;
+    let zoom = 1;
+    for (const percent of [90, 80, 70]) {
+      const next = percent / 100;
+      top = scrollTopForZoomPoint(
+        14029,
+        top,
+        viewportHeight,
+        paddingTop,
+        zoom,
+        next,
+        maxAt(next),
+        16,
+      );
+      zoom = next;
+      expect(top).toBeLessThanOrEqual(maxAt(zoom));
+      const lineTop = paddingTop + 14029 * zoom - top;
+      expect(lineTop).toBeGreaterThanOrEqual(0);
+      expect(lineTop + 16 * zoom).toBeLessThanOrEqual(viewportHeight);
+    }
+  });
+
+  it("ends a wheel to the maximum at the sheet's scaled bottom", () => {
+    const maxAt100 = maxAt(1);
+    expect(maxAt100).toBe(14082);
+    const top = scrollTopForZoom(maxAt100, viewportHeight, paddingTop, 1, 0.7, maxAt(0.7));
+    expect(top).toBe(9702);
+    expect(paddingTop + sheetHeight * 0.7 + paddingBottom - top).toBeCloseTo(
+      viewportHeight,
+      0,
+    );
+  });
+
+  it("reaches both edges of the 150% page from either scroll position", () => {
+    const pane = 950;
+    const padding = 34;
+    const maxScrollLeft = sheetScrollMax(padding + (794 * 150) / 100, padding, pane);
+    expect(maxScrollLeft).toBe(309);
+    expect(scrollLeftForZoom(0, 1, 1.5, maxScrollLeft)).toBe(0);
+    expect(padding + (794 * 150) / 100 - maxScrollLeft).toBeLessThanOrEqual(pane);
+  });
+});
+
 describe("pageLineGaps", () => {
   it("moves the line crossing a page edge to the next page's text area", () => {
     const geometry = pageGeometry(DEFAULT_SETTINGS);
