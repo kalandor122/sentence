@@ -102,6 +102,34 @@ describe("scrollTopForZoom", () => {
   });
 });
 
+describe("zooming out from the end of a long document", () => {
+  // qa-326: the 3,600-word probe document is 13 A4 pages. Stepping the zoom
+  // down from the wheeled maximum has to clamp every step to the sheet's scaled
+  // bottom, so no step leaves blank scroll below the last page.
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetHeight = 1123 * 13;
+  const maxAt = (zoom: number) =>
+    sheetScrollMax(paddingTop + sheetHeight * zoom, paddingBottom, viewportHeight);
+
+  it("stops at the scaled sheet bottom on every zoom-out step", () => {
+    let top = maxAt(1);
+    let previous = 1;
+    for (const percent of [90, 80, 70]) {
+      const zoom = percent / 100;
+      top = scrollTopForZoom(top, viewportHeight, paddingTop, previous, zoom, maxAt(zoom));
+      expect(top).toBe(maxAt(zoom));
+      // The sheet ends no higher than the pane's bottom edge, so the last page
+      // is never left above the viewport.
+      expect(paddingTop + sheetHeight * zoom - top).toBeGreaterThanOrEqual(
+        viewportHeight - paddingBottom,
+      );
+      previous = zoom;
+    }
+  });
+});
+
 describe("sheetScrollMax", () => {
   // qa-312: the 13-page A4 sheet ends at 14,629px and the scroller has 30px of
   // top and 80px of bottom padding, so the zoomed-out range must stop at the
