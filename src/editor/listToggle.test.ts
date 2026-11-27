@@ -168,6 +168,41 @@ describe("removing one bulleted item", () => {
     );
     editor.destroy();
   });
+
+  it("removes the bullet from a child selected with its parent", () => {
+    const editor = createEditor(
+      "<ul><li><p>outer</p><ul><li><p>child</p></li></ul></li></ul>",
+    );
+    // From "outer" down to "child".
+    editor.commands.setTextSelection({ from: 4, to: 16 });
+    expect(toggleList(editor, "bulletList")).toBe(true);
+    expect(getHTML(editor)).toBe("<p>outer</p><p>child</p>");
+    editor.destroy();
+  });
+
+  it("removes the bullets when the selection starts in the nested item", () => {
+    const editor = createEditor(
+      "<ul><li><p>outer</p><ul><li><p>child</p></li></ul></li><li><p>second</p></li></ul>",
+    );
+    // From "child" down to the following top-level item.
+    editor.commands.setTextSelection({ from: 14, to: 26 });
+    expect(toggleList(editor, "bulletList")).toBe(true);
+    expect(getHTML(editor)).toBe("<p>outer</p><p>child</p><p>second</p>");
+    editor.destroy();
+  });
+
+  it("keeps the sublist items the selection does not reach", () => {
+    const editor = createEditor(
+      "<ul><li><p>outer</p><ul><li><p>child one</p></li><li><p>child two</p></li></ul></li></ul>",
+    );
+    // From "outer" down to "child one".
+    editor.commands.setTextSelection({ from: 4, to: 20 });
+    expect(toggleList(editor, "bulletList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<p>outer</p><p>child one</p><ul><li><p>child two</p></li></ul>",
+    );
+    editor.destroy();
+  });
 });
 
 describe("removing one numbered item", () => {
