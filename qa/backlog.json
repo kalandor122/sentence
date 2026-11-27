@@ -4819,8 +4819,9 @@
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-26T21:08:33Z"
+      "attempts": 1,
+      "startedAt": "2026-11-27T16:17:58Z",
+      "lastAttemptAt": "2026-11-27T16:17:58Z"
     },
     {
       "id": "qa-304",
@@ -4984,6 +4985,66 @@
     },
     {
       "id": "qa-317",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-318",
+      "title": "Shift+Tab on a nested item in the middle of a sublist reparents every following sibling under it",
+      "why": "Exploratory pass on lists (functional): expected Only 'child two' moves out to 'outer' level; 'child one' and 'child three' stay in the same sublist under 'outer', so the document reads: outer, child one, child three nested under outer, child two beside outer. Outdenting 'child one' should likewise leave child two and three under outer.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'child one', press Tab, press Enter, type 'child two', press Enter, type 'child three'. Click at the end of 'child two' and press Shift+Tab. Open Source in the status bar, click Refresh from visual and read the LaTeX textarea.\nActual: The outdented item adopts the following sibling. After outdenting 'child two' the DOM is '<ul><li>outer<ul>child one</ul></li><li>child two<ul>child three</ul></li></ul>' and the LaTeX is '\\begin{itemize}\\n\\item outer\\n\\begin{itemize}\\n\\item child one\\n\\end{itemize}\\n\\item child two\\n\\begin{itemize}\\n\\item child three\\n\\end{itemize}\\n\\end{itemize}', so 'child three' becomes a child of 'child two' visually and in the PDF. Outdenting 'child one' instead moves both child two and child three under it. The same thing happens with a numbered sublist and when Enter exits an empty nested item in the middle of a sublist (probe scenarios outdentMiddleNumberedNested and nestedEmptyMiddle).",
+      "source": "explore:lists:shift+tab on a nested item in the middle of a sublist reparents every following sibling under it",
+      "status": "open"
+    },
+    {
+      "id": "qa-319",
+      "title": "Turning bullets off for a selection that spans a parent and its nested child leaves the selected child bulleted",
+      "why": "Exploratory pass on lists (functional): expected Both selected bullet items lose their bullet and become plain paragraphs, as they do when a flat bullet list is fully selected and the same button is clicked.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Type 'outer text', click Home > Bulleted list, press Enter, type 'child text', press Tab. Click at the end of 'outer text', press Home, then Shift+ArrowDown and Shift+End so the selection covers both 'outer text' and 'child text' (the Bulleted list button is shown pressed). Click Home > Bulleted list. Open Source, click Refresh from visual and read the LaTeX.\nActual: 'outer text' becomes a paragraph but the selected 'child text' keeps its bullet and is promoted to a top-level list: DOM '<p>outer text</p><ul><li><p>child text</p></li></ul>', LaTeX 'outer text\\n\\n\\begin{itemize}\\n\\item child text\\n\\end{itemize}'. A selected bullet item is left untouched even though the Bulleted list button reported itself pressed.",
+      "source": "explore:lists:turning bullets off for a selection that spans a parent and its nested child leaves the selected child bulleted",
+      "status": "open"
+    },
+    {
+      "id": "qa-320",
+      "title": "The bullet button stays pressed on a paragraph that has no bullet, and clicking it removes the parent item's bullet",
+      "why": "Exploratory pass on lists (ux): expected With the caret on the visually unbulleted paragraph 'inner one', the Bulleted list button is not pressed, and clicking it bullets that paragraph (or does nothing) instead of changing a different item.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'inner one', press Tab, press Enter, type 'inner two'. Click at the end of 'inner one' and click Home > Bulleted list once ('inner one' becomes a plain paragraph). Read the Bulleted list button's aria-pressed value, then click Home > Bulleted list again.\nActual: The button still reports aria-pressed='true' on the unbulleted paragraph and Numbered list reports 'false'. The second click removes the bullet from 'outer' instead: both 'outer' and 'inner one' become plain paragraphs and 'inner two' is promoted to a top-level list. LaTeX after the second click is 'outer\\n\\ninner one\\n\\n\\begin{itemize}\\n\\item inner two\\n\\end{itemize}'. There is no way to re-bullet 'inner one' through this button; clicking it again only strips more list structure.",
+      "source": "explore:lists:the bullet button stays pressed on a paragraph that has no bullet, and clicking it removes the parent item's bullet",
+      "status": "open"
+    },
+    {
+      "id": "qa-321",
+      "title": "A numbered list typed as '0. ' shows 0 in the editor but exports an enumerate starting at 1",
+      "why": "Exploratory pass on lists (content): expected The editor and the exported LaTeX agree on the numbering: either the LaTeX preserves the visible 0 start (for example with \\setcounter{enumi}{-1}) or the editor starts the list at 1.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a new document and type '0. zero item' (the ordered-list input rule creates the list). Open Source, click Refresh from visual and read the LaTeX textarea.\nActual: The editor DOM is '<ol start=\"0\">' with list-style decimal, so the item is shown as 0, but the LaTeX is '\\begin{enumerate}\\n\\item zero item\\n\\end{enumerate}' with no \\setcounter, so the PDF numbers the same item 1.",
+      "source": "explore:lists:a numbered list typed as '0. ' shows 0 in the editor but exports an enumerate starting at 1",
+      "status": "open"
+    },
+    {
+      "id": "qa-322",
       "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
       "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
       "severity": "medium",
