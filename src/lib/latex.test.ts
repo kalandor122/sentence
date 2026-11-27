@@ -218,6 +218,44 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("protects a footnote inside a heading and round-trips it", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "heading",
+          attrs: { level: 1 },
+          content: [
+            { type: "text", text: "Heading footnote" },
+            { type: "footnote", attrs: { text: "Heading note" } },
+          ],
+        },
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "Body " },
+            { type: "footnote", attrs: { text: "Body note" } },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).toContain(
+      "\\section{Heading footnote\\protect\\footnote{Heading note}}",
+    );
+    expect(latex).toContain("Body \\footnote{Body note}");
+
+    const parsed = latexToDocument(latex, settings).document;
+    const heading = parsed.content[0];
+    expect(heading?.type).toBe("heading");
+    expect(heading?.content?.find((node) => node.type === "footnote")?.attrs?.text).toBe(
+      "Heading note",
+    );
+    expect(documentToLatex(parsed, settings)).toContain(
+      "\\section{Heading footnote\\protect\\footnote{Heading note}}",
+    );
+  });
+
   it("ignores LaTeX comments in the body instead of importing them as text", () => {
     const latex = [
       "\\documentclass{article}",
