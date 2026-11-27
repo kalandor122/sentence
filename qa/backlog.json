@@ -5130,10 +5130,11 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-27T19:51:33Z",
-      "lastAttemptAt": "2026-11-27T19:51:34Z"
+      "lastAttemptAt": "2026-11-27T19:51:34Z",
+      "doneAt": "2026-11-27T20:03:44Z"
     },
     {
       "id": "qa-324",
@@ -5329,6 +5330,68 @@
     },
     {
       "id": "qa-340",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-341",
+      "title": "Typing while an equation is selected silently replaces the equation",
+      "why": "Exploratory pass on math (functional): expected The typed text continues after the equation (or is placed in a new paragraph after it); the equation stays in the document and in the exported LaTeX.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and type 'Speed ' in the editor.\n2. Open Insert > Equation block, enter E=mc^2 and click Insert.\n3. Without clicking anywhere else, type the word 'next'.\n4. Open View > LaTeX and click Refresh from visual.\nThe same happens to an existing equation: click it to open the editor, press Escape to dismiss it, then type any character (e.g. inline 'Before [x+1] after' -> Escape -> 'Z').\nActual: The equation is replaced by the typed text. After step 3 the DOM has zero [data-math-block] nodes and two paragraphs 'Speed' and 'next'; the exported body is 'Speed\\n\\nnext' with no equation. In the Escape case the source becomes 'Before Z after' and the inline math node is gone.",
+      "source": "explore:math:typing while an equation is selected silently replaces the equation",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-27T20:26:45Z"
+    },
+    {
+      "id": "qa-342",
+      "title": "A bare percent sign in inline math is accepted, but the exported formula never closes because % comments out the delimit",
+      "why": "Exploratory pass on math (content): expected The dialog reports the unescaped % as invalid and blocks Insert (it already rejects the related input \\text{50%}), or the export writes \\% so the formula compiles.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and type 'Rate '.\n2. Open Insert > Inline equation.\n3. Enter 100% in the LaTeX source: the preview shows only '100', there is no error message and Insert is enabled.\n4. Click Insert, go to View > LaTeX and click Refresh from visual: the body reads 'Rate \\(100%\\)'.\n5. Compile that source with the bundled Tectonic.\nActual: The preview silently drops everything from % onward and Insert is allowed. The exported inline math is 'Rate \\(100%\\)'; the % starts a TeX comment that swallows the closing \\), so Tectonic stops with '! Missing $ inserted.' and writes no PDF.",
+      "source": "explore:math:a bare percent sign in inline math is accepted, but the exported formula never closes because % comments out the delimit",
+      "status": "open"
+    },
+    {
+      "id": "qa-343",
+      "title": "The math preview accepts \\textcolor, but the exported preamble omits xcolor so the PDF compile fails",
+      "why": "Exploratory pass on math (content): expected The preamble includes \\usepackage{xcolor} when a math formula uses colour commands, or the dialog rejects the command and explains that the package is unavailable.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and type 'Colour '.\n2. Open Insert > Inline equation and enter \\textcolor{red}{x}: the preview renders a red x with no error and Insert is enabled.\n3. Click Insert, then View > LaTeX: the body contains \\(\\textcolor{red}{x}\\) and the preamble lists fontspec, amsmath/amssymb, graphicx, booktabs, ulem, microtype, hyperref, fancyhdr and geometry, but no xcolor.\n4. Compile the exported source with the bundled Tectonic.\nActual: Tectonic stops with '! Undefined control sequence.' at \\(\\textcolor{red}{x}\\) and writes no pages, even though the dialog preview showed the formula as valid.",
+      "source": "explore:math:the math preview accepts \\textcolor, but the exported preamble omits xcolor so the pdf compile fails",
+      "status": "open"
+    },
+    {
+      "id": "qa-344",
+      "title": "Valid empty inline math \\(\\) is imported as literal text and re-exported as \\textbackslash{}(\\textbackslash{})",
+      "why": "Exploratory pass on math (content): expected The valid empty formula becomes an (empty) inline math node, the way an empty $$ $$ block becomes a math block, or at minimum the source is preserved verbatim.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project, open View > LaTeX and replace the body before \\end{document} with: Empty \\(\\) math.\n2. Click Apply source: the toast says 'Visual document synchronized from LaTeX.'\n3. Switch to View > Visual: the paragraph reads literally 'Empty \\(\\) math.' and contains no math node.\n4. Back in View > LaTeX, click Refresh from visual: the body is 'Empty \\textbackslash{}(\\textbackslash{}) math.'\nActual: No math node is created; the delimiters remain as paragraph text and the next export escapes both backslashes to \\textbackslash{}, so the math is gone and the source has changed. The same 'Empty \\(\\) math.' document compiles without error in Tectonic before the round trip.",
+      "source": "explore:math:valid empty inline math \\(\\) is imported as literal text and re-exported as \\textbackslash{}(\\textbackslash{})",
+      "status": "open"
+    },
+    {
+      "id": "qa-345",
       "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
       "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
       "severity": "medium",
