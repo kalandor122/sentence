@@ -29,23 +29,25 @@ function documentHasList(editor: Editor, listType: "bulletList" | "orderedList")
 // editor.isActive("bulletList") is also true for a numbered list nested inside a
 // bullet list, because every enclosing list counts. Report only the innermost
 // list that holds the caret so the two ribbon buttons are mutually exclusive.
-function enclosingListType(editor: Editor): string | null {
-  const { selection } = editor.state;
-  if (selection instanceof NodeSelection && isListNode(selection.node)) return selection.node.type.name;
-  if (!selection.empty) return null;
-  const { $from } = selection;
-  for (let depth = $from.depth; depth > 0; depth -= 1) {
-    const name = $from.node(depth).type.name;
-    if (name === "bulletList" || name === "orderedList") return name;
+// Its marker is drawn on the item's first block, so a paragraph left inside an
+// item after a nested bullet was removed is not itself bulleted.
+function markerListType($pos: ResolvedPos): string | null {
+  for (let depth = $pos.depth - 1; depth > 0; depth -= 1) {
+    const node = $pos.node(depth);
+    if (!isListNode(node)) continue;
+    return $pos.index(depth + 1) === 0 ? node.type.name : null;
   }
   return null;
 }
 
 export function isListActive(editor: Editor, listType: "bulletList" | "orderedList"): boolean {
   if (isAllSelected(editor)) return documentHasList(editor, listType);
-  const enclosing = enclosingListType(editor);
-  if (enclosing) return enclosing === listType;
-  return editor.isActive(listType);
+  const { selection } = editor.state;
+  if (selection instanceof NodeSelection && isListNode(selection.node)) {
+    return selection.node.type.name === listType;
+  }
+  if (!selection.empty) return editor.isActive(listType);
+  return markerListType(selection.$from) === listType;
 }
 
 function unwrapList(node: ProseMirrorNode, listType: "bulletList" | "orderedList"): ProseMirrorNode[] {
@@ -308,9 +310,12 @@ export function removeListItem(
   const { state } = editor;
   const { selection } = state;
   if (!(selection instanceof TextSelection)) return false;
-  if (!editor.isActive(listType)) return false;
   const { $from, $to } = selection;
   if ($from.depth < 3) return false;
+  // Removing a bullet needs the caret on the item's own marker block. A
+  // paragraph left inside an item after a nested bullet was removed has no
+  // marker, and stripping the enclosing item's bullet would be the wrong edit.
+  if (markerListType($from) !== listType) return false;
   const fromList = findInnermostList($from, listType);
   if (!fromList) return false;
   const toList = findInnermostList($to, listType);
@@ -374,6 +379,56 @@ function convertList(node: ProseMirrorNode, listType: "bulletList" | "orderedLis
 }
 
 /**
+ * A plain block left inside a list item after a nested item lost its bullet has
+ * no marker of its own. Turning list formatting back on for it should make that
+ * block an item again next to the sublist it was lifted out of, joined to it
+ * when the sublist has the requested type. Wrapping the enclosing item instead
+ * would strip the parent's bullet.
+ */
+function restoreListItem(
+  editor: Editor,
+  listType: "bulletList" | "orderedList",
+): boolean {
+  if (!editor.isEditable) return false;
+  const { state } = editor;
+  const { selection } = state;
+  if (!(selection instanceof TextSelection) || !selection.empty) return false;
+  const { $from } = selection;
+  if ($from.depth < 3) return false;
+  const item = $from.node(-1);
+  if (item.type.name !== "listItem") return false;
+  const block = $from.parent;
+  if (block.type.name !== "paragraph") return false;
+  const index = $from.index(-1);
+  if (index === 0) return false;
+
+  const blockStart = $from.before();
+  const blockEnd = $from.after();
+  const newItem = item.type.create(item.attrs, block);
+  const next = item.maybeChild(index + 1);
+  const previous = item.maybeChild(index - 1);
+  let tr = state.tr.delete(blockStart, blockEnd);
+  let caret = $from.pos;
+  if (next && next.type.name === listType) {
+    tr.insert(blockStart + 1, newItem);
+    caret += 2;
+  } else if (previous && previous.type.name === listType) {
+    tr.insert(blockStart - 1, newItem);
+  } else {
+    tr = state.tr.replaceWith(
+      blockStart,
+      blockEnd,
+      state.schema.nodes[listType].create(null, newItem),
+    );
+    caret += 2;
+  }
+  tr.setSelection(TextSelection.create(tr.doc, caret));
+  editor.view.dispatch(tr.scrollIntoView());
+  editor.commands.focus();
+  return true;
+}
+
+/**
  * Toggle a list type. When the entire document is selected, ProseMirror's
  * default toggle wraps every selected block in a new list, which nests existing
  * lists under the first paragraph and can append an empty item. Instead handle
@@ -405,6 +460,7 @@ export function toggleList(editor: Editor, listType: "bulletList" | "orderedList
     }
   }
   if (removeListItem(editor, listType)) return true;
+  if (restoreListItem(editor, listType)) return true;
   const cmd = listType === "bulletList" ? "toggleBulletList" : "toggleOrderedList";
   return editor.chain().focus()[cmd]().run();
 }

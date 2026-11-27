@@ -205,6 +205,47 @@ describe("removing one bulleted item", () => {
   });
 });
 
+describe("re-bulleting a paragraph left inside an item", () => {
+  function caretAfter(editor: Editor, text: string) {
+    let pos = -1;
+    editor.state.doc.descendants((node, offset) => {
+      if (pos >= 0) return false;
+      if (node.isText && node.text === text) pos = offset + node.nodeSize;
+      return pos < 0;
+    });
+    expect(pos).toBeGreaterThan(0);
+    editor.commands.setTextSelection(pos);
+  }
+
+  it("does not report a marker on the paragraph the bullet was removed from", () => {
+    const editor = createEditor(
+      "<ul><li><p>outer</p><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>",
+    );
+    caretAfter(editor, "inner one");
+    expect(isListActive(editor, "bulletList")).toBe(false);
+    expect(isListActive(editor, "orderedList")).toBe(false);
+    editor.destroy();
+  });
+
+  it("restores the bullet and leaves the parent item alone", () => {
+    const editor = createEditor(
+      "<ul><li><p>outer</p><ul><li><p>inner one</p></li><li><p>inner two</p></li></ul></li></ul>",
+    );
+    caretAfter(editor, "inner one");
+    expect(toggleList(editor, "bulletList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ul><li><p>outer</p><p>inner one</p><ul><li><p>inner two</p></li></ul></li></ul>",
+    );
+    expect(isListActive(editor, "bulletList")).toBe(false);
+    expect(toggleList(editor, "bulletList")).toBe(true);
+    expect(getHTML(editor)).toBe(
+      "<ul><li><p>outer</p><ul><li><p>inner one</p></li><li><p>inner two</p></li></ul></li></ul>",
+    );
+    expect(isListActive(editor, "bulletList")).toBe(true);
+    editor.destroy();
+  });
+});
+
 describe("removing one numbered item", () => {
   // Positions run from the list start; an item's paragraph opens one past the
   // item start, so the cursor inside "two" below sits at 8.
