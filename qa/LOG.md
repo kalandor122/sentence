@@ -1005,3 +1005,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-27T20:26:26Z EXPLORE math: 4 new items, agent exit 0
 2026-11-27T20:26:45Z IMPORTED 1 tester findings into the backlog
 2026-11-27T20:26:45Z START qa-341 on qa/qa-341-typing-while-an-equation-is-selected-sil: Typing while an equation is selected silently replaces the equation
+2026-11-27T20:29:12Z PUSHED main
+2026-11-27T20:29:12Z DONE qa-341 (tsc -b, npm test, smoke all green)
+2026-11-27T20:29:51Z IMPORTED 1 tester findings into the backlog
