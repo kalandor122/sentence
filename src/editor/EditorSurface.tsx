@@ -256,10 +256,15 @@ function textLines(block: HTMLElement, zoom: number): TextLine[] {
   return lines;
 }
 
-// The caret's position in unscaled document pixels, measured after the zoom
-// has been applied so the value is independent of the current scroll offset.
-// Returns null when the selection is outside the page (or has no layout box).
-function caretDocumentTop(scroller: HTMLElement, paddingTop: number, zoom: number): number | null {
+// The caret's position and line height in unscaled document pixels, measured
+// after the zoom has been applied so the values are independent of the current
+// scroll offset. Returns null when the selection is outside the page (or has no
+// layout box).
+function caretDocumentBox(
+  scroller: HTMLElement,
+  paddingTop: number,
+  zoom: number,
+): { top: number; height: number } | null {
   const selection = window.getSelection();
   const node = selection?.focusNode;
   if (!selection || !node || !scroller.contains(node)) return null;
@@ -269,7 +274,10 @@ function caretDocumentTop(scroller: HTMLElement, paddingTop: number, zoom: numbe
     range.collapse(true);
     const rect = range.getBoundingClientRect();
     if (rect.height <= 0) return null;
-    return (rect.top - scroller.getBoundingClientRect().top + scroller.scrollTop - paddingTop) / zoom;
+    return {
+      top: (rect.top - scroller.getBoundingClientRect().top + scroller.scrollTop - paddingTop) / zoom,
+      height: rect.height / zoom,
+    };
   } catch {
     return null;
   }
@@ -400,8 +408,8 @@ export default function EditorSurface({
     if (!scroller || previousZoom === zoom) return;
     const paddingTop = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
     const maxScrollTop = scroller.scrollHeight - scroller.clientHeight;
-    const caretTop = caretDocumentTop(scroller, paddingTop, zoom);
-    scroller.scrollTop = caretTop === null
+    const caret = caretDocumentBox(scroller, paddingTop, zoom);
+    scroller.scrollTop = caret === null
       ? scrollTopForZoom(
           scrollTopRef.current,
           scroller.clientHeight,
@@ -411,13 +419,14 @@ export default function EditorSurface({
           maxScrollTop,
         )
       : scrollTopForZoomPoint(
-          caretTop,
+          caret.top,
           scrollTopRef.current,
           scroller.clientHeight,
           paddingTop,
           previousZoom,
           zoom,
           maxScrollTop,
+          caret.height,
         );
     scroller.scrollLeft = scrollLeftForZoom(
       scrollLeftRef.current,

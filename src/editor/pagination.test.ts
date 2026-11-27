@@ -129,6 +129,31 @@ describe("scrollTopForZoomPoint", () => {
     expect(scrollTopForZoomPoint(end, at150, 627, 30, 1.5, 1, 14082)).toBeCloseTo(13558, 6);
   });
 
+  it("keeps the whole caret line on screen when the line grows with the zoom", () => {
+    // The end line sits 611px down the 627px viewport at 100%; at 150% the
+    // line grows to 24px and holding only its top would clip the bottom.
+    const unclamped = scrollTopForZoomPoint(14029, 13448, 627, 30, 1, 1.5, 21382);
+    expect(30 + 14029 * 1.5 - unclamped).toBeCloseTo(611, 6);
+    expect(30 + (14029 + 16) * 1.5 - unclamped).toBeCloseTo(635, 6);
+
+    const clamped = scrollTopForZoomPoint(14029, 13448, 627, 30, 1, 1.5, 21382, 16);
+    expect(30 + 14029 * 1.5 - clamped).toBeCloseTo(603, 6);
+    expect(30 + (14029 + 16) * 1.5 - clamped).toBeCloseTo(627, 6);
+  });
+
+  it("never scrolls a box taller than the viewport above the top", () => {
+    // An 800px image at 150% is 1200px tall, so it cannot fit; the clamp stops
+    // with its top at the top of the viewport instead of scrolling it away.
+    const target = scrollTopForZoomPoint(500, 0, 627, 30, 1, 1.5, 20000, 800);
+    expect(30 + 500 * 1.5 - target).toBeCloseTo(0, 6);
+  });
+
+  it("ignores the line height when the caret was out of view before the zoom", () => {
+    expect(scrollTopForZoomPoint(0, 13558, 627, 30, 1, 0.7, 9702, 16)).toBe(
+      scrollTopForZoom(13558, 627, 30, 1, 0.7, 9702),
+    );
+  });
+
   it("uses the pre-zoom offset when the new zoom clamped it before the effect ran", () => {
     // The end sat at 20925 at 150%; switching to 100% clamps the DOM offset to
     // 14082 first, but the caret's unscaled top 14029 was on screen at 148.5.
