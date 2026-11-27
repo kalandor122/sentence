@@ -93,6 +93,43 @@ export function splitListItemKeepingSublist(editor: Editor): boolean {
 }
 
 /**
+ * Outdenting an item in the middle of a nested list should move only that item
+ * out to the enclosing list. ProseMirror's liftListItem hands the following
+ * siblings to the lifted item instead, silently nesting text it never contained.
+ * Keep them in the sublist under the same parent item and let only the lifted
+ * item move out, right after that parent.
+ */
+export function liftListItemKeepingSiblings(editor: Editor): boolean {
+  if (!editor.isEditable) return false;
+  const { state } = editor;
+  const { selection } = state;
+  if (!(selection instanceof TextSelection) || !selection.empty) return false;
+  const { $from } = selection;
+  if ($from.depth < 4) return false;
+  const item = $from.node(-1);
+  const list = $from.node(-2);
+  const parentItem = $from.node(-3);
+  const parentList = $from.node(-4);
+  if (item.type.name !== "listItem" || parentItem.type.name !== "listItem") return false;
+  if (!isListNode(list) || !isListNode(parentList)) return false;
+  const index = $from.index(-2);
+  const items: ProseMirrorNode[] = [];
+  list.forEach((child) => items.push(child));
+  if (index >= items.length - 1) return false;
+
+  const remaining = list.type.create(
+    list.attrs,
+    items.filter((_, at) => at !== index),
+  );
+  const tr = state.tr.replaceWith($from.before(-2), $from.after(-2), remaining);
+  const insertAt = tr.mapping.map($from.after(-3));
+  tr.insert(insertAt, item);
+  tr.setSelection(TextSelection.create(tr.doc, insertAt + $from.pos - $from.before(-1)));
+  editor.view.dispatch(tr.scrollIntoView());
+  return true;
+}
+
+/**
  * Enter on an empty item in the middle of a nested list has nothing to split:
  * ProseMirror leaves the item in place and the fallback command tears a
  * paragraph out of the parent item, so the text typed next joins the parent
@@ -112,7 +149,7 @@ export function liftEmptyNestedItem(editor: Editor): boolean {
   const parentItem = $from.node(-3);
   if (item.type.name !== "listItem" || item.childCount !== 1) return false;
   if (!isListNode(list) || parentItem.type.name !== "listItem") return false;
-  return editor.chain().liftListItem("listItem").run();
+  return liftListItemKeepingSiblings(editor) || editor.chain().liftListItem("listItem").run();
 }
 
 /**

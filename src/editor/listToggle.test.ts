@@ -277,7 +277,7 @@ describe("liftEmptyNestedItem", () => {
     editor.commands.setTextSelection(23);
     expect(liftEmptyNestedItem(editor)).toBe(true);
     expect(getHTML(editor)).toBe(
-      "<ul><li><p>outer</p><ul><li><p>child one</p></li></ul></li><li><p></p><ul><li><p>child two</p></li></ul></li></ul>",
+      "<ul><li><p>outer</p><ul><li><p>child one</p></li><li><p>child two</p></li></ul></li><li><p></p></li></ul>",
     );
     const { $from } = editor.state.selection;
     expect($from.depth).toBe(3);
@@ -292,7 +292,7 @@ describe("liftEmptyNestedItem", () => {
     editor.commands.setTextSelection(23);
     expect(liftEmptyNestedItem(editor)).toBe(true);
     expect(getHTML(editor)).toBe(
-      "<ol><li><p>outer</p><ol><li><p>child one</p></li></ol></li><li><p></p><ol><li><p>child two</p></li></ol></li></ol>",
+      "<ol><li><p>outer</p><ol><li><p>child one</p></li><li><p>child two</p></li></ol></li><li><p></p></li></ol>",
     );
     const { $from } = editor.state.selection;
     expect($from.parent.content.size).toBe(0);
