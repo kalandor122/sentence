@@ -275,9 +275,13 @@ function caretDocumentBox(
     range.collapse(true);
     const rect = range.getBoundingClientRect();
     if (rect.height <= 0) return null;
+    // A collapsed range reports the glyph box, which is shorter than the line
+    // box. Use the line height so zooming in does not clip the foot of the line.
+    const element = node.nodeType === Node.ELEMENT_NODE ? (node as HTMLElement) : node.parentElement;
+    const lineHeight = element ? parseFloat(getComputedStyle(element).lineHeight) : 0;
     return {
       top: (rect.top - scroller.getBoundingClientRect().top + scroller.scrollTop - paddingTop) / zoom,
-      height: rect.height / zoom,
+      height: Math.max(rect.height / zoom, Number.isFinite(lineHeight) ? lineHeight : 0),
     };
   } catch {
     return null;
@@ -407,6 +411,9 @@ export default function EditorSurface({
     const previousZoom = previousZoomRef.current;
     previousZoomRef.current = zoom;
     if (!scroller || previousZoom === zoom) return;
+    // The zoom prop is a percentage; the scroll helpers work in scale factors.
+    const previousScale = previousZoom / 100;
+    const scale = zoom / 100;
     const styles = getComputedStyle(scroller);
     const paddingTop = parseFloat(styles.paddingTop) || 0;
     const paddingRight = parseFloat(styles.paddingRight) || 0;
@@ -431,14 +438,14 @@ export default function EditorSurface({
           scroller.clientWidth,
         )
       : scroller.scrollWidth - scroller.clientWidth;
-    const caret = caretDocumentBox(scroller, paddingTop, zoom);
+    const caret = caretDocumentBox(scroller, paddingTop, scale);
     scroller.scrollTop = caret === null
       ? scrollTopForZoom(
           scrollTopRef.current,
           scroller.clientHeight,
           paddingTop,
-          previousZoom,
-          zoom,
+          previousScale,
+          scale,
           maxScrollTop,
         )
       : scrollTopForZoomPoint(
@@ -446,15 +453,15 @@ export default function EditorSurface({
           scrollTopRef.current,
           scroller.clientHeight,
           paddingTop,
-          previousZoom,
-          zoom,
+          previousScale,
+          scale,
           maxScrollTop,
           caret.height,
         );
     scroller.scrollLeft = scrollLeftForZoom(
       scrollLeftRef.current,
-      previousZoom,
-      zoom,
+      previousScale,
+      scale,
       maxScrollLeft,
     );
     scrollTopRef.current = scroller.scrollTop;
