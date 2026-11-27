@@ -199,6 +199,50 @@ describe("zoom keeps the scroll range on the rendered sheet", () => {
   });
 });
 
+describe("zoom on a fit-scaled page", () => {
+  // qa-325: in an 820x640 window the 794px sheet is fitted to 684/794 before
+  // the zoom is applied, so both factors shape the reserved size. Zooming out
+  // at the end has to stop at the scaled sheet bottom, and at 150% the fitted
+  // page is still wider than the pane, so both of its edges stay reachable.
+  const pane = 804;
+  const padding = 34;
+  const viewportHeight = 467;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const fit = 684 / 794;
+  const fittedHeight = 1123 * 11 * fit;
+  const fittedWidth = 794 * fit;
+
+  it("ends the zoomed-out range at the fit-scaled sheet bottom", () => {
+    const maxAt100 = sheetScrollMax(paddingTop + fittedHeight, paddingBottom, viewportHeight);
+    const maxAt70 = sheetScrollMax(
+      paddingTop + fittedHeight * 0.7,
+      paddingBottom,
+      viewportHeight,
+    );
+    expect(maxAt100).toBeGreaterThan(maxAt70);
+
+    const top = scrollTopForZoom(maxAt100, viewportHeight, paddingTop, 1, 0.7, maxAt70);
+    expect(top).toBe(maxAt70);
+    // The range ends at the fitted sheet, leaving only its own 1px rounding.
+    const tail = paddingTop + fittedHeight * 0.7 + paddingBottom - top;
+    expect(tail).toBeGreaterThanOrEqual(viewportHeight);
+    expect(tail).toBeLessThan(viewportHeight + 1);
+  });
+
+  it("reaches both edges of the fit-scaled page at 150%", () => {
+    const maxAt150 = sheetScrollMax(padding + fittedWidth * 1.5, padding, pane);
+    const maxAt70 = sheetScrollMax(padding + fittedWidth * 0.7, padding, pane);
+    expect(maxAt150).toBeGreaterThan(0);
+    expect(maxAt70).toBe(0);
+
+    // The left edge is visible at 0 and the right edge at the maximum.
+    expect(padding + fittedWidth * 1.5 - maxAt150).toBeLessThanOrEqual(pane);
+    expect(scrollLeftForZoom(0, 1, 1.5, maxAt150)).toBe(0);
+    expect(scrollLeftForZoom(maxAt150, 1.5, 0.7, maxAt70)).toBe(0);
+  });
+});
+
 describe("zoom keeps a page wider than the pane reachable at both edges", () => {
   // qa-324: the 150% sheet is 1,191px wide in a 950px pane with 34px of side
   // padding. Reserving the scaled width on the stage makes the range cover the
