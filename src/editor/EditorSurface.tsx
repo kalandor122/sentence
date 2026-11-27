@@ -57,8 +57,10 @@ import type {
 } from "../lib/types";
 
 // Inline atoms that have no in-place text: clicking one selects the whole node,
-// so typing must land beside it instead of replacing it.
-const PRESERVED_ON_TYPING = new Set(["footnote", "citation", "crossReference"]);
+// so typing must land beside it instead of replacing it. Math is edited in its
+// own dialog too, so a keystroke next to a selected equation continues the
+// sentence instead of silently deleting the formula.
+const PRESERVED_ON_TYPING = new Set(["footnote", "citation", "crossReference", "mathInline"]);
 
 interface EditorSurfaceProps {
   document: SentenceDocument;
@@ -554,13 +556,25 @@ export default function EditorSurface({
         if (!marker) return false;
         return editAtom(view, marker);
       },
-      // A citation, cross-reference or footnote marker is an atom, so clicking
-      // it selects the whole node and the next keystroke would replace it with
-      // body text. Typing while the atom is selected lands beside it instead;
-      // removing the reference stays an explicit Backspace/Delete.
+      // A citation, cross-reference, footnote or equation is an atom, so
+      // clicking it selects the whole node and the next keystroke would replace
+      // it with body text. Typing while the atom is selected lands beside it
+      // instead; removing it stays an explicit Backspace/Delete.
       handleTextInput(view, _from, _to, text) {
         const { selection } = view.state;
-        if (!(selection instanceof NodeSelection) || !PRESERVED_ON_TYPING.has(selection.node.type.name)) return false;
+        if (!(selection instanceof NodeSelection)) return false;
+        const name = selection.node.type.name;
+        if (name === "mathBlock") {
+          // An equation block has no text of its own to type into, so the
+          // keystroke opens a paragraph right after it and continues there.
+          const position = selection.to;
+          const paragraph = view.state.schema.nodes.paragraph.create(null, view.state.schema.text(text));
+          const transaction = view.state.tr.insert(position, paragraph).scrollIntoView();
+          transaction.setSelection(TextSelection.create(transaction.doc, position + 1 + text.length));
+          view.dispatch(transaction);
+          return true;
+        }
+        if (!PRESERVED_ON_TYPING.has(name)) return false;
         const position = selection.to;
         const transaction = view.state.tr.insertText(text, position).scrollIntoView();
         transaction.setSelection(TextSelection.create(transaction.doc, position + text.length));
