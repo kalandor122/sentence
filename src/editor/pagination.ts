@@ -165,12 +165,14 @@ export function scrollTopForZoom(
 // at whatever size the stage reserved while the page layout was still settling.
 // `sheetEnd` and `paddingEnd` are measured in the scroller's content
 // coordinates, so a zoom correction can never leave blank space past the page.
+// A scaled edge is often fractional, and rounding it up would put the maximum
+// a fraction of a pixel past the page, so the range is rounded down instead.
 export function sheetScrollMax(
   sheetEnd: number,
   paddingEnd: number,
   viewportSize: number,
 ): number {
-  return Math.max(0, Math.round(sheetEnd + paddingEnd - viewportSize));
+  return Math.max(0, Math.floor(sheetEnd + paddingEnd - viewportSize));
 }
 
 // A zoomed-in sheet can be wider than the pane, so the horizontal offset has to

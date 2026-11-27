@@ -102,6 +102,12 @@ describe("sheetScrollMax", () => {
   it("never scrolls past a sheet that already fits", () => {
     expect(sheetScrollMax(400, 80, 627)).toBe(0);
   });
+
+  it("rounds a fractional scaled edge down instead of past the page", () => {
+    // The 13-page sheet at 150% ends at 21,928.5px and has 80px of bottom
+    // padding, so the maximum has to stop at 21,381px rather than round up.
+    expect(sheetScrollMax(21928.5, 80, 627)).toBe(21381);
+  });
 });
 
 describe("scrollLeftForZoom", () => {
