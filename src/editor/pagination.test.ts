@@ -199,6 +199,30 @@ describe("zoom keeps the scroll range on the rendered sheet", () => {
   });
 });
 
+describe("zoom keeps a page wider than the pane reachable at both edges", () => {
+  // qa-324: the 150% sheet is 1,191px wide in a 950px pane with 34px of side
+  // padding. Reserving the scaled width on the stage makes the range cover the
+  // whole page (309px) instead of the 121px the centred, unscaled stage used to
+  // leave, and zooming back out from the right edge returns the page to the
+  // pane instead of stranding the reader sideways.
+  const pane = 950;
+  const padding = 34;
+  const sheetAt150 = (794 * 150) / 100;
+
+  it("reaches the right edge at 150% and returns to the pane at 70%", () => {
+    const maxAt150 = sheetScrollMax(padding + sheetAt150, padding, pane);
+    const maxAt70 = sheetScrollMax(padding + (794 * 70) / 100, padding, pane);
+    expect(maxAt150).toBe(309);
+    expect(maxAt150).toBeGreaterThan(121);
+    expect(maxAt70).toBe(0);
+
+    // The left edge is visible at 0 and the right edge at the maximum.
+    expect(padding + sheetAt150 - maxAt150).toBeLessThanOrEqual(pane);
+
+    expect(scrollLeftForZoom(maxAt150, 1.5, 0.7, maxAt70)).toBe(0);
+  });
+});
+
 describe("scrollTopForZoomPoint", () => {
   it("keeps the caret at the same screen position while zooming out at the end", () => {
     const pointTop = 14029;
