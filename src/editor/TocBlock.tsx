@@ -2,6 +2,7 @@ import { NodeViewWrapper, ReactNodeViewRenderer, type NodeViewProps } from "@tip
 import { useEffect, useState } from "react";
 import type { Editor } from "@tiptap/core";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import type { ProjectSettings } from "../lib/types";
 
 export const TOC_COMPILE_NOTE =
   "Final contents and page numbers are generated when the PDF compiles.";
@@ -25,6 +26,7 @@ interface TocHeading {
 interface TocStorage {
   title: string;
   generated: boolean;
+  documentClass: ProjectSettings["documentClass"];
 }
 
 function tocStorage(editor: Editor | null): TocStorage | undefined {
@@ -48,6 +50,24 @@ export function setTocTitle(editor: Editor, title: string): void {
   editor.view.dispatch(editor.state.tr.setMeta("addToHistory", false));
 }
 
+// Report and book number sections under a chapter counter, so \section prints
+// 0.1 while no chapter has started. The preview reads the class to match it.
+export function tocDocumentClass(editor: Editor | null): ProjectSettings["documentClass"] {
+  const documentClass = tocStorage(editor)?.documentClass;
+  return documentClass === "report" || documentClass === "book" ? documentClass : "article";
+}
+
+export function setTocDocumentClass(
+  editor: Editor,
+  documentClass: ProjectSettings["documentClass"],
+): void {
+  if (editor.isDestroyed) return;
+  const storage = tocStorage(editor);
+  if (!storage || storage.documentClass === documentClass) return;
+  storage.documentClass = documentClass;
+  editor.view.dispatch(editor.state.tr.setMeta("addToHistory", false));
+}
+
 // The Properties switch generates a contents page without placing a block in
 // the document. The editor still has to show it, so the extension draws it as
 // a decoration from this flag.
@@ -59,10 +79,15 @@ export function setGeneratedToc(editor: Editor, generated: boolean): void {
   editor.view.dispatch(editor.state.tr.setMeta("addToHistory", false));
 }
 
-function tocEntriesFromHeadings(headings: TocHeading[], title: string): TocEntry[] {
+function tocEntriesFromHeadings(
+  headings: TocHeading[],
+  title: string,
+  documentClass: ProjectSettings["documentClass"] = "article",
+): TocEntry[] {
   const counters = [0, 0, 0];
   const entries: TocEntry[] = [];
   const normalizedTitle = title.trim().toLocaleLowerCase();
+  const chaptered = documentClass === "report" || documentClass === "book";
   for (const heading of headings) {
     // \section*{...} is left out of the contents and does not step the section
     // counter, so the next numbered heading keeps the number it would have had.
@@ -83,9 +108,10 @@ function tocEntriesFromHeadings(headings: TocHeading[], title: string): TocEntry
     for (let deeper = level; deeper < counters.length; deeper += 1) counters[deeper] = 0;
     // \section[Short]{Long} makes the PDF contents print the optional short
     // title, so the preview has to show that rather than the heading text.
+    const parts = chaptered ? ["0", ...counters.slice(0, level)] : counters.slice(0, level);
     entries.push({
       level,
-      number: counters.slice(0, level).join("."),
+      number: parts.join("."),
       text: heading.shortTitle || heading.text,
     });
   }
@@ -119,8 +145,12 @@ function headingsIn(doc: ProseMirrorNode): TocHeading[] {
   return headings;
 }
 
-export function tocEntries(editor: Editor, title = ""): TocEntry[] {
-  return tocEntriesFromHeadings(headingsIn(editor.state.doc), title);
+export function tocEntries(
+  editor: Editor,
+  title = "",
+  documentClass = tocDocumentClass(editor),
+): TocEntry[] {
+  return tocEntriesFromHeadings(headingsIn(editor.state.doc), title, documentClass);
 }
 
 function tocList(entries: TocEntry[]): HTMLElement {
@@ -150,7 +180,11 @@ function tocList(entries: TocEntry[]): HTMLElement {
 // The generated contents is a decoration rather than a node, so it follows
 // the headings as they change but adds no second \tableofcontents to the
 // serialized document.
-export function tocPreviewElement(doc: ProseMirrorNode, title: string): HTMLElement {
+export function tocPreviewElement(
+  doc: ProseMirrorNode,
+  title: string,
+  documentClass: ProjectSettings["documentClass"] = "article",
+): HTMLElement {
   const nav = document.createElement("nav");
   nav.className = "toc-block";
   nav.setAttribute("data-toc", "");
@@ -162,7 +196,11 @@ export function tocPreviewElement(doc: ProseMirrorNode, title: string): HTMLElem
   const note = document.createElement("p");
   note.className = "toc-block-note";
   note.textContent = TOC_COMPILE_NOTE;
-  nav.append(heading, tocList(tocEntriesFromHeadings(headingsIn(doc), title)), note);
+  nav.append(
+    heading,
+    tocList(tocEntriesFromHeadings(headingsIn(doc), title, documentClass)),
+    note,
+  );
   return nav;
 }
 

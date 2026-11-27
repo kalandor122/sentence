@@ -2,7 +2,7 @@
 import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
-import { tocEntries, tocTitle, setTocTitle, setGeneratedToc } from "./TocBlock";
+import { tocEntries, tocTitle, setTocTitle, setGeneratedToc, setTocDocumentClass } from "./TocBlock";
 import { HeadingLabel, MathInline, TableOfContents } from "./extensions";
 
 describe("tocEntries", () => {
@@ -106,6 +106,53 @@ describe("tocEntries", () => {
       "Introduction",
       "Drafting with constraints",
     ]);
+    editor.destroy();
+  });
+
+  it("numbers report sections under the chapter counter, the way the PDF contents prints them", () => {
+    const editor = new Editor({
+      extensions: [StarterKit, HeadingLabel, TableOfContents],
+      content: {
+        type: "doc",
+        content: [
+          { type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Introduction" }] },
+          {
+            type: "heading",
+            attrs: { level: 2 },
+            content: [{ type: "text", text: "Drafting with constraints" }],
+          },
+          { type: "heading", attrs: { level: 3 }, content: [{ type: "text", text: "Details" }] },
+        ],
+      },
+    });
+    setTocDocumentClass(editor, "report");
+    expect(tocEntries(editor)).toEqual([
+      { level: 1, number: "0.1", text: "Introduction" },
+      { level: 2, number: "0.1.1", text: "Drafting with constraints" },
+      { level: 3, number: "0.1.1.1", text: "Details" },
+    ]);
+    setTocDocumentClass(editor, "article");
+    expect(tocEntries(editor).map((entry) => entry.number)).toEqual(["1", "1.1", "1.1.1"]);
+    editor.destroy();
+  });
+
+  it("opens a placed contents on a new page where the class does", () => {
+    const editor = new Editor({
+      extensions: [StarterKit, HeadingLabel, TableOfContents],
+      content: {
+        type: "doc",
+        content: [
+          { type: "heading", attrs: { level: 1 }, content: [{ type: "text", text: "Introduction" }] },
+          { type: "toc" },
+        ],
+      },
+    });
+    expect(editor.view.dom.querySelectorAll(".generated-toc-break")).toHaveLength(0);
+    setTocDocumentClass(editor, "report");
+    // \tableofcontents in report and book uses \chapter*, which starts a page.
+    expect(editor.view.dom.querySelectorAll(".generated-toc-break")).toHaveLength(1);
+    setTocDocumentClass(editor, "article");
+    expect(editor.view.dom.querySelectorAll(".generated-toc-break")).toHaveLength(0);
     editor.destroy();
   });
 
