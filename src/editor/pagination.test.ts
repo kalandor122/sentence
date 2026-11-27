@@ -10,6 +10,7 @@ import {
   scrollLeftForZoom,
   scrollTopForZoom,
   scrollTopForZoomPoint,
+  sheetScrollMax,
 } from "./pagination";
 
 describe("pageGeometry", () => {
@@ -81,6 +82,25 @@ describe("scrollTopForZoom", () => {
     const zoomedIn = scrollTopForZoom(5000, 627, 30, 1, 1.5, 30000);
     expect(zoomedIn).toBeCloseTo(7642, 0);
     expect(scrollTopForZoom(zoomedIn, 627, 30, 1.5, 1, 20000)).toBeCloseTo(5000, 6);
+  });
+});
+
+describe("sheetScrollMax", () => {
+  // qa-312: the 13-page A4 sheet ends at 14,629px and the scroller has 30px of
+  // top and 80px of bottom padding, so the zoomed-out range must stop at the
+  // scaled sheet bottom instead of the 100% layout's height.
+  it("ends the zoomed-out range at the scaled sheet bottom", () => {
+    expect(sheetScrollMax(10249, 80, 627)).toBe(9702);
+    expect(sheetScrollMax(14629, 80, 627)).toBe(14082);
+  });
+
+  it("covers a zoomed-in sheet that is wider than the pane", () => {
+    // 950px pane, 1,191px sheet, 34px of padding on each side.
+    expect(sheetScrollMax(1225, 34, 950)).toBe(309);
+  });
+
+  it("never scrolls past a sheet that already fits", () => {
+    expect(sheetScrollMax(400, 80, 627)).toBe(0);
   });
 });
 

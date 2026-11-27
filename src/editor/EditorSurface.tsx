@@ -37,6 +37,7 @@ import {
   scrollLeftForZoom,
   scrollTopForZoom,
   scrollTopForZoomPoint,
+  sheetScrollMax,
 } from "./pagination";
 import { RevisionMarks, setRevisionMarks } from "./revisions";
 import {
@@ -406,8 +407,30 @@ export default function EditorSurface({
     const previousZoom = previousZoomRef.current;
     previousZoomRef.current = zoom;
     if (!scroller || previousZoom === zoom) return;
-    const paddingTop = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
-    const maxScrollTop = scroller.scrollHeight - scroller.clientHeight;
+    const styles = getComputedStyle(scroller);
+    const paddingTop = parseFloat(styles.paddingTop) || 0;
+    const paddingRight = parseFloat(styles.paddingRight) || 0;
+    const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+    // Clamp against the rendered sheet rather than the size the stage reserved:
+    // the page count can still be catching up with the layout, and a stale
+    // reservation is what used to let the viewport scroll past the last page.
+    const bounds = scroller.getBoundingClientRect();
+    const sheet = scroller.querySelector<HTMLElement>(".paper-sheet");
+    const sheetBox = sheet?.getBoundingClientRect();
+    const maxScrollTop = sheetBox
+      ? sheetScrollMax(
+          sheetBox.bottom - bounds.top + scroller.scrollTop,
+          paddingBottom,
+          scroller.clientHeight,
+        )
+      : scroller.scrollHeight - scroller.clientHeight;
+    const maxScrollLeft = sheetBox
+      ? sheetScrollMax(
+          sheetBox.right - bounds.left + scroller.scrollLeft,
+          paddingRight,
+          scroller.clientWidth,
+        )
+      : scroller.scrollWidth - scroller.clientWidth;
     const caret = caretDocumentBox(scroller, paddingTop, zoom);
     scroller.scrollTop = caret === null
       ? scrollTopForZoom(
@@ -432,7 +455,7 @@ export default function EditorSurface({
       scrollLeftRef.current,
       previousZoom,
       zoom,
-      scroller.scrollWidth - scroller.clientWidth,
+      maxScrollLeft,
     );
     scrollTopRef.current = scroller.scrollTop;
     scrollLeftRef.current = scroller.scrollLeft;
