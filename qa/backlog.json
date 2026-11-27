@@ -5071,8 +5071,9 @@
       "hint": "Repro: Create a new document. Type 'outer text', click Home > Bulleted list, press Enter, type 'child text', press Tab. Click at the end of 'outer text', press Home, then Shift+ArrowDown and Shift+End so the selection covers both 'outer text' and 'child text' (the Bulleted list button is shown pressed). Click Home > Bulleted list. Open Source, click Refresh from visual and read the LaTeX.\nActual: 'outer text' becomes a paragraph but the selected 'child text' keeps its bullet and is promoted to a top-level list: DOM '<p>outer text</p><ul><li><p>child text</p></li></ul>', LaTeX 'outer text\\n\\n\\begin{itemize}\\n\\item child text\\n\\end{itemize}'. A selected bullet item is left untouched even though the Bulleted list button reported itself pressed.",
       "source": "explore:lists:turning bullets off for a selection that spans a parent and its nested child leaves the selected child bulleted",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-27T19:32:46Z"
+      "attempts": 1,
+      "startedAt": "2026-11-27T19:32:46Z",
+      "lastAttemptAt": "2026-11-27T19:32:46Z"
     },
     {
       "id": "qa-320",

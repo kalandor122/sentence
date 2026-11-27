@@ -214,6 +214,84 @@ function findInnermostList(
   return null;
 }
 
+function listItems(list: ProseMirrorNode): ProseMirrorNode[] {
+  const items: ProseMirrorNode[] = [];
+  list.forEach((child) => items.push(child));
+  return items;
+}
+
+// Items of a nested sublist that the selection touches, found by position
+// because the selection may start in a parent item, outside the sublist.
+function selectedItemRange(
+  list: ProseMirrorNode,
+  listPos: number,
+  from: number,
+  to: number,
+): { first: number; last: number } | null {
+  const items = listItems(list);
+  let pos = listPos + 1;
+  let first = -1;
+  let last = -1;
+  items.forEach((item, index) => {
+    const end = pos + item.nodeSize;
+    if (pos < to && end > from) {
+      if (first < 0) first = index;
+      last = index;
+    }
+    pos = end;
+  });
+  return first < 0 ? null : { first, last };
+}
+
+/**
+ * Blocks for `list` with the selected items lifted out of it. Any sublist of the
+ * same type inside a lifted item is lifted too when the selection reaches it, so
+ * a selection that covers a parent item and its nested child removes both
+ * bullets instead of leaving the child in a promoted list.
+ */
+function liftSelectedItems(
+  list: ProseMirrorNode,
+  listPos: number,
+  listType: "bulletList" | "orderedList",
+  range: { first: number; last: number },
+  from: number,
+  to: number,
+): ProseMirrorNode[] {
+  const items = listItems(list);
+  const start = Number(list.attrs.start ?? 1);
+  const baseStart = Number.isSafeInteger(start) && start > 0 ? start : 1;
+
+  const blocks: ProseMirrorNode[] = [];
+  if (range.first > 0) blocks.push(list.type.create(list.attrs, items.slice(0, range.first)));
+  let itemPos = listPos + 1;
+  for (let index = 0; index < range.first; index += 1) itemPos += items[index].nodeSize;
+  items.slice(range.first, range.last + 1).forEach((item) => {
+    let childPos = itemPos + 1;
+    item.forEach((child) => {
+      if (isListNode(child) && child.type.name === listType) {
+        const nested = selectedItemRange(child, childPos, from, to);
+        if (nested) {
+          blocks.push(...liftSelectedItems(child, childPos, listType, nested, from, to));
+        } else {
+          blocks.push(child);
+        }
+      } else {
+        blocks.push(child);
+      }
+      childPos += child.nodeSize;
+    });
+    itemPos += item.nodeSize;
+  });
+  if (range.last < items.length - 1) {
+    const attrs =
+      listType === "orderedList"
+        ? { ...list.attrs, start: baseStart + range.last + 1 }
+        : list.attrs;
+    blocks.push(list.type.create(attrs, items.slice(range.last + 1)));
+  }
+  return blocks;
+}
+
 /**
  * Turning a list type off for an item should remove the bullet or number, but
  * ProseMirror's liftListItem only promotes a nested item into the enclosing
@@ -236,48 +314,45 @@ export function removeListItem(
   const fromList = findInnermostList($from, listType);
   if (!fromList) return false;
   const toList = findInnermostList($to, listType);
-  if (!toList || toList.depth !== fromList.depth) return false;
-  if ($from.before(fromList.depth) !== $to.before(fromList.depth)) return false;
+  if (!toList) return false;
+  // A selection can span a parent item and its nested child, so the list being
+  // unwrapped is the outermost of the two and both ends must sit in it.
+  const listDepth = Math.min(fromList.depth, toList.depth);
+  if ($from.before(listDepth) !== $to.before(listDepth)) return false;
+  const list = $from.node(listDepth);
+  if (!isListNode(list) || list.type.name !== listType) return false;
 
-  const itemDepth = fromList.depth + 1;
+  const itemDepth = listDepth + 1;
   if ($from.depth < itemDepth || $to.depth < itemDepth) return false;
   if ($from.node(itemDepth).type.name !== "listItem") return false;
   if ($to.node(itemDepth).type.name !== "listItem") return false;
 
-  const list = fromList.node;
-  const items: ProseMirrorNode[] = [];
-  list.forEach((child) => items.push(child));
-  const fromIndex = $from.index(fromList.depth);
-  const toIndex = Math.min($to.index(fromList.depth), items.length - 1);
+  const items = listItems(list);
+  const fromIndex = $from.index(listDepth);
+  const toIndex = Math.min($to.index(listDepth), items.length - 1);
   if (fromIndex > toIndex) return false;
 
-  const start = Number(list.attrs.start ?? 1);
-  const baseStart = Number.isSafeInteger(start) && start > 0 ? start : 1;
-
-  const blocks: ProseMirrorNode[] = [];
-  const listPos = $from.before(fromList.depth);
-  if (fromIndex > 0) blocks.push(list.type.create(list.attrs, items.slice(0, fromIndex)));
+  const listPos = $from.before(listDepth);
+  const blocks = liftSelectedItems(
+    list,
+    listPos,
+    listType,
+    { first: fromIndex, last: toIndex },
+    $from.pos,
+    $to.pos,
+  );
   const liftedPos = listPos + (fromIndex > 0 ? blocks[0].nodeSize : 0);
-  items.slice(fromIndex, toIndex + 1).forEach((item) => {
-    item.forEach((child) => blocks.push(child));
-  });
-  if (toIndex < items.length - 1) {
-    const attrs =
-      listType === "orderedList"
-        ? { ...list.attrs, start: baseStart + toIndex + 1 }
-        : list.attrs;
-    blocks.push(list.type.create(attrs, items.slice(toIndex + 1)));
-  }
 
   const itemStart = $from.start(itemDepth);
   const offsetFrom = $from.pos - itemStart;
   const offsetTo = $to.pos - itemStart;
   const tr = state.tr.replaceWith(listPos, listPos + list.nodeSize, blocks);
   if (blocks.length > 0) {
+    const end = tr.doc.content.size;
     tr.setSelection(
       TextSelection.between(
-        tr.doc.resolve(liftedPos + offsetFrom),
-        tr.doc.resolve(liftedPos + offsetTo),
+        tr.doc.resolve(Math.min(liftedPos + offsetFrom, end)),
+        tr.doc.resolve(Math.min(liftedPos + offsetTo, end)),
       ),
     );
   }
