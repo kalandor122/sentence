@@ -355,11 +355,16 @@ function inlineContent(nodes: DocumentNode[] | undefined, settings: ProjectSetti
 // Inline images have no caption and no float, so they also work inside a
 // tabular cell where a figure environment would either break or escape it.
 // A block image moved into a cell keeps the figure's own sizing (`inline` off).
-function inlineImageToLatex(node: DocumentNode, settings: ProjectSettings, inline: boolean): string {
+function inlineImageToLatex(
+  node: DocumentNode,
+  settings: ProjectSettings,
+  inline: boolean,
+  columns = 0,
+): string {
   const src = attribute(node, "path") ?? attribute(node, "src") ?? "";
   const alt = attribute(node, "alt") ?? "";
   const filename = imageSourcePath(src, alt);
-  const options = imageOptions(node, settings, inline) ?? (inline ? "height=1.5em" : null);
+  const options = imageOptions(node, settings, inline, columns) ?? (inline ? "height=1.5em" : null);
   const image = options
     ? `\\includegraphics[${options}]{${escapeLatex(filename)}}`
     : `\\includegraphics{${escapeLatex(filename)}}`;
@@ -373,11 +378,15 @@ function inlineImageToLatex(node: DocumentNode, settings: ProjectSettings, inlin
 // graphic with a \captionof, which the caption package provides for exactly
 // this case. Dropping the caption would leave it visible in the page and
 // missing from the PDF with no warning.
-function imageInCellToLatex(node: DocumentNode, settings: ProjectSettings): string {
-  const graphic = inlineImageToLatex(node, settings, false);
+function imageInCellToLatex(
+  node: DocumentNode,
+  settings: ProjectSettings,
+  columns: number,
+): string {
+  const graphic = inlineImageToLatex(node, settings, false, columns);
   const caption = attribute(node, "caption") ?? "";
   if (!caption.trim()) return graphic;
-  const options = imageOptions(node, settings, false) ?? "";
+  const options = imageOptions(node, settings, false, columns) ?? "";
   const width = options.match(/(?:^|,)width=([^,]+)/)?.[1] ?? "\\linewidth";
   return [
     `\\begin{minipage}{${width}}`,
@@ -422,6 +431,7 @@ function tableCellToLatex(
   cell: DocumentNode,
   columnAlign: LatexColumnAlign,
   settings: ProjectSettings,
+  columns: number,
 ): string {
   const children = cell.content ?? [];
   const align = cellAlign(cell);
@@ -430,7 +440,7 @@ function tableCellToLatex(
   // is valid in an l, c or r column, so the break stays where the page shows it.
   const body = children
     .map((child) => {
-      if (child.type === "image") return imageInCellToLatex(child, settings);
+      if (child.type === "image") return imageInCellToLatex(child, settings, columns);
       if (child.type === "mathBlock") return mathBlockInCellToLatex(child);
       const inline = inlineContent([child], settings);
       return containsHardBreak(child) ? `\\shortstack[${align}]{${inline}}` : inline;
@@ -471,7 +481,7 @@ function tableToLatex(node: DocumentNode, settings: ProjectSettings): string {
       let column = 0;
       return `${row
         .map((cell) => {
-          const latex = tableCellToLatex(cell, columnAligns[column] ?? "l", settings);
+          const latex = tableCellToLatex(cell, columnAligns[column] ?? "l", settings, columnCount);
           column += tableCellSpan(cell);
           return latex;
         })
@@ -629,10 +639,19 @@ function naturalImageSize(node: DocumentNode): { width: number; height: number }
 // LaTeX length instead, which also keeps a figure from growing past the page.
 const BP_PER_CSS_PX = 0.75;
 
+// A table column pads its content with \tabcolsep on both sides, and every
+// column of the tabular contributes that padding. A graphic pinned to the text
+// block inside a cell has to give that padding back, or the table runs exactly
+// that far past the margin in the compiled PDF.
+function cellImageWidth(columns: number): string {
+  return `\\dimexpr\\linewidth-${2 * columns}\\tabcolsep\\relax`;
+}
+
 function imageOptions(
   node: DocumentNode,
   settings: ProjectSettings,
   inline: boolean,
+  columns = 0,
 ): string | null {
   const size = naturalImageSize(node);
   if (!size) return null;
@@ -642,9 +661,10 @@ function imageOptions(
   if (size.width <= maxWidth && size.height <= maxHeight) {
     return `width=${(size.width * BP_PER_CSS_PX).toFixed(2)}bp`;
   }
+  const width = columns > 0 ? cellImageWidth(columns) : "\\linewidth";
   return inline
-    ? "width=\\linewidth,height=1.5em,keepaspectratio"
-    : "width=\\linewidth,height=\\textheight,keepaspectratio";
+    ? `width=${width},height=1.5em,keepaspectratio`
+    : `width=${width},height=\\textheight,keepaspectratio`;
 }
 
 function imageToLatex(node: DocumentNode, settings: ProjectSettings): string {

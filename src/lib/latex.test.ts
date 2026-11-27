@@ -2085,6 +2085,51 @@ describe("LaTeX generation", () => {
     expect(latex).not.toContain("width=0.8\\linewidth");
   });
 
+  it("sizes an oversized image inside a table cell to the cell, not the text block", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [
+                    { type: "paragraph" },
+                    {
+                      type: "image",
+                      attrs: {
+                        path: "assets/images/wide-cell.png",
+                        naturalWidth: 2400,
+                        naturalHeight: 600,
+                      },
+                    },
+                  ],
+                },
+                { type: "tableCell", content: [{ type: "paragraph" }] },
+                { type: "tableCell", content: [{ type: "paragraph" }] },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    // Three columns put six \tabcolsep into the tabular. Sizing the graphic to
+    // the text block makes the table overrun the margin by exactly that
+    // padding, so the width has to leave room for it.
+    expect(latex).toContain(
+      "\\includegraphics[width=\\dimexpr\\linewidth-6\\tabcolsep\\relax,height=\\textheight,keepaspectratio]{assets/images/wide-cell.png}",
+    );
+    expect(latex).toContain("\\begin{tabular}{lll}");
+    expect(latex).not.toContain("width=\\linewidth");
+    const parsed = latexToDocument(latex, settings).document;
+    expect(parsed.content[0]?.type).toBe("table");
+  });
+
   it("round-trips a table caption through LaTeX", () => {
     const document: SentenceDocument = {
       type: "doc",

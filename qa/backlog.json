@@ -4931,8 +4931,9 @@
       "hint": "Repro: In the demo project press Ctrl+End, click Insert > Insert table, click the first cell, then Insert > Image and choose a 2400x600 PNG. The picture renders 438x111 px inside the 459 px cell and the table stays 600 px wide, the text width. View > LaTeX exports '\\includegraphics[width=\\linewidth,height=\\textheight,keepaspectratio]{assets/images/wide-cell.png}' inside the '\\begin{tabular}{lll}' block. Copy that asset to assets/images/wide-cell.png and compile the exported source with the bundled Tectonic; the log reports 'Overfull \\hbox (35.96829pt too wide) in paragraph at lines 62--70', so the table extends 35.97 pt beyond the text block.\nActual: The cell is an 'l' column, so 'width=\\linewidth' resolves to the full A4 text width, not the cell width. The table is centred with column padding and becomes 35.97 pt wider than the text block in the compiled PDF, while the visual page shows the 438 px image fitting a 459 px cell inside the 600 px table. Probe qa/probes/insert-media.mjs scenario 'wide-image-in-table-cell'.",
       "source": "explore:insert-media:a wide image inserted into a table cell exports at the full text width, so the compiled table overflows the page margin",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-27T17:46:18Z"
+      "attempts": 1,
+      "startedAt": "2026-11-27T17:46:18Z",
+      "lastAttemptAt": "2026-11-27T17:46:18Z"
     },
     {
       "id": "qa-311",
