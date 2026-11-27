@@ -971,3 +971,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-27T18:26:09Z DONE qa-314 (tsc -b, npm test, smoke all green)
 2026-11-27T18:26:49Z IMPORTED 1 tester findings into the backlog
 2026-11-27T18:26:49Z START qa-315 on qa/qa-315-zooming-out-while-at-the-end-leaves-the: Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of 
+2026-11-27T18:39:31Z PUSHED main
+2026-11-27T18:39:31Z DONE qa-315 (tsc -b, npm test, smoke all green)
+2026-11-27T18:40:10Z IMPORTED 1 tester findings into the backlog
