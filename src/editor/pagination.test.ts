@@ -10,6 +10,7 @@ import {
   pageRowShifts,
   scrollLeftForCaret,
   scrollLeftForZoom,
+  scrollTopForFit,
   scrollTopForZoom,
   scrollTopForZoomPoint,
   sheetScrollMax,
@@ -656,6 +657,50 @@ describe("qa-332: zooming out at the end holds the reading line and the sheet", 
     expect(caretOffset).toBeLessThanOrEqual(maxScrollLeft);
     expect(padding + (794 * 150) / 100 - maxScrollLeft).toBeLessThanOrEqual(pane);
     expect(scrollLeftForZoom(0, 1, 1.5, maxScrollLeft)).toBe(0);
+  });
+});
+
+describe("qa-333: a pane rescale keeps the reading position on the scaled sheet", () => {
+  // Opening the inspector narrows the editor from a 950px pane to 608px and
+  // scales the 13-page probe sheet to 0.615. The scroll range shrinks with that
+  // scale, so the offset has to follow it: otherwise closing the panel leaves
+  // the reader thousands of pixels above the page they were reading.
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetHeight = 1123 * 13;
+  const endLine = 14029;
+  const inspectorFit = 488 / 794;
+  const maxAt = (fit: number) =>
+    sheetScrollMax(paddingTop + sheetHeight * fit, paddingBottom, viewportHeight);
+
+  it("follows the sheet when a side panel narrows the pane", () => {
+    const top = scrollTopForFit(13558, paddingTop, 1, inspectorFit, maxAt(inspectorFit));
+    expect(top).toBeLessThanOrEqual(maxAt(inspectorFit));
+    // The end line keeps its place on the page instead of leaving the viewport.
+    const lineTop = paddingTop + endLine * inspectorFit - top;
+    expect(lineTop).toBeGreaterThanOrEqual(0);
+    expect(lineTop + 16).toBeLessThanOrEqual(viewportHeight);
+  });
+
+  it("holds the end of the page when the panel closes again", () => {
+    const top = scrollTopForFit(
+      maxAt(inspectorFit),
+      paddingTop,
+      inspectorFit,
+      1,
+      maxAt(1),
+    );
+    expect(top).toBeLessThanOrEqual(maxAt(1));
+    const lineTop = paddingTop + endLine - top;
+    expect(lineTop).toBeGreaterThanOrEqual(0);
+    expect(lineTop + 16).toBeLessThanOrEqual(viewportHeight);
+  });
+
+  it("keeps a reader at the top of the sheet at the top", () => {
+    expect(scrollTopForFit(0, paddingTop, 1, 0.6, maxAt(0.6))).toBeLessThan(paddingTop);
+    expect(scrollTopForFit(0, paddingTop, 0.6, 1, maxAt(1))).toBe(0);
+    expect(scrollTopForFit(0, paddingTop, 1, 1.5, maxAt(1.5))).toBe(0);
   });
 });
 

@@ -36,6 +36,7 @@ import {
   pageRowShifts,
   scrollLeftForCaret,
   scrollLeftForZoom,
+  scrollTopForFit,
   scrollTopForZoom,
   scrollTopForZoomPoint,
   sheetScrollMax,
@@ -399,24 +400,68 @@ export default function EditorSurface({
     scrollLeftRef.current = scrollRef.current.scrollLeft;
   }
   const previousZoomRef = useRef(zoom);
+  const fitScaleRef = useRef<number | null>(null);
   const [pageCount, setPageCount] = useState(1);
   const geometry = pageGeometry(settings);
 
   // A page is laid out at its real paper width and only scaled down when the
   // pane is narrower, so opening Split or the inspector never reflows the text
-  // or moves the page boundaries.
+  // or moves the page boundaries. That scale defines the scroll range just like
+  // the zoom does, so it has to move the scroll offsets with it: otherwise
+  // closing a side panel at the end of a long document leaves the viewport
+  // thousands of pixels away from the page the reader was on.
   useLayoutEffect(() => {
     const scroller = scrollRef.current;
     if (!scroller) return;
+    fitScaleRef.current = null;
     const fit = () => {
       const styles = getComputedStyle(scroller);
-      const padding = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
-      const available = scroller.clientWidth - padding - PAPER_GUTTER;
+      const paddingLeft = parseFloat(styles.paddingLeft) || 0;
+      const paddingRight = parseFloat(styles.paddingRight) || 0;
+      const paddingTop = parseFloat(styles.paddingTop) || 0;
+      const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+      const available = scroller.clientWidth - paddingLeft - paddingRight - PAPER_GUTTER;
       if (available <= 0) return;
-      scroller.style.setProperty(
-        "--paper-fit-scale",
-        String(Math.min(1, available / geometry.width)),
+      const scale = Math.min(1, available / geometry.width);
+      const previous = fitScaleRef.current;
+      fitScaleRef.current = scale;
+      if (previous === null || previous === scale) {
+        scroller.style.setProperty("--paper-fit-scale", String(scale));
+        return;
+      }
+      // Capture the offsets before the sheet is rescaled, then hold the
+      // document point at the top of the viewport and clamp both offsets to the
+      // new, scaled sheet so the range can never extend past the page.
+      const scrollTop = scroller.scrollTop;
+      const scrollLeft = scroller.scrollLeft;
+      scroller.style.setProperty("--paper-fit-scale", String(scale));
+      const bounds = scroller.getBoundingClientRect();
+      const sheet = scroller.querySelector<HTMLElement>(".paper-sheet");
+      const sheetBox = sheet?.getBoundingClientRect();
+      const maxScrollTop = sheetBox
+        ? sheetScrollMax(
+            sheetBox.bottom - bounds.top + scroller.scrollTop,
+            paddingBottom,
+            scroller.clientHeight,
+          )
+        : scroller.scrollHeight - scroller.clientHeight;
+      const maxScrollLeft = sheetBox
+        ? sheetScrollMax(
+            sheetBox.right - bounds.left + scroller.scrollLeft,
+            paddingRight,
+            scroller.clientWidth,
+          )
+        : scroller.scrollWidth - scroller.clientWidth;
+      scroller.scrollTop = scrollTopForFit(
+        scrollTop,
+        paddingTop,
+        previous,
+        scale,
+        maxScrollTop,
       );
+      scroller.scrollLeft = scrollLeftForZoom(scrollLeft, previous, scale, maxScrollLeft);
+      scrollTopRef.current = scroller.scrollTop;
+      scrollLeftRef.current = scroller.scrollLeft;
     };
     fit();
     const observer = new ResizeObserver(fit);
