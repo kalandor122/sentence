@@ -375,6 +375,14 @@ export default function EditorSurface({
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const scrollTopRef = useRef(0);
   const scrollLeftRef = useRef(0);
+  // A programmatic jump (Ctrl+End, an outline or find result) moves the DOM
+  // before its scroll event is delivered. Capture the live offset during render
+  // so a zoom click that arrives in the same frame still anchors on the page
+  // the reader is looking at instead of snapping back to an older position.
+  if (scrollRef.current) {
+    scrollTopRef.current = scrollRef.current.scrollTop;
+    scrollLeftRef.current = scrollRef.current.scrollLeft;
+  }
   const previousZoomRef = useRef(zoom);
   const [pageCount, setPageCount] = useState(1);
   const geometry = pageGeometry(settings);
