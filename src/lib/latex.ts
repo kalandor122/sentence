@@ -323,7 +323,15 @@ function applyMarks(text: string, marks: DocumentMark[] | undefined): string {
   return rendered;
 }
 
-function inlineContent(nodes: DocumentNode[] | undefined, settings: ProjectSettings): string {
+// \footnote is a fragile command: inside a heading it also runs while the title
+// is written to the .toc, where the unexpanded text breaks \@sect with an
+// "extra }". \protect keeps it working in that moving argument, and the import
+// below accepts the protected form so the source round-trips.
+function inlineContent(
+  nodes: DocumentNode[] | undefined,
+  settings: ProjectSettings,
+  protectFragile = false,
+): string {
   return (nodes ?? [])
     .map((node) => {
       if (node.type === "text") {
@@ -339,7 +347,7 @@ function inlineContent(nodes: DocumentNode[] | undefined, settings: ProjectSetti
         return `\\cite{${latexCitationKeys(attribute(node, "key") ?? "")}}`;
       }
       if (node.type === "footnote") {
-        return `\\footnote{${escapeLatex(attribute(node, "text") ?? "")}}`;
+        return `${protectFragile ? "\\protect" : ""}\\footnote{${escapeLatex(attribute(node, "text") ?? "")}}`;
       }
       if (node.type === "crossReference") {
         return `\\ref{${latexReferenceTarget(attribute(node, "label") ?? "")}}`;
@@ -347,7 +355,7 @@ function inlineContent(nodes: DocumentNode[] | undefined, settings: ProjectSetti
       if (node.type === "inlineImage") {
         return inlineImageToLatex(node, settings, true);
       }
-      return inlineContent(node.content, settings);
+      return inlineContent(node.content, settings, protectFragile);
     })
     .join("");
 }
@@ -549,7 +557,7 @@ function blockToLatex(node: DocumentNode, settings: ProjectSettings, enumDepth =
       const short = attribute(node, "shortTitle");
       return wrapAlignment(
         node,
-        `\\${command}${star}${short === null ? "" : `[${short}]`}{${inlineContent(node.content, settings)}}${label ? `\\label{${label}}` : ""}`,
+        `\\${command}${star}${short === null ? "" : `[${short}]`}{${inlineContent(node.content, settings, true)}}${label ? `\\label{${label}}` : ""}`,
       );
     }
     case "bulletList":
@@ -1310,7 +1318,7 @@ function parseInline(source: string): InlineParseResult {
       continue;
     }
 
-    const footnoteMatch = remainder.match(/^\\footnote\{/);
+    const footnoteMatch = remainder.match(/^(?:\\protect\s*)?\\footnote\{/);
     if (footnoteMatch) {
       const open = index + footnoteMatch[0].length - 1;
       const close = findMatchingBrace(source, open);

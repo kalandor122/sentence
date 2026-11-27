@@ -1029,3 +1029,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-27T21:10:46Z DONE qa-328 (tsc -b, npm test, smoke all green)
 2026-11-27T21:52:29Z EXPLORE links-cites-footnotes: 5 new items, agent exit 1
 2026-11-27T21:52:49Z IMPORTED 1 tester findings into the backlog
+2026-11-27T21:52:49Z START qa-351 on qa/qa-351-a-footnote-inserted-inside-a-heading-exp: A footnote inserted inside a heading exports as an unprotected \footnote and the document no longer compiles
