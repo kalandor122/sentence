@@ -60,7 +60,7 @@ function alignmentKey(value: unknown): string {
     if (typeof value.text === "string") return value.text;
     if (value.type === "hardBreak") return "\n";
     const type = typeof value.type === "string" ? value.type : "";
-    return `${type}{${alignmentKey(value.content)}}`;
+    return `${type}{${trackedAttributes(value)}${alignmentKey(value.content)}}`;
   }
   return JSON.stringify(value);
 }
@@ -295,21 +295,42 @@ function plainNodeText(node: unknown): string {
   return Array.isArray(node.content) ? node.content.map(plainNodeText).join("") : "";
 }
 
+// An atom keeps its content in attributes instead of child nodes, so editing a
+// citation key or an equation body changes the document and the exported LaTeX
+// without changing any text run. Those attributes count as content; a block's
+// formatting attributes (alignment, heading level) still stay out.
+const ATOM_NODE_TYPES = new Set([
+  "citation",
+  "crossReference",
+  "footnote",
+  "mathInline",
+  "mathBlock",
+  "image",
+  "inlineImage",
+]);
+
+function trackedAttributes(node: { type?: unknown; attrs?: unknown }): string {
+  if (typeof node.type !== "string" || !ATOM_NODE_TYPES.has(node.type) || !isObject(node.attrs)) return "";
+  // Schema defaults are materialised on load, so an absent or default value must
+  // read the same as a stored one: only values that carry content count.
+  return Object.entries(node.attrs)
+    .filter(([, value]) => value !== null && value !== undefined && value !== false && value !== "")
+    .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
+    .map(([name, value]) => `${name}=${JSON.stringify(value)}`)
+    .join(",");
+}
+
 // Structural edits need their own signature: splitting a paragraph or adding an
 // empty one leaves the joined text unchanged ("Only paragraph" is the same
 // characters as "Only" + " paragraph"), so a text-only comparison would fold the
 // block change into the next revision's baseline and rejecting that revision
-// would leave the empty block behind. Marks and attributes stay out of the
-// comparison so a comment or formatting change is still not a tracked edit.
+// would leave the empty block behind. Marks stay out of the comparison so a
+// comment or formatting change is still not a tracked edit.
 export function trackedShape(document: SentenceDocument): string {
   const visit = (node: DocumentNode): string => {
     if (typeof node.text === "string") return node.text;
     if (node.type === "hardBreak") return "\n";
-    if (node.type === "footnote") {
-      const text = node.attrs?.text;
-      return typeof text === "string" ? text : "";
-    }
-    return `${node.type}{${(node.content ?? []).map(visit).join("")}}`;
+    return `${node.type}{${trackedAttributes(node)}}${(node.content ?? []).map(visit).join("")}`;
   };
   return (document.content ?? []).map(visit).join("");
 }
@@ -325,6 +346,21 @@ export function revisionText(document: SentenceDocument): string {
       const text = node.attrs?.text;
       return typeof text === "string" ? text : "";
     }
+    // An atom's content lives in its attributes, so the preview has to print it
+    // too; otherwise a citation-key or equation edit reads as the same text
+    // before and after.
+    if (node.type === "citation") {
+      const key = node.attrs?.key;
+      return typeof key === "string" ? `[${key}]` : "";
+    }
+    if (node.type === "mathInline" || node.type === "mathBlock") {
+      const latex = node.attrs?.latex;
+      return typeof latex === "string" ? latex : "";
+    }
+    if (node.type === "crossReference") {
+      const label = node.attrs?.label;
+      return typeof label === "string" ? `ref: ${label}` : "";
+    }
     const inner = (node.content ?? []).map(visit).join("");
     return ["paragraph", "heading", "listItem", "blockquote"].includes(node.type)
       ? `${inner || "¶"}\n`
@@ -337,10 +373,39 @@ export function documentChanges(before: SentenceDocument, after: SentenceDocumen
   return changesBetween(before, after, []);
 }
 
+// An atom's content is an attribute (a citation key, an equation body), so the
+// diff names it with a text change on `attrs.<name>`. Paths come from the
+// document with adjacent text runs merged, so the recorded index can point past
+// the node in the unmerged document. Fall back to the siblings of the block,
+// preferring the one that still holds the changed value.
+function undoAttributeText(root: unknown, change: TextChange): boolean {
+  const length = change.path.length;
+  if (length < 3 || change.path[length - 2] !== "attrs" || typeof change.path[length - 1] !== "string") {
+    return false;
+  }
+  const name = change.path[length - 1] as string;
+  const nodePath = change.path.slice(0, -2);
+  const candidates: unknown[] = [getAt(root, nodePath)];
+  const siblings = getAt(root, nodePath.slice(0, -1));
+  if (Array.isArray(siblings)) candidates.push(...siblings);
+  for (const candidate of candidates) {
+    if (!isObject(candidate) || !isObject(candidate.attrs)) continue;
+    const current = candidate.attrs[name];
+    if (typeof current !== "string") continue;
+    const undone = undoText(current, change);
+    if (undone !== current) {
+      candidate.attrs[name] = undone;
+      return true;
+    }
+  }
+  return false;
+}
+
 export function undoDocumentChanges(document: SentenceDocument, changes: Change[]): SentenceDocument {
   const next = JSON.parse(JSON.stringify(document)) as SentenceDocument;
   for (const change of changes) {
     if (change.kind === "text") {
+      if (undoAttributeText(next, change)) continue;
       if (undoBlockText(next, change)) continue;
       const current = getAt(next, change.path);
       if (typeof current === "string") setValue(next, change.path, undoText(current, change));
