@@ -704,6 +704,121 @@ describe("qa-333: a pane rescale keeps the reading position on the scaled sheet"
   });
 });
 
+describe("qa-334: the whole probe zoom trace stays on the sheet", () => {
+  // The 3,600-word probe document at 1280x800 is 13 A4 pages with a 627px
+  // editor viewport. Its finding walks the complete sequence: Ctrl+End at
+  // 13,558 of a 14,082 maximum, three zoom-out clicks to 70%, a wheel to the new
+  // maximum and then a zoom in to 150% (where the page is wider than the pane).
+  // The three clicks, the wheeled end and the zoomed-in page all have to keep
+  // the sheet under the viewport, the end line readable and both horizontal
+  // edges reachable.
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetHeight = 1123 * 13;
+  const endLine = 14029;
+  const lineHeight = 16;
+  const maxAt = (zoom: number) =>
+    sheetScrollMax(paddingTop + sheetHeight * zoom, paddingBottom, viewportHeight);
+  const endLineBottom = (zoom: number, top: number) =>
+    paddingTop + (endLine + lineHeight) * zoom - top;
+
+  it("ends the wheeled range at the scaled page after the zoom-out clicks", () => {
+    let top = 13558;
+    let zoom = 1;
+    for (const percent of [90, 80, 70]) {
+      const next = percent / 100;
+      top = scrollTopForZoomPoint(
+        endLine,
+        top,
+        viewportHeight,
+        paddingTop,
+        zoom,
+        next,
+        maxAt(next),
+        lineHeight,
+      );
+      zoom = next;
+      expect(top).toBeLessThanOrEqual(maxAt(zoom));
+      // The sheet stays under the viewport through every click.
+      expect(paddingTop + sheetHeight * zoom - top).toBeGreaterThan(
+        viewportHeight - paddingBottom,
+      );
+      expect(endLineBottom(zoom, top)).toBeLessThanOrEqual(viewportHeight);
+    }
+
+    // Wheeling to the maximum stops at the scaled page: the end line remains
+    // readable and only the scroller's own padding sits below the sheet.
+    top = maxAt(0.7);
+    expect(top).toBe(9702);
+    expect(paddingTop + endLine * 0.7 - top).toBeGreaterThanOrEqual(0);
+    expect(endLineBottom(0.7, top)).toBeLessThanOrEqual(viewportHeight);
+    expect(paddingTop + sheetHeight * 0.7 + paddingBottom - top).toBeCloseTo(
+      viewportHeight,
+      0,
+    );
+  });
+
+  it("zooms back in from the wheeled end without leaving the sheet", () => {
+    const wheeled = maxAt(0.7);
+    const lineTop = paddingTop + endLine * 0.7 - wheeled;
+    const top = scrollTopForZoomPoint(
+      endLine,
+      wheeled,
+      viewportHeight,
+      paddingTop,
+      0.7,
+      1.5,
+      maxAt(1.5),
+      lineHeight,
+    );
+    expect(top).toBeLessThanOrEqual(maxAt(1.5));
+    // The end line keeps its screen position and the page still fills the pane.
+    expect(paddingTop + endLine * 1.5 - top).toBeCloseTo(lineTop, 6);
+    expect(endLineBottom(1.5, top)).toBeLessThanOrEqual(viewportHeight);
+    expect(paddingTop + sheetHeight * 1.5 - top).toBeGreaterThan(
+      viewportHeight - paddingBottom,
+    );
+  });
+
+  it("keeps both edges of the 150% page reachable from either end", () => {
+    const pane = 950;
+    const padding = 34;
+    const width = 794 * 1.5;
+    const maxScrollLeft = sheetScrollMax(padding + width, padding, pane);
+    expect(maxScrollLeft).toBe(309);
+    // The left edge is on screen at the start and the right edge at the end.
+    expect(scrollLeftForZoom(0, 1, 1.5, maxScrollLeft)).toBe(0);
+    expect(padding + width - maxScrollLeft).toBeLessThanOrEqual(pane);
+    // Zooming back out puts a page that fits the pane back at its left edge.
+    expect(
+      scrollLeftForZoom(
+        maxScrollLeft,
+        1.5,
+        0.7,
+        sheetScrollMax(padding + 794 * 0.7, padding, pane),
+      ),
+    ).toBe(0);
+  });
+
+  it("reserves the scaled sheet without letting the backdrop widen the range", () => {
+    const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+    const stage = (/\.paper-stage\s*\{([^}]*)\}/.exec(css)?.[1] ?? "").replace(/\s+/g, " ");
+    const stack = (/\.paper-stack\s*\{([^}]*)\}/.exec(css)?.[1] ?? "").replace(/\s+/g, " ");
+    // The stage is the scroll geometry, so it has to reserve the sheet at both
+    // scales, and the absolute backdrop only applies the zoom on top of the
+    // fitted width. A backdrop that scaled the fit a second time would stick
+    // out past the page and inflate the horizontal range again.
+    expect(stage).toContain(
+      "width: max( 100%, calc(var(--paper-width, 794px) * var(--paper-fit-scale, 1) * var(--editor-zoom, 1)) );",
+    );
+    expect(stack).toContain(
+      "width: calc(var(--paper-width, 794px) * var(--paper-fit-scale, 1));",
+    );
+    expect(stack).toContain("transform: translateX(-50%) scale(var(--editor-zoom));");
+  });
+});
+
 describe("pageLineGaps", () => {
   it("moves the line crossing a page edge to the next page's text area", () => {
     const geometry = pageGeometry(DEFAULT_SETTINGS);
