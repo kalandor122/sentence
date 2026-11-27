@@ -5210,10 +5210,11 @@
       ],
       "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'inner one', press Tab, press Enter, type 'inner two'. Click at the end of 'inner one' and click Home > Bulleted list once ('inner one' becomes a plain paragraph inside the outer item). Read the Bulleted list button's aria-pressed value, then click Home > Bulleted list a second time.\nActual: The button still reports aria-pressed='true' on the plain paragraph (Numbered list reports 'false'). The second click removes the bullet from 'outer', which does not contain the caret: the DOM becomes '<p>outer</p><p>inner one</p><ul><li><p>inner two</p></li></ul>' and the LaTeX becomes 'outer\\n\\ninner one\\n\\n\\begin{itemize}\\n\\item inner two\\n\\end{itemize}'. There is no way to re-bullet 'inner one' through this button; each extra click strips more of the surrounding list.",
       "source": "explore:lists:the bullet button stays pressed on a paragraph that has no bullet, and clicking it again removes the parent item's bulle",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-27T21:04:33Z",
-      "lastAttemptAt": "2026-11-27T21:04:33Z"
+      "lastAttemptAt": "2026-11-27T21:04:33Z",
+      "doneAt": "2026-11-27T21:10:44Z"
     },
     {
       "id": "qa-329",
@@ -5473,6 +5474,80 @@
     },
     {
       "id": "qa-350",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-351",
+      "title": "A footnote inserted inside a heading exports as an unprotected \\footnote and the document no longer compiles",
+      "why": "Exploratory pass on links-cites-footnotes (content): expected A footnote in a section title is written with \\protect (or moved out of the moving argument), so the exported document still compiles to a PDF.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Type \"Heading footnote\" in a new paragraph, click Home > Apply heading, click at the end of the heading text, then Insert > Footnote, enter \"Heading note\" and click Insert. Open View > LaTeX: the heading is exported as \\section{Heading footnote\\footnote{Heading note}}. The probe saves this export to qa/probes/links-cites-footnotes-heading.tex and compiles it with the bundled engine: src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu -X compile qa/probes/links-cites-footnotes-heading.tex --outdir qa/probes/links-cites-footnotes-heading-out.\nActual: Tectonic exits 1 with \"! Argument of \\@sect has an extra }.\" at the \\section line, reports \"No pages of output\" and writes no PDF (the probe records compile.exitCode 1, pdf false). A citation (\\cite) or cross-reference (\\ref) inserted in the same heading compiles normally; the failure is specific to \\footnote.",
+      "source": "explore:links-cites-footnotes:a footnote inserted inside a heading exports as an unprotected \\footnote and the document no longer compiles",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-27T21:52:49Z"
+    },
+    {
+      "id": "qa-352",
+      "title": "Inserting a footnote, citation or cross-reference over a text selection deletes the selected text",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected The selected word is kept and the footnote marker, citation or cross-reference is inserted after it; adding a link to selected text already preserves that text in this app.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project and type \"SelectNote alpha beta\". Select \"beta\" (Ctrl+Shift+ArrowLeft), open Insert > Footnote, enter \"Selected note\" and click Insert. Repeat with \"SelectCite alpha beta\", References > Insert citation > Enter a key manually, key sentence2026; and with \"SelectRef alpha beta\", References > Cross-reference, label fig:sel.\nActual: The selected word is deleted. The probe's atomInsertOverSelection scenario records the paragraphs as \"SelectNote alpha 1\", \"SelectCite alpha [sentence2026]\" and \"SelectRef alpha ref: fig:sel\"; \"beta\" is gone from the document and from the exported LaTeX, with no warning.",
+      "source": "explore:links-cites-footnotes:inserting a footnote, citation or cross-reference over a text selection deletes the selected text",
+      "status": "open"
+    },
+    {
+      "id": "qa-353",
+      "title": "Cancelling a citation, footnote or cross-reference edit immediately after it opens drops the caret to the start of the d",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected The caret returns to the edited atom, so \"Z\" is inserted next to its marker and continues the sentence.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project and leave the first paragraph empty; press Enter and type \"QuickNote \", then insert a footnote with text \"Note\". Double-click the new footnote marker, then press Escape as soon as the Edit footnote dialog appears (the probe presses it immediately, without waiting for the dialog's focus hand-off; the failure window is roughly the first 250 ms). Wait for the dialog to close and type \"Z\". The probe's atomEditQuickEscape scenario repeats this for a footnote, a citation and a cross-reference.\nActual: The atom's selection is lost. The probe's paragraphs after typing become [\"Z\", \"QuickNote 1\"], [\"Z\", \"QuickCite [sentence2026]\"] and [\"Z\", \"QuickRef ref: fig:quick\"]: the character is inserted at the very start of the document instead of beside the marker. Pressing Escape after the dialog has been open for about 300 ms preserves the caret, so the failure is the fast-cancel path.",
+      "source": "explore:links-cites-footnotes:cancelling a citation, footnote or cross-reference edit immediately after it opens drops the caret to the start of the d",
+      "status": "open"
+    },
+    {
+      "id": "qa-354",
+      "title": "The References panel's Cite and manual-citation controls are enabled in Source view but silently insert nothing",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected The citation is inserted at the last visual caret, or the panel's citation controls are disabled and explain that the visual document is not available while the source pane is active.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project and type \"SourceCite \". Open References > Insert citation to show the References panel. Switch to View > LaTeX (the panel remains visible). Click the Cite button for sentence2026, then click \"Enter a key manually\", enter ghost2026 and click Insert. Switch back to Visual.\nActual: Cite and \"Enter a key manually\" are both enabled, and the manual dialog accepts the key and closes, but the source contains no \\cite, the visual document still has no citation, and no toast or alert appears. The probe records citationsInSourceAfterCite [], citationsInSourceAfterManual [], toastBefore/toastAfterCite/toastAfterManual all null, and afterVisual with no citations. The same controls insert normally in Visual and Split views.",
+      "source": "explore:links-cites-footnotes:the references panel's cite and manual-citation controls are enabled in source view but silently insert nothing",
+      "status": "open"
+    },
+    {
+      "id": "qa-355",
+      "title": "A footnote imported with \\textit or \\textbf formatting is turned into literal escaped commands after the next visual edi",
+      "why": "Exploratory pass on links-cites-footnotes (content): expected The imported footnote keeps its formatting, or at least the source commands remain intact; re-exporting must not turn them into visible command text.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project. Open View > LaTeX and insert before \\end{document}: \"Formatted note \\footnote{See \\textit{Smith} and \\textbf{Jones}.} end.\" Click Apply source and return to Visual. The footnote's data-text reads \"See \\textit{Smith} and \\textbf{Jones}.\" Type any character at the end of the document, then open View > LaTeX.\nActual: The re-exported line is \"Formatted note \\footnote{See \\textbackslash{}textit\\{Smith\\} and \\textbackslash{}textbf\\{Jones\\}.} end.\" The PDF will print the command names as literal text. The same \\textit/\\textbf input in a normal paragraph imports as italic/bold marks and re-exports unchanged, so the loss is specific to the footnote's plain-text attribute.",
+      "source": "explore:links-cites-footnotes:a footnote imported with \\textit or \\textbf formatting is turned into literal escaped commands after the next visual edi",
+      "status": "open"
+    },
+    {
+      "id": "qa-356",
       "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
       "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
       "severity": "medium",
