@@ -5087,8 +5087,9 @@
       "hint": "Repro: Create a new document. Type 'outer', click Home > Bulleted list, press Enter, type 'inner one', press Tab, press Enter, type 'inner two'. Click at the end of 'inner one' and click Home > Bulleted list once ('inner one' becomes a plain paragraph). Read the Bulleted list button's aria-pressed value, then click Home > Bulleted list again.\nActual: The button still reports aria-pressed='true' on the unbulleted paragraph and Numbered list reports 'false'. The second click removes the bullet from 'outer' instead: both 'outer' and 'inner one' become plain paragraphs and 'inner two' is promoted to a top-level list. LaTeX after the second click is 'outer\\n\\ninner one\\n\\n\\begin{itemize}\\n\\item inner two\\n\\end{itemize}'. There is no way to re-bullet 'inner one' through this button; clicking it again only strips more list structure.",
       "source": "explore:lists:the bullet button stays pressed on a paragraph that has no bullet, and clicking it removes the parent item's bullet",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-27T19:37:16Z"
+      "attempts": 1,
+      "startedAt": "2026-11-27T19:37:16Z",
+      "lastAttemptAt": "2026-11-27T19:37:16Z"
     },
     {
       "id": "qa-321",
