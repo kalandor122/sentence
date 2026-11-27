@@ -962,7 +962,12 @@ export default function EditorSurface({
     };
   }, [editor, geometry.height, geometry.margin, comments, onPageCountChange]);
 
+  // The zoom scale lives on the scroller, next to the stage that reserves the
+  // scaled sheet size and the scroll correction that measures it. Keeping both
+  // in one commit means a zoom change can never update the transform without
+  // also updating the scrollable range it has to be clamped against.
   const paperStyle = {
+    "--editor-zoom": zoom / 100,
     "--paper-font": FONT_STACKS[settings.fontFamily],
     "--paper-line-height": LINE_HEIGHTS[settings.lineSpacing],
     "--paper-width": `${geometry.width}px`,
