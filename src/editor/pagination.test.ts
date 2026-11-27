@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_SETTINGS } from "../lib/defaults";
 import {
@@ -438,6 +439,82 @@ describe("scrollTopForZoomPoint", () => {
     expect(
       scrollTopForZoomPoint(14029, at70, viewportHeight, paddingTop, 0.7, 1, 14082),
     ).toBeCloseTo(13558, 6);
+  });
+});
+
+describe("qa-329: the probe zoom sequence stays on the sheet", () => {
+  // qa-329 repeated the qa-322..327 report: the workflow is the 3,600-word probe
+  // document at 1280x800, where Ctrl+End sits at 13,558 and three zoom-out clicks
+  // reach 70%. The fix has two halves, so both are pinned here: the stage has to
+  // reserve the fit- and zoom-scaled sheet (otherwise the transform leaves the
+  // range at the 100% layout), and every zoom step has to clamp to that range.
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetHeight = 1123 * 13;
+  const maxAt = (zoom: number) =>
+    sheetScrollMax(paddingTop + sheetHeight * zoom, paddingBottom, viewportHeight);
+
+  it("keeps the sheet under the viewport from the end through zooming out and back in", () => {
+    let zoom = 1;
+    let top = 13558;
+    for (const next of [0.9, 0.8, 0.7]) {
+      top = scrollTopForZoomPoint(
+        14029,
+        top,
+        viewportHeight,
+        paddingTop,
+        zoom,
+        next,
+        maxAt(next),
+        16,
+      );
+      zoom = next;
+      expect(top).toBeLessThanOrEqual(maxAt(zoom));
+      expect(paddingTop + sheetHeight * zoom - top).toBeGreaterThan(0);
+    }
+
+    // Wheeling to the new maximum stops at the scaled sheet, so the only blank
+    // space left past the last page is the scroller's own padding.
+    top = maxAt(0.7);
+    expect(paddingTop + sheetHeight * 0.7 + paddingBottom - top).toBeCloseTo(viewportHeight, 0);
+
+    // Zooming back in from that bottom keeps the viewport on the sheet at every
+    // step instead of scrolling past the scaled end.
+    for (const next of [0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5]) {
+      top = scrollTopForZoom(top, viewportHeight, paddingTop, zoom, next, maxAt(next));
+      zoom = next;
+      expect(top).toBeLessThanOrEqual(maxAt(zoom));
+      expect(paddingTop + sheetHeight * zoom - top).toBeGreaterThan(0);
+    }
+    expect(paddingTop + sheetHeight * 1.5 - top).toBeGreaterThan(
+      viewportHeight - paddingBottom,
+    );
+  });
+
+  it("reserves the scaled sheet in the stage that defines the scroll range", () => {
+    const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+    const stage = (/\.paper-stage\s*\{([^}]*)\}/.exec(css)?.[1] ?? "").replace(/\s+/g, " ");
+    // The sheet is only transformed, which does not change layout, so both axes
+    // of the stage have to include the fit and zoom factors.
+    expect(stage).toContain("var(--paper-fit-scale, 1) * var(--editor-zoom, 1)");
+    expect(stage).toContain(
+      "height: calc( var(--paper-height, 1053px) * var(--sentence-page-count, 1) * var(--paper-fit-scale, 1) * var(--editor-zoom, 1) );",
+    );
+  });
+
+  it("keeps the whole 150% page reachable sideways", () => {
+    const pane = 950;
+    const padding = 34;
+    const widthAt = (zoom: number) => 794 * zoom;
+    const maxLeftAt = (zoom: number) =>
+      sheetScrollMax(padding + widthAt(zoom), padding, pane);
+    expect(maxLeftAt(1)).toBe(0);
+    expect(maxLeftAt(1.5)).toBe(309);
+    // The left edge is visible at the start and the right edge at the maximum.
+    expect(scrollLeftForZoom(0, 1, 1.5, maxLeftAt(1.5))).toBe(0);
+    expect(padding + widthAt(1.5) - maxLeftAt(1.5)).toBeLessThanOrEqual(pane);
+    expect(scrollLeftForZoom(maxLeftAt(1.5), 1.5, 0.7, maxLeftAt(0.7))).toBe(0);
   });
 });
 
