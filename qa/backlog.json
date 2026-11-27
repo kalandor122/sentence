@@ -4915,8 +4915,9 @@
       "hint": "Repro: Open the demo project. On the Layout tab set Document class to Report. Press Ctrl+End and click References > Table of contents. The preview entries read '1 Introduction' and '1.1 Drafting with constraints', and the status bar says '1 page'. View > LaTeX contains '\\documentclass[11pt,a4paper]{report}', '\\section{Introduction}', '\\subsection{Drafting with constraints}' and '\\tableofcontents'. Compile that exported source with the bundled engine, e.g. 'src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu --untrusted main.tex'; pdftotext shows the contents as '0.1 Introduction' and '0.1.1 Drafting with constraints', and pdfinfo reports 4 pages (the report class starts a title page and a contents page, which the visual page and status bar do not show).\nActual: The preview numbers the same headings as 1 and 1.1 and keeps the TOC block on the single visual page; the exact exported source, compiled with Tectonic, prints 0.1 and 0.1.1 and is 4 pages (probe entries: ['1 Introduction', '1.1 Drafting with constraints'], documentClass report, tocCount 1, status '1 page'). Probe qa/probes/insert-media.mjs scenario 'toc-report-class'.",
       "source": "explore:insert-media:the table-of-contents preview numbers sections from 1 in report/book documents while the compiled pdf prints 0.1",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-27T17:34:45Z"
+      "attempts": 1,
+      "startedAt": "2026-11-27T17:34:45Z",
+      "lastAttemptAt": "2026-11-27T17:34:45Z"
     },
     {
       "id": "qa-310",

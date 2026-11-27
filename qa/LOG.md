@@ -949,3 +949,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-27T17:34:06Z PUSHED main
 2026-11-27T17:34:06Z DONE qa-307 (tsc -b, npm test, smoke all green)
 2026-11-27T17:34:45Z IMPORTED 1 tester findings into the backlog
+2026-11-27T17:34:45Z START qa-309 on qa/qa-309-the-table-of-contents-preview-numbers-se: The table-of-contents preview numbers sections from 1 in report/book documents while the compiled PDF prints 0.1

@@ -3,9 +3,17 @@ import Image from "@tiptap/extension-image";
 import type { DOMOutputSpec, Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import type { ProjectSettings } from "../lib/types";
 import { footnoteNodeView } from "./Footnote";
 import { katexNodeView } from "./KatexMath";
-import { TOC_COMPILE_NOTE, tocEntries, tocNodeView, tocPageBreakElement, tocPreviewElement, tocTitle } from "./TocBlock";
+import {
+  TOC_COMPILE_NOTE,
+  tocEntries,
+  tocNodeView,
+  tocPageBreakElement,
+  tocPreviewElement,
+  tocTitle,
+} from "./TocBlock";
 
 const generatedTocKey = new PluginKey("sentenceGeneratedToc");
 
@@ -394,40 +402,60 @@ export const TableOfContents = Node.create({
   selectable: true,
 
   addStorage() {
-    return { title: "", generated: false };
+    return {
+      title: "",
+      generated: false,
+      documentClass: "article" as ProjectSettings["documentClass"],
+    };
   },
 
   // The Properties switch asks for a generated contents page. Draw it at the
   // same place the export prints it: after a title heading that repeats the
-  // project title, otherwise at the top of the body.
+  // project title, otherwise at the top of the body. Report and book print
+  // \tableofcontents with \chapter*, which starts a new page, so a placed
+  // contents block also claims the page it opens.
   addProseMirrorPlugins() {
     return [
       new Plugin({
         key: generatedTocKey,
         props: {
           decorations: (state) => {
-            if (!this.storage.generated) return null;
+            const documentClass = this.storage.documentClass;
+            const chaptered = documentClass === "report" || documentClass === "book";
+            const decorations: Decoration[] = [];
+            let hasPlacedToc = false;
+            state.doc.descendants((node, position) => {
+              if (node.type.name !== "toc") return;
+              hasPlacedToc = true;
+              if (chaptered) {
+                decorations.push(
+                  Decoration.widget(position, tocPageBreakElement, { side: -1 }),
+                );
+              }
+            });
             // A placed contents block already represents the TOC, and the
             // export only prints one of the two.
-            for (const child of state.doc.content.content) {
-              if (child.type.name === "toc") return null;
+            if (this.storage.generated && !hasPlacedToc) {
+              const title = this.storage.title;
+              const first = state.doc.firstChild;
+              const repeatsTitle = Boolean(
+                first &&
+                  title.trim() &&
+                  first.type.name === "heading" &&
+                  Number(first.attrs.level ?? 1) === 1 &&
+                  first.textContent.trim().toLocaleLowerCase() === title.trim().toLocaleLowerCase(),
+              );
+              const position = repeatsTitle && first ? first.nodeSize : 0;
+              decorations.push(
+                Decoration.widget(
+                  position,
+                  () => tocPreviewElement(state.doc, title, documentClass),
+                  { side: position === 0 ? -1 : 1 },
+                ),
+                Decoration.widget(position, tocPageBreakElement, { side: 1 }),
+              );
             }
-            const title = this.storage.title;
-            const first = state.doc.firstChild;
-            const repeatsTitle = Boolean(
-              first &&
-                title.trim() &&
-                first.type.name === "heading" &&
-                Number(first.attrs.level ?? 1) === 1 &&
-                first.textContent.trim().toLocaleLowerCase() === title.trim().toLocaleLowerCase(),
-            );
-            const position = repeatsTitle && first ? first.nodeSize : 0;
-            return DecorationSet.create(state.doc, [
-              Decoration.widget(position, () => tocPreviewElement(state.doc, title), {
-                side: position === 0 ? -1 : 1,
-              }),
-              Decoration.widget(position, tocPageBreakElement, { side: 1 }),
-            ]);
+            return decorations.length > 0 ? DecorationSet.create(state.doc, decorations) : null;
           },
         },
       }),
