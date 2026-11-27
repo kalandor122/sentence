@@ -2388,7 +2388,7 @@ export default function App() {
   }
 
   return (
-    <div className={`app-shell ${showTabs ? "with-document-tabs" : ""}`} style={{ "--editor-zoom": zoom / 100 } as React.CSSProperties}>
+    <div className={`app-shell ${showTabs ? "with-document-tabs" : ""}`}>
       <a
         className="skip-link"
         href="#document-stage"
