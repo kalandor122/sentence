@@ -216,6 +216,28 @@ export function scrollTopForFit(
   return Math.max(0, Math.min(maxScrollTop, target));
 }
 
+// The top-of-viewport anchor above keeps a reader at the start of the page in
+// place, but on a wider pane it also grows the sheet below them, so a caret
+// near the foot of the viewport can end up past it: the paragraph being edited
+// scrolls out of view and does not come back when the window is restored.
+// `pointTop` and `pointHeight` are the caret's line in the rescaled sheet, and
+// `screenTop` is where that line sat before the pane changed. Hold the line at
+// that screen position (pulled inside the viewport when it would be clipped),
+// and clamp to the scroll range so the page can never be scrolled past its
+// edges.
+export function scrollTopForFitPoint(
+  pointTop: number,
+  screenTop: number,
+  paddingTop: number,
+  viewportHeight: number,
+  maxScrollTop: number,
+  pointHeight = 0,
+): number {
+  const screen = Math.max(0, Math.min(screenTop, viewportHeight - pointHeight));
+  const target = paddingTop + pointTop - screen;
+  return Math.max(0, Math.min(maxScrollTop, target));
+}
+
 // Zooming in grows the page around its centre, so a caret that sits near a
 // line's right margin can leave the pane even though the vertical correction
 // keeps its line on screen. That leaves the reader typing at a caret they cannot

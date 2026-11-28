@@ -11,6 +11,7 @@ import {
   scrollLeftForCaret,
   scrollLeftForZoom,
   scrollTopForFit,
+  scrollTopForFitPoint,
   scrollTopForZoom,
   scrollTopForZoomPoint,
   scrollportWidth,
@@ -774,6 +775,35 @@ describe("qa-333: a pane rescale keeps the reading position on the scaled sheet"
     expect(scrollTopForFit(0, paddingTop, 1, 0.6, maxAt(0.6))).toBeLessThan(paddingTop);
     expect(scrollTopForFit(0, paddingTop, 0.6, 1, maxAt(1))).toBe(0);
     expect(scrollTopForFit(0, paddingTop, 1, 1.5, maxAt(1.5))).toBe(0);
+  });
+});
+
+describe("qa-397: a pane rescale keeps the edited line on screen", () => {
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const lineHeight = 16;
+
+  it("holds a caret near the foot when a wider pane would push it below", () => {
+    // 1200 -> 1280: the sheet grows from 0.945 to 1, so a line at y=525 would
+    // be drawn at 685 (past the 627px viewport) by the top-of-viewport anchor.
+    const pointTop = 5594;
+    const top = scrollTopForFitPoint(pointTop, 525, paddingTop, viewportHeight, 14082, lineHeight);
+    expect(top).toBe(5099);
+    const screen = paddingTop + pointTop - top;
+    expect(screen).toBe(525);
+    expect(screen + lineHeight).toBeLessThanOrEqual(viewportHeight);
+  });
+
+  it("pulls a held line fully inside when it sat at the foot of the pane", () => {
+    const top = scrollTopForFitPoint(6000, 700, paddingTop, viewportHeight, 14082, lineHeight);
+    const screen = paddingTop + 6000 - top;
+    expect(screen).toBe(viewportHeight - lineHeight);
+    expect(screen + lineHeight).toBe(viewportHeight);
+  });
+
+  it("stays inside the scroll range", () => {
+    expect(scrollTopForFitPoint(100, 0, paddingTop, viewportHeight, 0, lineHeight)).toBe(0);
+    expect(scrollTopForFitPoint(20000, 0, paddingTop, viewportHeight, 14082, lineHeight)).toBe(14082);
   });
 });
 

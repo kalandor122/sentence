@@ -1308,3 +1308,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T12:32:20Z START qa-395 on qa/qa-395-tracked-insertions-of-a-citation-or-an-e: Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the 
 2026-11-28T12:36:36Z PUSHED main
 2026-11-28T12:36:36Z DONE qa-395 (tsc -b, npm test, smoke all green)
+2026-11-28T12:37:15Z START qa-397 on qa/qa-397-resizing-the-window-mid-document-jumps-t: Resizing the window mid-document jumps the scroll position about two pages and leaves the caret off-screen

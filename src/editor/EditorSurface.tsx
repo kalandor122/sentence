@@ -45,6 +45,7 @@ import {
   scrollLeftForCaret,
   scrollLeftForZoom,
   scrollTopForFit,
+  scrollTopForFitPoint,
   scrollTopForZoom,
   scrollTopForZoomPoint,
   scrollportWidth,
@@ -545,6 +546,18 @@ export default function EditorSurface({
       // new, scaled sheet so the range can never extend past the page.
       const scrollTop = scroller.scrollTop;
       const scrollLeft = scroller.scrollLeft;
+      // A wider pane grows the sheet below the reader, so capture the caret's
+      // screen position before the rescale. Focus outside the page (a dialog,
+      // the source pane, the toolbar) leaves nothing to hold and keeps the
+      // top-of-viewport anchor.
+      const caretBefore = caretScreenBox(scroller);
+      const caretTop = caretBefore
+        ? caretBefore.rect.top - scroller.getBoundingClientRect().top
+        : null;
+      const caretVisibleBefore =
+        caretTop !== null &&
+        caretTop + (caretBefore?.rect.height ?? 0) > 0 &&
+        caretTop < scroller.clientHeight;
       scroller.style.setProperty("--paper-fit-scale", String(scale));
       reserveSheetInStage(scroller);
       const bounds = scroller.getBoundingClientRect();
@@ -571,6 +584,29 @@ export default function EditorSurface({
         scale,
         maxScrollTop,
       );
+      // The top anchor can push the line being edited past the foot of the
+      // viewport when the pane grows. When that line was on screen before the
+      // rescale, hold its old screen position instead, so resizing never leaves
+      // the reader typing at a caret they cannot see. A scale of 1 keeps the
+      // measured line in the rescaled sheet's pixels, the unit the fit
+      // correction works in.
+      const caret = caretTop === null ? null : caretDocumentBox(scroller, paddingTop, 1);
+      const caretScreen = caret ? paddingTop + caret.top - scroller.scrollTop : 0;
+      if (
+        caret &&
+        caretVisibleBefore &&
+        caretTop !== null &&
+        (caretScreen < 0 || caretScreen + caret.height > scroller.clientHeight)
+      ) {
+        scroller.scrollTop = scrollTopForFitPoint(
+          caret.top,
+          caretTop,
+          paddingTop,
+          scroller.clientHeight,
+          maxScrollTop,
+          caret.height,
+        );
+      }
       scroller.scrollLeft = scrollLeftForZoom(scrollLeft, previous, scale, maxScrollLeft);
       scrollTopRef.current = scroller.scrollTop;
       scrollLeftRef.current = scroller.scrollLeft;
