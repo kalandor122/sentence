@@ -6234,10 +6234,11 @@
       ],
       "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
       "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T11:43:20Z",
-      "lastAttemptAt": "2026-11-28T11:43:20Z"
+      "lastAttemptAt": "2026-11-28T11:43:20Z",
+      "doneAt": "2026-11-28T11:54:13Z"
     },
     {
       "id": "qa-394",
@@ -6249,7 +6250,9 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T12:17:24Z"
     },
     {
       "id": "qa-395",
@@ -7233,6 +7236,78 @@
       ],
       "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
       "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-475",
+      "title": "Accepting a tracked change drops keyboard focus to <body>, and the next keystrokes are silently discarded",
+      "why": "Exploratory pass on review (functional): expected The Accept button removes the review card but keeps the caret in the editor, so the typed text is appended to the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open http://localhost:1420, create a project, and put the caret at the end of the last paragraph. 2. Open the Review tab and click Track changes. 3. Type 'PROBE-ACCEPT' and wait about 2.5 s. 4. Open History and click Accept on the tracked change. 5. Without clicking back into the document, type 'PROBE-AFTER-ACCEPT'.\nActual: After the click document.activeElement is BODY. The typed text never reaches the document (the paragraph still ends with 'PROBE-ACCEPT'), so the whole sentence is silently lost. Clicking the document first makes the same typing work.",
+      "source": "explore:review:accepting a tracked change drops keyboard focus to <body>, and the next keystrokes are silently discarded",
+      "status": "open"
+    },
+    {
+      "id": "qa-476",
+      "title": "Rejecting a tracked deletion inside a commented phrase restores the text but leaves the comment highlight truncated",
+      "why": "Exploratory pass on review (functional): expected The rejected deletion restores 'alpha beta gamma' and the comment keeps its original 'alpha beta' highlight, because the thread is still live.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document, triple-click the first body paragraph and type 'alpha beta gamma'. 2. Click at the start of that paragraph, hold Shift and press ArrowRight 10 times to select 'alpha beta'; Review tab > New comment > enter 'PROBE-PARTIAL' > Comment. 3. Click Track changes, click at the start of the paragraph, press Home, ArrowRight 6 times, then Shift+ArrowRight 4 times to select 'beta', and press Backspace. 4. Wait about 2.5 s, open History and click Reject. 5. Open Review and inspect the highlight on 'alpha beta gamma'.\nActual: The text is restored and the thread is shown as anchored (not detached), but its highlight is only 'alpha '; the restored 'beta' is no longer highlighted. A reviewer therefore sees a comment that covers less text than it did before the rejected change.",
+      "source": "explore:review:rejecting a tracked deletion inside a commented phrase restores the text but leaves the comment highlight truncated",
+      "status": "open"
+    },
+    {
+      "id": "qa-477",
+      "title": "Enabling Track changes leaves focus on the ribbon button, so the first typed text is silently discarded",
+      "why": "Exploratory pass on review (ux): expected The tracking toggle returns focus to the editor, so the text is inserted and recorded as a tracked change.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a project and put the caret at the end of the last paragraph. 2. Open the Review tab and click Track changes. 3. Without clicking back into the document, immediately type 'PROBE-AFTER-TOGGLE'.\nActual: document.activeElement remains the Track changes BUTTON and none of the typed text appears in the document. After clicking the document, typing works, proving the initial keystrokes were lost.",
+      "source": "explore:review:enabling track changes leaves focus on the ribbon button, so the first typed text is silently discarded",
+      "status": "open"
+    },
+    {
+      "id": "qa-478",
+      "title": "Adding a comment to a selected citation creates a detached thread with a false 'text was deleted' warning",
+      "why": "Exploratory pass on review (functional): expected Either the comment is attached to the selected citation, or New comment is disabled for a selection that contains no text; in no case should it report deleted text.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Put the caret at the end of the last paragraph, open References and insert a citation manually with the key 'sentence2026'. 2. With the caret after the citation, hold Shift and press ArrowLeft to select '[sentence2026]'. 3. Open Review > New comment, enter 'PROBE-ATOM-COMMENT' and click Comment. 4. Open the Review panel.\nActual: The dialog accepts the comment and the thread appears immediately detached with the note 'The text this comment was attached to was deleted, so it has no highlight in the document.' No text was deleted and the document gets no highlight for the comment.",
+      "source": "explore:review:adding a comment to a selected citation creates a detached thread with a false 'text was deleted' warning",
+      "status": "open"
+    },
+    {
+      "id": "qa-479",
+      "title": "A tracked insertion of only a space produces a History card with identical before/after previews",
+      "why": "Exploratory pass on review (ux): expected The card shows that whitespace was inserted (for example with a visible marker), so the reviewer can tell what changed.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a project and put the caret at the end of the last paragraph. 2. Open Review and click Track changes. 3. Type a single space and wait about 2.5 s. 4. Open History.\nActual: The card's before and after previews are both '...meaning = structure + language.' with no visible difference, although the document does contain the extra space and its inline insertion mark is a space. The change cannot be identified from the card and cannot be distinguished from a no-op.",
+      "source": "explore:review:a tracked insertion of only a space produces a history card with identical before/after previews",
+      "status": "open"
+    },
+    {
+      "id": "qa-480",
+      "title": "The tracking toggle toast says 'Tracked changes is on.' instead of 'Track changes is on.'",
+      "why": "Exploratory pass on review (content): expected A grammatical message such as 'Track changes is on.'",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a project. 2. Open the Review tab. 3. Click Track changes and read the toast.\nActual: The toast reads 'Tracked changes is on.'",
+      "source": "explore:review:the tracking toggle toast says 'tracked changes is on.' instead of 'track changes is on.'",
       "status": "open"
     }
   ]
