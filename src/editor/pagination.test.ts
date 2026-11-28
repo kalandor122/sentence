@@ -13,6 +13,7 @@ import {
   scrollTopForFit,
   scrollTopForZoom,
   scrollTopForZoomPoint,
+  scrollportWidth,
   sheetScrollMax,
   zoomAnchor,
 } from "./pagination";
@@ -871,6 +872,25 @@ describe("qa-334: the whole probe zoom trace stays on the sheet", () => {
         sheetScrollMax(padding + 794 * 0.7, padding, pane),
       ),
     ).toBe(0);
+  });
+
+  it("measures the horizontal range against the scrollport, gutter included", () => {
+    const pane = 950;
+    const gutter = 15;
+    const padding = 34;
+    const width = 794 * 1.5;
+    // `scrollbar-gutter: stable` takes the last gutter-width out of clientWidth
+    // and out of the browser's horizontal maximum, so a clientWidth range would
+    // promise 15px the browser refuses to scroll. The page's right edge still
+    // has to fit inside the pane at the offset that is really reachable.
+    const viewport = scrollportWidth(pane, pane + gutter);
+    expect(viewport).toBe(965);
+    const maxScrollLeft = sheetScrollMax(padding + width, padding, viewport);
+    expect(maxScrollLeft).toBe(294);
+    expect(maxScrollLeft).toBeLessThan(309);
+    expect(padding + width - maxScrollLeft).toBeLessThanOrEqual(pane);
+    // Without a reserved gutter both widths agree and nothing changes.
+    expect(scrollportWidth(pane, pane)).toBe(pane);
   });
 
   it("reserves the scaled sheet without letting the backdrop widen the range", () => {
