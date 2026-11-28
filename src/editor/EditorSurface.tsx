@@ -473,7 +473,6 @@ export default function EditorSurface({
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const scrollTopRef = useRef(0);
   const scrollLeftRef = useRef(0);
-  const maxScrollTopRef = useRef(0);
   // A programmatic jump (Ctrl+End, an outline or find result) moves the DOM
   // before its scroll event is delivered. Capture the live offset during render
   // so a zoom click that arrives in the same frame still anchors on the page
@@ -481,9 +480,6 @@ export default function EditorSurface({
   if (scrollRef.current) {
     scrollTopRef.current = scrollRef.current.scrollTop;
     scrollLeftRef.current = scrollRef.current.scrollLeft;
-    // The range before the zoom changes, so the correction can tell whether the
-    // reader had wheeled all the way down to the page's bottom margin.
-    maxScrollTopRef.current = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
   }
   const previousZoomRef = useRef(zoom);
   const fitScaleRef = useRef<number | null>(null);
@@ -613,12 +609,14 @@ export default function EditorSurface({
       previousScale,
       { top: 0, height: 1 },
     );
-    // Wheeling to the very bottom stops on the blank bottom margin of the last
-    // page, where none of the anchors is on screen. Centring the zoom there
-    // leaves the whole document above the viewport and the editor blank, so pin
-    // the last block to the viewport instead and keep its text in view.
+    // Sitting below the last block means the reader is in the blank bottom
+    // margin of the final page, where none of the anchors is on screen.
+    // Centring the zoom there leaves the whole document above the viewport and
+    // the editor blank, so pin the last block to the viewport instead and keep
+    // its text in view. Any offset past the text counts, not just the very
+    // bottom of the range: wheeling part of the way into the margin and then
+    // zooming out had the same blank result.
     const pinEnd =
-      scrollTopRef.current >= maxScrollTopRef.current - 1 &&
       endBlock !== null &&
       paddingTop + (endBlock.top + endBlock.height) * previousScale - scrollTopRef.current <= 0;
     scroller.scrollTop = pinEnd && endBlock
