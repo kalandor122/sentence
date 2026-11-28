@@ -256,6 +256,24 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("keeps the inline formatting of an imported footnote through a round trip", () => {
+    const latex = [
+      "\\documentclass{article}",
+      "\\begin{document}",
+      "Formatted note \\footnote{See \\textit{Smith} and \\textbf{Jones}.} end.",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(latex, DEFAULT_SETTINGS).document;
+    const note = parsed.content[0]?.content?.find((node) => node.type === "footnote");
+    expect(note?.attrs?.text).toBe("See \\textit{Smith} and \\textbf{Jones}.");
+
+    const exported = documentToLatex(parsed, DEFAULT_SETTINGS);
+    expect(exported).toContain(
+      "\\footnote{See \\textit{Smith} and \\textbf{Jones}.}",
+    );
+    expect(exported).not.toContain("\\textbackslash{}");
+  });
+
   it("ignores LaTeX comments in the body instead of importing them as text", () => {
     const latex = [
       "\\documentclass{article}",

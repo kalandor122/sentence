@@ -1137,3 +1137,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T03:02:51Z PUSHED main
 2026-11-28T03:02:51Z DONE qa-354 (tsc -b, npm test, smoke all green)
 2026-11-28T03:03:31Z IMPORTED 1 tester findings into the backlog
+2026-11-28T03:03:31Z START qa-355 on qa/qa-355-a-footnote-imported-with-textit-or-textb: A footnote imported with \textit or \textbf formatting is turned into literal escaped commands after the next visual edi
