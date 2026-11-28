@@ -175,6 +175,17 @@ export function sheetScrollMax(
   return Math.max(0, Math.floor(sheetEnd + paddingEnd - viewportSize));
 }
 
+// The scroller reserves a stable scrollbar gutter at its inline end. The browser
+// clamps horizontal scrolling against the whole scrollport, gutter included, but
+// `clientWidth` leaves the gutter out, so `scrollWidth - clientWidth` promises
+// a gutter-width of travel that the browser then refuses. `offsetWidth` includes
+// the gutter (the scroller has no border), so measuring the horizontal range
+// against it keeps every correction on the offset the browser actually accepts
+// instead of having the final 15px silently clamped away.
+export function scrollportWidth(clientWidth: number, offsetWidth: number): number {
+  return Math.max(clientWidth, offsetWidth);
+}
+
 // A zoomed-in sheet can be wider than the pane, so the horizontal offset has to
 // be rescaled with it too. Keeping the offset proportional holds the part of the
 // page being read in view instead of snapping back to the left edge, while a

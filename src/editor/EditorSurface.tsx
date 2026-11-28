@@ -47,6 +47,7 @@ import {
   scrollTopForFit,
   scrollTopForZoom,
   scrollTopForZoomPoint,
+  scrollportWidth,
   sheetScrollMax,
   zoomAnchor,
 } from "./pagination";
@@ -396,7 +397,7 @@ function clampScrollToSheet(scroller: HTMLElement): void {
   const maxScrollLeft = sheetScrollMax(
     sheetBox.right - bounds.left + scroller.scrollLeft,
     paddingRight,
-    scroller.clientWidth,
+    scrollportWidth(scroller.clientWidth, scroller.offsetWidth),
   );
   if (scroller.scrollTop > maxScrollTop) scroller.scrollTop = maxScrollTop;
   if (scroller.scrollLeft > maxScrollLeft) scroller.scrollLeft = maxScrollLeft;
@@ -549,9 +550,9 @@ export default function EditorSurface({
         ? sheetScrollMax(
             sheetBox.right - bounds.left + scroller.scrollLeft,
             paddingRight,
-            scroller.clientWidth,
+            scrollportWidth(scroller.clientWidth, scroller.offsetWidth),
           )
-        : scroller.scrollWidth - scroller.clientWidth;
+        : scroller.scrollWidth - scrollportWidth(scroller.clientWidth, scroller.offsetWidth);
       scroller.scrollTop = scrollTopForFit(
         scrollTop,
         paddingTop,
@@ -607,9 +608,9 @@ export default function EditorSurface({
       ? sheetScrollMax(
           sheetBox.right - bounds.left + scroller.scrollLeft,
           paddingRight,
-          scroller.clientWidth,
+          scrollportWidth(scroller.clientWidth, scroller.offsetWidth),
         )
-      : scroller.scrollWidth - scroller.clientWidth;
+      : scroller.scrollWidth - scrollportWidth(scroller.clientWidth, scroller.offsetWidth);
     const caret = caretDocumentBox(scroller, paddingTop, scale);
     const endBlock = lastBlockDocumentBox(scroller, paddingTop, scale);
     // With focus outside the page there is no caret to hold, so anchor on the
