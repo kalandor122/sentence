@@ -1133,3 +1133,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T02:59:43Z PUSHED main
 2026-11-28T02:59:43Z DONE qa-353 (tsc -b, npm test, smoke all green)
 2026-11-28T03:00:22Z IMPORTED 1 tester findings into the backlog
+2026-11-28T03:00:22Z START qa-354 on qa/qa-354-the-references-panel-s-cite-and-manual-c: The References panel's Cite and manual-citation controls are enabled in Source view but silently insert nothing

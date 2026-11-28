@@ -5623,8 +5623,9 @@
       "hint": "Repro: Create a project and type \"SourceCite \". Open References > Insert citation to show the References panel. Switch to View > LaTeX (the panel remains visible). Click the Cite button for sentence2026, then click \"Enter a key manually\", enter ghost2026 and click Insert. Switch back to Visual.\nActual: Cite and \"Enter a key manually\" are both enabled, and the manual dialog accepts the key and closes, but the source contains no \\cite, the visual document still has no citation, and no toast or alert appears. The probe records citationsInSourceAfterCite [], citationsInSourceAfterManual [], toastBefore/toastAfterCite/toastAfterManual all null, and afterVisual with no citations. The same controls insert normally in Visual and Split views.",
       "source": "explore:links-cites-footnotes:the references panel's cite and manual-citation controls are enabled in source view but silently insert nothing",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T03:00:22Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T03:00:22Z",
+      "lastAttemptAt": "2026-11-28T03:00:22Z"
     },
     {
       "id": "qa-355",

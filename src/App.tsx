@@ -1516,6 +1516,14 @@ export default function App() {
   };
 
   const insertCitation = (key: string) => {
+    // The visual editor is unmounted in Source view, so this can only land in
+    // the document when Visual or Split view is showing. The References panel
+    // disables its citation controls there; this is the backstop for any other
+    // route into the same action.
+    if (!editor) {
+      setToast("Switch to Visual or Split view to insert a citation.");
+      return;
+    }
     insertInlineAtom("citation", { key });
     warnMissingCitations(key);
   };
@@ -2508,6 +2516,7 @@ export default function App() {
           history={workspace.git.history}
           bibliography={workspace.bibliography}
           activeCommentId={activeCommentId}
+          canInsertCitations={mode !== "source"}
           onPanelChange={setSidebarPanel}
           onBibliographyChange={handleBibliographyChange}
           onInsertCitationKey={insertCitation}

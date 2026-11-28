@@ -298,6 +298,7 @@ function RevisionList({
 interface ReferencesPanelProps {
   document: SentenceDocument;
   bibliography: string;
+  canInsertCitations: boolean;
   onChange: (value: string) => void;
   onInsertCitation: (key: string) => void;
   onInsertManually: () => void;
@@ -308,6 +309,7 @@ interface ReferencesPanelProps {
 function ReferencesPanel({
   document,
   bibliography,
+  canInsertCitations,
   onChange,
   onInsertCitation,
   onInsertManually,
@@ -329,6 +331,8 @@ function ReferencesPanel({
     : entries;
 
   const insertFirst = () => {
+    // The search form still filters in Source view; submitting it there reaches
+    // the App-level citation guard, which explains why nothing is inserted.
     if (visible.length > 0) onInsertCitation(visible[0].key);
   };
 
@@ -343,6 +347,12 @@ function ReferencesPanel({
           <Plus size={12} /> Add
         </button>
       </header>
+      {canInsertCitations ? null : (
+        <div className="bib-warning" id="bib-insert-unavailable" role="status">
+          <TriangleAlert size={12} aria-hidden="true" />
+          <span>Citations can only be inserted in Visual or Split view. Switch views to cite an entry.</span>
+        </div>
+      )}
       {missing.length > 0 ? (
         <div className="bib-warning" role="status">
           <TriangleAlert size={12} aria-hidden="true" />
@@ -403,7 +413,15 @@ function ReferencesPanel({
               </div>
             ) : (
               <div className="bib-entry-actions">
-                <button type="button" className="accent-button small" onClick={() => onInsertCitation(entry.key)}>Cite</button>
+                <button
+                  type="button"
+                  className="accent-button small"
+                  disabled={!canInsertCitations}
+                  aria-describedby={canInsertCitations ? undefined : "bib-insert-unavailable"}
+                  onClick={() => onInsertCitation(entry.key)}
+                >
+                  Cite
+                </button>
                 <IconButton label={`Edit ${entry.key}`} compact onClick={() => onEditEntry(entry)}><Pencil size={13} /></IconButton>
                 <IconButton label={`Delete ${entry.key}`} compact className="danger" onClick={() => setConfirmKey(entry.key)}><Trash2 size={13} /></IconButton>
               </div>
@@ -412,7 +430,15 @@ function ReferencesPanel({
         ))}
       </div>
       <footer className="bib-panel-footer">
-        <button type="button" className="text-button" onClick={onInsertManually}>Enter a key manually</button>
+        <button
+          type="button"
+          className="text-button"
+          disabled={!canInsertCitations}
+          aria-describedby={canInsertCitations ? undefined : "bib-insert-unavailable"}
+          onClick={onInsertManually}
+        >
+          Enter a key manually
+        </button>
       </footer>
     </>
   );
@@ -427,6 +453,7 @@ interface SidebarProps {
   history: GitCommit[];
   bibliography: string;
   activeCommentId: string | null;
+  canInsertCitations: boolean;
   onPanelChange: (panel: SidebarPanel) => void;
   onBibliographyChange: (value: string) => void;
   onInsertCitationKey: (key: string) => void;
@@ -453,6 +480,7 @@ export default function Sidebar({
   history,
   bibliography,
   activeCommentId,
+  canInsertCitations,
   onPanelChange,
   onBibliographyChange,
   onInsertCitationKey,
@@ -585,6 +613,7 @@ export default function Sidebar({
           <ReferencesPanel
             document={document}
             bibliography={bibliography}
+            canInsertCitations={canInsertCitations}
             onChange={onBibliographyChange}
             onInsertCitation={onInsertCitationKey}
             onInsertManually={onInsertCitationManually}
