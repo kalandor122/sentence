@@ -1125,3 +1125,7 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T02:41:25Z DONE qa-350 (tsc -b, npm test, smoke all green)
 2026-11-28T02:42:04Z IMPORTED 1 tester findings into the backlog
 2026-11-28T02:42:04Z START qa-352 on qa/qa-352-inserting-a-footnote-citation-or-cross-r: Inserting a footnote, citation or cross-reference over a text selection deletes the selected text
+2026-11-28T02:44:35Z PUSHED main
+2026-11-28T02:44:35Z DONE qa-352 (tsc -b, npm test, smoke all green)
+2026-11-28T02:54:49Z EXPLORE persistence: 1 new items, agent exit 0
+2026-11-28T02:55:08Z IMPORTED 1 tester findings into the backlog

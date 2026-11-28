@@ -5590,10 +5590,11 @@
       ],
       "hint": "Repro: Create a project and type \"SelectNote alpha beta\". Select \"beta\" (Ctrl+Shift+ArrowLeft), open Insert > Footnote, enter \"Selected note\" and click Insert. Repeat with \"SelectCite alpha beta\", References > Insert citation > Enter a key manually, key sentence2026; and with \"SelectRef alpha beta\", References > Cross-reference, label fig:sel.\nActual: The selected word is deleted. The probe's atomInsertOverSelection scenario records the paragraphs as \"SelectNote alpha 1\", \"SelectCite alpha [sentence2026]\" and \"SelectRef alpha ref: fig:sel\"; \"beta\" is gone from the document and from the exported LaTeX, with no warning.",
       "source": "explore:links-cites-footnotes:inserting a footnote, citation or cross-reference over a text selection deletes the selected text",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T02:42:04Z",
-      "lastAttemptAt": "2026-11-28T02:42:04Z"
+      "lastAttemptAt": "2026-11-28T02:42:04Z",
+      "doneAt": "2026-11-28T02:44:33Z"
     },
     {
       "id": "qa-353",
@@ -5605,7 +5606,9 @@
       ],
       "hint": "Repro: Create a project and leave the first paragraph empty; press Enter and type \"QuickNote \", then insert a footnote with text \"Note\". Double-click the new footnote marker, then press Escape as soon as the Edit footnote dialog appears (the probe presses it immediately, without waiting for the dialog's focus hand-off; the failure window is roughly the first 250 ms). Wait for the dialog to close and type \"Z\". The probe's atomEditQuickEscape scenario repeats this for a footnote, a citation and a cross-reference.\nActual: The atom's selection is lost. The probe's paragraphs after typing become [\"Z\", \"QuickNote 1\"], [\"Z\", \"QuickCite [sentence2026]\"] and [\"Z\", \"QuickRef ref: fig:quick\"]: the character is inserted at the very start of the document instead of beside the marker. Pressing Escape after the dialog has been open for about 300 ms preserves the caret, so the failure is the fast-cancel path.",
       "source": "explore:links-cites-footnotes:cancelling a citation, footnote or cross-reference edit immediately after it opens drops the caret to the start of the d",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T02:55:08Z"
     },
     {
       "id": "qa-354",
@@ -6229,6 +6232,30 @@
     },
     {
       "id": "qa-405",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-406",
+      "title": "A failed recent-projects write reports a fully saved document as unsaved",
+      "why": "Exploratory pass on persistence (ux): expected The document's saved state should follow the workspace snapshot: once sentence.workspace holds the current text the indicator should read 'Saved locally'. A failure to write the auxiliary recent-projects list should be reported separately or ignored rather than turning a saved document into 'Editing'/'Not saved' with an error toast.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1) Open http://localhost:1420 in a fresh browser profile, click 'New document' and wait for the top bar to read 'Saved locally'. 2) In the devtools console run: const orig = Storage.prototype.setItem; Storage.prototype.setItem = function (key, value) { if (key === 'sentence.recent') throw new DOMException('The quota has been exceeded.', 'QuotaExceededError'); return orig.call(this, key, value); }; . 3) Type a unique marker at the end of the document and wait 1.6 s: the top bar shows 'Editing' with a 'Retry save: The quota has been exceeded.' button and an error toast, while localStorage['sentence.workspace'] already contains the marker (check with JSON.parse(localStorage.getItem('sentence.workspace'))). 4) Reload: the marker is still in the editor and the bar now reads 'Saved locally'. 5) For the boot variant, apply the same override before the page loads (Playwright page.addInitScript / CDP Page.addScriptToEvaluateOnNewDocument) and reload: the unchanged, restored document displays 'Not saved' with the same Retry save control and error toast, even though its text is present in the editor and in localStorage. Probe evidence: qa/probes/persistence.mjs phases 'recent-write-failure' (storedHasMarker true, editorHasMarker true, indicator label 'Editing', retry 'Retry save: The quota has been exceeded.') and 'recent-boot-indicator' (label 'Not saved', retry present, hasAlpha true, storedHasAlpha true).\nActual: In persist() the result of rememberProject(current) is assigned to recentError and, if set, saveError is populated and saveState is forced to 'error' (src/App.tsx:999-1002), so the heading renders 'Editing' while dirty is true. On boot the workspace effect calls rememberProject (src/App.tsx:1175-1177); with dirty false the TopBar renders 'Not saved' (src/components/TopBar.tsx:41). The 'Retry save' control cannot clear the state while the recent-list key stays unwritable, even though the document itself is persisted and survives a reload.",
+      "source": "explore:persistence:a failed recent-projects write reports a fully saved document as unsaved",
+      "status": "open"
+    },
+    {
+      "id": "qa-407",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
