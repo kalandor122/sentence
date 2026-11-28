@@ -473,6 +473,7 @@ export default function EditorSurface({
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const scrollTopRef = useRef(0);
   const scrollLeftRef = useRef(0);
+  const maxScrollTopRef = useRef(0);
   // A programmatic jump (Ctrl+End, an outline or find result) moves the DOM
   // before its scroll event is delivered. Capture the live offset during render
   // so a zoom click that arrives in the same frame still anchors on the page
@@ -480,6 +481,9 @@ export default function EditorSurface({
   if (scrollRef.current) {
     scrollTopRef.current = scrollRef.current.scrollTop;
     scrollLeftRef.current = scrollRef.current.scrollLeft;
+    // The range before the zoom changes, so the correction can tell whether the
+    // reader had wheeled all the way down to the page's bottom margin.
+    maxScrollTopRef.current = scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
   }
   const previousZoomRef = useRef(zoom);
   const fitScaleRef = useRef<number | null>(null);
@@ -594,6 +598,7 @@ export default function EditorSurface({
         )
       : scroller.scrollWidth - scroller.clientWidth;
     const caret = caretDocumentBox(scroller, paddingTop, scale);
+    const endBlock = lastBlockDocumentBox(scroller, paddingTop, scale);
     // With focus outside the page there is no caret to hold, so anchor on the
     // top edge of the sheet when the reader is at the start and on the last
     // block when the reader has scrolled to the end. The top point has a 1px
@@ -601,32 +606,52 @@ export default function EditorSurface({
     // the viewport top.
     const anchor = zoomAnchor(
       caret,
-      lastBlockDocumentBox(scroller, paddingTop, scale),
+      endBlock,
       scrollTopRef.current,
       scroller.clientHeight,
       paddingTop,
       previousScale,
       { top: 0, height: 1 },
     );
-    scroller.scrollTop = anchor === null
-      ? scrollTopForZoom(
+    // Wheeling to the very bottom stops on the blank bottom margin of the last
+    // page, where none of the anchors is on screen. Centring the zoom there
+    // leaves the whole document above the viewport and the editor blank, so pin
+    // the last block to the viewport instead and keep its text in view.
+    const pinEnd =
+      scrollTopRef.current >= maxScrollTopRef.current - 1 &&
+      endBlock !== null &&
+      paddingTop + (endBlock.top + endBlock.height) * previousScale - scrollTopRef.current <= 0;
+    scroller.scrollTop = pinEnd && endBlock
+      ? scrollTopForZoomPoint(
+          endBlock.top,
           scrollTopRef.current,
           scroller.clientHeight,
           paddingTop,
           previousScale,
           scale,
           maxScrollTop,
+          endBlock.height,
+          true,
         )
-      : scrollTopForZoomPoint(
-          anchor.top,
-          scrollTopRef.current,
-          scroller.clientHeight,
-          paddingTop,
-          previousScale,
-          scale,
-          maxScrollTop,
-          anchor.height,
-        );
+      : anchor === null
+        ? scrollTopForZoom(
+            scrollTopRef.current,
+            scroller.clientHeight,
+            paddingTop,
+            previousScale,
+            scale,
+            maxScrollTop,
+          )
+        : scrollTopForZoomPoint(
+            anchor.top,
+            scrollTopRef.current,
+            scroller.clientHeight,
+            paddingTop,
+            previousScale,
+            scale,
+            maxScrollTop,
+            anchor.height,
+          );
     scroller.scrollLeft = scrollLeftForZoom(
       scrollLeftRef.current,
       previousScale,

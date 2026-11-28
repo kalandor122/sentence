@@ -271,6 +271,9 @@ export function zoomAnchor(
 // line the reader was on clipped. `pointTop` is the caret's unscaled document
 // offset from the top of the sheet, and `pointHeight` its line box; a box taller
 // than the viewport cannot fit, so it stops with its top at the viewport top.
+// `pin` anchors even when the box was completely out of view, which is what
+// keeps the last block reachable when the reader zoomed while sitting below it
+// in the blank bottom margin of the final page.
 export function scrollTopForZoomPoint(
   pointTop: number,
   scrollTop: number,
@@ -280,10 +283,11 @@ export function scrollTopForZoomPoint(
   zoom: number,
   maxScrollTop: number,
   pointHeight = 0,
+  pin = false,
 ): number {
   const previousScreen = pointTop * previousZoom + paddingTop - scrollTop;
   const edge = pointHeight * previousZoom;
-  if (previousScreen < -edge || previousScreen > viewportHeight + edge) {
+  if (!pin && (previousScreen < -edge || previousScreen > viewportHeight + edge)) {
     return scrollTopForZoom(scrollTop, viewportHeight, paddingTop, previousZoom, zoom, maxScrollTop);
   }
   const screen = Math.max(
