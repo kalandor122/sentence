@@ -5606,10 +5606,11 @@
       ],
       "hint": "Repro: Create a project and leave the first paragraph empty; press Enter and type \"QuickNote \", then insert a footnote with text \"Note\". Double-click the new footnote marker, then press Escape as soon as the Edit footnote dialog appears (the probe presses it immediately, without waiting for the dialog's focus hand-off; the failure window is roughly the first 250 ms). Wait for the dialog to close and type \"Z\". The probe's atomEditQuickEscape scenario repeats this for a footnote, a citation and a cross-reference.\nActual: The atom's selection is lost. The probe's paragraphs after typing become [\"Z\", \"QuickNote 1\"], [\"Z\", \"QuickCite [sentence2026]\"] and [\"Z\", \"QuickRef ref: fig:quick\"]: the character is inserted at the very start of the document instead of beside the marker. Pressing Escape after the dialog has been open for about 300 ms preserves the caret, so the failure is the fast-cancel path.",
       "source": "explore:links-cites-footnotes:cancelling a citation, footnote or cross-reference edit immediately after it opens drops the caret to the start of the d",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T02:55:08Z",
-      "lastAttemptAt": "2026-11-28T02:55:08Z"
+      "lastAttemptAt": "2026-11-28T02:55:08Z",
+      "doneAt": "2026-11-28T02:59:41Z"
     },
     {
       "id": "qa-354",
@@ -5621,7 +5622,9 @@
       ],
       "hint": "Repro: Create a project and type \"SourceCite \". Open References > Insert citation to show the References panel. Switch to View > LaTeX (the panel remains visible). Click the Cite button for sentence2026, then click \"Enter a key manually\", enter ghost2026 and click Insert. Switch back to Visual.\nActual: Cite and \"Enter a key manually\" are both enabled, and the manual dialog accepts the key and closes, but the source contains no \\cite, the visual document still has no citation, and no toast or alert appears. The probe records citationsInSourceAfterCite [], citationsInSourceAfterManual [], toastBefore/toastAfterCite/toastAfterManual all null, and afterVisual with no citations. The same controls insert normally in Visual and Split views.",
       "source": "explore:links-cites-footnotes:the references panel's cite and manual-citation controls are enabled in source view but silently insert nothing",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T03:00:22Z"
     },
     {
       "id": "qa-355",
@@ -6257,6 +6260,18 @@
     },
     {
       "id": "qa-407",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-408",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",

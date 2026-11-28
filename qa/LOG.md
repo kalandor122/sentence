@@ -1130,3 +1130,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T02:54:49Z EXPLORE persistence: 1 new items, agent exit 0
 2026-11-28T02:55:08Z IMPORTED 1 tester findings into the backlog
 2026-11-28T02:55:08Z START qa-353 on qa/qa-353-cancelling-a-citation-footnote-or-cross: Cancelling a citation, footnote or cross-reference edit immediately after it opens drops the caret to the start of the d
+2026-11-28T02:59:43Z PUSHED main
+2026-11-28T02:59:43Z DONE qa-353 (tsc -b, npm test, smoke all green)
+2026-11-28T03:00:22Z IMPORTED 1 tester findings into the backlog
