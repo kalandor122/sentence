@@ -88,6 +88,91 @@ function markInsertion(
   );
 }
 
+// An atom keeps its content in attributes instead of text, so findDocumentMatches
+// cannot see it. Locate the inserted node in its recorded block by type and
+// attributes, then mark the node itself as the insertion.
+const ATOM_NODE_TYPES = new Set([
+  "citation",
+  "crossReference",
+  "footnote",
+  "mathInline",
+  "mathBlock",
+  "image",
+  "inlineImage",
+]);
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function sameAttributes(left: Record<string, unknown>, right: Record<string, unknown>): boolean {
+  return Object.keys(right).every((name) => JSON.stringify(left[name]) === JSON.stringify(right[name]));
+}
+
+function nodeAtPath(doc: ProseMirrorNode, path: Path): { node: ProseMirrorNode; position: number } | null {
+  let node = doc;
+  let position = 0;
+  for (let step = 0; step < path.length; step += 2) {
+    const index = path[step + 1];
+    if (path[step] !== "content" || typeof index !== "number" || index >= node.childCount) return null;
+    let offset = node === doc ? 0 : 1;
+    for (let child = 0; child < index; child += 1) offset += node.child(child).nodeSize;
+    position += offset;
+    node = node.child(index);
+  }
+  return node === doc ? null : { node, position };
+}
+
+function matchesAtom(child: ProseMirrorNode, type: string, attrs: Record<string, unknown>): boolean {
+  return child.type.name === type && sameAttributes(child.attrs as Record<string, unknown>, attrs);
+}
+
+function findAtomRange(doc: ProseMirrorNode, node: Record<string, unknown>, path: Path | null): { from: number; to: number } | null {
+  if (typeof node.type !== "string" || !ATOM_NODE_TYPES.has(node.type) || !isRecord(node.attrs)) return null;
+  const type = node.type;
+  const attrs = node.attrs;
+  const exact = path ? nodeAtPath(doc, path) : null;
+  if (exact && matchesAtom(exact.node, type, attrs)) {
+    return { from: exact.position, to: exact.position + exact.node.nodeSize };
+  }
+  const index = path?.[0] === "content" ? path[1] : undefined;
+  let blockStart = 0;
+  let blockEnd = doc.content.size;
+  if (typeof index === "number" && index < doc.childCount) {
+    for (let child = 0; child < index; child += 1) blockStart += doc.child(child).nodeSize;
+    blockEnd = blockStart + doc.child(index).nodeSize;
+  }
+  let range: { from: number; to: number } | null = null;
+  doc.descendants((child, position) => {
+    if (range) return false;
+    if (position < blockStart || position >= blockEnd) return true;
+    if (!matchesAtom(child, type, attrs)) return true;
+    range = { from: position, to: position + child.nodeSize };
+    return false;
+  });
+  return range;
+}
+
+function markAtomInsertion(
+  decorations: Decoration[],
+  doc: ProseMirrorNode,
+  node: unknown,
+  revision: Revision,
+  colorClass: string,
+  path: Path | null,
+): void {
+  if (!isRecord(node)) return;
+  const range = findAtomRange(doc, node, path);
+  if (!range) return;
+  decorations.push(
+    Decoration.inline(range.from, range.to, {
+      class: `sentence-revision-insertion ${colorClass}`,
+      "data-revision-id": revision.id,
+      title: `Inserted by ${revision.author || "Author"}`,
+    }),
+  );
+}
+
 // An inserted empty block carries no text for the inline insertion mark to
 // anchor to, yet the reviewer still needs to see the new paragraph break.
 function markBlockInsertion(
@@ -203,6 +288,7 @@ export const RevisionMarks = Extension.create({
                   if (text) {
                     markInsertion(decorations, state.doc, text, revision, colorClass, change.path);
                   } else {
+                    markAtomInsertion(decorations, state.doc, change.after, revision, colorClass, change.path);
                     markBlockInsertion(decorations, state.doc, change.after, revision, colorClass, change.path);
                   }
                 } else if (change.after === undefined) {
