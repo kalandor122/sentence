@@ -153,6 +153,18 @@ function findAtomRange(doc: ProseMirrorNode, node: Record<string, unknown>, path
   return range;
 }
 
+function atomDecoration(
+  range: { from: number; to: number },
+  revision: Revision,
+  colorClass: string,
+): Decoration {
+  return Decoration.inline(range.from, range.to, {
+    class: `sentence-revision-insertion ${colorClass}`,
+    "data-revision-id": revision.id,
+    title: `Inserted by ${revision.author || "Author"}`,
+  });
+}
+
 function markAtomInsertion(
   decorations: Decoration[],
   doc: ProseMirrorNode,
@@ -163,14 +175,26 @@ function markAtomInsertion(
 ): void {
   if (!isRecord(node)) return;
   const range = findAtomRange(doc, node, path);
-  if (!range) return;
-  decorations.push(
-    Decoration.inline(range.from, range.to, {
-      class: `sentence-revision-insertion ${colorClass}`,
-      "data-revision-id": revision.id,
-      title: `Inserted by ${revision.author || "Author"}`,
-    }),
-  );
+  if (range) {
+    decorations.push(atomDecoration(range, revision, colorClass));
+    return;
+  }
+  // A block inserted as a whole (a new paragraph holding only an equation, or a
+  // paragraph typed around a new citation) is not an atom itself, but every
+  // atom inside it arrived with it, so mark each one.
+  if (!Array.isArray(node.content)) return;
+  const container = path ? nodeAtPath(doc, path) : null;
+  if (!container) return;
+  const end = container.position + container.node.nodeSize;
+  doc.descendants((child, position) => {
+    if (position < container.position) return true;
+    if (position >= end) return false;
+    if (ATOM_NODE_TYPES.has(child.type.name)) {
+      decorations.push(atomDecoration({ from: position, to: position + child.nodeSize }, revision, colorClass));
+      return false;
+    }
+    return true;
+  });
 }
 
 // An inserted empty block carries no text for the inline insertion mark to
@@ -297,8 +321,10 @@ export const RevisionMarks = Extension.create({
                   const text = nodeText(change.after);
                   if (text) {
                     markInsertion(decorations, state.doc, text, revision, colorClass, change.path);
-                  } else {
-                    markAtomInsertion(decorations, state.doc, change.after, revision, colorClass, change.path);
+                  }
+                  // A new block may also carry atoms, with or without text.
+                  markAtomInsertion(decorations, state.doc, change.after, revision, colorClass, change.path);
+                  if (!text) {
                     markBlockInsertion(decorations, state.doc, change.after, revision, colorClass, change.path);
                   }
                 } else if (change.after === undefined) {

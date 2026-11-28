@@ -159,6 +159,56 @@ describe("tracked change decorations", () => {
     editor.destroy();
   });
 
+  it("marks an equation inserted inside a new paragraph as an insertion", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "Keep this" }] }],
+    };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        ...(before.content ?? []),
+        { type: "paragraph", content: [{ type: "mathInline", attrs: { latex: "z^3" } }] },
+      ],
+    };
+    const editor = new Editor({ extensions: [StarterKit, MathInline, RevisionMarks], content: after });
+    setRevisionMarks(editor, [revision(before, after)]);
+
+    const [, second] = paragraphs(editor);
+    const marks = second.querySelectorAll(".sentence-revision-insertion");
+    expect(marks).toHaveLength(1);
+    expect(marks[0].getAttribute("data-revision-id")).toBe("r1");
+    editor.destroy();
+  });
+
+  it("marks a citation typed together with a new paragraph as an insertion", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "Keep this" }] }],
+    };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        ...(before.content ?? []),
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "See " },
+            { type: "citation", attrs: { key: "sentence2026" } },
+          ],
+        },
+      ],
+    };
+    const editor = new Editor({ extensions: [StarterKit, Citation, RevisionMarks], content: after });
+    setRevisionMarks(editor, [revision(before, after)]);
+
+    const [, second] = paragraphs(editor);
+    const marks = second.querySelectorAll(".sentence-revision-insertion");
+    expect(marks).toHaveLength(1);
+    expect(marks[0].textContent).toBe("[sentence2026]");
+    editor.destroy();
+  });
+
   it("marks an inserted empty paragraph with a paragraph symbol", () => {
     const before: SentenceDocument = {
       type: "doc",
