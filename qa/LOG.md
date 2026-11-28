@@ -1175,3 +1175,7 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T04:44:07Z DONE qa-364 (tsc -b, npm test, smoke all green)
 2026-11-28T04:44:47Z IMPORTED 1 tester findings into the backlog
 2026-11-28T04:44:47Z START qa-365 on qa/qa-365-tracked-insertions-of-a-citation-or-an-e: Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the 
+2026-11-28T04:53:45Z PUSHED main
+2026-11-28T04:53:45Z DONE qa-365 (tsc -b, npm test, smoke all green)
+2026-11-28T05:12:10Z EXPLORE insert-media: 4 new items, agent exit 0
+2026-11-28T05:12:29Z IMPORTED 1 tester findings into the backlog

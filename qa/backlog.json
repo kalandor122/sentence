@@ -5798,10 +5798,11 @@
       ],
       "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
       "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T04:44:47Z",
-      "lastAttemptAt": "2026-11-28T04:44:47Z"
+      "lastAttemptAt": "2026-11-28T04:44:47Z",
+      "doneAt": "2026-11-28T04:53:43Z"
     },
     {
       "id": "qa-366",
@@ -6493,6 +6494,68 @@
     },
     {
       "id": "qa-423",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-424",
+      "title": "Inserting an image with the caret inside a verbatim block truncates the code and moves the rest of it into prose",
+      "why": "Exploratory pass on insert-media (functional): expected The code block keeps both lines and its monospace/verbatim form, and the picture is inserted as a block before or after the code (as it already is when the caret is at the start of the block, which produces a figure before the verbatim block), or the Image command is disabled inside a code block.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the demo project. View > LaTeX, append the following before \\end{document}: '\\begin{verbatim}\\nCODE LINE ONE\\nCODE LINE TWO\\n\\end{verbatim}\\n\\nAFTER CODE', then click Apply source and View > Visual. Click the code text, press Home, then ArrowRight four times so the caret is after 'CODE'. Insert > Image and choose any PNG. The PRE block now contains only 'CODE'; a new normal paragraph ' LINE ONE CODE LINE TWO' (containing one inline 120x60 img plus one 0x0 img) appears between the code block and 'AFTER CODE'. View > LaTeX shows '\\begin{verbatim}\\nCODE\\n\\end{verbatim}' followed by '\\includegraphics[width=\\linewidth,height=1.5em,keepaspectratio]{assets/images/code-probe.png}% Sentence alt: code probe.png\\n LINE ONE\\nCODE LINE TWO'. No toast, no console error. Probe qa/probes/insert-media.mjs scenario 'image-in-code-block'.\nActual: The inline image insertion splits the text-only code block: the verbatim body is cut at the caret ('CODE'), the remainder ' LINE ONE CODE LINE TWO' is re-exported and displayed as ordinary prose outside \\begin{verbatim}, and the image is spliced into that prose. The visible defect is a silent, immediate loss of the formatting and position of most of the code block.",
+      "source": "explore:insert-media:inserting an image with the caret inside a verbatim block truncates the code and moves the rest of it into prose",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T05:12:29Z"
+    },
+    {
+      "id": "qa-425",
+      "title": "An image that fits the page in a two-column document is exported at its natural width and runs across both columns and o",
+      "why": "Exploratory pass on insert-media (visual): expected An image displayed inside the text block is exported at a width that fits the column it is placed in (for example width=\\linewidth in twocolumn), so the compiled PDF matches the visual page and stays inside the right margin.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the demo project and set Layout > Columns to Two. Press Ctrl+End, click Insert > Image and choose a 500x100 PNG. The page still shows one 600 px column and draws the picture 502x102 px inside it. View > LaTeX contains '\\documentclass[11pt,a4paper,twocolumn]{article}' and '\\includegraphics[width=375.00bp]{assets/images/column-probe.png}'. Compile that source with the bundled engine (src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu --untrusted main.tex, with the asset at assets/images/column-probe.png): the log reports 'Overfull \\hbox (154.9223pt too wide) in paragraph at lines 62--63' and the rendered page shows the red picture starting in the left column, crossing the column gap and the right column, and ending at the page edge. Probe qa/probes/insert-media.mjs scenario 'image-two-columns'.\nActual: imageOptions compares the 500 px natural width with the single-column text width (602 px) and writes the image at 375 bp; a twocolumn article's \\columnwidth is about 221 pt, so the graphic is 155 pt too wide, overlaps the second column and is clipped by the page edge. The visual page never shows the two-column layout, so the mismatch is invisible before compiling.",
+      "source": "explore:insert-media:an image that fits the page in a two-column document is exported at its natural width and runs across both columns and o",
+      "status": "open"
+    },
+    {
+      "id": "qa-426",
+      "title": "An image inserted at the end of a blockquote or list item is destroyed by Apply source: the figure becomes accent-mangle",
+      "why": "Exploratory pass on insert-media (functional): expected A block image at the end of a quote or list item either survives Apply source as a figure with its caption, or is inserted after the quote/list rather than inside it (the behavior page breaks and contents already have), so the visual document and the re-exported LaTeX keep the picture and the caption.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the demo project, click the blockquote text ('Clarity arrives when the mechanics disappear...'), press End, then Insert > Image and choose a PNG. Click the image, type 'Quoted caption' in Figure caption and press Tab. View > LaTeX shows the figure inside the quote ('\\begin{quote} ... \\begin{figure}[htbp] ... \\caption{Quoted caption} \\end{figure} \\end{quote}'). Go back to Visual, then to LaTeX and click Apply source (a space plus Backspace enables it). In Visual the quote now has one paragraph and no figure: its text is 'Clarity arrives when the mechanics disappear and only the thought remains. e\u0331gin{figure}[htbp] \u0229ntering a\u0327ption{Quoted caption} \\end{figure}', with the image demoted to an inline img. Type one character in the quote and View > LaTeX: the corrupted text is exported as '\\\\e\u0331gin\\{figure\\}[htbp]' and '\\textbackslash{}end\\{figure\\}'. The same happens with a figure at the end of a list item: the item becomes '... \\texttt{meaning = structure + language}. e\u0331gin{figure}[htbp] \u0229ntering \\end{figure}' with 0 figures. Probe scenarios 'quote-image-roundtrip' and 'list-image-roundtrip' in qa/probes/insert-media.mjs.\nActual: The exported source is valid before the sync, but the importer parses the figure markup inside the quote/list as inline text: \\b, \\c and \\c are read as accent commands ('e\u0331gin', '\u0229ntering', 'a\u0327ption'), the figure node disappears, the image becomes an inline image, and the caption turns into literal punctuation text. The corrupted text is then re-exported as escaped prose (backslashes written as \\textbackslash{}).",
+      "source": "explore:insert-media:an image inserted at the end of a blockquote or list item is destroyed by apply source: the figure becomes accent-mangle",
+      "status": "open"
+    },
+    {
+      "id": "qa-427",
+      "title": "A page break left as the last block shows a second blank page and '2 pages' while the exported PDF has one page",
+      "why": "Exploratory pass on insert-media (content): expected The page count reflects what the exported document produces: either the trailing break does not add a blank page to the visual sheet/status bar, or the export emits something that really produces the blank page the editor shows.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the demo project, press Ctrl+End and click Insert > Page break. Do not type after it. The editor shows two page sheets (sheetHeight 2246 px for two 1123 px pages) and the status bar reads '92 words 2 pages'; page two contains only two empty paragraphs. View > LaTeX ends with '... language}.\\n\\n\\newpage\\n\\n\\n\\n\\end{document}'. Compile that exact source with the bundled Tectonic engine: pdfinfo reports Pages: 1, because \\newpage followed by \\end{document} ships no second page. Probe qa/probes/insert-media.mjs scenario 'page-break-at-end'.\nActual: The visual sheet and the status bar count 2 pages, but the compiled PDF is 1 page; the second page the user sees (and the '2 pages' count) never reaches the output.",
+      "source": "explore:insert-media:a page break left as the last block shows a second blank page and '2 pages' while the exported pdf has one page",
+      "status": "open"
+    },
+    {
+      "id": "qa-428",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
