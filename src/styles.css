@@ -1674,6 +1674,16 @@ button:disabled {
   border-radius: 2px;
 }
 
+/* An atom's node view draws its own surface over the decoration wrapper, which
+   would hide the insertion wash. Carry the reviewer's colour through so an
+   inserted equation is as visible as an inserted citation. */
+.sentence-revision-insertion .math-inline,
+.sentence-revision-insertion .math-block {
+  color: var(--revision-color, #356f8c);
+  background: var(--revision-wash, #e6f1f6);
+  border-color: var(--revision-color, #356f8c);
+}
+
 /* Decoration widget for an inserted empty paragraph: the paragraph symbol is
    review-only, so keep it inert for clicks and text selection. */
 .sentence-revision-paragraph {
