@@ -5782,10 +5782,11 @@
       ],
       "hint": "Repro: 1. Open a new document, put the caret at the end, press Enter and type 'BASE' with tracking off. 2. Review tab > Track changes, then type 'AAA' at the end and wait about 2.5 s so History shows one tracked change. 3. Type 'BBB' at the same position and immediately (inside the roughly 1.8 s revision debounce) click Reject on the AAA card. 4. Wait 2.5 s, then type 'CCC' at the end and wait for History to settle.\nActual: The document becomes 'BASEBBB' but History shows 0 tracked changes, so BBB is no longer reviewable. The next tracked edit 'CCC' produces one card whose before preview already contains 'BASEBBB' and whose after preview is 'BASEBBBCCC', proving BBB was absorbed into the revision baseline without ever appearing in History.",
       "source": "explore:review:rejecting a tracked change while a newer tracked edit is still uncommitted silently folds that edit into the review base",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T04:35:36Z",
-      "lastAttemptAt": "2026-11-28T04:35:36Z"
+      "lastAttemptAt": "2026-11-28T04:35:36Z",
+      "doneAt": "2026-11-28T04:44:06Z"
     },
     {
       "id": "qa-365",
@@ -5797,7 +5798,9 @@
       ],
       "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
       "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T04:44:47Z"
     },
     {
       "id": "qa-366",
@@ -6477,6 +6480,18 @@
     },
     {
       "id": "qa-422",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-423",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
