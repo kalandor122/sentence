@@ -6358,10 +6358,11 @@
       ],
       "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
       "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T13:30:43Z",
-      "lastAttemptAt": "2026-11-28T13:30:43Z"
+      "lastAttemptAt": "2026-11-28T13:30:43Z",
+      "doneAt": "2026-11-28T13:42:58Z"
     },
     {
       "id": "qa-402",
@@ -6373,7 +6374,9 @@
       ],
       "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
       "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T13:57:09Z"
     },
     {
       "id": "qa-403",
@@ -7329,6 +7332,78 @@
       ],
       "hint": "Repro: 1. Open a project. 2. Open the Review tab. 3. Click Track changes and read the toast.\nActual: The toast reads 'Tracked changes is on.'",
       "source": "explore:review:the tracking toggle toast says 'tracked changes is on.' instead of 'track changes is on.'",
+      "status": "open"
+    },
+    {
+      "id": "qa-481",
+      "title": "A visual edit silently regenerates the source pane and drops hand-written table formatting, short captions and comments",
+      "why": "Exploratory pass on source-editor (content): expected The regenerated source keeps the hand-written table column specification, the optional short caption and the comment, or warns that the visual model cannot represent them.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In the editor click Source in the status bar, place the caret before \\end{document} and insert: '\\section{Probe Hand Section}', a paragraph line, a table with '\\begin{tabular}{|p{2cm}|r|}', a row 'ZXFMTNAME & 9 \\\\', '\\caption[ZXFMTSHORT]{ZXFMTLONG}', '\\label{tab:probe-hand}' and '\\end{table}', plus a line '% ZXHANDCOMMENT keep this note'. Click Apply source (toast 'Visual document synchronized from LaTeX.'), click Visual, click at the end of the page and type ' Visual edit after the hand-written source.', then click Source.\nActual: The pane is rewritten without notice: \\begin{tabular}{|p{2cm}|r|} becomes \\begin{tabular}{lr}, \\caption[ZXFMTSHORT]{ZXFMTLONG} becomes \\caption{ZXFMTLONG}, and the '% ZXHANDCOMMENT' line disappears. Only the visual edit text, the long caption and the table cells survive; no warning toast or banner is shown.",
+      "source": "explore:source-editor:a visual edit silently regenerates the source pane and drops hand-written table formatting, short captions and comments",
+      "status": "open"
+    },
+    {
+      "id": "qa-482",
+      "title": "A link containing formatted text is split into several duplicate \\href commands on the round trip",
+      "why": "Exploratory pass on source-editor (content): expected The link stays one \\href command whose second argument contains the emphasis, as it does for plain link text ('\\href{...}{Plain text}' stays a single command).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In Source mode insert 'Link probe: \\href{https://example.com/a_b}{Example \\emph{site}}.' before \\end{document}, click Apply source, then click Refresh from visual.\nActual: The link is duplicated into two consecutive commands with the same URL: '\\href{https://example.com/a\\_b}{Example }\\href{https://example.com/a\\_b}{\\textit{site}}'. With \\textbf link text the same probe produced three consecutive \\href commands.",
+      "source": "explore:source-editor:a link containing formatted text is split into several duplicate \\href commands on the round trip",
+      "status": "open"
+    },
+    {
+      "id": "qa-483",
+      "title": "Grouping braces inside a text command are rendered and exported as literal braces",
+      "why": "Exploratory pass on source-editor (content): expected The braces are LaTeX grouping only: the page shows 'bold inner run' and the source keeps '\\textbf{bold {inner} run}' (or flattens it to '\\textbf{bold inner run}').",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In Source mode insert 'Nested probe: \\textbf{bold {inner} run} end.' before \\end{document}, click Apply source, read the Visual page, then click Refresh from visual and read the LaTeX.\nActual: The page shows 'bold {inner} run' (the <strong> run contains literal '{inner}') and Refresh rewrites it as '\\textbf{bold \\{inner\\} run}', which prints literal braces in the compiled PDF.",
+      "source": "explore:source-editor:grouping braces inside a text command are rendered and exported as literal braces",
+      "status": "open"
+    },
+    {
+      "id": "qa-484",
+      "title": "\u2018Refresh from visual\u2019 leaves focus on the button, so typing immediately after is silently lost",
+      "why": "Exploratory pass on source-editor (ux): expected The source editor keeps or regains focus and the keystrokes land in the LaTeX, as they do after Apply source.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In Source mode add any line so Apply source is enabled, click 'Refresh from visual', then type 'typed-right-after-refresh' without clicking into the textarea first.\nActual: document.activeElement remains the 'Refresh from visual' button and the textarea value is unchanged, so the typed text is dropped.",
+      "source": "explore:source-editor:\u2018refresh from visual\u2019 leaves focus on the button, so typing immediately after is silently lost",
+      "status": "open"
+    },
+    {
+      "id": "qa-485",
+      "title": "The parse-error toast stays on screen after the corrected source has saved successfully",
+      "why": "Exploratory pass on source-editor (ux): expected The error notice clears as soon as the corrected draft parses and saves.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In Source mode insert '\\section{Probe Unclosed Error' before \\end{document} and click Apply source (toast: 'Invalid LaTeX: missing closing brace.'). Change the line to '\\section{Probe Repaired Error}' and wait about 1.8 s for the autosave.\nActual: The Retry-save control disappears and Apply source disables (the Visual page shows 'Probe Repaired Error'), but the toast still reads 'Invalid LaTeX: missing closing brace.' until its 4 s timeout, including after switching to Visual.",
+      "source": "explore:source-editor:the parse-error toast stays on screen after the corrected source has saved successfully",
+      "status": "open"
+    },
+    {
+      "id": "qa-486",
+      "title": "LaTeX parse errors name no line and the reason disappears with the toast, leaving only a tooltip",
+      "why": "Exploratory pass on source-editor (ux): expected The error points at the failing line (for example 'line 58') and remains readable beside the source until the draft is fixed.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In Source mode insert '\\section{Probe Unclosed Error' before \\end{document} and click Apply source; read the toast and the line gutter, then wait about 5 s and inspect the page.\nActual: The toast says only 'Invalid LaTeX: missing closing brace.' and no gutter line is highlighted (0 elements with the active class). After about 5 s no body text mentions the error; only a 'Retry save' button is left, with the reason available only in its title/aria-label.",
+      "source": "explore:source-editor:latex parse errors name no line and the reason disappears with the toast, leaving only a tooltip",
       "status": "open"
     }
   ]
