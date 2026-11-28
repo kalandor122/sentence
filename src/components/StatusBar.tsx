@@ -1,4 +1,5 @@
 import { Check, Code2, Columns2, Minus, Monitor, Plus } from "lucide-react";
+import type { Dispatch, SetStateAction } from "react";
 import type { EditorMode } from "../lib/types";
 
 interface StatusBarProps {
@@ -9,7 +10,7 @@ interface StatusBarProps {
   tracking: boolean;
   zoom: number;
   compileState: "idle" | "compiling" | "success" | "error";
-  onZoomChange: (zoom: number) => void;
+  onZoomChange: Dispatch<SetStateAction<number>>;
   onModeChange: (mode: EditorMode) => void;
 }
 
@@ -66,7 +67,7 @@ export default function StatusBar({
         <button
           type="button"
           onMouseDown={(event) => event.preventDefault()}
-          onClick={() => onZoomChange(Math.max(70, zoom - 10))}
+          onClick={() => onZoomChange((current) => Math.max(70, current - 10))}
           aria-label="Zoom out"
           title="Zoom out (Ctrl+-)"
         >
@@ -76,7 +77,7 @@ export default function StatusBar({
         <button
           type="button"
           onMouseDown={(event) => event.preventDefault()}
-          onClick={() => onZoomChange(Math.min(150, zoom + 10))}
+          onClick={() => onZoomChange((current) => Math.min(150, current + 10))}
           aria-label="Zoom in"
           title="Zoom in (Ctrl+=)"
         >

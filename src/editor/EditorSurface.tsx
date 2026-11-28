@@ -6,7 +6,15 @@ import Superscript from "@tiptap/extension-superscript";
 import { TableKit } from "@tiptap/extension-table";
 import TextAlign from "@tiptap/extension-text-align";
 import { NodeSelection, Selection, TextSelection } from "@tiptap/pm/state";
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import {
   Citation,
   CommentMark,
@@ -71,7 +79,7 @@ interface EditorSurfaceProps {
   revisions: Revision[];
   editable?: boolean;
   zoom: number;
-  onZoomChange: (zoom: number) => void;
+  onZoomChange: Dispatch<SetStateAction<number>>;
   // undoneComments carries the comment marks an undo removed from the
   // document, so their threads can go with the highlight.
   onUpdate: (document: SentenceDocument, undoneComments?: string[]) => void;
@@ -402,10 +410,6 @@ export default function EditorSurface({
     scrollLeftRef.current = scrollRef.current.scrollLeft;
   }
   const previousZoomRef = useRef(zoom);
-  // The wheel listener below reads the live zoom from a ref so a burst of
-  // gesture events never stacks against a stale render value.
-  const zoomRef = useRef(zoom);
-  zoomRef.current = zoom;
   const fitScaleRef = useRef<number | null>(null);
   const [pageCount, setPageCount] = useState(1);
   const geometry = pageGeometry(settings);
@@ -610,7 +614,9 @@ export default function EditorSurface({
       if (now - lastStep < 120) return;
       lastStep = now;
       const step = event.deltaY < 0 ? 10 : -10;
-      onZoomChange(Math.max(70, Math.min(150, zoomRef.current + step)));
+      // Step from the latest state so a burst of wheel events cannot stack
+      // against the zoom value of an older render.
+      onZoomChange((current) => Math.max(70, Math.min(150, current + step)));
     };
     scroller.addEventListener("wheel", onWheel, { passive: false });
     return () => scroller.removeEventListener("wheel", onWheel);
