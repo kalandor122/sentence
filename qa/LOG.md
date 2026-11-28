@@ -1088,3 +1088,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T00:53:01Z DONE qa-340 (tsc -b, npm test, smoke all green)
 2026-11-28T00:53:40Z IMPORTED 2 tester findings into the backlog
 2026-11-28T00:53:40Z START qa-342 on qa/qa-342-a-bare-percent-sign-in-inline-math-is-ac: A bare percent sign in inline math is accepted, but the exported formula never closes because % comments out the delimit
+2026-11-28T00:55:56Z PUSHED main
+2026-11-28T00:55:56Z DONE qa-342 (tsc -b, npm test, smoke all green)
+2026-11-28T00:56:35Z IMPORTED 2 tester findings into the backlog
