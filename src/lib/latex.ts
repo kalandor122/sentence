@@ -152,6 +152,22 @@ function nodesContainMathColor(nodes: DocumentNode[] | undefined): boolean {
   });
 }
 
+// A \footnote inside a tabular is typeset inside a box, so LaTeX discards the
+// note text and prints only the marker. The footnote package's saved-note
+// environment carries those notes out of the table to the page bottom.
+function nodesContainFootnote(nodes: DocumentNode[] | undefined): boolean {
+  return (nodes ?? []).some(
+    (node) => node.type === "footnote" || nodesContainFootnote(node.content),
+  );
+}
+
+function nodesContainTableFootnote(nodes: DocumentNode[] | undefined): boolean {
+  return (nodes ?? []).some((node) => {
+    if (node.type === "table") return nodesContainFootnote(node.content);
+    return nodesContainTableFootnote(node.content);
+  });
+}
+
 // \captionof comes from the caption package, so only a picture captioned
 // inside a table cell makes the export load it.
 function hasCaptionedImageInCell(nodes: DocumentNode[] | undefined): boolean {
@@ -849,6 +865,7 @@ export function documentToLatex(
     containsMark(content, "highlight") ||
     nodesContainMathColor(content);
   const usesCaptionOf = hasCaptionedImageInCell(content);
+  const usesTableFootnotes = nodesContainTableFootnote(content);
   const preamble = settings.preamble.trim();
   return `${arxivComments ? `% Prepared for arXiv\n${arxivComments}\n` : ""}\\documentclass[${settings.fontSize},${settings.paperSize}${settings.columns === "two" ? ",twocolumn" : ""}]{${settings.documentClass}}
 ${typography}
@@ -858,7 +875,7 @@ ${usesCaptionOf ? "\\usepackage{caption}\n" : ""}\\usepackage{booktabs}
 \\usepackage{ulem}
 \\usepackage{microtype}
 ${usesColor ? "\\usepackage{xcolor}\n" : ""}\\usepackage[hidelinks]{hyperref}
-\\usepackage{fancyhdr}
+${usesTableFootnotes ? "\\usepackage{footnote}\n\\makesavenoteenv{table}\n" : ""}\\usepackage{fancyhdr}
 \\usepackage[${marginGeometry(settings)}]{geometry}
 \\providecommand{\\keywords}[1]{\\par\\noindent\\textbf{Keywords:} #1\\par}
 ${settings.lineNumbers ? "\\usepackage{lineno}\\linenumbers" : ""}
