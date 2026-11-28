@@ -50,7 +50,7 @@ import {
   type BibliographyDraft,
   type BibliographyEntry,
 } from "./lib/bibliography";
-import { commentAnchors, restoreCommentMarks } from "./lib/comments";
+import { commentAnchors, restoreCommentMarks, restoreThreadComments } from "./lib/comments";
 import {
   documentToHtml,
   documentToMarkdown,
@@ -1428,7 +1428,19 @@ export default function App() {
   const rejectTrackedChanges = (ids: string[]) => {
     const current = workspaceRef.current;
     if (!current || ids.length === 0) return;
-    const { document, revisions } = rejectRevisions(current.document, current.revisions, ids);
+    const { document: rejectedDocument, revisions } = rejectRevisions(current.document, current.revisions, ids);
+    // The rejected text comes back without the comment mark it used to carry.
+    // A thread that still exists should keep its highlight, so re-anchor it from
+    // the revision snapshots that remembered the text.
+    const snapshots = ids
+      .map((id) => current.revisions.find((revision) => revision.id === id))
+      .filter((revision) => revision !== undefined)
+      .flatMap((revision) => [revision.beforeDocument, revision.afterDocument]);
+    const document = restoreThreadComments(
+      rejectedDocument,
+      snapshots,
+      (current.comments ?? []).map((thread) => thread.markId),
+    );
     if (revisionTimer.current) window.clearTimeout(revisionTimer.current);
     const next: Workspace = { ...current, document, revisions };
     workspaceRef.current = next;

@@ -5767,8 +5767,9 @@
       "hint": "Repro: 1. Open a new document. 2. Select the leading phrase 'A sentence is not ' of the first body paragraph, click Review > New comment, enter 'PROBEREJECTCOMMENT' and submit. 3. On the Review tab click Track changes. 4. Select the same phrase again and press Backspace. 5. Wait about 2 s until the deleted phrase is struck through and History shows one tracked change. 6. Open History and click Reject on that change. 7. Inspect the Review panel and the paragraph, then reload the page.\nActual: The phrase is restored but the comment stays in the detached state with the note 'The text this comment was attached to was deleted, so it has no highlight in the document.' There is no highlight on the restored phrase, the thread is still detached after a reload, and there is no UI to reattach it. The warning is false because the text exists again.",
       "source": "explore:review:rejecting a tracked deletion of commented text permanently drops the comment highlight and leaves a false 'text was dele",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T04:31:12Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T04:31:12Z",
+      "lastAttemptAt": "2026-11-28T04:31:12Z"
     },
     {
       "id": "qa-364",

@@ -99,6 +99,29 @@ export function commentAnchors(document: SentenceDocument): CommentAnchor[] {
   }));
 }
 
+// Rejecting a tracked deletion puts the text back, but the comment mark it
+// carried was dropped with the text. The thread can still exist, so find its
+// old anchor in the revision snapshots and highlight the restored words again.
+export function restoreThreadComments(
+  document: SentenceDocument,
+  snapshots: Array<SentenceDocument | undefined>,
+  markIds: Iterable<string>,
+): SentenceDocument {
+  const present = new Set(commentAnchors(document).map((anchor) => anchor.markId));
+  const missing = new Set([...markIds].filter((markId) => !present.has(markId)));
+  if (missing.size === 0) return document;
+  const anchors: CommentAnchor[] = [];
+  for (const snapshot of snapshots) {
+    if (!snapshot) continue;
+    for (const anchor of commentAnchors(snapshot)) {
+      if (!missing.has(anchor.markId)) continue;
+      if (anchors.some((found) => found.markId === anchor.markId)) continue;
+      anchors.push(anchor);
+    }
+  }
+  return anchors.length > 0 ? restoreCommentMarks(document, anchors).document : document;
+}
+
 export function restoreCommentMarks(
   document: SentenceDocument,
   anchors: CommentAnchor[],

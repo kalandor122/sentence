@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { commentAnchors, restoreCommentMarks } from "./comments";
+import { commentAnchors, restoreCommentMarks, restoreThreadComments } from "./comments";
 import type { DocumentNode, SentenceDocument } from "./types";
 
 const comment = (markId: string) => ({ type: "comment", attrs: { markId } });
@@ -159,5 +159,37 @@ describe("restoreCommentMarks", () => {
     expect(restored.detached).toEqual([]);
     const [first] = restored.document.content;
     expect(commentMarks(first.content?.[0] ?? first)).toEqual(["c1"]);
+  });
+});
+
+describe("restoreThreadComments", () => {
+  it("re-anchors a live thread after a rejected deletion restored its text", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [paragraph({ type: "text", text: "Removed passage", marks: [comment("c1")] })],
+    };
+    const restored: SentenceDocument = {
+      type: "doc",
+      content: [paragraph({ type: "text", text: "Removed passage still here" })],
+    };
+
+    const document = restoreThreadComments(restored, [before], ["c1"]);
+
+    const node = document.content[0].content?.[0] ?? document.content[0];
+    expect(commentMarks(node)).toEqual(["c1"]);
+    expect(commentAnchors(document)).toEqual([{ markId: "c1", text: "Removed passage", offset: 0 }]);
+  });
+
+  it("does not bring back a comment whose thread was deleted", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [paragraph({ type: "text", text: "Removed passage", marks: [comment("c1")] })],
+    };
+    const restored: SentenceDocument = {
+      type: "doc",
+      content: [paragraph({ type: "text", text: "Removed passage still here" })],
+    };
+
+    expect(restoreThreadComments(restored, [before], [])).toEqual(restored);
   });
 });
