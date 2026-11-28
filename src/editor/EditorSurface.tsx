@@ -333,11 +333,36 @@ function lastBlockDocumentBox(
   };
 }
 
+// The stage is what gives the scroller its scroll range, and it reserves the
+// sheet from the zoom custom property the scroller passes down. If that
+// reservation is ever behind the transformed sheet (a page count that landed
+// late, a zoom that did not reach the stage), the range no longer ends at the
+// scaled bottom: zooming out leaves blank scroll past the last page, wheeling
+// to the end can put the whole page above the viewport, and a page wider than
+// the pane cannot be scrolled to its left edge. Reserve at least the rendered
+// sheet here, in the same commit that moved it, so both axes always cover it.
+function reserveSheetInStage(scroller: HTMLElement): void {
+  const stage = scroller.querySelector<HTMLElement>(".paper-stage");
+  const sheet = scroller.querySelector<HTMLElement>(".paper-sheet");
+  if (!stage || !sheet) return;
+  const sheetBox = sheet.getBoundingClientRect();
+  if (sheetBox.width <= 0 || sheetBox.height <= 0) return;
+  const styles = getComputedStyle(scroller);
+  const paddingLeft = parseFloat(styles.paddingLeft) || 0;
+  const paddingRight = parseFloat(styles.paddingRight) || 0;
+  const available = scroller.clientWidth - paddingLeft - paddingRight;
+  // The sheet is centred in the stage, so a stage at least as wide as the sheet
+  // keeps both of its edges inside the scroll range.
+  stage.style.width = `${Math.max(available, sheetBox.width)}px`;
+  stage.style.height = `${sheetBox.height}px`;
+}
+
 // The stage reserves the sheet from --sentence-page-count, which pagination can
 // still update after the zoom correction has run. Pull the offsets back to the
 // rendered sheet whenever it changes, so a late page-count or layout update
 // cannot leave blank scroll past the last page.
 function clampScrollToSheet(scroller: HTMLElement): void {
+  reserveSheetInStage(scroller);
   const bounds = scroller.getBoundingClientRect();
   const sheetBox = scroller.querySelector<HTMLElement>(".paper-sheet")?.getBoundingClientRect();
   if (!sheetBox) return;
@@ -490,6 +515,7 @@ export default function EditorSurface({
       const scrollTop = scroller.scrollTop;
       const scrollLeft = scroller.scrollLeft;
       scroller.style.setProperty("--paper-fit-scale", String(scale));
+      reserveSheetInStage(scroller);
       const bounds = scroller.getBoundingClientRect();
       const sheet = scroller.querySelector<HTMLElement>(".paper-sheet");
       const sheetBox = sheet?.getBoundingClientRect();
@@ -541,6 +567,10 @@ export default function EditorSurface({
     const paddingTop = parseFloat(styles.paddingTop) || 0;
     const paddingRight = parseFloat(styles.paddingRight) || 0;
     const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+    // Reserve the sheet at the new scale before the corrections measure the
+    // range, so a zoomed-in page is fully scrollable and a zoomed-out one has no
+    // blank tail below it.
+    reserveSheetInStage(scroller);
     // Clamp against the rendered sheet rather than the size the stage reserved:
     // the page count can still be catching up with the layout, and a stale
     // reservation is what used to let the viewport scroll past the last page.
@@ -1153,6 +1183,12 @@ export default function EditorSurface({
         shift += fill;
       });
       snapToPages();
+      // Pagination changes how tall the sheet is, and the stage around it is
+      // what the scroller measures its range from. Reserve the page as it now
+      // renders so a page count that lands after a zoom correction cannot leave
+      // the range short of the sheet or extending past it.
+      const scrollHost = dom.closest<HTMLElement>(".visual-editor-scroll");
+      if (scrollHost) reserveSheetInStage(scrollHost);
       // The sheet's min-height is derived from the count, so measure the last
       // block rather than the editor box. Explicit breaks always claim a page.
       const lastBlock = dom.lastElementChild as HTMLElement | null;
