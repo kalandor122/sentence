@@ -313,6 +313,31 @@ function caretDocumentBox(
   };
 }
 
+// The stage reserves the sheet from --sentence-page-count, which pagination can
+// still update after the zoom correction has run. Pull the offsets back to the
+// rendered sheet whenever it changes, so a late page-count or layout update
+// cannot leave blank scroll past the last page.
+function clampScrollToSheet(scroller: HTMLElement): void {
+  const bounds = scroller.getBoundingClientRect();
+  const sheetBox = scroller.querySelector<HTMLElement>(".paper-sheet")?.getBoundingClientRect();
+  if (!sheetBox) return;
+  const styles = getComputedStyle(scroller);
+  const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+  const paddingRight = parseFloat(styles.paddingRight) || 0;
+  const maxScrollTop = sheetScrollMax(
+    sheetBox.bottom - bounds.top + scroller.scrollTop,
+    paddingBottom,
+    scroller.clientHeight,
+  );
+  const maxScrollLeft = sheetScrollMax(
+    sheetBox.right - bounds.left + scroller.scrollLeft,
+    paddingRight,
+    scroller.clientWidth,
+  );
+  if (scroller.scrollTop > maxScrollTop) scroller.scrollTop = maxScrollTop;
+  if (scroller.scrollLeft > maxScrollLeft) scroller.scrollLeft = maxScrollLeft;
+}
+
 // The document position at the start of a line, used to put a page gap before
 // the first character that belongs on the next page.
 function lineStartPosition(view: Editor["view"], line: TextLine): number | null {
@@ -567,34 +592,23 @@ export default function EditorSurface({
     scrollLeftRef.current = scroller.scrollLeft;
     // The scroller reserves the scaled sheet from --sentence-page-count, which
     // the pagination pass can still update after this commit. Check the range
-    // once the frame has laid out and pull the offsets back if the reserved
-    // stage was larger than the rendered sheet, so a late catch-up cannot leave
-    // blank scroll past the last page.
-    const frame = window.requestAnimationFrame(() => {
+    // once the frame has laid out and then keep watching the sheet until the
+    // next zoom: pagination can take more than one frame to settle, and a late
+    // catch-up must not leave blank scroll past the last page.
+    const clamp = () => {
       const live = scrollRef.current;
       if (!live) return;
-      const bounds = live.getBoundingClientRect();
-      const sheetBox = live.querySelector<HTMLElement>(".paper-sheet")?.getBoundingClientRect();
-      if (!sheetBox) return;
-      const liveStyles = getComputedStyle(live);
-      const bottomPadding = parseFloat(liveStyles.paddingBottom) || 0;
-      const rightPadding = parseFloat(liveStyles.paddingRight) || 0;
-      const liveMaxTop = sheetScrollMax(
-        sheetBox.bottom - bounds.top + live.scrollTop,
-        bottomPadding,
-        live.clientHeight,
-      );
-      const liveMaxLeft = sheetScrollMax(
-        sheetBox.right - bounds.left + live.scrollLeft,
-        rightPadding,
-        live.clientWidth,
-      );
-      if (live.scrollTop > liveMaxTop) live.scrollTop = liveMaxTop;
-      if (live.scrollLeft > liveMaxLeft) live.scrollLeft = liveMaxLeft;
+      clampScrollToSheet(live);
       scrollTopRef.current = live.scrollTop;
       scrollLeftRef.current = live.scrollLeft;
-    });
-    return () => window.cancelAnimationFrame(frame);
+    };
+    const frame = window.requestAnimationFrame(clamp);
+    const observer = new ResizeObserver(clamp);
+    if (sheet) observer.observe(sheet);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
   }, [zoom]);
 
   // Word's zoom gesture: Ctrl/Cmd+wheel over the page steps the zoom the same
