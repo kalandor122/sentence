@@ -1170,3 +1170,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T04:34:56Z PUSHED main
 2026-11-28T04:34:56Z DONE qa-363 (tsc -b, npm test, smoke all green)
 2026-11-28T04:35:36Z IMPORTED 1 tester findings into the backlog
+2026-11-28T04:35:36Z START qa-364 on qa/qa-364-rejecting-a-tracked-change-while-a-newer: Rejecting a tracked change while a newer tracked edit is still uncommitted silently folds that edit into the review base

@@ -434,6 +434,22 @@ describe("reviewing tracked changes", () => {
     expect(latex).not.toMatch(/revision|accepted|rejected|Ada/);
   });
 
+  it("keeps a newer uncommitted edit reviewable when an older revision is rejected", () => {
+    const base = doc("BASE");
+    const withOld = doc("BASEAAA");
+    const withNew = doc("BASEAAABBB");
+    // The app commits the edit typed after AAA as a pending revision before it
+    // rejects AAA, so the newer change is not absorbed into the baseline.
+    const revisions = [revision("new", withOld, withNew), revision("old", base, withOld)];
+    const { document, revisions: reviewed } = rejectRevisions(withNew, revisions, ["old"]);
+    expect(documentPlainText(document)).toBe("BASEBBB");
+    expect(reviewed[1].accepted).toBe(true);
+    expect(reviewed[0].accepted).toBe(false);
+    expect(reviewed[0].before).toBe("BASE");
+    expect(reviewed[0].after).toBe("BASEBBB");
+    expect(documentPlainText(rejectRevisions(document, reviewed, ["new"]).document)).toBe("BASE");
+  });
+
   it("accepts only the requested changes", () => {
     const before = doc("alpha");
     const after = doc("alpha beta");
