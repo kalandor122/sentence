@@ -1353,6 +1353,56 @@ describe("LaTeX generation", () => {
     }
   });
 
+  it("keeps empty rows in a one-column table through a source round trip", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\begin{tabular}{l}",
+      "\\hline",
+      "Head \\\\",
+      " \\\\",
+      " \\\\",
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(table?.content).toHaveLength(3);
+    expect(table?.content?.[0]?.content?.[0]?.type).toBe("tableHeader");
+    for (const row of table?.content ?? []) {
+      expect(row.content).toHaveLength(1);
+    }
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("Head \\\\\n \\\\\n \\\\");
+  });
+
+  it("imports a single empty cell as a 1x1 table instead of body text", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{table}[htbp]",
+      "\\centering",
+      "\\begin{tabular}{l}",
+      "\\hline",
+      " \\\\",
+      "\\hline",
+      "\\end{tabular}",
+      "\\end{table}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    expect(table?.content).toHaveLength(1);
+    expect(table?.content?.[0]?.content).toHaveLength(1);
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain("\\begin{tabular}{l}\n\\hline\n \\\\\n\\hline");
+    expect(exported).not.toContain("textbackslash");
+  });
+
   it("keeps a hand-written table label so its \\ref still resolves", () => {
     const source = [
       "\\begin{document}",

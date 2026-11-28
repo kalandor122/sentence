@@ -2494,11 +2494,12 @@ export function latexToDocument(
       const parts = tabularBody.split(/\\\\\s*(?:\[[^\]]*\])?\s*(?:\n|$)/);
       // LaTeX lets the last row end at \end{tabular} without a trailing row
       // break, so a single-row tabular with no \\ at all is still one row.
-      const rows = tabular
-        ? parts
-            .map((row) => row.replace(/^\s*\\hline\s*/, "").trim())
-            .filter(Boolean)
-        : [];
+      // Whatever follows the last row break is not a row, so dropping it keeps
+      // an exported trailing \\ from adding a phantom row. Empty rows between
+      // row breaks are table structure, though, and must survive: a one-column
+      // table keeps its blank body rows, and a 1x1 table keeps its empty cell.
+      if (parts.length > 0 && parts[parts.length - 1].trim() === "") parts.pop();
+      const rows = tabular ? parts.map((row) => row.trim()) : [];
       if (rows.length > 0) {
         const attrs: Record<string, string> = {};
         if (caption !== null) attrs.caption = decodeLatexText(caption);

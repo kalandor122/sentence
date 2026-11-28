@@ -6791,8 +6791,9 @@
       "hint": "Repro: New document. Insert tab > Insert table (3x3, header row). Click the first body cell, then Table toolbar > Delete column twice, leaving one column. Click the header cell and type Head. Open the source pane (status-bar Source), append a space to the source so Apply source enables, click Apply source, then Visual. For the 1x1 case: New document > Insert table, click the first body cell, Delete column twice and Delete row twice, leaving a single empty header cell; make the same trivial source edit, Apply source, then Visual.\nActual: The 3x1 table returns as 1x1: only the row containing Head survives, and both empty body rows are dropped. The 1x1 table disappears entirely (0 tables in the editor) and its LaTeX is inserted as paragraph text, rendered as 'egin{table}[htbp] entering egin{tabular}{l} \\hline \\hline \\end{tabular} \\end{table}' (the \\b and \\c sequences are decoded as accent macros); the status bar reports 7 words and the toast says 'Visual document synchronized from LaTeX.' The source pane still shows the original 3-row tabular, so source and visual disagree. Both cases reproduce from the trivial 'append a space + Apply source' edit, not only from a hand-written tabular. Evidence: qa/shots/probe-tables-narrow.png, probe scenarios narrowTableRoundTrip and trivialSourceEdit.",
       "source": "explore:tables:source round trip drops empty rows from one-column tables; a 1x1 empty table disappears and its latex becomes body text",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T08:15:07Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T08:15:07Z",
+      "lastAttemptAt": "2026-11-28T08:15:07Z"
     },
     {
       "id": "qa-444",
