@@ -527,6 +527,12 @@ export default function EditorSurface({
       fitScaleRef.current = scale;
       if (previous === null || previous === scale) {
         scroller.style.setProperty("--paper-fit-scale", String(scale));
+        // The pane can change width without changing the fit scale (opening the
+        // inspector, for example). The stage keeps the inline size reserved by
+        // the last zoom, so it has to follow the pane even on this path: a stage
+        // left at the old width holds a scroll range wider than the page and
+        // lets a page that fits the pane sit partly outside it.
+        reserveSheetInStage(scroller);
         return;
       }
       // Capture the offsets before the sheet is rescaled, then hold the
