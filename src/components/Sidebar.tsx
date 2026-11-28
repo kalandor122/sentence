@@ -22,7 +22,7 @@ import {
   type BibliographyEntry,
 } from "../lib/bibliography";
 import { commentAnchors } from "../lib/comments";
-import { pendingRevisions, revisionAuthorClass } from "../lib/revisions";
+import { pendingRevisions, revisionAuthorClass, revisionPreviewText } from "../lib/revisions";
 import type {
   CommentThread,
   DocumentNode,
@@ -261,7 +261,8 @@ function RevisionList({
         <p className="panel-empty">Edits made with Tracking on appear here for review.</p>
       )}
       {revisions.map((revision) => {
-        const preview = revisionPreview(revision.before, revision.after);
+        const { before, after } = revisionPreviewText(revision);
+        const preview = revisionPreview(before, after);
         return (
           <article className={`revision-card ${revisionAuthorClass(revision.author)}`} key={revision.id}>
             <header>

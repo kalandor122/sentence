@@ -380,6 +380,17 @@ export function revisionText(document: SentenceDocument): string {
   return (document.content ?? []).map(visit).join("").trim();
 }
 
+// History previews used to be stored without an atom's attribute content, so
+// an older revision can still carry identical before/after text even though its
+// snapshots show an inserted citation or equation. The snapshots are the source
+// of truth; rebuild the preview from them when they are available.
+export function revisionPreviewText(revision: Revision): { before: string; after: string } {
+  return {
+    before: revision.beforeDocument ? revisionText(revision.beforeDocument) : revision.before,
+    after: revision.afterDocument ? revisionText(revision.afterDocument) : revision.after,
+  };
+}
+
 export function documentChanges(before: SentenceDocument, after: SentenceDocument): Change[] {
   return changesBetween(before, after, []);
 }
