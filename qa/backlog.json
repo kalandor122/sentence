@@ -6006,10 +6006,11 @@
       ],
       "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
       "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T08:37:34Z",
-      "lastAttemptAt": "2026-11-28T08:37:34Z"
+      "lastAttemptAt": "2026-11-28T08:37:34Z",
+      "doneAt": "2026-11-28T08:46:01Z"
     },
     {
       "id": "qa-379",
@@ -6021,7 +6022,9 @@
       ],
       "hint": "Repro: Open the app, click Source in the status bar and place the caret inside the body (before \\end{document}). Type a line '% Autosave comment note' plus a new line 'Probe commented body line.', then wait ~2 s until Apply source disables (the autosave committed the draft). Click Visual, then Source. Press Ctrl+Z three times.\nActual: The pane is regenerated from the visual model: the comment disappears and all three Ctrl+Z presses leave the text unchanged (Apply source stays disabled, so the history was reset). The same edit is undone normally if Ctrl+Z is pressed before leaving the pane.",
       "source": "explore:source-editor:returning to source after an autosaved edit wipes the undo history and rewrites the pane",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T08:46:43Z"
     },
     {
       "id": "qa-380",
@@ -6857,6 +6860,18 @@
     },
     {
       "id": "qa-448",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-449",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
