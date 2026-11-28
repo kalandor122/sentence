@@ -4,6 +4,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
 import { documentPlainText } from "../lib/latex";
 import type { Revision, SentenceDocument } from "../lib/types";
+import { Citation, MathInline } from "./extensions";
 import { RevisionMarks, setRevisionMarks } from "./revisions";
 
 function twoParagraphs(first: string, second: string): SentenceDocument {
@@ -90,6 +91,52 @@ describe("tracked change decorations", () => {
 
     const [, second] = paragraphs(editor);
     expect(second.querySelector(".sentence-revision-deletion")?.textContent).toBe("Gone entirely");
+    editor.destroy();
+  });
+
+  it("marks an inserted citation as an insertion", () => {
+    const before = twoParagraphs("Keep this", "See");
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Keep this" }] },
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "See" },
+            { type: "citation", attrs: { key: "sentence2026" } },
+          ],
+        },
+      ],
+    };
+    const editor = new Editor({ extensions: [StarterKit, Citation, RevisionMarks], content: after });
+    setRevisionMarks(editor, [revision(before, after)]);
+
+    const [, second] = paragraphs(editor);
+    expect(second.querySelector(".sentence-revision-insertion")?.textContent).toBe("[sentence2026]");
+    editor.destroy();
+  });
+
+  it("marks an inserted equation as an insertion", () => {
+    const before = twoParagraphs("Keep this", "See");
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Keep this" }] },
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "See" },
+            { type: "mathInline", attrs: { latex: "x^2" } },
+          ],
+        },
+      ],
+    };
+    const editor = new Editor({ extensions: [StarterKit, MathInline, RevisionMarks], content: after });
+    setRevisionMarks(editor, [revision(before, after)]);
+
+    const [, second] = paragraphs(editor);
+    expect(second.querySelectorAll(".sentence-revision-insertion")).toHaveLength(1);
     editor.destroy();
   });
 
