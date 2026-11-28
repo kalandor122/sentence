@@ -256,6 +256,84 @@ describe("LaTeX generation", () => {
     );
   });
 
+  it("loads the footnote package for a footnote inside a table and round-trips it", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableHeader",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "Head" }] }],
+                },
+              ],
+            },
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [
+                        { type: "text", text: "Cell text" },
+                        { type: "footnote", attrs: { text: "Table UI note" } },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    // A footnote inside the float's tabular is otherwise typeset into a box
+    // LaTeX throws away, printing the marker with no note.
+    expect(latex).toContain("\\usepackage{footnote}");
+    expect(latex).toContain("\\makesavenoteenv{table}");
+    expect(latex).toContain("Cell text\\footnote{Table UI note}");
+
+    const parsed = latexToDocument(latex, settings).document;
+    const table = parsed.content[0];
+    expect(table?.type).toBe("table");
+    const note = table?.content?.[1]?.content?.[0]?.content?.[0]?.content?.find(
+      (node) => node.type === "footnote",
+    );
+    expect(note?.attrs?.text).toBe("Table UI note");
+  });
+
+  it("does not load the footnote package for tables without notes", () => {
+    const document: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [{ type: "paragraph", content: [{ type: "text", text: "Cell" }] }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const latex = documentToLatex(document, settings);
+    expect(latex).not.toContain("\\usepackage{footnote}");
+    expect(latex).not.toContain("\\makesavenoteenv");
+  });
+
   it("keeps the inline formatting of an imported footnote through a round trip", () => {
     const latex = [
       "\\documentclass{article}",

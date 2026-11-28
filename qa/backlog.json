@@ -7079,8 +7079,9 @@
       "hint": "Repro: Create a project and clear the demo body (Ctrl+A, Backspace, twice). Insert > Insert table. Click the first cell of the second row, type \"Cell text\", then Insert > Footnote, enter \"Table UI note\" and click Insert. View > LaTeX shows the footnote inside the tabular row. Save the exported document, compile it with `src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu -X compile <file>.tex --outdir <dir>`, and run `pdftotext <file>.pdf -`.\nActual: The PDF contains only \"Cell text1\" and an empty footnote line (\"1\"); the string \"Table UI note\" does not appear anywhere in the extracted PDF text. The footnote marker's link annotation is also empty (pdftohtml reports `<a href=\"\">`). The probe's list-item control, compiled the same way, prints \"List note\", so the loss is specific to the table cell.",
       "source": "explore:links-cites-footnotes:a footnote inserted in a table cell is silently dropped from the compiled pdf",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T10:54:30Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T10:54:30Z",
+      "lastAttemptAt": "2026-11-28T10:54:30Z"
     },
     {
       "id": "qa-464",
