@@ -1104,3 +1104,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T01:20:10Z DONE qa-346 (tsc -b, npm test, smoke all green)
 2026-11-28T01:48:29Z EXPLORE long-document: 4 new items, agent exit 0
 2026-11-28T01:48:48Z IMPORTED 1 tester findings into the backlog
+2026-11-28T01:48:48Z START qa-396 on qa/qa-396-page-count-line-wrapping-and-page-margin: Page count, line wrapping and page margins change when the window is resized, so a 13-page document reports 11 pages
