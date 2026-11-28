@@ -126,6 +126,50 @@ describe("tracked text comparison", () => {
     expect(revisionText(appended)).toBe("Only paragraph\n¶");
   });
 
+  it("identifies an inserted citation or equation in the review preview", () => {
+    const before = doc("See");
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "See " },
+            { type: "citation", attrs: { key: "sentence2026" } },
+            { type: "text", text: " and " },
+            { type: "mathInline", attrs: { latex: "x^2" } },
+          ],
+        },
+      ],
+    };
+    expect(trackedShape(before)).not.toBe(trackedShape(after));
+    expect(revisionText(before)).not.toBe(revisionText(after));
+    expect(revisionText(after)).toContain("[sentence2026]");
+    expect(revisionText(after)).toContain("x^2");
+  });
+
+  it("identifies other inserted atoms in the review preview", () => {
+    const before = doc("Body");
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "Body" },
+            { type: "image", attrs: { path: "assets/images/figure.png" } },
+            { type: "pageBreak" },
+            { type: "toc" },
+          ],
+        },
+      ],
+    };
+    expect(revisionText(before)).not.toBe(revisionText(after));
+    expect(revisionText(after)).toContain("assets/images/figure.png");
+    expect(revisionText(after)).toContain("[page break]");
+    expect(revisionText(after)).toContain("[table of contents]");
+  });
+
   it("treats a citation key or equation body edit as a tracked edit", () => {
     const before: SentenceDocument = {
       type: "doc",
