@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { latexHasBlankLine, latexHasError, renderLatex } from "./KatexMath";
+import { latexHasBlankLine, latexHasError, latexHasUnclosedComment, renderLatex } from "./KatexMath";
 
 describe("latexHasError", () => {
   it("flags commands KaTeX renders in its error colour", () => {
@@ -23,6 +23,17 @@ describe("latexHasError", () => {
     expect(latexHasBlankLine("a\r\n  \r\nb", "align")).toBe(true);
     expect(latexHasBlankLine("a\nb")).toBe(false);
     expect(latexHasBlankLine("\\frac{")).toBe(false);
+  });
+
+  it("flags an unescaped percent that would comment out the closing delimiter", () => {
+    expect(latexHasError("100%", false)).toBe(true);
+    expect(latexHasError("100\\%", false)).toBe(false);
+    expect(latexHasError("a % note\nb", false)).toBe(false);
+    expect(latexHasError("a\n% note", false)).toBe(true);
+    expect(latexHasUnclosedComment("100%")).toBe(true);
+    expect(latexHasUnclosedComment("%")).toBe(true);
+    expect(latexHasUnclosedComment("100\\%")).toBe(false);
+    expect(latexHasUnclosedComment("a % note\nb")).toBe(false);
   });
 
   it("accepts valid LaTeX", () => {

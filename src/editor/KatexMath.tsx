@@ -40,10 +40,26 @@ export function latexHasBlankLine(latex: string, environment = ""): boolean {
   return /\r?\n[ \t]*\r?\n/.test(mathSource(latex, environment));
 }
 
+// An inline formula is exported as \(...\) on one line, so an unescaped % that
+// reaches the end of the source comments out the closing delimiter and the
+// formula never ends. A comment that stops at a line break is harmless.
+export function latexHasUnclosedComment(latex: string): boolean {
+  const source = mathSource(latex, "");
+  const lastLine = source.slice(source.lastIndexOf("\n") + 1);
+  for (let index = 0; index < lastLine.length; index++) {
+    if (lastLine[index] !== "%") continue;
+    let backslashes = 0;
+    for (let before = index - 1; before >= 0 && lastLine[before] === "\\"; before--) backslashes++;
+    if (backslashes % 2 === 0) return true;
+  }
+  return false;
+}
+
 export function latexHasError(latex: string, displayMode: boolean, environment = ""): boolean {
   const source = mathSource(latex, environment);
   if (!source) return false;
   if (latexHasBlankLine(latex, environment)) return true;
+  if (!displayMode && latexHasUnclosedComment(latex)) return true;
   try {
     const html = katex.renderToString(source, {
       displayMode,
