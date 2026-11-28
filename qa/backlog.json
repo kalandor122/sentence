@@ -5878,10 +5878,11 @@
       ],
       "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
       "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T05:42:05Z",
-      "lastAttemptAt": "2026-11-28T05:42:05Z"
+      "lastAttemptAt": "2026-11-28T05:42:05Z",
+      "doneAt": "2026-11-28T05:51:06Z"
     },
     {
       "id": "qa-371",
@@ -6637,6 +6638,56 @@
     },
     {
       "id": "qa-433",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-434",
+      "title": "A list nested five levels deep exports LaTeX that the bundled engine refuses to compile",
+      "why": "Exploratory pass on lists (functional): expected Nesting stops at four levels (the article class defines only enumi-enumiv/itemi-itemiv) or the exporter writes compilable LaTeX for deeper levels (for example an enumitem setlistdepth declaration).",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: New document. Click Home > Numbered list. Type L1, press Enter, type L2, press Tab; repeat Enter + type L3 + Tab; L4 + Tab; L5 + Tab. Open View > LaTeX and read the body.\nActual: The editor builds all five levels and View > LaTeX contains five nested \\begin{enumerate} environments. Running the bundled Tectonic engine on the exported source (src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu --untrusted) exits 1 with \"LaTeX Error: Too deeply nested.\" at the fifth environment and produces no PDF; a four-level list compiles. Five-level bullet lists fail the same way (\"Too deeply nested.\" with five nested itemize environments).",
+      "source": "explore:lists:a list nested five levels deep exports latex that the bundled engine refuses to compile",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T06:20:34Z"
+    },
+    {
+      "id": "qa-435",
+      "title": "A bulleted or numbered list inside a table cell is flattened into concatenated text in the exported LaTeX",
+      "why": "Exploratory pass on lists (content): expected The cell keeps its two list items (an itemize/enumerate inside a p{} cell or equivalent), or list commands are disabled inside table cells with an explanation.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: New document. Insert > Insert table (3x3). Click the first body cell (row 2, column 1). Home > Bulleted list, type \"first item\", press Enter, type \"second item\". View > LaTeX and read the tabular row.\nActual: The visual cell shows <ul><li><p>first item</p></li><li><p>second item</p></li></ul>, but the exported row is \"first itemsecond item &  &  \\\\\": there is no \\item and the two items are joined without even a space, so the PDF prints one merged run. A numbered list in the same cell exports as \"one celltwo cell\".",
+      "source": "explore:lists:a bulleted or numbered list inside a table cell is flattened into concatenated text in the exported latex",
+      "status": "open"
+    },
+    {
+      "id": "qa-436",
+      "title": "A numbered list typed as \"0. \" shows 0 in the editor but exports an enumerate starting at 1",
+      "why": "Exploratory pass on lists (content): expected The editor and the PDF agree: the visible 0 is preserved (for example with \\setcounter{enumi}{-1}) or the editor starts the list at 1.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: New document. Type \"0. zero item\" (the ordered-list input rule creates the list), press Enter, type \"next item\". Read the editor numbering, then open View > LaTeX.\nActual: The editor DOM is <ol start=\"0\"> and shows \"0. zero item\" / \"1. next item\", but the exported source is a plain \\begin{enumerate} with no \\setcounter, so the PDF numbers the same items 1. and 2.",
+      "source": "explore:lists:a numbered list typed as \"0. \" shows 0 in the editor but exports an enumerate starting at 1",
+      "status": "open"
+    },
+    {
+      "id": "qa-437",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
