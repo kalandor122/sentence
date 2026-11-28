@@ -1034,6 +1034,71 @@ describe("qa-348: zooming to the end with focus outside the page keeps the text 
   });
 });
 
+describe("qa-349: zooming in at the start with focus outside the page keeps the top in view", () => {
+  // Focus in the Split source pane leaves the visual page without a caret in
+  // the document. At the top of a long document the last block is far below the
+  // viewport, so centre anchoring makes a zoom-in scroll the page top under the
+  // toolbar (at 70% to 150% the sheet starts 298px above the viewport). The top
+  // edge of the sheet is the reading position in that case, so it becomes the
+  // anchor and the zoom grows the page downwards from there.
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetHeight = 1123 * 13;
+  const pageStart = { top: 0, height: 1 };
+  const endBlock = { top: 14030, height: 126 };
+  const maxAt = (zoom: number) =>
+    sheetScrollMax(paddingTop + sheetHeight * zoom, paddingBottom, viewportHeight);
+
+  it("anchors on the sheet top when the viewport is at the start", () => {
+    expect(
+      zoomAnchor(null, endBlock, 0, viewportHeight, paddingTop, 0.7, pageStart),
+    ).toBe(pageStart);
+    // A caret in the page still wins, and a short document keeps its top when
+    // both the top edge and the last block are on screen.
+    const caret = { top: 150, height: 16 };
+    expect(
+      zoomAnchor(caret, endBlock, 0, viewportHeight, paddingTop, 0.7, pageStart),
+    ).toBe(caret);
+    const shortStart = { top: 800, height: 126 };
+    expect(
+      zoomAnchor(null, shortStart, 0, viewportHeight, paddingTop, 0.7, pageStart),
+    ).toBe(pageStart);
+  });
+
+  it("keeps the top of the sheet fixed when zooming in from the start", () => {
+    const anchor = zoomAnchor(null, endBlock, 0, viewportHeight, paddingTop, 0.7, pageStart);
+    expect(anchor).toBe(pageStart);
+    const top = scrollTopForZoomPoint(
+      anchor!.top,
+      0,
+      viewportHeight,
+      paddingTop,
+      0.7,
+      1.5,
+      maxAt(1.5),
+      anchor!.height,
+    );
+    expect(top).toBe(0);
+    expect(paddingTop + 0 * 1.5 - top).toBe(paddingTop);
+    // Centre anchoring from the same top scrolls the sheet 298px above the
+    // viewport, which is what hid the first page.
+    const centred = scrollTopForZoom(0, viewportHeight, paddingTop, 0.7, 1.5, maxAt(1.5));
+    expect(paddingTop - centred).toBeLessThan(0);
+  });
+
+  it("still falls back to centre anchoring away from the start and end", () => {
+    const midScroll = 5000;
+    const caret = { top: 5000, height: 16 };
+    expect(
+      zoomAnchor(caret, endBlock, midScroll, viewportHeight, paddingTop, 1, pageStart),
+    ).toBe(caret);
+    expect(
+      zoomAnchor(null, endBlock, midScroll, viewportHeight, paddingTop, 1, pageStart),
+    ).toBeNull();
+  });
+});
+
 describe("pageLineGaps", () => {
   it("moves the line crossing a page edge to the next page's text area", () => {
     const geometry = pageGeometry(DEFAULT_SETTINGS);
