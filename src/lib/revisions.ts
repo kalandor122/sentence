@@ -361,10 +361,21 @@ export function revisionText(document: SentenceDocument): string {
       const label = node.attrs?.label;
       return typeof label === "string" ? `ref: ${label}` : "";
     }
+    if (node.type === "image" || node.type === "inlineImage") {
+      const alt = node.attrs?.alt;
+      const path = node.attrs?.path ?? node.attrs?.src;
+      const label = typeof alt === "string" && alt ? alt : typeof path === "string" ? path : "";
+      return label ? `[image: ${label}]` : "[image]";
+    }
+    if (node.type === "pageBreak") return "\n[page break]\n";
+    if (node.type === "toc") return "\n[table of contents]\n";
     const inner = (node.content ?? []).map(visit).join("");
-    return ["paragraph", "heading", "listItem", "blockquote"].includes(node.type)
-      ? `${inner || "¶"}\n`
-      : inner;
+    if (["paragraph", "heading", "listItem", "blockquote"].includes(node.type)) {
+      return `${inner || "¶"}\n`;
+    }
+    // Any other attribute-only atom still has to identify itself: a card whose
+    // before and after read the same cannot show what was inserted.
+    return inner || (trackedAttributes(node) ? `[${node.type}]` : "");
   };
   return (document.content ?? []).map(visit).join("").trim();
 }
