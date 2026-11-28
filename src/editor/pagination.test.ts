@@ -380,6 +380,26 @@ describe("scrollTopForZoomPoint", () => {
     );
   });
 
+  // qa-357: wheeling to the very bottom stops on the blank margin below the
+  // last block, so the zoom correction had no anchor on screen and centred on
+  // the blank tail, leaving the whole document above the viewport. Pinning the
+  // last block brings its text back to the top of the viewport.
+  it("pins a block the reader had scrolled past when asked to", () => {
+    const target = scrollTopForZoomPoint(14000, 21200, 627, 30, 1.5, 0.7, 10489, 50, true);
+    expect(target).toBeCloseTo(9830, 6);
+    expect(30 + 14000 * 0.7 - target).toBeCloseTo(0, 6);
+    expect(30 + (14000 + 50) * 0.7 - target).toBeLessThanOrEqual(627);
+    // Without the pin the same point still falls back to the centre.
+    expect(scrollTopForZoomPoint(14000, 21200, 627, 30, 1.5, 0.7, 10489, 50)).toBe(
+      scrollTopForZoom(21200, 627, 30, 1.5, 0.7, 10489),
+    );
+  });
+
+  it("pins an end block taller than the viewport to its top", () => {
+    const target = scrollTopForZoomPoint(12000, 20000, 627, 30, 1.5, 0.7, 20000, 1200, true);
+    expect(30 + 12000 * 0.7 - target).toBeCloseTo(0, 6);
+  });
+
   it("clamps the target to the scaled scroll range", () => {
     expect(scrollTopForZoomPoint(14029, 13558, 627, 30, 1, 0.7, 9000)).toBe(9000);
   });
