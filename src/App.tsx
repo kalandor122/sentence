@@ -613,6 +613,9 @@ export default function App() {
   // change the textarea's text, so without this the next keystroke would
   // coalesce into the edit that was just applied and one undo would drop both.
   const [sourceUndoBoundary, setSourceUndoBoundary] = useState(0);
+  // Bumped by Refresh from visual so the text it replaced stays one undo step
+  // in the source editor instead of wiping the stack.
+  const [sourceUndoableReplace, setSourceUndoableReplace] = useState(0);
   // The message that autosave reported for an unapplied source draft, so
   // discarding that draft can drop the error with it.
   const draftSaveError = useRef<string | null>(null);
@@ -2672,6 +2675,7 @@ export default function App() {
                     {sourceFile === "document.tex" ? (
                       <>
                         <button className="secondary-button small" type="button" onClick={() => {
+                          const hadDraft = sourceDirtyRef.current;
                           const latex = documentToLatex(workspace.document, workspace.settings);
                           setSource(latex);
                           setSourceDirty(false);
@@ -2679,6 +2683,10 @@ export default function App() {
                           sourceDraftDocument.current = null;
                           sourceDraftWarning.current = false;
                           discardSourceDraft();
+                          setSourceUndoableReplace((value) => value + 1);
+                          if (hadDraft) {
+                            setToast("LaTeX regenerated from the visual document. Press Ctrl+Z to restore the draft.");
+                          }
                         }}>
                           Refresh from visual
                         </button>
@@ -2699,6 +2707,7 @@ export default function App() {
                   historyRef={sourceHistory}
                   historyKey={sourceFile}
                   undoBoundary={sourceUndoBoundary}
+                  undoableReplace={sourceUndoableReplace}
                 />
               </section>
             ) : null}
