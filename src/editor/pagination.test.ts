@@ -14,6 +14,7 @@ import {
   scrollTopForZoom,
   scrollTopForZoomPoint,
   sheetScrollMax,
+  zoomAnchor,
 } from "./pagination";
 
 describe("pageGeometry", () => {
@@ -963,6 +964,73 @@ describe("qa-336: the probe's zoom stage keeps the scaled sheet in range", () =>
     expect(
       scrollLeftForZoom(caretOffset, 1.5, 1, sheetScrollMax(padding + 794, padding, pane)),
     ).toBe(0);
+  });
+});
+
+describe("qa-348: zooming to the end with focus outside the page keeps the text in view", () => {
+  // Focus in the Split source pane leaves the visual page without a caret in
+  // the document. At the wheeled end the blank tail of the last page fills the
+  // lower viewport, so centre anchoring scales the last block off the top while
+  // the blank tail stays below: the reader zooms and sees no text at all. The
+  // last block is the reading position in that case, so it becomes the anchor.
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetHeight = 1123 * 13;
+  const endBlock = { top: 14030, height: 126 };
+  const maxAt = (zoom: number) =>
+    sheetScrollMax(paddingTop + sheetHeight * zoom, paddingBottom, viewportHeight);
+
+  it("anchors on the last block when the caret is outside the viewport", () => {
+    const caret = { top: 5000, height: 25 };
+    expect(zoomAnchor(caret, endBlock, maxAt(1), viewportHeight, paddingTop, 1)).toBe(endBlock);
+  });
+
+  it("keeps the last block on screen when zooming in from the wheeled end", () => {
+    const anchor = zoomAnchor(null, endBlock, maxAt(1), viewportHeight, paddingTop, 1);
+    expect(anchor).not.toBeNull();
+    const top = scrollTopForZoomPoint(
+      anchor!.top,
+      maxAt(1),
+      viewportHeight,
+      paddingTop,
+      1,
+      1.5,
+      maxAt(1.5),
+      anchor!.height,
+    );
+    const blockTop = paddingTop + endBlock.top * 1.5 - top;
+    const blockBottom = blockTop + endBlock.height * 1.5;
+    expect(blockTop).toBeGreaterThanOrEqual(0);
+    expect(blockBottom).toBeLessThanOrEqual(viewportHeight);
+    // Centre anchoring (the fallback when there is no usable anchor) would have
+    // left the block above the viewport at 150%.
+    const centred = scrollTopForZoom(maxAt(1), viewportHeight, paddingTop, 1, 1.5, maxAt(1.5));
+    expect(paddingTop + endBlock.top * 1.5 - centred).toBeLessThan(0);
+  });
+
+  it("still prefers a caret that is on screen", () => {
+    const caret = { top: 14029, height: 25 };
+    expect(zoomAnchor(caret, endBlock, maxAt(1), viewportHeight, paddingTop, 1)).toBe(caret);
+  });
+
+  it("falls back to centre anchoring when neither point is on screen", () => {
+    const caret = { top: 5000, height: 25 };
+    const farEnd = { top: 13000, height: 126 };
+    const anchor = zoomAnchor(caret, farEnd, maxAt(1), viewportHeight, paddingTop, 1);
+    expect(anchor).toBe(caret);
+    expect(
+      scrollTopForZoomPoint(
+        anchor!.top,
+        maxAt(1),
+        viewportHeight,
+        paddingTop,
+        1,
+        0.7,
+        maxAt(0.7),
+        anchor!.height,
+      ),
+    ).toBe(scrollTopForZoom(maxAt(1), viewportHeight, paddingTop, 1, 0.7, maxAt(0.7)));
   });
 });
 
