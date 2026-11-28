@@ -132,7 +132,10 @@ describe("tracked change decorations", () => {
     setRevisionMarks(editor, [revision(before, after)]);
 
     const [, second] = paragraphs(editor);
-    expect(second.querySelector(".sentence-revision-insertion")?.textContent).toBe("[sentence2026]");
+    const mark = second.querySelector(".sentence-revision-insertion");
+    expect(mark?.textContent).toBe("[sentence2026]");
+    expect(mark?.getAttribute("title")).toBe("Inserted by Ada: [sentence2026]");
+    expect(mark?.getAttribute("aria-label")).toBe("Inserted by Ada: [sentence2026]");
     editor.destroy();
   });
 
@@ -357,7 +360,8 @@ describe("tracked change decorations", () => {
 
     const pending = editor.view.dom.querySelector(".sentence-revision-insertion");
     expect(pending?.getAttribute("data-revision-id")).toBe("r1");
-    expect(pending?.getAttribute("title")).toBe("Inserted by Ada");
+    expect(pending?.getAttribute("title")).toBe("Inserted by Ada: z^3");
+    expect(pending?.getAttribute("aria-label")).toBe("Inserted by Ada: z^3");
     editor.destroy();
   });
 

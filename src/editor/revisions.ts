@@ -179,6 +179,22 @@ function findAtomRange(
   return range;
 }
 
+// An atom carries what it is in its attributes, not in text, so name it in the
+// mark's tooltip and accessible label. A reviewer hovering or reading the
+// insertion learns which citation key or equation was added, not just who
+// added it.
+function atomLabel(node: ProseMirrorNode): string {
+  const attrs = node.attrs as Record<string, unknown>;
+  if (node.type.name === "citation") {
+    return typeof attrs.key === "string" && attrs.key ? `[${attrs.key}]` : "citation";
+  }
+  if (node.type.name === "mathInline" || node.type.name === "mathBlock") {
+    return typeof attrs.latex === "string" && attrs.latex.trim() ? attrs.latex : "equation";
+  }
+  const label = attrs.label ?? attrs.alt ?? attrs.path ?? attrs.text;
+  return typeof label === "string" && label.trim() ? label : node.type.name;
+}
+
 function atomDecoration(
   node: ProseMirrorNode,
   from: number,
@@ -186,10 +202,12 @@ function atomDecoration(
   revision: Revision,
   colorClass: string,
 ): Decoration {
+  const description = `Inserted by ${revision.author || "Author"}: ${atomLabel(node)}`;
   const attributes = {
     class: `sentence-revision-insertion ${colorClass}`,
     "data-revision-id": revision.id,
-    title: `Inserted by ${revision.author || "Author"}`,
+    title: description,
+    "aria-label": description,
   };
   // A block atom (a display equation, a block image) has no inline content to
   // underline, so the decoration belongs on the block's own DOM.
