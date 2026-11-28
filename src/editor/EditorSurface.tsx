@@ -774,7 +774,7 @@ export default function EditorSurface({
       TableKit.configure({ table: false }),
       CaptionTable.configure({ resizable: true }),
       TextAlign.configure({
-        types: ["heading", "paragraph"],
+        types: ["heading", "paragraph", "mathBlock"],
       }),
       FontFamilyMark,
       FontSizeMark,

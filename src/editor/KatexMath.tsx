@@ -78,6 +78,8 @@ function KatexNodeView({ node }: NodeViewProps) {
   const displayMode = node.type.name === "mathBlock";
   const numbered = node.attrs.numbered === true;
   const environment = typeof node.attrs.environment === "string" ? node.attrs.environment : "";
+  const textAlign =
+    displayMode && typeof node.attrs.textAlign === "string" ? node.attrs.textAlign : "";
   const html = useMemo(
     () => renderLatex(latex, displayMode, environment),
     [environment, latex, displayMode],
@@ -91,7 +93,9 @@ function KatexNodeView({ node }: NodeViewProps) {
       data-latex={latex}
       data-numbered={displayMode ? (numbered ? "true" : "false") : undefined}
       data-math-environment={environment || undefined}
+      data-math-align={textAlign || undefined}
       title={latex}
+      style={textAlign ? { textAlign } : undefined}
     >
       <span className="katex-output" contentEditable={false} dangerouslySetInnerHTML={{ __html: html }} />
     </NodeViewWrapper>
