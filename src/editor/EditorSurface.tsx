@@ -695,6 +695,12 @@ export default function EditorSurface({
         if (corrected !== scroller.scrollLeft) scroller.scrollLeft = corrected;
       }
     }
+    // Clamp against the rendered sheet in this commit too, not just on the next
+    // frame: the offsets above were chosen from the same measurement, but a
+    // sheet that settles smaller during this commit would otherwise paint the
+    // blank area past the last page for one frame before the observer below
+    // catches up. That flash is the reported "zoomed out at the end" state.
+    clampScrollToSheet(scroller);
     scrollTopRef.current = scroller.scrollTop;
     scrollLeftRef.current = scroller.scrollLeft;
     // The scroller reserves the scaled sheet from --sentence-page-count, which
