@@ -6038,10 +6038,11 @@
       ],
       "hint": "Repro: In Source mode add '% Hand-written draft to keep' plus 'Second draft line.' to the body so Apply source is enabled. Click 'Refresh from visual' within the autosave window, then click into the textarea and press Ctrl+Z.\nActual: The draft is replaced with generated LaTeX immediately; no toast or confirmation appears and Ctrl+Z after refocusing the textarea does nothing (the undo history was reset).",
       "source": "explore:source-editor:'refresh from visual' destroys the unsaved draft instantly and it cannot be undone",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T08:49:42Z",
-      "lastAttemptAt": "2026-11-28T08:49:42Z"
+      "lastAttemptAt": "2026-11-28T08:49:42Z",
+      "doneAt": "2026-11-28T08:52:50Z"
     },
     {
       "id": "qa-381",
@@ -6889,6 +6890,92 @@
     },
     {
       "id": "qa-450",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-451",
+      "title": "Display math inside a center/flushleft/flushright wrapper is corrupted on Apply",
+      "why": "Exploratory pass on math (content): expected Both formulas become editable math blocks inside the centered/left-aligned wrapper, exactly as they do at top level, and Refresh from visual keeps the equation and flushleft LaTeX intact.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and open View > LaTeX.\n2. Replace the body before \\end{document} with:\n\\begin{center}\n\\begin{equation}\nE=mc^2\n\\end{equation}\n\\end{center}\n\n\\begin{flushleft}\n\\[\nF=ma\n\\]\n\\end{flushleft}\n3. Click Apply source. The toast says \"Visual document synchronized from LaTeX.\"; switch to View > Visual.\n4. Return to View > LaTeX and click Refresh from visual.\nActual: Zero math nodes are created. The visual page shows literal paragraphs `e\u0331gin{equation} E=mc^2 \\end{equation}` and `\\[ F=ma \\]`; Refresh from visual rewrites the body to `e\u0331gin\\{equation\\}`, `E=mc\\textasciicircum{}2`, `\\textbackslash{}end\\{equation\\}`, and escapes the flushleft delimiters as `\\textbackslash{}[` and `\\textbackslash{}]`. Applying the export again is reported as a success and reproduces the same escaped text, so the original valid source is lost.",
+      "source": "explore:math:display math inside a center/flushleft/flushright wrapper is corrupted on apply",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T09:19:06Z"
+    },
+    {
+      "id": "qa-452",
+      "title": "Hand-written align/gather inside a blockquote or list item is corrupted on Apply",
+      "why": "Exploratory pass on math (content): expected The align and gather environments become editable math blocks (with their environment names) inside the quote and list item, as a top-level align does; if the container form is unsupported, Apply source must report it instead of rewriting the environment.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and open View > LaTeX.\n2. Replace the body before \\end{document} with:\n\\begin{quote}\nQuoted text\n\n\\begin{align}\na &= b \\\\\nc &= d\n\\end{align}\n\\end{quote}\n\n\\begin{itemize}\n\\item Item text\n\n\\begin{gather}\ng=1 \\\\\nh=2\n\\end{gather}\n\\end{itemize}\n3. Click Apply source (the toast reports success), switch to View > Visual, then go back to View > LaTeX and click Refresh from visual.\nActual: Zero math nodes are created. The quote shows `Quoted text e\u0331gin{align} a &= b c &= d \\end{align}` and the list item shows `Item texte\u0331gin{gather} g=1 h=2 \\end{gather}`. Refresh from visual writes `e\u0331gin\\{align\\}`, `a \\&= b`, `\\textbackslash{}end\\{align\\}`, and the same for gather; a second Apply reproduces the escaped text. The plain equation and $$ forms in the same containers do work, so only the hand-written align/gather forms are missed.",
+      "source": "explore:math:hand-written align/gather inside a blockquote or list item is corrupted on apply",
+      "status": "open"
+    },
+    {
+      "id": "qa-453",
+      "title": "Equation block dialog accepts a full align environment and exports it nested inside equation*, which amsmath rejects",
+      "why": "Exploratory pass on math (content): expected The dialog stores the input as an align math block (environment 'align') or rejects a complete environment in the single-equation dialog; the export should be one align environment.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and type \"Nested \" in the editor.\n2. Open Insert > Equation block.\n3. Enter:\n\\begin{align}\na &= b \\\\\nc &= d\n\\end{align}\n4. The preview is valid and Insert is enabled; click Insert.\n5. Open View > LaTeX, click Refresh from visual, and compile the generated body with the bundled Tectonic.\nActual: Insert creates a mathBlock with data-math-environment absent and data-numbered=\"false\". Refresh from visual wraps the input in an equation* block: the exported body starts with `\\begin{equation*}` followed by `\\begin{align}` and ends with `\\end{align}` then `\\end{equation*}`. Tectonic 0.17.0 stops with `! Package amsmath Error: Erroneous nesting of equation structures;` and writes no pages. The same acceptance happens for a pasted `\\begin{equation}...\\end{equation}` and `\\begin{gather}...\\end{gather}`.",
+      "source": "explore:math:equation block dialog accepts a full align environment and exports it nested inside equation*, which amsmath rejects",
+      "status": "open"
+    },
+    {
+      "id": "qa-454",
+      "title": "The math dialog accepts \\mathscr, \\bm and \\cancel but the exported preamble loads none of their packages",
+      "why": "Exploratory pass on math (content): expected Either the preamble loads the packages the preview supports (mathrsfs, bm, cancel) or the dialog rejects those commands with an explanation that the package is unavailable.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and insert an inline equation three times (Insert > Inline equation), using \\mathscr{A}, \\bm{x} and \\cancel{x} in turn. Each preview renders the formula and Insert is enabled.\n2. Open View > LaTeX and click Refresh from visual.\n3. Read the preamble: it lists fontspec, amsmath/amssymb, graphicx, booktabs, ulem, microtype, hyperref, fancyhdr and geometry, but no mathrsfs, bm or cancel.\n4. Compile the three formulas with the bundled Tectonic using that package set.\nActual: The exported body contains `\\(\\mathscr{A}\\)\\(\\bm{x}\\)\\(\\cancel{x}\\)` and the preamble has no mathrsfs, bm or cancel. Tectonic fails with `! Undefined control sequence.` for each of the three, while the dialog reported no error, the preview rendered every formula, and the visual page showed all three.",
+      "source": "explore:math:the math dialog accepts \\mathscr, \\bm and \\cancel but the exported preamble loads none of their packages",
+      "status": "open"
+    },
+    {
+      "id": "qa-455",
+      "title": "Valid empty display math ($$ $$) is re-exported as an equation* with a blank line and no longer compiles",
+      "why": "Exploratory pass on math (content): expected The empty formula round-trips as a valid empty equation (for example \\begin{equation*}\\end{equation*} with no blank line), or Apply source rejects it; it must not turn a compilable document into an uncompilable one.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and open View > LaTeX.\n2. Replace the body before \\end{document} with: Before $$ $$ after.\n3. Click Apply source (the toast reports success). The visual page contains an empty 600x36 equation block with data-latex=\"\".\n4. Open View > LaTeX and click Refresh from visual.\n5. Compile the generated body with the bundled Tectonic.\nActual: Refresh from visual emits a blank line between `\\begin{equation*}` and `\\end{equation*}`. Tectonic stops with `! Missing $ inserted.` and writes no pages. Applying the export again is reported as synchronized and reproduces the same blank-line block. The original `Before $$ $$ after.` compiles without error.",
+      "source": "explore:math:valid empty display math ($$ $$) is re-exported as an equation* with a blank line and no longer compiles",
+      "status": "open"
+    },
+    {
+      "id": "qa-456",
+      "title": "Valid math containing the literal text \"katex-error\" is rejected by the dialog as unrenderable",
+      "why": "Exploratory pass on math (functional): expected The formula inserts and exports, because \\text{katex-error} is valid amsmath and compiles.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Create a project and open Insert > Inline equation.\n2. Enter \\text{katex-error} (or \\text{__sentence_katex_error__}).\n3. Look at the preview and the Insert button state.\nActual: The preview renders the text, but Insert is disabled and the dialog shows 'This LaTeX could not be rendered. Check the syntax and try again.'; there are zero .katex-error nodes and .math-preview-invalid is present. The validity check scans the rendered HTML for the substrings 'katex-error' and '__sentence_katex_error__', so legitimate formula text matching those strings is marked invalid. Tectonic compiles `\\(\\text{katex-error}\\)` without error, and the same formula inserted from the source pane round-trips fine, so only the dialog blocks it.",
+      "source": "explore:math:valid math containing the literal text \"katex-error\" is rejected by the dialog as unrenderable",
+      "status": "open"
+    },
+    {
+      "id": "qa-457",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",

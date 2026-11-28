@@ -1250,3 +1250,7 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T08:49:03Z DONE qa-379 (tsc -b, npm test, smoke all green)
 2026-11-28T08:49:42Z IMPORTED 1 tester findings into the backlog
 2026-11-28T08:49:42Z START qa-380 on qa/qa-380-refresh-from-visual-destroys-the-unsave: 'Refresh from visual' destroys the unsaved draft instantly and it cannot be undone
+2026-11-28T08:52:52Z PUSHED main
+2026-11-28T08:52:52Z DONE qa-380 (tsc -b, npm test, smoke all green)
+2026-11-28T09:18:46Z EXPLORE math: 6 new items, agent exit 0
+2026-11-28T09:19:06Z IMPORTED 1 tester findings into the backlog
