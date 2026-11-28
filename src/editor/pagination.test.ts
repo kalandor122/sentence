@@ -1240,6 +1240,73 @@ describe("qa-375: a fit-scaled sheet stays whole through a zoom", () => {
   });
 });
 
+describe("qa-377: the end of a 13-page sheet stays reachable through the zoom", () => {
+  // The long-document probe at 1280x800: 13 pages (a 14,599px sheet), Ctrl+End
+  // stops at 13,558 of the 14,082 range, and three zoom-out clicks reach 70%.
+  // The scroll range then has to end at the scaled sheet, the last line has to
+  // stay on screen, and at 150% the gutter-aware range has to expose both edges
+  // of the sheet that is wider than the 950px pane.
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetHeight = 1123 * 13;
+  const endLine = 14029;
+  const lineHeight = 16;
+  const maxAt = (zoom: number) =>
+    sheetScrollMax(paddingTop + sheetHeight * zoom, paddingBottom, viewportHeight);
+
+  it("keeps the sheet and its last line in the viewport across the clicks", () => {
+    let top = 13558;
+    let zoom = 1;
+    for (const percent of [90, 80, 70]) {
+      const next = percent / 100;
+      top = scrollTopForZoomPoint(
+        endLine,
+        top,
+        viewportHeight,
+        paddingTop,
+        zoom,
+        next,
+        maxAt(next),
+        lineHeight,
+      );
+      zoom = next;
+      expect(top).toBeLessThanOrEqual(maxAt(zoom));
+      const lineTop = paddingTop + endLine * zoom - top;
+      expect(lineTop).toBeGreaterThanOrEqual(0);
+      expect(lineTop + lineHeight * zoom).toBeLessThanOrEqual(viewportHeight);
+      // No part of the sheet can be left entirely above the visible area.
+      expect(paddingTop + sheetHeight * zoom - top).toBeGreaterThan(
+        viewportHeight - paddingBottom,
+      );
+    }
+    // Wheeling to the 70% maximum stops at the scaled sheet bottom, so only the
+    // scroller's own bottom padding sits below the page.
+    expect(maxAt(0.7)).toBe(9702);
+    expect(paddingTop + sheetHeight * 0.7 + paddingBottom - maxAt(0.7)).toBeCloseTo(
+      viewportHeight,
+      0,
+    );
+  });
+
+  it("reaches both edges of the 150% sheet in the reserved-gutter pane", () => {
+    const pane = 950;
+    const gutter = 15;
+    const padding = 34;
+    const sheetWidth = (794 * 150) / 100;
+    const scrollport = scrollportWidth(pane, pane + gutter);
+    const maxScrollLeft = sheetScrollMax(padding + sheetWidth, padding, scrollport);
+    expect(scrollport).toBe(965);
+    // The range is measured against the scrollport, not the narrower client
+    // width, so the last 15px the browser accepts are reachable.
+    expect(maxScrollLeft).toBe(294);
+    // The left edge is visible at the start and the right edge at the maximum.
+    expect(scrollLeftForZoom(0, 1, 1.5, maxScrollLeft)).toBe(0);
+    expect(padding + sheetWidth - maxScrollLeft).toBeLessThanOrEqual(pane);
+    expect(scrollLeftForZoom(maxScrollLeft, 1.5, 1, 0)).toBe(0);
+  });
+});
+
 describe("pageLineGaps", () => {
   it("moves the line crossing a page edge to the next page's text area", () => {
     const geometry = pageGeometry(DEFAULT_SETTINGS);
