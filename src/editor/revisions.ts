@@ -218,19 +218,29 @@ function markDeletion(
   if (!text) return;
   // Prefer the text immediately after the removed run; fall back to its left
   // context, then to a direct match (which handles deletions inside a run).
+  // A repeated phrase can match earlier than the removal: deleting "X " from
+  // "tail X tail" leaves "tail tail", where the suffix also starts the
+  // paragraph. The prefix and suffix were adjacent around the removed run, so
+  // locating them together pins the strike-through to the right occurrence.
+  let position: number | null = null;
+  if (prefix && suffix) {
+    const match = findChangeMatches(doc, `${prefix}${suffix}`, path)[0];
+    if (match) position = positionAt(match.ranges, prefix.length);
+  }
   const anchors: Array<{ text: string; atEnd: boolean }> = [
     { text: suffix.slice(0, 60), atEnd: false },
     { text: prefix.slice(-60), atEnd: true },
     { text, atEnd: true },
   ];
-  let position: number | null = null;
-  for (const anchor of anchors) {
-    const match = findChangeMatches(doc, anchor.text, path)[0];
-    if (!match) continue;
-    position = anchor.atEnd
-      ? match.ranges[match.ranges.length - 1].to
-      : match.ranges[0].from;
-    break;
+  if (position === null) {
+    for (const anchor of anchors) {
+      const match = findChangeMatches(doc, anchor.text, path)[0];
+      if (!match) continue;
+      position = anchor.atEnd
+        ? match.ranges[match.ranges.length - 1].to
+        : match.ranges[0].from;
+      break;
+    }
   }
   if (position === null && block) {
     const located = locateBlock(doc, block);

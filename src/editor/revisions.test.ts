@@ -48,6 +48,25 @@ describe("tracked change decorations", () => {
     editor.destroy();
   });
 
+  it("draws a deletion between the repeated context that surrounds it", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "tail X tail" }] }],
+    };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "tail tail" }] }],
+    };
+    const editor = new Editor({ extensions: [StarterKit, RevisionMarks], content: after });
+    setRevisionMarks(editor, [revision(before, after)]);
+
+    const [paragraph] = paragraphs(editor);
+    const deletion = paragraph.querySelector(".sentence-revision-deletion");
+    expect(paragraph.textContent).toBe("tail X tail");
+    expect(deletion?.previousSibling?.textContent).toBe("tail ");
+    editor.destroy();
+  });
+
   it("draws an insertion in the edited paragraph when an identical line appears earlier", () => {
     const before = twoParagraphs("Same row", "Same line");
     const after = twoParagraphs("Same row", "Same row");
