@@ -361,7 +361,13 @@ function inlineContent(
         return `\\cite{${latexCitationKeys(attribute(node, "key") ?? "")}}`;
       }
       if (node.type === "footnote") {
-        return `${protectFragile ? "\\protect" : ""}\\footnote{${escapeLatex(attribute(node, "text") ?? "")}}`;
+        // The note is a plain-text attribute, so inline markup it held when the
+        // source was imported (for example \textit inside \footnote) is still
+        // written as characters. Reading them through the inline parser keeps
+        // that markup as LaTeX instead of escaping it into visible
+        // \textbackslash{} command names.
+        const note = inlineContent(parseInline(attribute(node, "text") ?? "").content, settings);
+        return `${protectFragile ? "\\protect" : ""}\\footnote{${note}}`;
       }
       if (node.type === "crossReference") {
         return `\\ref{${latexReferenceTarget(attribute(node, "label") ?? "")}}`;

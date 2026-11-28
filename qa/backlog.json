@@ -5639,8 +5639,9 @@
       "hint": "Repro: Create a project. Open View > LaTeX and insert before \\end{document}: \"Formatted note \\footnote{See \\textit{Smith} and \\textbf{Jones}.} end.\" Click Apply source and return to Visual. The footnote's data-text reads \"See \\textit{Smith} and \\textbf{Jones}.\" Type any character at the end of the document, then open View > LaTeX.\nActual: The re-exported line is \"Formatted note \\footnote{See \\textbackslash{}textit\\{Smith\\} and \\textbackslash{}textbf\\{Jones\\}.} end.\" The PDF will print the command names as literal text. The same \\textit/\\textbf input in a normal paragraph imports as italic/bold marks and re-exports unchanged, so the loss is specific to the footnote's plain-text attribute.",
       "source": "explore:links-cites-footnotes:a footnote imported with \\textit or \\textbf formatting is turned into literal escaped commands after the next visual edi",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T03:03:31Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T03:03:31Z",
+      "lastAttemptAt": "2026-11-28T03:03:31Z"
     },
     {
       "id": "qa-356",
