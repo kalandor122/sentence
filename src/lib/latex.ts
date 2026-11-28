@@ -138,6 +138,20 @@ function containsMark(nodes: DocumentNode[] | undefined, type: string): boolean 
   );
 }
 
+// The preview renders colour commands inside a formula, so the export has to
+// load xcolor whenever one appears in math as well as in a text mark.
+const MATH_COLOR_COMMAND =
+  /\\(?:textcolor|colorbox|fcolorbox|color|pagecolor|definecolor)(?![a-zA-Z])/;
+
+function nodesContainMathColor(nodes: DocumentNode[] | undefined): boolean {
+  return (nodes ?? []).some((node) => {
+    if (node.type === "mathInline" || node.type === "mathBlock") {
+      return MATH_COLOR_COMMAND.test(attribute(node, "latex") ?? "");
+    }
+    return nodesContainMathColor(node.content);
+  });
+}
+
 // \captionof comes from the caption package, so only a picture captioned
 // inside a table cell makes the export load it.
 function hasCaptionedImageInCell(nodes: DocumentNode[] | undefined): boolean {
@@ -822,7 +836,9 @@ export function documentToLatex(
 
   const typography = typographyPackages(settings);
   const usesColor =
-    containsMark(content, "color") || containsMark(content, "highlight");
+    containsMark(content, "color") ||
+    containsMark(content, "highlight") ||
+    nodesContainMathColor(content);
   const usesCaptionOf = hasCaptionedImageInCell(content);
   const preamble = settings.preamble.trim();
   return `${arxivComments ? `% Prepared for arXiv\n${arxivComments}\n` : ""}\\documentclass[${settings.fontSize},${settings.paperSize}${settings.columns === "two" ? ",twocolumn" : ""}]{${settings.documentClass}}

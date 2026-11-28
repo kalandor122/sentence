@@ -1091,3 +1091,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T00:55:56Z PUSHED main
 2026-11-28T00:55:56Z DONE qa-342 (tsc -b, npm test, smoke all green)
 2026-11-28T00:56:35Z IMPORTED 2 tester findings into the backlog
+2026-11-28T00:56:35Z START qa-343 on qa/qa-343-the-math-preview-accepts-textcolor-but-t: The math preview accepts \textcolor, but the exported preamble omits xcolor so the PDF compile fails
