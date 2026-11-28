@@ -1309,3 +1309,5 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T12:36:36Z PUSHED main
 2026-11-28T12:36:36Z DONE qa-395 (tsc -b, npm test, smoke all green)
 2026-11-28T12:37:15Z START qa-397 on qa/qa-397-resizing-the-window-mid-document-jumps-t: Resizing the window mid-document jumps the scroll position about two pages and leaves the caret off-screen
+2026-11-28T12:52:17Z PUSHED main
+2026-11-28T12:52:17Z DONE qa-397 (tsc -b, npm test, smoke all green)
