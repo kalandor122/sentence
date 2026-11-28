@@ -1110,11 +1110,13 @@ button:disabled {
   top: 8px;
   left: 50%;
   /* The stage is already scaled by the fit and zoom factors, so the backdrop
-     takes the sheet's unscaled fitted width and only applies the zoom here.
+     takes the sheet's unscaled fitted size and only applies the zoom here.
      Otherwise it is scaled twice in a narrow pane and sticks out past the
-     sheet, extending the horizontal scroll range beyond the page. */
+     sheet, extending the scroll range past the page on both axes: its width
+     used to add blank sideways scroll, and its unfitted height added blank
+     scroll below the last page of a short document. */
   width: calc(var(--paper-width, 794px) * var(--paper-fit-scale, 1));
-  height: var(--paper-height, 1053px);
+  height: calc(var(--paper-height, 1053px) * var(--paper-fit-scale, 1));
   transform: translateX(-50%) scale(var(--editor-zoom));
   transform-origin: top center;
   background: rgba(255, 255, 255, 0.42);
