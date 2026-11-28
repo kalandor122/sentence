@@ -65,6 +65,46 @@ describe("nestListItem", () => {
     editor.destroy();
   });
 
+  it("nests up to the fourth level LaTeX can write", () => {
+    const editor = new Editor({
+      extensions: [StarterKit],
+      content:
+        "<ol><li><p>L1</p><ol><li><p>L2</p><ol><li><p>A</p></li><li><p>L3</p></li></ol></li></ol></li></ol>",
+    });
+    selectEnd(editor, "L3");
+    expect(nestListItem(editor, false)).toBe(true);
+    expect(editor.getHTML()).toContain(
+      "<li><p>A</p><ol><li><p>L3</p></li></ol></li>",
+    );
+    editor.destroy();
+  });
+
+  it("refuses a fifth level and leaves the fourth in place", () => {
+    const editor = new Editor({
+      extensions: [StarterKit],
+      content:
+        "<ol><li><p>L1</p><ol><li><p>L2</p><ol><li><p>L3</p><ol><li><p>L4a</p></li><li><p>L4b</p></li></ol></li></ol></li></ol></li></ol>",
+    });
+    selectEnd(editor, "L4b");
+    const before = editor.getHTML();
+    expect(nestListItem(editor, false)).toBe(true);
+    expect(editor.getHTML()).toBe(before);
+    editor.destroy();
+  });
+
+  it("refuses to sink a parent whose sublist already reaches the fourth level", () => {
+    const editor = new Editor({
+      extensions: [StarterKit],
+      content:
+        "<ol><li><p>L1</p><ol><li><p>L2</p><ol><li><p>A</p></li><li><p>L3</p><ol><li><p>L4a</p></li><li><p>L4b</p></li></ol></li></ol></li></ol></li></ol>",
+    });
+    selectEnd(editor, "L3");
+    const before = editor.getHTML();
+    expect(nestListItem(editor, false)).toBe(true);
+    expect(editor.getHTML()).toBe(before);
+    editor.destroy();
+  });
+
   it("leaves the key alone outside lists", () => {
     const editor = paragraphEditor();
     expect(nestListItem(editor, false)).toBe(false);
