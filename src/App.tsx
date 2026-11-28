@@ -1829,6 +1829,13 @@ export default function App() {
   };
 
   const closeDialog = () => {
+    // Cancelling an atom edit must put the caret back beside the marker: the
+    // dialog took the DOM selection with it, and handing focus back alone left
+    // the editor reading a collapsed selection at the start of the document.
+    const atomPosition =
+      dialog?.kind === "citation" || dialog?.kind === "footnote" || dialog?.kind === "cross-reference"
+        ? dialog.position
+        : undefined;
     if (dialog?.kind === "link" && dialog.revertOnCancel && dialog.range && !linkSubmitted.current && editor) {
       // The temporary link shown while the dialog was open is not part of the
       // document's history, so drop it instead of undoing the user's last edit.
@@ -1848,6 +1855,7 @@ export default function App() {
     // being swallowed by the ribbon or sidebar button that opened the dialog.
     window.requestAnimationFrame(() => {
       if (mode === "source") sourceTextarea.current?.focus();
+      else if (editor && atomPosition !== undefined && editor.state.doc.nodeAt(atomPosition)) editor.chain().focus().setTextSelection(atomPosition + 1).run();
       else editor?.commands.focus();
     });
   };
