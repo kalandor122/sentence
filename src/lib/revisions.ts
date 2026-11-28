@@ -355,7 +355,10 @@ export function revisionText(document: SentenceDocument): string {
     }
     if (node.type === "mathInline" || node.type === "mathBlock") {
       const latex = node.attrs?.latex;
-      return typeof latex === "string" ? latex : "";
+      // An empty equation still has to name itself in the preview, or inserting
+      // one reads as an identical before/after card even though the document
+      // changed.
+      return typeof latex === "string" && latex.trim() ? latex : "[equation]";
     }
     if (node.type === "crossReference") {
       const label = node.attrs?.label;
