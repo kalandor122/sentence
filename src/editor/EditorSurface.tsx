@@ -71,6 +71,7 @@ interface EditorSurfaceProps {
   revisions: Revision[];
   editable?: boolean;
   zoom: number;
+  onZoomChange: (zoom: number) => void;
   // undoneComments carries the comment marks an undo removed from the
   // document, so their threads can go with the highlight.
   onUpdate: (document: SentenceDocument, undoneComments?: string[]) => void;
@@ -333,6 +334,7 @@ export default function EditorSurface({
   revisions,
   editable = true,
   zoom,
+  onZoomChange,
   onUpdate,
   onReady,
   onStateChange,
@@ -400,6 +402,10 @@ export default function EditorSurface({
     scrollLeftRef.current = scrollRef.current.scrollLeft;
   }
   const previousZoomRef = useRef(zoom);
+  // The wheel listener below reads the live zoom from a ref so a burst of
+  // gesture events never stacks against a stale render value.
+  const zoomRef = useRef(zoom);
+  zoomRef.current = zoom;
   const fitScaleRef = useRef<number | null>(null);
   const [pageCount, setPageCount] = useState(1);
   const geometry = pageGeometry(settings);
@@ -586,6 +592,30 @@ export default function EditorSurface({
     });
     return () => window.cancelAnimationFrame(frame);
   }, [zoom]);
+
+  // Word's zoom gesture: Ctrl/Cmd+wheel over the page steps the zoom the same
+  // way the status bar does. The listener is non-passive so the browser's own
+  // page zoom never fires, and the correction above runs with the caret still
+  // in the document, so the reading line keeps its place instead of jumping.
+  useEffect(() => {
+    const scroller = scrollRef.current;
+    if (!scroller) return;
+    let lastStep = 0;
+    const onWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      event.preventDefault();
+      // A trackpad pinch sends a burst of small wheel events, so one zoom step
+      // per gesture keeps the page from crossing the whole range at once.
+      const now = performance.now();
+      if (now - lastStep < 120) return;
+      lastStep = now;
+      const step = event.deltaY < 0 ? 10 : -10;
+      onZoomChange(Math.max(70, Math.min(150, zoomRef.current + step)));
+    };
+    scroller.addEventListener("wheel", onWheel, { passive: false });
+    return () => scroller.removeEventListener("wheel", onWheel);
+  }, [onZoomChange]);
+
   const editor = useEditor({
     extensions: [
       ParagraphSpacing,
