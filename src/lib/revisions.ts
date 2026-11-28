@@ -425,7 +425,20 @@ export function revisionPreviewText(revision: Revision): { before: string; after
     before: revision.beforeDocument ? revisionText(revision.beforeDocument) : revision.before,
     after: revision.afterDocument ? revisionText(revision.afterDocument) : revision.after,
   };
-  if (snapshots.before !== snapshots.after) return snapshots;
+  if (snapshots.before !== snapshots.after) {
+    // A snapshot prints the atom labels it knows, but an inserted node revisionText
+    // cannot describe (a rule, a newer atom type) would still be invisible when
+    // other text in the revision happens to differ. Name those nodes too, so the
+    // card always shows what was inserted.
+    const labels = revisionChanges(revision)
+      .filter((change) => change.kind === "value" && change.after !== undefined)
+      .map((change) => (change.after !== undefined ? changeValueText(change.after) : ""))
+      .filter((label) => label && !snapshots.after.includes(label));
+    if (labels.length > 0) {
+      return { before: snapshots.before, after: `${snapshots.after} ${[...new Set(labels)].join(" ")}` };
+    }
+    return snapshots;
+  }
   // The stored strings may be more detailed than a snapshot that predates an
   // atom's preview support.
   if (revision.before !== revision.after) return { before: revision.before, after: revision.after };

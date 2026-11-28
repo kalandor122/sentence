@@ -6359,8 +6359,9 @@
       "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
       "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T13:30:43Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T13:30:43Z",
+      "lastAttemptAt": "2026-11-28T13:30:43Z"
     },
     {
       "id": "qa-402",

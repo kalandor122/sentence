@@ -3,6 +3,7 @@ import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
 import { documentPlainText } from "../lib/latex";
+import { revisionText } from "../lib/revisions";
 import type { Revision, SentenceDocument } from "../lib/types";
 import { Citation, CommentMark, MathBlock, MathInline } from "./extensions";
 import { RevisionMarks, setRevisionMarks } from "./revisions";
@@ -412,6 +413,54 @@ describe("tracked change decorations", () => {
     ]);
 
     const marks = Array.from(editor.view.dom.querySelectorAll(".sentence-revision-insertion"));
+    expect(marks.map((mark) => mark.getAttribute("data-revision-id"))).toEqual(["r1", "r2"]);
+    expect(marks.map((mark) => mark.getAttribute("title"))).toEqual([
+      "Inserted by Ada: [sentence2026]",
+      "Inserted by Ada: x^2",
+    ]);
+    editor.destroy();
+  });
+
+  it("marks and previews a citation and an equation inserted at the end of a paragraph", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "The central model can be expressed compactly: " },
+            { type: "text", marks: [{ type: "code" }], text: "meaning = structure + language" },
+            { type: "text", text: "." },
+          ],
+        },
+      ],
+    };
+    const editor = new Editor({ extensions: [StarterKit, Citation, MathInline, RevisionMarks], content: before });
+    // The real command path: the dialog inserts the atom into the document, the
+    // app snapshots the result, and History renders from those snapshots.
+    editor.chain().insertContentAt(editor.state.doc.content.size - 1, { type: "citation", attrs: { key: "sentence2026" } }).run();
+    const withCitation = editor.getJSON() as unknown as SentenceDocument;
+    expect(withCitation).not.toEqual(before);
+    const withCitationRevision = revision(before, withCitation);
+    withCitationRevision.before = revisionText(before);
+    withCitationRevision.after = revisionText(withCitation);
+
+    editor.chain().insertContentAt(editor.state.doc.content.size - 1, { type: "mathInline", attrs: { latex: "x^2" } }).run();
+    const withEquation = editor.getJSON() as unknown as SentenceDocument;
+    const withEquationRevision = revision(withCitation, withEquation);
+    withEquationRevision.before = revisionText(withCitation);
+    withEquationRevision.after = revisionText(withEquation);
+
+    expect(withCitationRevision.before).not.toBe(withCitationRevision.after);
+    expect(withCitationRevision.after).toContain("[sentence2026]");
+    expect(withEquationRevision.before).not.toBe(withEquationRevision.after);
+    expect(withEquationRevision.after).toContain("x^2");
+
+    setRevisionMarks(editor, [
+      { ...withCitationRevision, id: "r1" },
+      { ...withEquationRevision, id: "r2" },
+    ]);
+    const marks = Array.from(editor.view.dom.querySelectorAll<HTMLElement>(".sentence-revision-insertion"));
     expect(marks.map((mark) => mark.getAttribute("data-revision-id"))).toEqual(["r1", "r2"]);
     expect(marks.map((mark) => mark.getAttribute("title"))).toEqual([
       "Inserted by Ada: [sentence2026]",
