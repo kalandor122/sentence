@@ -1166,3 +1166,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T04:30:33Z PUSHED main
 2026-11-28T04:30:33Z DONE qa-361 (tsc -b, npm test, smoke all green)
 2026-11-28T04:31:12Z IMPORTED 1 tester findings into the backlog
+2026-11-28T04:31:12Z START qa-363 on qa/qa-363-rejecting-a-tracked-deletion-of-commente: Rejecting a tracked deletion of commented text permanently drops the comment highlight and leaves a false 'text was dele
