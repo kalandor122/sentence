@@ -227,6 +227,36 @@ export function scrollLeftForCaret(
   return scrollLeft;
 }
 
+export interface ZoomPoint {
+  top: number;
+  height: number;
+}
+
+// The caret is the natural reading anchor, but focus can sit outside the page
+// (the source pane in Split mode, a dialog or the toolbar) while the visual
+// page is scrolled to its end. Centring the zoom there pushes the last block
+// off the top of the viewport while the blank tail of the last page stays
+// below it, so the reader sees no text at all. Prefer whichever point is on
+// screen before the zoom, falling back to the end of the page when the caret
+// is elsewhere. `null` means neither point is visible and the caller should
+// fall back to centre anchoring.
+export function zoomAnchor(
+  caret: ZoomPoint | null,
+  endBlock: ZoomPoint | null,
+  scrollTop: number,
+  viewportHeight: number,
+  paddingTop: number,
+  previousZoom: number,
+): ZoomPoint | null {
+  const onScreen = (point: ZoomPoint) => {
+    const top = paddingTop + point.top * previousZoom - scrollTop;
+    return top + point.height * previousZoom > 0 && top < viewportHeight;
+  };
+  if (caret && onScreen(caret)) return caret;
+  if (endBlock && onScreen(endBlock)) return endBlock;
+  return caret;
+}
+
 // Centre-anchoring alone loses the caret when it sits below the middle of the
 // viewport (at the end of a document, for example): scaling its distance from
 // the centre can push it off-screen. When the caret was visible before the

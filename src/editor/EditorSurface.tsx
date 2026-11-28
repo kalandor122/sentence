@@ -48,6 +48,7 @@ import {
   scrollTopForZoom,
   scrollTopForZoomPoint,
   sheetScrollMax,
+  zoomAnchor,
 } from "./pagination";
 import { RevisionMarks, setRevisionMarks } from "./revisions";
 import {
@@ -313,6 +314,25 @@ function caretDocumentBox(
   };
 }
 
+// The last block of the page, in unscaled document pixels. Focus can sit in the
+// source pane, a dialog or the toolbar, which leaves the caret outside the
+// page; the block at the bottom of the document is then what a reader who has
+// scrolled to the end is actually looking at.
+function lastBlockDocumentBox(
+  scroller: HTMLElement,
+  paddingTop: number,
+  zoom: number,
+): { top: number; height: number } | null {
+  const block = scroller.querySelector<HTMLElement>(".tiptap > *:last-child");
+  if (!block) return null;
+  const rect = block.getBoundingClientRect();
+  if (rect.height <= 0) return null;
+  return {
+    top: (rect.top - scroller.getBoundingClientRect().top + scroller.scrollTop - paddingTop) / zoom,
+    height: rect.height / zoom,
+  };
+}
+
 // The stage reserves the sheet from --sentence-page-count, which pagination can
 // still update after the zoom correction has run. Pull the offsets back to the
 // rendered sheet whenever it changes, so a late page-count or layout update
@@ -542,7 +562,17 @@ export default function EditorSurface({
         )
       : scroller.scrollWidth - scroller.clientWidth;
     const caret = caretDocumentBox(scroller, paddingTop, scale);
-    scroller.scrollTop = caret === null
+    // With focus outside the page there is no caret to hold, so anchor on the
+    // last block when that is what the reader has scrolled to.
+    const anchor = zoomAnchor(
+      caret,
+      lastBlockDocumentBox(scroller, paddingTop, scale),
+      scrollTopRef.current,
+      scroller.clientHeight,
+      paddingTop,
+      previousScale,
+    );
+    scroller.scrollTop = anchor === null
       ? scrollTopForZoom(
           scrollTopRef.current,
           scroller.clientHeight,
@@ -552,14 +582,14 @@ export default function EditorSurface({
           maxScrollTop,
         )
       : scrollTopForZoomPoint(
-          caret.top,
+          anchor.top,
           scrollTopRef.current,
           scroller.clientHeight,
           paddingTop,
           previousScale,
           scale,
           maxScrollTop,
-          caret.height,
+          anchor.height,
         );
     scroller.scrollLeft = scrollLeftForZoom(
       scrollLeftRef.current,
