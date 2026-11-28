@@ -1280,3 +1280,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T10:54:11Z EXPLORE links-cites-footnotes: 6 new items, agent exit 0
 2026-11-28T10:54:30Z IMPORTED 1 tester findings into the backlog
 2026-11-28T10:54:30Z START qa-463 on qa/qa-463-a-footnote-inserted-in-a-table-cell-is-s: A footnote inserted in a table cell is silently dropped from the compiled PDF
+2026-11-28T10:58:43Z PUSHED main
+2026-11-28T10:58:43Z DONE qa-463 (tsc -b, npm test, smoke all green)
+2026-11-28T10:59:23Z IMPORTED 1 tester findings into the backlog

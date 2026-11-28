@@ -6170,7 +6170,9 @@
       ],
       "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
       "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T10:59:23Z"
     },
     {
       "id": "qa-390",
@@ -7078,10 +7080,11 @@
       ],
       "hint": "Repro: Create a project and clear the demo body (Ctrl+A, Backspace, twice). Insert > Insert table. Click the first cell of the second row, type \"Cell text\", then Insert > Footnote, enter \"Table UI note\" and click Insert. View > LaTeX shows the footnote inside the tabular row. Save the exported document, compile it with `src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu -X compile <file>.tex --outdir <dir>`, and run `pdftotext <file>.pdf -`.\nActual: The PDF contains only \"Cell text1\" and an empty footnote line (\"1\"); the string \"Table UI note\" does not appear anywhere in the extracted PDF text. The footnote marker's link annotation is also empty (pdftohtml reports `<a href=\"\">`). The probe's list-item control, compiled the same way, prints \"List note\", so the loss is specific to the table cell.",
       "source": "explore:links-cites-footnotes:a footnote inserted in a table cell is silently dropped from the compiled pdf",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T10:54:30Z",
-      "lastAttemptAt": "2026-11-28T10:54:30Z"
+      "lastAttemptAt": "2026-11-28T10:54:30Z",
+      "doneAt": "2026-11-28T10:58:41Z"
     },
     {
       "id": "qa-464",
@@ -7145,6 +7148,18 @@
     },
     {
       "id": "qa-469",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-470",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
