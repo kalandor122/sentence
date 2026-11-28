@@ -6266,10 +6266,11 @@
       ],
       "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
       "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T12:32:20Z",
-      "lastAttemptAt": "2026-11-28T12:32:20Z"
+      "lastAttemptAt": "2026-11-28T12:32:20Z",
+      "doneAt": "2026-11-28T12:36:34Z"
     },
     {
       "id": "qa-396",
@@ -6297,7 +6298,9 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.resizeScroll`. Or by hand at 1280x800 with the 50-heading/3,600-word document: click `Heading 25` in the outline, scroll `BODY25` into view, click into its text and wait. The scroller is at scrollTop 6,773 with the caret at y=503 (visible; editor viewport y=149-776). Resize the window to 1200x800, which does not change the page count (still 13 pages): scrollTop jumps to 8,817 and the caret moves to y=-1,934, above the viewport. Resize back to 1280x800: scrollTop is 9,333 and the caret is at y=-2,057, still off-screen; the editor is showing a different part of the document from the one being edited.\nActual: A width-only resize fires the pane-rescale path and moves the scroll offset by about 2,044px even though the page count is unchanged; the caret and the paragraph being edited end up far above the viewport and do not return when the window is restored.",
       "source": "explore:long-document:resizing the window mid-document jumps the scroll position about two pages and leaves the caret off-screen",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T12:37:15Z"
     },
     {
       "id": "qa-398",
