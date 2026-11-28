@@ -563,7 +563,10 @@ export default function EditorSurface({
       : scroller.scrollWidth - scroller.clientWidth;
     const caret = caretDocumentBox(scroller, paddingTop, scale);
     // With focus outside the page there is no caret to hold, so anchor on the
-    // last block when that is what the reader has scrolled to.
+    // top edge of the sheet when the reader is at the start and on the last
+    // block when the reader has scrolled to the end. The top point has a 1px
+    // height so the top edge still counts as visible when it sits exactly at
+    // the viewport top.
     const anchor = zoomAnchor(
       caret,
       lastBlockDocumentBox(scroller, paddingTop, scale),
@@ -571,6 +574,7 @@ export default function EditorSurface({
       scroller.clientHeight,
       paddingTop,
       previousScale,
+      { top: 0, height: 1 },
     );
     scroller.scrollTop = anchor === null
       ? scrollTopForZoom(
