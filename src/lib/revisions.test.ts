@@ -8,6 +8,7 @@ import {
   nodeText,
   rejectRevisions,
   revisionChanges,
+  revisionPreviewText,
   revisionText,
   trackedShape,
   trackedText,
@@ -146,6 +147,24 @@ describe("tracked text comparison", () => {
     expect(revisionText(before)).not.toBe(revisionText(after));
     expect(revisionText(after)).toContain("[sentence2026]");
     expect(revisionText(after)).toContain("x^2");
+  });
+
+  it("rebuilds an older card's preview from its snapshots", () => {
+    const before = doc("See");
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "See " },
+            { type: "citation", attrs: { key: "sentence2026" } },
+          ],
+        },
+      ],
+    };
+    const legacy = { ...revision("old", before, after), before: "See", after: "See" };
+    expect(revisionPreviewText(legacy)).toEqual({ before: "See", after: "See [sentence2026]" });
   });
 
   it("identifies other inserted atoms in the review preview", () => {
