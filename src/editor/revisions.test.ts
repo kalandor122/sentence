@@ -4,7 +4,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
 import { documentPlainText } from "../lib/latex";
 import type { Revision, SentenceDocument } from "../lib/types";
-import { Citation, MathInline } from "./extensions";
+import { Citation, MathBlock, MathInline } from "./extensions";
 import { RevisionMarks, setRevisionMarks } from "./revisions";
 
 function twoParagraphs(first: string, second: string): SentenceDocument {
@@ -206,6 +206,24 @@ describe("tracked change decorations", () => {
     const marks = second.querySelectorAll(".sentence-revision-insertion");
     expect(marks).toHaveLength(1);
     expect(marks[0].textContent).toBe("[sentence2026]");
+    editor.destroy();
+  });
+
+  it("marks an equation inserted as a new block as an insertion", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "Keep this" }] }],
+    };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [...(before.content ?? []), { type: "mathBlock", attrs: { latex: "z^3" } }],
+    };
+    const editor = new Editor({ extensions: [StarterKit, MathBlock, RevisionMarks], content: after });
+    setRevisionMarks(editor, [revision(before, after)]);
+
+    const pending = editor.view.dom.querySelector(".sentence-revision-insertion");
+    expect(pending?.getAttribute("data-revision-id")).toBe("r1");
+    expect(pending?.getAttribute("title")).toBe("Inserted by Ada");
     editor.destroy();
   });
 
