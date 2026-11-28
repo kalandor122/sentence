@@ -1230,3 +1230,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T08:14:47Z EXPLORE tables: 2 new items, agent exit 0
 2026-11-28T08:15:07Z IMPORTED 1 tester findings into the backlog
 2026-11-28T08:15:07Z START qa-443 on qa/qa-443-source-round-trip-drops-empty-rows-from: Source round trip drops empty rows from one-column tables; a 1x1 empty table disappears and its LaTeX becomes body text
+2026-11-28T08:17:39Z PUSHED main
+2026-11-28T08:17:39Z DONE qa-443 (tsc -b, npm test, smoke all green)
+2026-11-28T08:18:18Z IMPORTED 1 tester findings into the backlog

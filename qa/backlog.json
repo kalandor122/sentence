@@ -5974,7 +5974,9 @@
       ],
       "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
       "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T08:18:18Z"
     },
     {
       "id": "qa-377",
@@ -6790,10 +6792,11 @@
       ],
       "hint": "Repro: New document. Insert tab > Insert table (3x3, header row). Click the first body cell, then Table toolbar > Delete column twice, leaving one column. Click the header cell and type Head. Open the source pane (status-bar Source), append a space to the source so Apply source enables, click Apply source, then Visual. For the 1x1 case: New document > Insert table, click the first body cell, Delete column twice and Delete row twice, leaving a single empty header cell; make the same trivial source edit, Apply source, then Visual.\nActual: The 3x1 table returns as 1x1: only the row containing Head survives, and both empty body rows are dropped. The 1x1 table disappears entirely (0 tables in the editor) and its LaTeX is inserted as paragraph text, rendered as 'egin{table}[htbp] entering egin{tabular}{l} \\hline \\hline \\end{tabular} \\end{table}' (the \\b and \\c sequences are decoded as accent macros); the status bar reports 7 words and the toast says 'Visual document synchronized from LaTeX.' The source pane still shows the original 3-row tabular, so source and visual disagree. Both cases reproduce from the trivial 'append a space + Apply source' edit, not only from a hand-written tabular. Evidence: qa/shots/probe-tables-narrow.png, probe scenarios narrowTableRoundTrip and trivialSourceEdit.",
       "source": "explore:tables:source round trip drops empty rows from one-column tables; a 1x1 empty table disappears and its latex becomes body text",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T08:15:07Z",
-      "lastAttemptAt": "2026-11-28T08:15:07Z"
+      "lastAttemptAt": "2026-11-28T08:15:07Z",
+      "doneAt": "2026-11-28T08:17:37Z"
     },
     {
       "id": "qa-444",
@@ -6809,6 +6812,18 @@
     },
     {
       "id": "qa-445",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-446",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
