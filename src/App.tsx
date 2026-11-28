@@ -2351,10 +2351,11 @@ export default function App() {
         }
       }
       // Ctrl/Cmd+= and Ctrl/Cmd+- step the page zoom, Ctrl/Cmd+0 returns to
-      // 100%, matching the status bar. Text fields keep their own editing keys,
-      // and zooming never leaves the page, so the caret anchor holds the line
-      // the reader is on while the sheet is rescaled.
-      if (mod && !event.altKey && !inTextField) {
+      // 100%, matching the status bar. The keys stay global rather than
+      // editor-only: a text field has no editing use for them, and a reader
+      // editing the LaTeX source in Split still needs to resize the page beside
+      // it. Modal dialogs are handled above, so this never zooms behind one.
+      if (mod && !event.altKey && !mathEditor) {
         const step =
           event.key === "=" || event.key === "+" || event.code === "NumpadAdd"
             ? 10
