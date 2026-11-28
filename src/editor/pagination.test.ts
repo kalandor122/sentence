@@ -1181,6 +1181,65 @@ describe("qa-349: zooming in at the start with focus outside the page keeps the 
   });
 });
 
+describe("qa-375: a fit-scaled sheet stays whole through a zoom", () => {
+  // At 1024x768 the pane is 728px wide, so the 794px sheet is fitted to 0.766.
+  // The reported failure combined that fit scale with the zoom: the range kept
+  // the 100% layout while the transform scaled the sheet, leaving blank scroll
+  // below the page and, at 150%, a page wider than the pane with no travel to
+  // its left edge.
+  const fit = 608 / 794;
+  const pane = 728;
+  const gutter = 15;
+  const padding = 34;
+  const viewportHeight = 627;
+  const paddingTop = 30;
+  const paddingBottom = 80;
+  const sheetWidth = 794;
+  const sheetHeight = 1123 * 13;
+  const maxTopAt = (zoom: number) =>
+    sheetScrollMax(paddingTop + sheetHeight * fit * zoom, paddingBottom, viewportHeight);
+  const maxLeftAt = (zoom: number) =>
+    sheetScrollMax(
+      padding + sheetWidth * fit * zoom,
+      padding,
+      scrollportWidth(pane, pane + gutter),
+    );
+
+  it("stops every zoom-out at the fitted sheet bottom", () => {
+    let top = maxTopAt(1);
+    let zoom = 1;
+    for (const next of [0.9, 0.8, 0.7]) {
+      top = scrollTopForZoom(top, viewportHeight, paddingTop, zoom, next, maxTopAt(next));
+      zoom = next;
+      // Only the scroller's own bottom padding sits below the fitted sheet.
+      expect(paddingTop + sheetHeight * fit * zoom - top).toBeGreaterThan(
+        viewportHeight - paddingBottom,
+      );
+      expect(top).toBeLessThanOrEqual(maxTopAt(zoom));
+    }
+    expect(top).toBe(maxTopAt(0.7));
+    expect(paddingTop + sheetHeight * fit * 0.7 + paddingBottom - top).toBeCloseTo(
+      viewportHeight,
+      0,
+    );
+  });
+
+  it("keeps both edges of the wider 150% page reachable", () => {
+    const maxLeft = maxLeftAt(1.5);
+    expect(maxLeft).toBeGreaterThan(0);
+    // At the left end the fitted page starts inside the pane's padding, and at
+    // the right end its edge is inside the scrollport (gutter included).
+    expect(scrollLeftForZoom(0, 1, 1.5, maxLeft)).toBe(0);
+    expect(padding + sheetWidth * fit * 1.5 - maxLeft).toBeLessThanOrEqual(pane);
+    // Following the caret sideways must not consume the range needed to bring
+    // the opposite edge back into view.
+    const caretOffset = scrollLeftForCaret(pane - 4, pane, 0, maxLeft);
+    expect(caretOffset).toBeGreaterThan(0);
+    expect(caretOffset).toBeLessThan(maxLeft);
+    expect(scrollLeftForZoom(caretOffset, 1.5, 1, maxLeftAt(1))).toBe(0);
+  });
+});
+
 describe("pageLineGaps", () => {
   it("moves the line crossing a page edge to the next page's text area", () => {
     const geometry = pageGeometry(DEFAULT_SETTINGS);
