@@ -2284,6 +2284,25 @@ export default function App() {
           handleModeChange(nextMode);
         }
       }
+      // Ctrl/Cmd+= and Ctrl/Cmd+- step the page zoom, Ctrl/Cmd+0 returns to
+      // 100%, matching the status bar. Text fields keep their own editing keys,
+      // and zooming never leaves the page, so the caret anchor holds the line
+      // the reader is on while the sheet is rescaled.
+      if (mod && !event.altKey && !inTextField) {
+        const step =
+          event.key === "=" || event.key === "+" || event.code === "NumpadAdd"
+            ? 10
+            : event.key === "-" || event.key === "_" || event.code === "NumpadSubtract"
+              ? -10
+              : null;
+        if (step !== null) {
+          event.preventDefault();
+          setZoom((current) => Math.max(70, Math.min(150, current + step)));
+        } else if (pressedDigit("0")) {
+          event.preventDefault();
+          setZoom(100);
+        }
+      }
       if (mod && event.key.toLowerCase() === "s") {
         event.preventDefault();
         void handleSave();
@@ -2556,6 +2575,7 @@ export default function App() {
                     revisions={editorRevisions}
                     editable
                     zoom={zoom}
+                    onZoomChange={setZoom}
                     onUpdate={handleDocumentUpdate}
                     onReady={setEditor}
                     onStateChange={() => setEditorVersion((version) => version + 1)}

@@ -68,15 +68,17 @@ export default function StatusBar({
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => onZoomChange(Math.max(70, zoom - 10))}
           aria-label="Zoom out"
+          title="Zoom out (Ctrl+-)"
         >
           <Minus size={12} />
         </button>
-        <span aria-live="polite">{zoom}%</span>
+        <span aria-live="polite" title="Ctrl+0 resets to 100%">{zoom}%</span>
         <button
           type="button"
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => onZoomChange(Math.min(150, zoom + 10))}
           aria-label="Zoom in"
+          title="Zoom in (Ctrl+=)"
         >
           <Plus size={12} />
         </button>
