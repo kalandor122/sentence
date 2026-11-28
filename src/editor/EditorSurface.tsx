@@ -555,6 +555,36 @@ export default function EditorSurface({
     }
     scrollTopRef.current = scroller.scrollTop;
     scrollLeftRef.current = scroller.scrollLeft;
+    // The scroller reserves the scaled sheet from --sentence-page-count, which
+    // the pagination pass can still update after this commit. Check the range
+    // once the frame has laid out and pull the offsets back if the reserved
+    // stage was larger than the rendered sheet, so a late catch-up cannot leave
+    // blank scroll past the last page.
+    const frame = window.requestAnimationFrame(() => {
+      const live = scrollRef.current;
+      if (!live) return;
+      const bounds = live.getBoundingClientRect();
+      const sheetBox = live.querySelector<HTMLElement>(".paper-sheet")?.getBoundingClientRect();
+      if (!sheetBox) return;
+      const liveStyles = getComputedStyle(live);
+      const bottomPadding = parseFloat(liveStyles.paddingBottom) || 0;
+      const rightPadding = parseFloat(liveStyles.paddingRight) || 0;
+      const liveMaxTop = sheetScrollMax(
+        sheetBox.bottom - bounds.top + live.scrollTop,
+        bottomPadding,
+        live.clientHeight,
+      );
+      const liveMaxLeft = sheetScrollMax(
+        sheetBox.right - bounds.left + live.scrollLeft,
+        rightPadding,
+        live.clientWidth,
+      );
+      if (live.scrollTop > liveMaxTop) live.scrollTop = liveMaxTop;
+      if (live.scrollLeft > liveMaxLeft) live.scrollLeft = liveMaxLeft;
+      scrollTopRef.current = live.scrollTop;
+      scrollLeftRef.current = live.scrollLeft;
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [zoom]);
   const editor = useEditor({
     extensions: [
