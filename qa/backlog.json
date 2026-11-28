@@ -5370,10 +5370,11 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T00:03:07Z",
-      "lastAttemptAt": "2026-11-28T00:03:07Z"
+      "lastAttemptAt": "2026-11-28T00:03:07Z",
+      "doneAt": "2026-11-28T00:14:34Z"
     },
     {
       "id": "qa-339",
@@ -5385,7 +5386,9 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T00:33:27Z"
     },
     {
       "id": "qa-340",
@@ -5857,6 +5860,90 @@
     },
     {
       "id": "qa-378",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-379",
+      "title": "Returning to Source after an autosaved edit wipes the undo history and rewrites the pane",
+      "why": "Exploratory pass on source-editor (functional): expected The typed comment is still in the source pane and Ctrl+Z undoes the last source edit, exactly as it does when Ctrl+Z is pressed before switching views.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open the app, click Source in the status bar and place the caret inside the body (before \\end{document}). Type a line '% Autosave comment note' plus a new line 'Probe commented body line.', then wait ~2 s until Apply source disables (the autosave committed the draft). Click Visual, then Source. Press Ctrl+Z three times.\nActual: The pane is regenerated from the visual model: the comment disappears and all three Ctrl+Z presses leave the text unchanged (Apply source stays disabled, so the history was reset). The same edit is undone normally if Ctrl+Z is pressed before leaving the pane.",
+      "source": "explore:source-editor:returning to source after an autosaved edit wipes the undo history and rewrites the pane",
+      "status": "open"
+    },
+    {
+      "id": "qa-380",
+      "title": "'Refresh from visual' destroys the unsaved draft instantly and it cannot be undone",
+      "why": "Exploratory pass on source-editor (ux): expected A confirmation, or an undoable replacement, so a mistaken Refresh does not destroy the hand-written draft.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In Source mode add '% Hand-written draft to keep' plus 'Second draft line.' to the body so Apply source is enabled. Click 'Refresh from visual' within the autosave window, then click into the textarea and press Ctrl+Z.\nActual: The draft is replaced with generated LaTeX immediately; no toast or confirmation appears and Ctrl+Z after refocusing the textarea does nothing (the undo history was reset).",
+      "source": "explore:source-editor:'refresh from visual' destroys the unsaved draft instantly and it cannot be undone",
+      "status": "open"
+    },
+    {
+      "id": "qa-381",
+      "title": "Focus stays on 'Refresh from visual', so typing right after the click is silently dropped",
+      "why": "Exploratory pass on source-editor (ux): expected The source editor regains focus so the keystrokes land in the document, as they do after Apply source (activeElement is the LaTeX textarea).",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Source mode. Edit the text so Apply source is enabled and click 'Refresh from visual'. Without clicking the textarea first, type 'typed-right-after-refresh'.\nActual: document.activeElement remains the 'Refresh from visual' button and the textarea value never receives the typed text.",
+      "source": "explore:source-editor:focus stays on 'refresh from visual', so typing right after the click is silently dropped",
+      "status": "open"
+    },
+    {
+      "id": "qa-382",
+      "title": "The parse-error toast keeps showing an error after the corrected source saves successfully",
+      "why": "Exploratory pass on source-editor (ux): expected The error notice clears as soon as the corrected draft parses and the autosave succeeds.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In Source mode add '\\section{Unclosed probe' before \\end{document} and click Apply source (toast: 'Invalid LaTeX: missing closing brace.'). Change the line to '\\section{Repaired probe}' and wait ~1.6 s for the autosave.\nActual: The save-error button disappears, Apply source disables and the visual document shows 'Repaired probe', but the toast still reads 'Invalid LaTeX: missing closing brace.' until its 4 s timeout; it is still on screen after switching to Visual.",
+      "source": "explore:source-editor:the parse-error toast keeps showing an error after the corrected source saves successfully",
+      "status": "open"
+    },
+    {
+      "id": "qa-383",
+      "title": "LaTeX parse errors are transient and never say which line failed",
+      "why": "Exploratory pass on source-editor (ux): expected The message points at the failing line (for example 'line 58') and remains available beside the source until the draft is fixed.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In Source mode insert '\\section{Unclosed probe' before \\end{document}, click Apply source, then read the toast and the line gutter and wait ~4 s.\nActual: The toast says only 'Invalid LaTeX: missing closing brace.', no gutter line is highlighted (0 elements with the active class), and after ~4 s the toast is gone with no 'Invalid LaTeX' text anywhere on the page; only a 'Retry save' button remains, with the reason hidden in its tooltip/aria-label.",
+      "source": "explore:source-editor:latex parse errors are transient and never say which line failed",
+      "status": "open"
+    },
+    {
+      "id": "qa-384",
+      "title": "Zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "why": "Exploratory pass on long-document (visual): expected Changing zoom keeps the reading position/content visible, the scroll range ends at the scaled bottom of the sheet, and the whole page can be reached horizontally when it is wider than the pane.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
+      "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
+      "status": "open"
+    },
+    {
+      "id": "qa-385",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
