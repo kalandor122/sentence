@@ -5815,8 +5815,9 @@
       "hint": "Repro: 1. Open a new document. 2. Triple-click the first body paragraph to select it and type 'tail X tail' to replace it. 3. Review tab > Track changes. 4. Click at the start of that paragraph, press ArrowRight five times, then hold Shift and press ArrowRight twice to select 'X '. 5. Press Backspace and wait about 2.5 s; open History to confirm one tracked change.\nActual: The strike-through is rendered before all of the paragraph text: the paragraph reads '[X ]tail tail' and the deletion widget's offset in the paragraph is 0 instead of 5. The review mark therefore points at the start of the paragraph rather than at the deletion point, and a reviewer checking a repeated phrase sees the wrong location.",
       "source": "explore:review:a tracked deletion is struck through at the start of the paragraph when the deleted text's trailing context repeats earl",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T05:17:37Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T05:17:37Z",
+      "lastAttemptAt": "2026-11-28T05:17:37Z"
     },
     {
       "id": "qa-367",
