@@ -149,6 +149,42 @@ describe("tracked text comparison", () => {
     expect(revisionText(after)).toContain("x^2");
   });
 
+  it("identifies an empty equation in the review preview", () => {
+    const before = doc("See");
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "See " }, { type: "mathInline", attrs: { latex: "" } }] }],
+    };
+    expect(trackedShape(before)).not.toBe(trackedShape(after));
+    expect(revisionText(after)).toBe("See [equation]");
+  });
+
+  it("identifies atoms appended to an existing paragraph across revisions", () => {
+    const before = doc("The central model can be expressed compactly: meaning = structure + language.");
+    const withCitation: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [...(before.content?.[0]?.content ?? []), { type: "citation", attrs: { key: "sentence2026" } }],
+        },
+      ],
+    };
+    const withEquation: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [...(withCitation.content?.[0]?.content ?? []), { type: "mathInline", attrs: { latex: "x^2" } }],
+        },
+      ],
+    };
+    expect(revisionText(before)).not.toBe(revisionText(withCitation));
+    expect(revisionText(withCitation)).not.toBe(revisionText(withEquation));
+    expect(revisionText(withCitation)).toContain("[sentence2026]");
+    expect(revisionText(withEquation)).toContain("x^2");
+  });
+
   it("rebuilds an older card's preview from its snapshots", () => {
     const before = doc("See");
     const after: SentenceDocument = {

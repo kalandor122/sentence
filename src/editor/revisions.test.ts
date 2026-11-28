@@ -159,6 +159,43 @@ describe("tracked change decorations", () => {
     editor.destroy();
   });
 
+  it("marks a citation and an equation appended to a paragraph in separate revisions", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "The model is compact: meaning = structure + language." }] }],
+    };
+    const withCitation: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [...(before.content?.[0]?.content ?? []), { type: "citation", attrs: { key: "sentence2026" } }],
+        },
+      ],
+    };
+    const withEquation: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [...(withCitation.content?.[0]?.content ?? []), { type: "mathInline", attrs: { latex: "x^2" } }],
+        },
+      ],
+    };
+    const editor = new Editor({ extensions: [StarterKit, Citation, MathInline, RevisionMarks], content: withEquation });
+    setRevisionMarks(editor, [
+      { ...revision(before, withCitation), id: "r1" },
+      { ...revision(withCitation, withEquation), id: "r2" },
+    ]);
+
+    const citation = editor.view.dom.querySelector('.citation[data-revision-id="r1"]');
+    const equation = editor.view.dom.querySelector('[data-revision-id="r2"]');
+    expect(citation?.textContent).toBe("[sentence2026]");
+    expect(equation?.classList.contains("sentence-revision-insertion")).toBe(true);
+    expect(editor.view.dom.querySelectorAll(".sentence-revision-insertion")).toHaveLength(2);
+    editor.destroy();
+  });
+
   it("marks an equation inserted inside a new paragraph as an insertion", () => {
     const before: SentenceDocument = {
       type: "doc",
