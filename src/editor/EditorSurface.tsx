@@ -368,10 +368,12 @@ function reserveSheetInStage(scroller: HTMLElement): void {
   const available = scroller.clientWidth - paddingLeft - paddingRight;
   // The sheet is centred in the stage, so a stage at least as wide as the sheet
   // keeps both of its edges inside the scroll range. Round a fractional scaled
-  // edge up: the range itself is rounded down, so a stage truncated here would
-  // leave the last fraction of the page unreachable at some zoom/fit scales.
-  stage.style.width = `${Math.ceil(Math.max(available, sheetBox.width))}px`;
-  stage.style.height = `${Math.ceil(sheetBox.height)}px`;
+  // edge down: the scroll range itself is rounded down, so reserving the ceil
+  // here would leave up to a pixel of blank scroll past the sheet's bottom and
+  // right edges. The remaining fraction stays inside the scroller's padding, so
+  // the page edge is still visible at the maximum offset.
+  stage.style.width = `${Math.floor(Math.max(available, sheetBox.width))}px`;
+  stage.style.height = `${Math.floor(sheetBox.height)}px`;
 }
 
 // The stage reserves the sheet from --sentence-page-count, which pagination can
