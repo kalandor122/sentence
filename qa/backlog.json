@@ -6107,8 +6107,9 @@
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.windowWidth`. Or by hand at 1280x800: create a project, clear the page, and paste 50 headings each followed by the probe's 69-word paragraph (unique words: 3,600 total). The status bar reads `3,600 words / 13 pages`, the sheet is 14,599px tall, 300 text line boxes are rendered and the 96px page margins measure 97px left and 99px right. Resize the window to 1180x800: the same untouched document now reads `3,600 words / 11 pages`, the sheet is 12,353px tall, only 250 line boxes are rendered, the paragraph after `Heading 2 HDOC2` rewraps from 5 lines to 4, and its text insets from the paper edge fall to 66px left and 68px right. At 1024x768 it stays 11 pages with 53px/55px insets. Resizing back to 1280x800 restores 13 pages, 300 line boxes and 97px/99px insets.\nActual: Once the sheet is fit-scaled (window narrower than about 1200px) the text column grows inside the page: the 96px margins shrink to 66px/68px at 1180 and 53px/55px at 1024, paragraphs rewrap, and the page count drops from 13 to 11. The status bar shows 11 pages and the sheet is drawn 2 pages shorter, while the document text and paper settings are unchanged.",
       "source": "explore:long-document:page count, line wrapping and page margins change when the window is resized, so a 13-page document reports 11 pages",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T01:48:48Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T01:48:48Z",
+      "lastAttemptAt": "2026-11-28T01:48:48Z"
     },
     {
       "id": "qa-397",

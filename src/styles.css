@@ -3661,10 +3661,6 @@ button:disabled {
     box-shadow: -10px 0 30px rgba(43, 46, 39, 0.14);
   }
 
-  .paper-sheet {
-    --paper-padding-x: min(var(--paper-margin, 96px), 68px);
-  }
-
   .document-heading small,
   .local-pill {
     display: none;
@@ -3681,19 +3677,6 @@ button:disabled {
   .ribbon-tabs button {
     min-width: auto;
     padding-inline: 9px;
-  }
-
-  .paper-sheet {
-    --paper-padding-x: min(var(--paper-margin, 96px), 48px);
-    --paper-padding-y: min(var(--paper-margin, 96px), 62px);
-  }
-
-  .sentence-editor {
-    font-size: min(var(--paper-font-size, 16px), 15px);
-  }
-
-  .paper-frontmatter h1 {
-    font-size: 27px;
   }
 
   .start-layout {
