@@ -493,7 +493,7 @@ export default function EditorSurface({
     .split(/\r?\n|;/)
     .map((name) => name.trim())
     .filter(Boolean);
-  const lastEmitted = useRef("");
+  const lastEmittedDocument = useRef<SentenceDocument | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const scrollTopRef = useRef(0);
   const scrollLeftRef = useRef(0);
@@ -964,7 +964,7 @@ export default function EditorSurface({
       // transaction is an undo (redo: false) or a redo.
       const history = transaction.getMeta("history$");
       const undone = history?.redo === false;
-      lastEmitted.current = JSON.stringify(json);
+      lastEmittedDocument.current = json;
       onUpdate(
         json,
         undone
@@ -984,11 +984,16 @@ export default function EditorSurface({
 
   useEffect(() => {
     if (!editor) return;
+    // A document this editor emitted is already what it renders, so the common
+    // per-keystroke path can stop on the identity and never re-serialize the
+    // whole manuscript for comparison.
+    if (document === lastEmittedDocument.current) return;
     const incoming = JSON.stringify(document);
-    if (incoming === JSON.stringify(editor.getJSON()) || incoming === lastEmitted.current) {
+    if (incoming === JSON.stringify(editor.getJSON())) {
+      lastEmittedDocument.current = document;
       return;
     }
-    lastEmitted.current = incoming;
+    lastEmittedDocument.current = document;
     // Document sync mirrors state that is already saved, such as a rejected
     // revision. It is not an edit, so it must not become an undo step.
     editor
@@ -1051,6 +1056,7 @@ export default function EditorSurface({
       return;
     }
     let frame = 0;
+    let settle = 0;
     let gapsApplied = false;
     // Page snapping and line gaps move the text after ProseMirror has already
     // scrolled to the caret, so a paste lands below the visible area. Follow the
@@ -1330,21 +1336,34 @@ export default function EditorSurface({
     const schedule = () => {
       if (!frame) frame = window.requestAnimationFrame(paginate);
     };
+    // A full pass measures every block, splits tall ones and rewrites their
+    // padding, so its cost grows with the document. Doing it between every two
+    // keystrokes made typing slower and slower as the manuscript grew. Wait for
+    // the typing to settle instead: ProseMirror keeps the caret in view on its
+    // own, and the page layout only has to catch up once the burst is over.
+    // Resizes and changes to the page geometry still paginate right away.
     const scheduleFollow = () => {
       followCaret = true;
-      schedule();
+      if (settle) window.clearTimeout(settle);
+      settle = window.setTimeout(() => {
+        settle = 0;
+        schedule();
+      }, 200);
     };
-
-    schedule();
-    editor.on("update", scheduleFollow);
-    window.addEventListener("resize", schedule);
-    const observer = new ResizeObserver(schedule);
+    // The editor box grows as text is typed, which is the update above, not a
+    // resize: observe it on the same trailing schedule so a line wrap does not
+    // pull a full pass into the middle of a burst.
+    const observer = new ResizeObserver(scheduleFollow);
     observer.observe(dom);
     // Front matter lives outside the editor but still consumes the first page.
     observer.observe(sheet);
+    schedule();
+    editor.on("update", scheduleFollow);
+    window.addEventListener("resize", schedule);
 
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
+      if (settle) window.clearTimeout(settle);
       editor.off("update", scheduleFollow);
       window.removeEventListener("resize", schedule);
       observer.disconnect();

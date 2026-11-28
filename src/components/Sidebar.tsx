@@ -498,7 +498,7 @@ export default function Sidebar({
   onAcceptAllRevisions,
   onRejectAllRevisions,
 }: SidebarProps) {
-  const headings = headingEntries(document);
+  const headings = useMemo(() => headingEntries(document), [document]);
   const anchoredCommentIds = useMemo(
     () => new Set(commentAnchors(document).map((anchor) => anchor.markId)),
     [document],

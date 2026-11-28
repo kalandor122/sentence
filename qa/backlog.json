@@ -6315,8 +6315,9 @@
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.typing`. At 1280x800 type the same 70-character sample (` Typing latency sample with several ordinary words in a long document.`) at the end of the 3,600-word document, then clear the page and paste 400 copies and 1,200 copies of the probe's 30-word paragraph to reach 12,400 and 37,200 words and type the sample again. Across two runs the median gap between input events is 4.2-4.3ms on a blank page, 12.4-13.1ms at 3,600 words, 25.8-27.7ms at 12,400 words and 89.3-94.8ms at 37,200 words; p90 rises to 24.3-26.0 / 40.3-45.5 / 124.1-185.7ms and typing the 70 characters takes 0.88-0.95s / 1.73s / 6.64-7.59s. Page count also grows to 25 and 72 pages in those two cases.\nActual: The pagination pass runs on every document update, so the input handling cost scales with the document. At 12,400 words each character already takes about 26-28ms (under 40 chars/s) and at 37,200 words about 90-95ms (about 11 chars/s), with observed input gaps up to 225ms.",
       "source": "explore:long-document:typing latency grows with document length: about 13ms per character at 3,600 words and 90ms at 37,200 words",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T12:52:57Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T12:52:57Z",
+      "lastAttemptAt": "2026-11-28T12:52:57Z"
     },
     {
       "id": "qa-399",
