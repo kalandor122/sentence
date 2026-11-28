@@ -1204,3 +1204,4 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T05:51:08Z DONE qa-370 (tsc -b, npm test, smoke all green)
 2026-11-28T06:20:15Z EXPLORE lists: 3 new items, agent exit 0
 2026-11-28T06:20:34Z IMPORTED 1 tester findings into the backlog
+2026-11-28T06:20:35Z START qa-434 on qa/qa-434-a-list-nested-five-levels-deep-exports-l: A list nested five levels deep exports LaTeX that the bundled engine refuses to compile

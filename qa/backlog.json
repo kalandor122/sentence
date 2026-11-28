@@ -6659,8 +6659,9 @@
       "hint": "Repro: New document. Click Home > Numbered list. Type L1, press Enter, type L2, press Tab; repeat Enter + type L3 + Tab; L4 + Tab; L5 + Tab. Open View > LaTeX and read the body.\nActual: The editor builds all five levels and View > LaTeX contains five nested \\begin{enumerate} environments. Running the bundled Tectonic engine on the exported source (src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu --untrusted) exits 1 with \"LaTeX Error: Too deeply nested.\" at the fifth environment and produces no PDF; a four-level list compiles. Five-level bullet lists fail the same way (\"Too deeply nested.\" with five nested itemize environments).",
       "source": "explore:lists:a list nested five levels deep exports latex that the bundled engine refuses to compile",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T06:20:34Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T06:20:34Z",
+      "lastAttemptAt": "2026-11-28T06:20:35Z"
     },
     {
       "id": "qa-435",

@@ -1,5 +1,38 @@
 import type { Editor } from "@tiptap/react";
+import type { Node as ProseMirrorNode, ResolvedPos } from "@tiptap/pm/model";
 import { liftListItemKeepingSiblings } from "./listToggle";
+
+// LaTeX defines four list levels (enumi-enumiv, itemi-itemiv) and refuses a
+// fifth with "Too deeply nested.", so the source could never compile. Stop
+// nesting where the exporter can still write it.
+const MAX_LIST_DEPTH = 4;
+
+function listItemDepth($pos: ResolvedPos): number {
+  let depth = 0;
+  for (let level = 1; level <= $pos.depth; level += 1) {
+    if ($pos.node(level).type.name === "listItem") depth += 1;
+  }
+  return depth;
+}
+
+// Sinking an item takes its sublist along, so the items underneath decide
+// whether the move stays within the levels LaTeX can nest.
+function deepestNestedItem(node: ProseMirrorNode): number {
+  let deepest = 0;
+  node.forEach((child) => {
+    const nested = deepestNestedItem(child);
+    deepest = Math.max(deepest, child.type.name === "listItem" ? nested + 1 : nested);
+  });
+  return deepest;
+}
+
+function deepestListItem($pos: ResolvedPos): ProseMirrorNode | null {
+  for (let level = $pos.depth; level >= 1; level -= 1) {
+    const node = $pos.node(level);
+    if (node.type.name === "listItem") return node;
+  }
+  return null;
+}
 
 // Indentation reuses the structures LaTeX already understands: nested list
 // items and quote environments. Tables and verbatim blocks keep their own
@@ -12,6 +45,9 @@ export function changeIndent(editor: Editor, outdent: boolean): boolean {
     if (outdent) {
       return liftListItemKeepingSiblings(editor) || chain.liftListItem("listItem").run();
     }
+    const { $from } = editor.state.selection;
+    const item = deepestListItem($from);
+    if (item && listItemDepth($from) + deepestNestedItem(item) >= MAX_LIST_DEPTH) return false;
     return chain.sinkListItem("listItem").run();
   }
   if (outdent) return editor.isActive("blockquote") ? chain.lift("blockquote").run() : false;
