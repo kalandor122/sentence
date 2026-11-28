@@ -6154,10 +6154,11 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T10:13:31Z",
-      "lastAttemptAt": "2026-11-28T10:13:31Z"
+      "lastAttemptAt": "2026-11-28T10:13:31Z",
+      "doneAt": "2026-11-28T10:29:05Z"
     },
     {
       "id": "qa-389",
@@ -7057,6 +7058,92 @@
     },
     {
       "id": "qa-462",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-463",
+      "title": "A footnote inserted in a table cell is silently dropped from the compiled PDF",
+      "why": "Exploratory pass on links-cites-footnotes (content): expected The footnote body is printed in the PDF, as the same footnote is in a normal paragraph or a list item, or the app refuses or relocates a footnote in a table.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project and clear the demo body (Ctrl+A, Backspace, twice). Insert > Insert table. Click the first cell of the second row, type \"Cell text\", then Insert > Footnote, enter \"Table UI note\" and click Insert. View > LaTeX shows the footnote inside the tabular row. Save the exported document, compile it with `src-tauri/binaries/tectonic-x86_64-unknown-linux-gnu -X compile <file>.tex --outdir <dir>`, and run `pdftotext <file>.pdf -`.\nActual: The PDF contains only \"Cell text1\" and an empty footnote line (\"1\"); the string \"Table UI note\" does not appear anywhere in the extracted PDF text. The footnote marker's link annotation is also empty (pdftohtml reports `<a href=\"\">`). The probe's list-item control, compiled the same way, prints \"List note\", so the loss is specific to the table cell.",
+      "source": "explore:links-cites-footnotes:a footnote inserted in a table cell is silently dropped from the compiled pdf",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T10:54:30Z"
+    },
+    {
+      "id": "qa-464",
+      "title": "A footnote in a heading that the table of contents lists is duplicated and leaves a marker in the contents entry",
+      "why": "Exploratory pass on links-cites-footnotes (content): expected The contents entry is \"Footnote Heading\" with no footnote marker, and the note is printed once in the section body.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project and clear the body. Insert > Contents (the Insert tab's Contents button). Press Ctrl+End, Enter, type \"Footnote Heading\", then Home > Apply heading. Click at the end of the heading and Insert > Footnote with \"Toc heading note\". Open View > LaTeX, compile the export with the bundled Tectonic, and run `pdftotext` on the PDF.\nActual: The visual contents block becomes \"1 Footnote Heading\" (the footnote marker is rendered inside the TOC). The exported source is `\\section{Footnote Heading\\protect\\footnote{Toc heading note}}`. The compiled PDF contains \"Toc heading note\" twice: the contents page shows \"1 Footnote Heading\" plus a footnote numbered 2, and the section page shows the heading with the note numbered 1. pdftotext reads \"Contents 1 Footnote Heading1 1 Footnote Heading2 ... Toc heading note Toc heading note\".",
+      "source": "explore:links-cites-footnotes:a footnote in a heading that the table of contents lists is duplicated and leaves a marker in the contents entry",
+      "status": "open"
+    },
+    {
+      "id": "qa-465",
+      "title": "Optional-argument citations are silently corrupted by Apply source",
+      "why": "Exploratory pass on links-cites-footnotes (content): expected The optional note is preserved as `\\cite[p.~5]{sentence2026}`, or Apply source reports the form as unsupported instead of rewriting the paragraph.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project and clear the body. View > LaTeX, insert `Optional \\cite[p.~5]{sentence2026} cite.` before `\\end{document}`, and click Apply source. Type one character at the end of the visual document, then open View > LaTeX. Compile the export with Tectonic and run `pdftotext`.\nActual: Apply reports \"Visual document synchronized from LaTeX.\" and creates zero citation nodes. The visual paragraph is \"Optional i\u0327te[p. 5]{sentence2026} cite.\"; the re-exported line is `Optional i\u0327te[p.~5]\\{sentence2026\\} cite.X`, and the PDF prints the same corrupted text instead of a citation (the `\\c` in `\\cite` is consumed as a cedilla accent). The probe compiles the untouched input separately as `citationOptionalArgumentOriginal` (Tectonic exit 0; its PDF shows `Optional [?, p. 5] cite.`), so the original is valid and the corruption is introduced by Apply source.",
+      "source": "explore:links-cites-footnotes:optional-argument citations are silently corrupted by apply source",
+      "status": "open"
+    },
+    {
+      "id": "qa-466",
+      "title": "Grouping braces in an imported footnote are escaped after a visual edit, so the PDF prints the braces",
+      "why": "Exploratory pass on links-cites-footnotes (content): expected The grouping braces keep their LaTeX meaning and do not print; the footnote re-exports as `\\footnote{The {NASA} study}`, or Apply source rejects the grouping instead of silently changing it.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project and clear the body. View > LaTeX, insert `Braced note \\footnote{The {NASA} study} end.` before `\\end{document}`, and click Apply source. The visual footnote is \"The {NASA} study\" and the paragraph is \"Braced note 1 end.\". Type one character at the end of the document, open View > LaTeX, compile the export and run `pdftotext`.\nActual: The re-exported line is `Braced note \\footnote{The \\{NASA\\} study} end.X`; the compiled PDF prints \"The {NASA} study\" with the braces visible.",
+      "source": "explore:links-cites-footnotes:grouping braces in an imported footnote are escaped after a visual edit, so the pdf prints the braces",
+      "status": "open"
+    },
+    {
+      "id": "qa-467",
+      "title": "The Add link dialog accepts addresses that produce malformed PDF link targets (space and braces)",
+      "why": "Exploratory pass on links-cites-footnotes (functional): expected The address is percent-encoded (space to %20, braces to %7B/%7D) or rejected with an error; the clickable PDF target is the address the user entered.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project and clear the body. Type \"word0\", select it, Home > Add link, enter `https://space.example.org/a b`, Insert. Add \"word1\", link it to `https://brace.example.org/a{b}` the same way. Open View > LaTeX and compile; dump the PDF link annotations with `pdftohtml -xml -stdout -i -noframes <pdf>`.\nActual: Both links are accepted with no error. The export is `\\href{https://space.example.org/a b}{word0}` and `\\href{https://brace.example.org/a\\{b\\}}{word1}`. The PDF annotations are `href=\"https://space.example.org/a b\"` (raw space) and `href=\"https://brace.example.org/a\\{b\\}\"` (literal backslashes), so the clickable target is not the address.",
+      "source": "explore:links-cites-footnotes:the add link dialog accepts addresses that produce malformed pdf link targets (space and braces)",
+      "status": "open"
+    },
+    {
+      "id": "qa-468",
+      "title": "The Edit link dialog's confirm button is still labelled Insert",
+      "why": "Exploratory pass on links-cites-footnotes (ux): expected The dialog's confirm button says Update, matching the Edit citation, Edit footnote and Edit cross-reference dialogs.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a project, type \"LinkFlow alpha\", select \"alpha\", Home > Add link, enter `https://first.example.org`, click Insert. Click the linked word, then Home > Add link again.\nActual: The dialog title is \"Edit link\" and the address is prefilled, but its buttons are \"Remove link\", \"Cancel\", \"Insert\"; clicking Insert updates the existing link. The probe records the button list as [\"\", \"Remove link\", \"Cancel\", \"Insert\"] (the empty entry is the Close icon).",
+      "source": "explore:links-cites-footnotes:the edit link dialog's confirm button is still labelled insert",
+      "status": "open"
+    },
+    {
+      "id": "qa-469",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
