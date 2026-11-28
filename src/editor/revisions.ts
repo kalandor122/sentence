@@ -148,11 +148,14 @@ function findAtomRange(
   }
   let range: { node: ProseMirrorNode; from: number; to: number } | null = null;
   doc.descendants((child, position) => {
-    if (range) return false;
     if (position < blockStart || position >= blockEnd) return true;
     if (!matchesAtom(child, type, attrs)) return true;
+    // Keep the last match: marks split text nodes, so the stored merged index
+    // can drift, and the diff attributes an extra identical atom to the final
+    // occurrence it aligns. Marking the first one would flag the atom that was
+    // already there and leave the new one unmarked.
     range = { node: child, from: position, to: position + child.nodeSize };
-    return false;
+    return true;
   });
   return range;
 }

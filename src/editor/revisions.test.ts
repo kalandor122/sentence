@@ -4,7 +4,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
 import { documentPlainText } from "../lib/latex";
 import type { Revision, SentenceDocument } from "../lib/types";
-import { Citation, MathBlock, MathInline } from "./extensions";
+import { Citation, CommentMark, MathBlock, MathInline } from "./extensions";
 import { RevisionMarks, setRevisionMarks } from "./revisions";
 
 function twoParagraphs(first: string, second: string): SentenceDocument {
@@ -206,6 +206,43 @@ describe("tracked change decorations", () => {
     const marks = second.querySelectorAll(".sentence-revision-insertion");
     expect(marks).toHaveLength(1);
     expect(marks[0].textContent).toBe("[sentence2026]");
+    editor.destroy();
+  });
+
+  it("marks the second of two identical citations when text in the paragraph is split", () => {
+    const mark = { type: "comment", attrs: { markId: "c1" } };
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "See " },
+            { type: "text", text: "the", marks: [mark] },
+            { type: "text", text: " note " },
+            { type: "citation", attrs: { key: "sentence2026" } },
+          ],
+        },
+      ],
+    };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            ...(before.content?.[0]?.content ?? []),
+            { type: "citation", attrs: { key: "sentence2026" } },
+          ],
+        },
+      ],
+    };
+    const editor = new Editor({ extensions: [StarterKit, CommentMark, Citation, RevisionMarks], content: after });
+    setRevisionMarks(editor, [revision(before, after)]);
+
+    const citations = Array.from(editor.view.dom.querySelectorAll(".citation"));
+    expect(citations).toHaveLength(2);
+    expect(citations.map((node) => node.classList.contains("sentence-revision-insertion"))).toEqual([false, true]);
     editor.destroy();
   });
 
