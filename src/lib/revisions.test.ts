@@ -7,6 +7,7 @@ import {
   documentChanges,
   nodeText,
   rejectRevisions,
+  revisionCardPreview,
   revisionChanges,
   revisionPreviewText,
   revisionText,
@@ -230,6 +231,27 @@ describe("tracked text comparison", () => {
       after: "See [sentence2026]",
     };
     expect(revisionPreviewText(legacy)).toEqual({ before: "See", after: "See [sentence2026]" });
+  });
+
+  it("keeps an appended atom visible when the same revision also changed text earlier", () => {
+    const before: SentenceDocument = doc("A".repeat(400));
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: `B${"A".repeat(399)}` },
+            { type: "citation", attrs: { key: "sentence2026" } },
+          ],
+        },
+      ],
+    };
+    const text = revisionPreviewText(revision("mixed", before, after));
+    const preview = revisionCardPreview(text.before, text.after);
+    expect(text.before).not.toBe(text.after);
+    expect(preview.before).not.toBe(preview.after);
+    expect(preview.after).toContain("[sentence2026]");
   });
 
   it("shows distinct History previews for a citation and an equation appended to the last paragraph", () => {

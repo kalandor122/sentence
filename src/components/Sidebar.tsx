@@ -22,7 +22,7 @@ import {
   type BibliographyEntry,
 } from "../lib/bibliography";
 import { commentAnchors } from "../lib/comments";
-import { pendingRevisions, revisionAuthorClass, revisionPreviewText } from "../lib/revisions";
+import { pendingRevisions, revisionAuthorClass, revisionCardPreview, revisionPreviewText } from "../lib/revisions";
 import type {
   CommentThread,
   DocumentNode,
@@ -220,21 +220,6 @@ interface RevisionListProps {
   onRejectAll: () => void;
 }
 
-const REVISION_PREVIEW_LENGTH = 180;
-const REVISION_PREVIEW_CONTEXT = 40;
-
-function revisionPreview(before: string, after: string) {
-  let changeStart = 0;
-  while (changeStart < before.length && changeStart < after.length && before[changeStart] === after[changeStart]) {
-    changeStart += 1;
-  }
-  const windowStart = Math.max(0, changeStart - REVISION_PREVIEW_CONTEXT);
-  return {
-    before: before.slice(windowStart, windowStart + REVISION_PREVIEW_LENGTH),
-    after: after.slice(windowStart, windowStart + REVISION_PREVIEW_LENGTH),
-  };
-}
-
 function RevisionList({
   revisions,
   onAccept,
@@ -262,7 +247,7 @@ function RevisionList({
       )}
       {revisions.map((revision) => {
         const { before, after } = revisionPreviewText(revision);
-        const preview = revisionPreview(before, after);
+        const preview = revisionCardPreview(before, after);
         return (
           <article className={`revision-card ${revisionAuthorClass(revision.author)}`} key={revision.id}>
             <header>
