@@ -203,6 +203,63 @@ describe("tracked text comparison", () => {
     expect(revisionPreviewText(legacy)).toEqual({ before: "See", after: "See [sentence2026]" });
   });
 
+  it("falls back to the recorded change when a snapshot cannot print an inserted atom", () => {
+    const before = doc("Body");
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [{ type: "text", text: "Body" }, { type: "horizontalRule" }],
+        },
+      ],
+    };
+    // The atom prints no text of its own, so both snapshots read "Body".
+    expect(revisionText(after)).toBe("Body");
+    expect(revisionPreviewText(revision("rule", before, after))).toEqual({
+      before: "Body",
+      after: "Body [horizontalRule]",
+    });
+  });
+
+  it("keeps a stored preview that is more detailed than a stale snapshot", () => {
+    const stale = doc("See");
+    const legacy = {
+      ...revision("old", stale, stale),
+      before: "See",
+      after: "See [sentence2026]",
+    };
+    expect(revisionPreviewText(legacy)).toEqual({ before: "See", after: "See [sentence2026]" });
+  });
+
+  it("shows distinct History previews for a citation and an equation appended to the last paragraph", () => {
+    const before = doc("The central model can be expressed compactly: meaning = structure + language.");
+    const withCitation: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [...(before.content?.[0]?.content ?? []), { type: "citation", attrs: { key: "sentence2026" } }],
+        },
+      ],
+    };
+    const withEquation: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [...(withCitation.content?.[0]?.content ?? []), { type: "mathInline", attrs: { latex: "x^2" } }],
+        },
+      ],
+    };
+    const citation = revisionPreviewText(revision("citation", before, withCitation));
+    const equation = revisionPreviewText(revision("equation", withCitation, withEquation));
+    expect(citation.before).not.toBe(citation.after);
+    expect(citation.after).toContain("[sentence2026]");
+    expect(equation.before).not.toBe(equation.after);
+    expect(equation.after).toContain("x^2");
+  });
+
   it("identifies other inserted atoms in the review preview", () => {
     const before = doc("Body");
     const after: SentenceDocument = {

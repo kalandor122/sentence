@@ -383,14 +383,53 @@ export function revisionText(document: SentenceDocument): string {
   return (document.content ?? []).map(visit).join("").trim();
 }
 
+// A change that a snapshot cannot print (an atom type added since the snapshot
+// was written, or an attribute-only leaf) still has to name itself in the card.
+function changeValueText(value: unknown): string {
+  if (Array.isArray(value)) return value.map(changeValueText).join("");
+  if (isObject(value) && typeof value.type === "string") {
+    return revisionText({ type: "doc", content: [value as unknown as DocumentNode] }) || `[${value.type}]`;
+  }
+  return typeof value === "string" ? value : "";
+}
+
+function changePreviewText(changes: Change[]): { before: string; after: string } {
+  const before: string[] = [];
+  const after: string[] = [];
+  for (const change of changes) {
+    if (change.kind === "text") {
+      if (change.removed) before.push(change.removed);
+      if (change.inserted) after.push(change.inserted);
+    } else {
+      if (change.before !== undefined) before.push(changeValueText(change.before));
+      if (change.after !== undefined) after.push(changeValueText(change.after));
+    }
+  }
+  const join = (parts: string[]) => parts.map((part) => part.trim()).filter(Boolean).join(" ");
+  return { before: join(before), after: join(after) };
+}
+
 // History previews used to be stored without an atom's attribute content, so
 // an older revision can still carry identical before/after text even though its
 // snapshots show an inserted citation or equation. The snapshots are the source
 // of truth; rebuild the preview from them when they are available.
 export function revisionPreviewText(revision: Revision): { before: string; after: string } {
-  return {
+  const snapshots = {
     before: revision.beforeDocument ? revisionText(revision.beforeDocument) : revision.before,
     after: revision.afterDocument ? revisionText(revision.afterDocument) : revision.after,
+  };
+  if (snapshots.before !== snapshots.after) return snapshots;
+  // The stored strings may be more detailed than a snapshot that predates an
+  // atom's preview support.
+  if (revision.before !== revision.after) return { before: revision.before, after: revision.after };
+  // Last resort: describe the recorded change, so a card whose snapshots print
+  // the same text still identifies the inserted atom instead of reading as an
+  // empty edit.
+  const changes = changePreviewText(revisionChanges(revision));
+  if (!changes.before && !changes.after) return snapshots;
+  return {
+    before: changes.before ? `${snapshots.before}${snapshots.before ? " " : ""}${changes.before}` : snapshots.before,
+    after: changes.after ? `${snapshots.after}${snapshots.after ? " " : ""}${changes.after}` : snapshots.after,
   };
 }
 
