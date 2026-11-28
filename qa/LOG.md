@@ -1184,3 +1184,6 @@ error: failed to push some refs to 'https://github.com/kalandor122/sentence.git'
 2026-11-28T05:16:58Z DONE qa-424 (tsc -b, npm test, smoke all green)
 2026-11-28T05:17:37Z IMPORTED 1 tester findings into the backlog
 2026-11-28T05:17:37Z START qa-366 on qa/qa-366-a-tracked-deletion-is-struck-through-at: A tracked deletion is struck through at the start of the paragraph when the deleted text's trailing context repeats earl
+2026-11-28T05:19:23Z PUSHED main
+2026-11-28T05:19:23Z DONE qa-366 (tsc -b, npm test, smoke all green)
+2026-11-28T05:20:02Z IMPORTED 1 tester findings into the backlog
