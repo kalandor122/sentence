@@ -960,6 +960,10 @@ export default function App() {
           sourceDirtyRef.current = false;
           sourceDraftDocument.current = null;
           sourceDraftWarning.current = false;
+          // The pane now matches the saved document, so returning from the
+          // visual view must keep this text and its undo history instead of
+          // regenerating LaTeX (which would drop comments typed in the pane).
+          appliedSourceDocument.current = JSON.stringify(current.document);
           // Autosave commits the draft without the Apply button, so the next key
           // still has to start a new undo step rather than extend the old one.
           setSourceUndoBoundary((value) => value + 1);
@@ -1003,6 +1007,7 @@ export default function App() {
         sourceDirtyRef.current = false;
         sourceDraftDocument.current = null;
         sourceDraftWarning.current = false;
+        appliedSourceDocument.current = JSON.stringify(current.document);
         // Autosave commits the draft without the Apply button, so the next key
         // still has to start a new undo step rather than extend the old one.
         setSourceUndoBoundary((value) => value + 1);

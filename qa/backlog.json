@@ -6023,8 +6023,9 @@
       "hint": "Repro: Open the app, click Source in the status bar and place the caret inside the body (before \\end{document}). Type a line '% Autosave comment note' plus a new line 'Probe commented body line.', then wait ~2 s until Apply source disables (the autosave committed the draft). Click Visual, then Source. Press Ctrl+Z three times.\nActual: The pane is regenerated from the visual model: the comment disappears and all three Ctrl+Z presses leave the text unchanged (Apply source stays disabled, so the history was reset). The same edit is undone normally if Ctrl+Z is pressed before leaving the pane.",
       "source": "explore:source-editor:returning to source after an autosaved edit wipes the undo history and rewrites the pane",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T08:46:43Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T08:46:43Z",
+      "lastAttemptAt": "2026-11-28T08:46:43Z"
     },
     {
       "id": "qa-380",
