@@ -5814,7 +5814,9 @@
       ],
       "hint": "Repro: 1. Open a new document. 2. Triple-click the first body paragraph to select it and type 'tail X tail' to replace it. 3. Review tab > Track changes. 4. Click at the start of that paragraph, press ArrowRight five times, then hold Shift and press ArrowRight twice to select 'X '. 5. Press Backspace and wait about 2.5 s; open History to confirm one tracked change.\nActual: The strike-through is rendered before all of the paragraph text: the paragraph reads '[X ]tail tail' and the deletion widget's offset in the paragraph is 0 instead of 5. The review mark therefore points at the start of the paragraph rather than at the deletion point, and a reviewer checking a repeated phrase sees the wrong location.",
       "source": "explore:review:a tracked deletion is struck through at the start of the paragraph when the deleted text's trailing context repeats earl",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T05:17:37Z"
     },
     {
       "id": "qa-367",
@@ -6514,10 +6516,11 @@
       ],
       "hint": "Repro: Open the demo project. View > LaTeX, append the following before \\end{document}: '\\begin{verbatim}\\nCODE LINE ONE\\nCODE LINE TWO\\n\\end{verbatim}\\n\\nAFTER CODE', then click Apply source and View > Visual. Click the code text, press Home, then ArrowRight four times so the caret is after 'CODE'. Insert > Image and choose any PNG. The PRE block now contains only 'CODE'; a new normal paragraph ' LINE ONE CODE LINE TWO' (containing one inline 120x60 img plus one 0x0 img) appears between the code block and 'AFTER CODE'. View > LaTeX shows '\\begin{verbatim}\\nCODE\\n\\end{verbatim}' followed by '\\includegraphics[width=\\linewidth,height=1.5em,keepaspectratio]{assets/images/code-probe.png}% Sentence alt: code probe.png\\n LINE ONE\\nCODE LINE TWO'. No toast, no console error. Probe qa/probes/insert-media.mjs scenario 'image-in-code-block'.\nActual: The inline image insertion splits the text-only code block: the verbatim body is cut at the caret ('CODE'), the remainder ' LINE ONE CODE LINE TWO' is re-exported and displayed as ordinary prose outside \\begin{verbatim}, and the image is spliced into that prose. The visible defect is a silent, immediate loss of the formatting and position of most of the code block.",
       "source": "explore:insert-media:inserting an image with the caret inside a verbatim block truncates the code and moves the rest of it into prose",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T05:12:29Z",
-      "lastAttemptAt": "2026-11-28T05:12:29Z"
+      "lastAttemptAt": "2026-11-28T05:12:29Z",
+      "doneAt": "2026-11-28T05:16:56Z"
     },
     {
       "id": "qa-425",
@@ -6557,6 +6560,18 @@
     },
     {
       "id": "qa-428",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-429",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
