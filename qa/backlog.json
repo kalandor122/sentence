@@ -5686,10 +5686,11 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T03:26:30Z",
-      "lastAttemptAt": "2026-11-28T03:26:30Z"
+      "lastAttemptAt": "2026-11-28T03:26:30Z",
+      "doneAt": "2026-11-28T03:40:09Z"
     },
     {
       "id": "qa-359",
@@ -5701,7 +5702,9 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "open"
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T04:00:26Z"
     },
     {
       "id": "qa-360",
@@ -6337,6 +6340,78 @@
     },
     {
       "id": "qa-412",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-413",
+      "title": "Deleting a comment drops keyboard focus on <body> and the next keystrokes are silently discarded",
+      "why": "Exploratory pass on keyboard (functional): expected After a comment is deleted, focus moves to the next or previous comment card, the Review rail or the editor, so the keyboard user keeps a usable position and later typing is not thrown away.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Open a project, select body text, go to Review and activate \"New comment\"; type a note and press Ctrl+Enter. Click the Review rail to show the panel. Tab to the first \"Delete comment\" button and press Enter. The thread disappears and document.activeElement becomes BODY. Type \"LOST\": the document text does not change.\nActual: Probe data: comment cards went 2 -> 1, document.activeElement is BODY (bodyFocused true), and typing \"LOST\" left the editor text without that word (typed false).",
+      "source": "explore:keyboard:deleting a comment drops keyboard focus on <body> and the next keystrokes are silently discarded",
+      "status": "open"
+    },
+    {
+      "id": "qa-414",
+      "title": "Paragraph spacing popover has a detached tab order: Shift+Tab jumps to the status-bar Zoom in, and Tab past the last fie",
+      "why": "Exploratory pass on keyboard (ux): expected The popover keeps its focus order anchored to its trigger and controls: Shift+Tab from the first field returns to the Paragraph spacing button, and leaving the last field either continues to a usable control or closes the popover (as the Text color palette does).",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: In a project open the Home ribbon tab, focus \"Paragraph spacing\" and press Enter (focus lands in the Before field). Press Shift+Tab once: focus goes to the status-bar \"Zoom in\" button. Focus the Before field again, press Tab (moves to After) and Tab again: document.activeElement is BODY while the .spacing-panel is still open.\nActual: Probe data: after Shift+Tab activeElement = BUTTON \"Zoom in\"; after two forward Tabs activeElement = BODY; document.querySelectorAll(\".spacing-panel\").length = 1, so the dialog is still open with focus outside it.",
+      "source": "explore:keyboard:paragraph spacing popover has a detached tab order: shift+tab jumps to the status-bar zoom in, and tab past the last fie",
+      "status": "open"
+    },
+    {
+      "id": "qa-415",
+      "title": "Comment cards in the Review panel are mouse-only: the ARTICLE is not focusable and has no keyboard path to select a comm",
+      "why": "Exploratory pass on keyboard (ux): expected Each comment card is reachable with Tab (role/button or tabIndex 0) and Enter/Space selects it, and the selected state is exposed to assistive technology, so selecting a comment is not a mouse-only action.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Create a comment, open the Review rail, and inspect the .comment-thread cards. Click the second card: its class changes from no \"active\" to \"active\" (the comment is selected). Now Tab through the panel: focus visits the other rail buttons and then the Resolve comment, Delete comment and Reply buttons, never the card itself.\nActual: Probe data for the cards: tag ARTICLE, tabIndex -1, role null, hasClick true, hasKey false. A click moves the active flag to the second card, but no focusable control performs the same action.",
+      "source": "explore:keyboard:comment cards in the review panel are mouse-only: the article is not focusable and has no keyboard path to select a comm",
+      "status": "open"
+    },
+    {
+      "id": "qa-416",
+      "title": "LaTeX source file switcher exposes no selected state, and the textarea is still named \"LaTeX source\" while editing refer",
+      "why": "Exploratory pass on keyboard (ux): expected The file switcher is a labelled tablist with aria-selected (or an equivalent pressed state) and the textarea's accessible name identifies the open file, for example \"references.bib source\", so a screen-reader user knows which file is being edited.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Press Ctrl+Alt+2 to open the source pane and inspect .source-file-tabs. Both buttons are plain buttons (role null, aria-selected null, aria-pressed null); only the CSS class active marks document.tex. Focus references.bib and press Enter: the textarea shows @article{sentence2026, ... and the active class moves, but the textarea's aria-label is still \"LaTeX source\".\nActual: Probe data: tabs = [{text:\"document.tex\", role:null, selected:null, pressed:null, cls:\"active\"}, {text:\"references.bib\", role:null, selected:null, pressed:null}]; after switching, the value starts \"@article{sentence2026,\" and the textarea aria-label remains \"LaTeX source\".",
+      "source": "explore:keyboard:latex source file switcher exposes no selected state, and the textarea is still named \"latex source\" while editing refer",
+      "status": "open"
+    },
+    {
+      "id": "qa-417",
+      "title": "Ribbon tablist ignores Home and End, so only the arrow keys move between ribbon tabs",
+      "why": "Exploratory pass on keyboard (ux): expected End moves focus and selection to the last ribbon tab (Git) and Home moves them to the first, matching the workspace tabs and the usual ARIA tabs keyboard model.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: Focus the Home ribbon tab (role=tab) and press End; inspect document.activeElement and the aria-selected tab. Then focus the Git tab and press Home.\nActual: Probe data: after End on Home, document.activeElement is still BUTTON#ribbon-tab-home \"Home\" and the only tab with aria-selected=\"true\" is Home. After Home on Git, focus and selection remain on Git. ArrowRight/ArrowLeft do move between tabs.",
+      "source": "explore:keyboard:ribbon tablist ignores home and end, so only the arrow keys move between ribbon tabs",
+      "status": "open"
+    },
+    {
+      "id": "qa-418",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
