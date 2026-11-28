@@ -329,20 +329,25 @@ function lastBlockDocumentBox(
 ): { top: number; height: number } | null {
   const blocks = scroller.querySelectorAll<HTMLElement>(".tiptap > *");
   let block: HTMLElement | null = null;
+  let rect: DOMRect | null = null;
   for (let index = blocks.length - 1; index >= 0; index -= 1) {
     const candidate = blocks[index];
     const hasText = (candidate.textContent ?? "").trim().length > 0;
     const hasAtom = candidate.querySelector(
       "img, table, [data-math-inline], [data-math-block], [data-page-break], [data-footnote], [data-citation], [data-cross-reference]",
     );
-    if (hasText || hasAtom || index === 0) {
-      block = candidate;
-      break;
-    }
+    if (!hasText && !hasAtom && index > 0) continue;
+    const box = candidate.getBoundingClientRect();
+    // A trailing page break or an emptied atom paints no box, so it cannot
+    // anchor the zoom. Fall back to the last block that does instead of
+    // returning no anchor at all: centring the zoom there can leave the whole
+    // document above the viewport.
+    if (box.height <= 0 && index > 0) continue;
+    block = candidate;
+    rect = box;
+    break;
   }
-  if (!block) return null;
-  const rect = block.getBoundingClientRect();
-  if (rect.height <= 0) return null;
+  if (!block || !rect || rect.height <= 0) return null;
   return {
     top: (rect.top - scroller.getBoundingClientRect().top + scroller.scrollTop - paddingTop) / zoom,
     height: rect.height / zoom,
@@ -729,6 +734,19 @@ export default function EditorSurface({
       observer.disconnect();
     };
   }, [zoom]);
+
+  // Pagination updates the page count after the last zoom correction, and the
+  // stage reserves the sheet from that count. Follow the new page in the same
+  // commit so the scroll range ends at the sheet that is about to paint: a
+  // stale reservation leaves blank scroll past the last page, so wheeling to
+  // the end can put the whole document above the viewport.
+  useLayoutEffect(() => {
+    const scroller = scrollRef.current;
+    if (!scroller) return;
+    clampScrollToSheet(scroller);
+    scrollTopRef.current = scroller.scrollTop;
+    scrollLeftRef.current = scroller.scrollLeft;
+  }, [pageCount]);
 
   // Word's zoom gesture: Ctrl/Cmd+wheel over the page steps the zoom the same
   // way the status bar does. The listener is non-passive so the browser's own
