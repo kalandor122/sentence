@@ -484,6 +484,18 @@ function tocNodePosition(editor: Editor | null): number | null {
 function insertImage(editor: Editor | null, attrs: Record<string, string>) {
   if (!editor) return;
   const { $from, empty } = editor.state.selection;
+  // A verbatim block accepts text only. An inline image would split it and the
+  // rest of the code would leave the environment as prose, so put the figure
+  // after the whole block instead and leave the code untouched.
+  if ($from.parent.type.name === "codeBlock") {
+    editor
+      .chain()
+      .focus()
+      .insertContentAt($from.after($from.depth), { type: "image", attrs })
+      .run();
+    caretAfterBlockAtom(editor);
+    return;
+  }
   const insideText =
     empty &&
     $from.parent.isTextblock &&

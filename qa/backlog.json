@@ -6515,8 +6515,9 @@
       "hint": "Repro: Open the demo project. View > LaTeX, append the following before \\end{document}: '\\begin{verbatim}\\nCODE LINE ONE\\nCODE LINE TWO\\n\\end{verbatim}\\n\\nAFTER CODE', then click Apply source and View > Visual. Click the code text, press Home, then ArrowRight four times so the caret is after 'CODE'. Insert > Image and choose any PNG. The PRE block now contains only 'CODE'; a new normal paragraph ' LINE ONE CODE LINE TWO' (containing one inline 120x60 img plus one 0x0 img) appears between the code block and 'AFTER CODE'. View > LaTeX shows '\\begin{verbatim}\\nCODE\\n\\end{verbatim}' followed by '\\includegraphics[width=\\linewidth,height=1.5em,keepaspectratio]{assets/images/code-probe.png}% Sentence alt: code probe.png\\n LINE ONE\\nCODE LINE TWO'. No toast, no console error. Probe qa/probes/insert-media.mjs scenario 'image-in-code-block'.\nActual: The inline image insertion splits the text-only code block: the verbatim body is cut at the caret ('CODE'), the remainder ' LINE ONE CODE LINE TWO' is re-exported and displayed as ordinary prose outside \\begin{verbatim}, and the image is spliced into that prose. The visible defect is a silent, immediate loss of the formatting and position of most of the code block.",
       "source": "explore:insert-media:inserting an image with the caret inside a verbatim block truncates the code and moves the rest of it into prose",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T05:12:29Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T05:12:29Z",
+      "lastAttemptAt": "2026-11-28T05:12:29Z"
     },
     {
       "id": "qa-425",
