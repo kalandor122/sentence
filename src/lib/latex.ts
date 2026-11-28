@@ -614,10 +614,13 @@ function blockToLatex(node: DocumentNode, settings: ProjectSettings, enumDepth =
       const mathEnvironment = attribute(node, "environment");
       const body = normaliseMathBody(attribute(node, "latex") ?? "");
       if (mathEnvironment) {
-        return `\\begin{${mathEnvironment}}\n${body}\n\\end{${mathEnvironment}}`;
+        return wrapAlignment(
+          node,
+          `\\begin{${mathEnvironment}}\n${body}\n\\end{${mathEnvironment}}`,
+        );
       }
       const environment = node.attrs?.numbered === true ? "equation" : "equation*";
-      return `\\begin{${environment}}\n${body}\n\\end{${environment}}`;
+      return wrapAlignment(node, `\\begin{${environment}}\n${body}\n\\end{${environment}}`);
     }
     case "pageBreak":
       return "\\newpage";
@@ -1497,6 +1500,50 @@ function parseMathEnvironmentBlock(block: string): { environment: string; body: 
   return { environment: match[1], body: normaliseMathBody(match[2]) };
 }
 
+// Display math in all its spellings becomes the same mathBlock node. The
+// alignment is the surrounding center/flushleft/flushright wrapper, which the
+// parser sets on the node so the exporter can write it back.
+function mathBlockFromSource(source: string, textAlign?: string): DocumentNode | null {
+  const alignment: Record<string, string> = textAlign ? { textAlign } : {};
+  const environment = parseMathEnvironmentBlock(source);
+  if (environment) {
+    return {
+      type: "mathBlock",
+      attrs: {
+        latex: environment.body,
+        environment: environment.environment,
+        numbered: false,
+        ...alignment,
+      },
+    };
+  }
+  // Both delimiters are unnumbered, so they round-trip through the same
+  // mathBlock node as an equation* environment.
+  const displayMath =
+    source.match(/^\\\[\s*([\s\S]*?)\s*\\\]$/) ??
+    source.match(/^\$\$\s*([\s\S]*?)\s*\$\$$/);
+  if (displayMath) {
+    return {
+      type: "mathBlock",
+      attrs: { latex: normaliseMathBody(displayMath[1]), numbered: false, ...alignment },
+    };
+  }
+  const equation = source.match(
+    /^\\begin\{equation(\*?)\}\s*([\s\S]*?)\s*\\end\{equation\1\}$/,
+  );
+  if (equation) {
+    return {
+      type: "mathBlock",
+      attrs: {
+        latex: normaliseMathBody(equation[2]),
+        numbered: equation[1] !== "*",
+        ...alignment,
+      },
+    };
+  }
+  return null;
+}
+
 function pushBodyParagraphs(content: DocumentNode[], text: string): void {
   let rest = text;
   for (;;) {
@@ -2327,6 +2374,11 @@ export function latexToDocument(
         aligned[1] === "center" ? "center" : aligned[1] === "flushleft" ? "left" : "right";
       const inner = aligned[2].trim();
       assertSupportedEnvironment(inner);
+      const innerMath = mathBlockFromSource(inner, textAlign);
+      if (innerMath) {
+        content.push(innerMath);
+        continue;
+      }
       const innerHeading = parseHeadingBlock(inner);
       if (innerHeading) {
         content.push({
@@ -2382,36 +2434,9 @@ export function latexToDocument(
       });
       continue;
     }
-    const mathEnvironment = parseMathEnvironmentBlock(block);
+    const mathEnvironment = mathBlockFromSource(block);
     if (mathEnvironment) {
-      content.push({
-        type: "mathBlock",
-        attrs: {
-          latex: mathEnvironment.body,
-          environment: mathEnvironment.environment,
-          numbered: false,
-        },
-      });
-      continue;
-    }
-    // Display math also comes in delimiter form. Both are unnumbered, so they
-    // round-trip through the same mathBlock node as an equation* environment.
-    const displayMath =
-      block.match(/^\\\[\s*([\s\S]*?)\s*\\\]$/) ??
-      block.match(/^\$\$\s*([\s\S]*?)\s*\$\$$/);
-    if (displayMath) {
-      content.push({ type: "mathBlock", attrs: { latex: normaliseMathBody(displayMath[1]), numbered: false } });
-      continue;
-    }
-    // The body may be on its own lines or inline with the environment tags.
-    const equation = block.match(
-      /^\\begin\{equation(\*?)\}\s*([\s\S]*?)\s*\\end\{equation\1\}$/,
-    );
-    if (equation) {
-      content.push({
-        type: "mathBlock",
-        attrs: { latex: normaliseMathBody(equation[2]), numbered: equation[1] !== "*" },
-      });
+      content.push(mathEnvironment);
       continue;
     }
     const verbatim = block.match(/^\\begin\{verbatim\}\n([\s\S]*)\n\\end\{verbatim\}$/);

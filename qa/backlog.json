@@ -6911,8 +6911,9 @@
       "hint": "Repro: 1. Create a project and open View > LaTeX.\n2. Replace the body before \\end{document} with:\n\\begin{center}\n\\begin{equation}\nE=mc^2\n\\end{equation}\n\\end{center}\n\n\\begin{flushleft}\n\\[\nF=ma\n\\]\n\\end{flushleft}\n3. Click Apply source. The toast says \"Visual document synchronized from LaTeX.\"; switch to View > Visual.\n4. Return to View > LaTeX and click Refresh from visual.\nActual: Zero math nodes are created. The visual page shows literal paragraphs `e\u0331gin{equation} E=mc^2 \\end{equation}` and `\\[ F=ma \\]`; Refresh from visual rewrites the body to `e\u0331gin\\{equation\\}`, `E=mc\\textasciicircum{}2`, `\\textbackslash{}end\\{equation\\}`, and escapes the flushleft delimiters as `\\textbackslash{}[` and `\\textbackslash{}]`. Applying the export again is reported as a success and reproduces the same escaped text, so the original valid source is lost.",
       "source": "explore:math:display math inside a center/flushleft/flushright wrapper is corrupted on apply",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T09:19:06Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T09:19:06Z",
+      "lastAttemptAt": "2026-11-28T09:19:06Z"
     },
     {
       "id": "qa-452",

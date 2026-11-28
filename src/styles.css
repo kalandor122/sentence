@@ -1487,6 +1487,12 @@ button:disabled {
   margin: 0;
 }
 
+/* KaTeX centres a display formula itself; when the block came from an aligned
+   wrapper, the wrapper's alignment wins so flushleft and flushright show. */
+.math-block[data-math-align] .katex-display {
+  text-align: inherit;
+}
+
 /* Visual equation editor dialog */
 .math-toolbar {
   display: flex;

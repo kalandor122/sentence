@@ -1112,6 +1112,62 @@ describe("LaTeX generation", () => {
     expect(centeredHeading?.attrs?.level).toBe(2);
   });
 
+  it("imports display math inside an aligned wrapper as an aligned math block", () => {
+    const source = [
+      "\\begin{document}",
+      "\\begin{center}",
+      "\\begin{equation}",
+      "E=mc^2",
+      "\\end{equation}",
+      "\\end{center}",
+      "",
+      "\\begin{flushleft}",
+      "\\[",
+      "F=ma",
+      "\\]",
+      "\\end{flushleft}",
+      "",
+      "\\begin{flushright}",
+      "$$",
+      "G=mg",
+      "$$",
+      "\\end{flushright}",
+      "\\end{document}",
+    ].join("\n");
+    const parsed = latexToDocument(source, DEFAULT_SETTINGS).document;
+    expect(parsed.content.map((node) => node.type)).toEqual([
+      "mathBlock",
+      "mathBlock",
+      "mathBlock",
+    ]);
+    expect(parsed.content[0]?.attrs).toMatchObject({
+      latex: "E=mc^2",
+      numbered: true,
+      textAlign: "center",
+    });
+    expect(parsed.content[1]?.attrs).toMatchObject({
+      latex: "F=ma",
+      numbered: false,
+      textAlign: "left",
+    });
+    expect(parsed.content[2]?.attrs).toMatchObject({
+      latex: "G=mg",
+      numbered: false,
+      textAlign: "right",
+    });
+    const exported = documentToLatex(parsed, settings);
+    expect(exported).toContain(
+      "\\begin{center}\n\\begin{equation}\nE=mc^2\n\\end{equation}\n\\end{center}",
+    );
+    expect(exported).toContain(
+      "\\begin{flushleft}\n\\begin{equation*}\nF=ma\n\\end{equation*}\n\\end{flushleft}",
+    );
+    expect(exported).toContain(
+      "\\begin{flushright}\n\\begin{equation*}\nG=mg\n\\end{equation*}\n\\end{flushright}",
+    );
+    expect(exported).not.toContain("\\textbackslash{}");
+  });
+
   it("parses $...$ source as editable inline math and keeps it on export", () => {
     const source = [
       "\\begin{document}",
