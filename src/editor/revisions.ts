@@ -127,13 +127,17 @@ function matchesAtom(child: ProseMirrorNode, type: string, attrs: Record<string,
   return child.type.name === type && sameAttributes(child.attrs as Record<string, unknown>, attrs);
 }
 
-function findAtomRange(doc: ProseMirrorNode, node: Record<string, unknown>, path: Path | null): { from: number; to: number } | null {
+function findAtomRange(
+  doc: ProseMirrorNode,
+  node: Record<string, unknown>,
+  path: Path | null,
+): { node: ProseMirrorNode; from: number; to: number } | null {
   if (typeof node.type !== "string" || !ATOM_NODE_TYPES.has(node.type) || !isRecord(node.attrs)) return null;
   const type = node.type;
   const attrs = node.attrs;
   const exact = path ? nodeAtPath(doc, path) : null;
   if (exact && matchesAtom(exact.node, type, attrs)) {
-    return { from: exact.position, to: exact.position + exact.node.nodeSize };
+    return { node: exact.node, from: exact.position, to: exact.position + exact.node.nodeSize };
   }
   const index = path?.[0] === "content" ? path[1] : undefined;
   let blockStart = 0;
@@ -142,27 +146,34 @@ function findAtomRange(doc: ProseMirrorNode, node: Record<string, unknown>, path
     for (let child = 0; child < index; child += 1) blockStart += doc.child(child).nodeSize;
     blockEnd = blockStart + doc.child(index).nodeSize;
   }
-  let range: { from: number; to: number } | null = null;
+  let range: { node: ProseMirrorNode; from: number; to: number } | null = null;
   doc.descendants((child, position) => {
     if (range) return false;
     if (position < blockStart || position >= blockEnd) return true;
     if (!matchesAtom(child, type, attrs)) return true;
-    range = { from: position, to: position + child.nodeSize };
+    range = { node: child, from: position, to: position + child.nodeSize };
     return false;
   });
   return range;
 }
 
 function atomDecoration(
-  range: { from: number; to: number },
+  node: ProseMirrorNode,
+  from: number,
+  to: number,
   revision: Revision,
   colorClass: string,
 ): Decoration {
-  return Decoration.inline(range.from, range.to, {
+  const attributes = {
     class: `sentence-revision-insertion ${colorClass}`,
     "data-revision-id": revision.id,
     title: `Inserted by ${revision.author || "Author"}`,
-  });
+  };
+  // A block atom (a display equation, a block image) has no inline content to
+  // underline, so the decoration belongs on the block's own DOM.
+  return node.isInline
+    ? Decoration.inline(from, to, attributes)
+    : Decoration.node(from, to, attributes);
 }
 
 function markAtomInsertion(
@@ -176,7 +187,7 @@ function markAtomInsertion(
   if (!isRecord(node)) return;
   const range = findAtomRange(doc, node, path);
   if (range) {
-    decorations.push(atomDecoration(range, revision, colorClass));
+    decorations.push(atomDecoration(range.node, range.from, range.to, revision, colorClass));
     return;
   }
   // A block inserted as a whole (a new paragraph holding only an equation, or a
@@ -190,7 +201,7 @@ function markAtomInsertion(
     if (position < container.position) return true;
     if (position >= end) return false;
     if (ATOM_NODE_TYPES.has(child.type.name)) {
-      decorations.push(atomDecoration({ from: position, to: position + child.nodeSize }, revision, colorClass));
+      decorations.push(atomDecoration(child, position, position + child.nodeSize, revision, colorClass));
       return false;
     }
     return true;
