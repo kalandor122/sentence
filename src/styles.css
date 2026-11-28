@@ -1080,6 +1080,11 @@ button:disabled {
   padding: 30px 34px 80px;
   overflow: auto;
   scrollbar-gutter: stable;
+  /* A rescale of the sheet (a zoom step or a pane-fit change) moves the text but
+     not the caret, so the browser's own scroll anchoring would pick an element
+     and shift the offset it thinks is stable before the zoom correction runs.
+     The offset is rescaled explicitly in EditorSurface, so anchoring is off. */
+  overflow-anchor: none;
 }
 
 .editor-loading {

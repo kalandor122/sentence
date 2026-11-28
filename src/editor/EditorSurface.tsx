@@ -317,13 +317,28 @@ function caretDocumentBox(
 // The last block of the page, in unscaled document pixels. Focus can sit in the
 // source pane, a dialog or the toolbar, which leaves the caret outside the
 // page; the block at the bottom of the document is then what a reader who has
-// scrolled to the end is actually looking at.
+// scrolled to the end is actually looking at. The final block can also be a
+// trailing empty paragraph (after Enter or an explicit page break), and pinning
+// that instead of the last text would leave the whole document above the
+// viewport on a zoom-out, so the last block with content wins.
 function lastBlockDocumentBox(
   scroller: HTMLElement,
   paddingTop: number,
   zoom: number,
 ): { top: number; height: number } | null {
-  const block = scroller.querySelector<HTMLElement>(".tiptap > *:last-child");
+  const blocks = scroller.querySelectorAll<HTMLElement>(".tiptap > *");
+  let block: HTMLElement | null = null;
+  for (let index = blocks.length - 1; index >= 0; index -= 1) {
+    const candidate = blocks[index];
+    const hasText = (candidate.textContent ?? "").trim().length > 0;
+    const hasAtom = candidate.querySelector(
+      "img, table, [data-math-inline], [data-math-block], [data-page-break], [data-footnote], [data-citation], [data-cross-reference]",
+    );
+    if (hasText || hasAtom || index === 0) {
+      block = candidate;
+      break;
+    }
+  }
   if (!block) return null;
   const rect = block.getBoundingClientRect();
   if (rect.height <= 0) return null;
