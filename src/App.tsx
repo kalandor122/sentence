@@ -1428,12 +1428,18 @@ export default function App() {
   const rejectTrackedChanges = (ids: string[]) => {
     const current = workspaceRef.current;
     if (!current || ids.length === 0) return;
-    const { document: rejectedDocument, revisions } = rejectRevisions(current.document, current.revisions, ids);
+    // An edit typed just before the click is still waiting for the revision
+    // debounce, so it lives only in the baseline. Rejecting rewrites the
+    // document and moves the baseline onto the result, which would fold that
+    // edit into the baseline without ever showing it in History. Commit it
+    // first so it stays a pending change of its own.
+    const pending = withPendingRevision(current);
+    const { document: rejectedDocument, revisions } = rejectRevisions(pending.document, pending.revisions, ids);
     // The rejected text comes back without the comment mark it used to carry.
     // A thread that still exists should keep its highlight, so re-anchor it from
     // the revision snapshots that remembered the text.
     const snapshots = ids
-      .map((id) => current.revisions.find((revision) => revision.id === id))
+      .map((id) => pending.revisions.find((revision) => revision.id === id))
       .filter((revision) => revision !== undefined)
       .flatMap((revision) => [revision.beforeDocument, revision.afterDocument]);
     const document = restoreThreadComments(
