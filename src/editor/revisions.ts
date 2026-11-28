@@ -109,16 +109,35 @@ function sameAttributes(left: Record<string, unknown>, right: Record<string, unk
   return Object.keys(right).every((name) => JSON.stringify(left[name]) === JSON.stringify(right[name]));
 }
 
+// Change paths are recorded against the document with adjacent text runs
+// merged, so a comment mark splitting a run makes the stored content index name
+// a different sibling in the live document. Resolve the index in merged space:
+// consecutive text nodes count as one, exactly as the diff saw them.
+function mergedChild(node: ProseMirrorNode, index: number): { node: ProseMirrorNode; index: number } | null {
+  let merged = 0;
+  let previousText = false;
+  for (let child = 0; child < node.childCount; child += 1) {
+    const current = node.child(child);
+    if (current.isText && previousText) continue;
+    if (merged === index) return { node: current, index: child };
+    merged += 1;
+    previousText = current.isText;
+  }
+  return null;
+}
+
 function nodeAtPath(doc: ProseMirrorNode, path: Path): { node: ProseMirrorNode; position: number } | null {
   let node = doc;
   let position = 0;
   for (let step = 0; step < path.length; step += 2) {
     const index = path[step + 1];
-    if (path[step] !== "content" || typeof index !== "number" || index >= node.childCount) return null;
+    if (path[step] !== "content" || typeof index !== "number") return null;
+    const child = mergedChild(node, index);
+    if (!child) return null;
     let offset = node === doc ? 0 : 1;
-    for (let child = 0; child < index; child += 1) offset += node.child(child).nodeSize;
+    for (let previous = 0; previous < child.index; previous += 1) offset += node.child(previous).nodeSize;
     position += offset;
-    node = node.child(index);
+    node = child.node;
   }
   return node === doc ? null : { node, position };
 }
