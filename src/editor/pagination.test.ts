@@ -403,6 +403,15 @@ describe("scrollTopForZoomPoint", () => {
     expect(30 + (14029 + 16) * 1.5 - clamped).toBeCloseTo(627, 6);
   });
 
+  it("pulls a line that only straddles the viewport edge fully into view", () => {
+    // At 100% the line top sits 630px down a 627px viewport, so its foot is cut
+    // off. Zooming out has to hold that line instead of snapping to the centre,
+    // and lift it just enough that its scaled box ends at the viewport bottom.
+    const target = scrollTopForZoomPoint(14000, 13400, 627, 30, 1, 0.7, 9702, 16);
+    const top = 30 + 14000 * 0.7 - target;
+    expect(top).toBeCloseTo(627 - 16 * 0.7, 6);
+  });
+
   it("never scrolls a box taller than the viewport above the top", () => {
     // An 800px image at 150% is 1200px tall, so it cannot fit; the clamp stops
     // with its top at the top of the viewport instead of scrolling it away.

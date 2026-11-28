@@ -231,11 +231,12 @@ export function scrollLeftForCaret(
 // viewport (at the end of a document, for example): scaling its distance from
 // the centre can push it off-screen. When the caret was visible before the
 // zoom, hold its exact screen position instead and fall back to the viewport
-// centre only when it was already out of view. `pointTop` is the caret's
-// unscaled document offset from the top of the sheet, and `pointHeight` its
-// line box: holding the top of a line that grows with the zoom would leave its
-// bottom clipped at the foot of the viewport, so the overflow is removed from
-// the offset and the whole line stays readable.
+// centre only when it was already out of view. A line that only straddles the
+// edge still counts as visible, and the held position is pulled inside when its
+// scaled box would cross the foot of the viewport, so zooming never leaves the
+// line the reader was on clipped. `pointTop` is the caret's unscaled document
+// offset from the top of the sheet, and `pointHeight` its line box; a box taller
+// than the viewport cannot fit, so it stops with its top at the viewport top.
 export function scrollTopForZoomPoint(
   pointTop: number,
   scrollTop: number,
@@ -247,15 +248,14 @@ export function scrollTopForZoomPoint(
   pointHeight = 0,
 ): number {
   const previousScreen = pointTop * previousZoom + paddingTop - scrollTop;
-  if (previousScreen < 0 || previousScreen > viewportHeight) {
+  const edge = pointHeight * previousZoom;
+  if (previousScreen < -edge || previousScreen > viewportHeight + edge) {
     return scrollTopForZoom(scrollTop, viewportHeight, paddingTop, previousZoom, zoom, maxScrollTop);
   }
-  let target = paddingTop + pointTop * zoom - previousScreen;
-  if (pointHeight > 0) {
-    const overflow = paddingTop + (pointTop + pointHeight) * zoom - target - viewportHeight;
-    // A box taller than the viewport cannot fit, so the shift stops once its
-    // top reaches the top of the viewport rather than scrolling it out of view.
-    if (overflow > 0) target += Math.min(overflow, Math.max(0, previousScreen));
-  }
+  const screen = Math.max(
+    0,
+    Math.min(previousScreen, viewportHeight - pointHeight * zoom),
+  );
+  const target = paddingTop + pointTop * zoom - screen;
   return Math.max(0, Math.min(maxScrollTop, target));
 }
