@@ -416,6 +416,44 @@ function changePreviewText(changes: Change[]): { before: string; after: string }
   return { before: join(before), after: join(after) };
 }
 
+const REVISION_PREVIEW_LENGTH = 180;
+const REVISION_PREVIEW_CONTEXT = 40;
+const REVISION_PREVIEW_ELLIPSIS = " … ";
+
+// A card preview is a window around the change with a little context. A single
+// revision can hold more than one change (a deletion near the start and an
+// insertion at the end), and the first window would then hide the inserted
+// atom. When the last change falls outside it, show the start of the change and
+// an elided tail that still names what was added.
+export function revisionCardPreview(before: string, after: string): { before: string; after: string } {
+  let changeStart = 0;
+  while (changeStart < before.length && changeStart < after.length && before[changeStart] === after[changeStart]) {
+    changeStart += 1;
+  }
+  let beforeEnd = before.length;
+  let afterEnd = after.length;
+  while (beforeEnd > changeStart && afterEnd > changeStart && before[beforeEnd - 1] === after[afterEnd - 1]) {
+    beforeEnd -= 1;
+    afterEnd -= 1;
+  }
+  const windowStart = Math.max(0, changeStart - REVISION_PREVIEW_CONTEXT);
+  const beforeWindowEnd = Math.min(before.length, windowStart + REVISION_PREVIEW_LENGTH);
+  const afterWindowEnd = Math.min(after.length, windowStart + REVISION_PREVIEW_LENGTH);
+  if (beforeEnd <= beforeWindowEnd && afterEnd <= afterWindowEnd) {
+    return {
+      before: before.slice(windowStart, beforeWindowEnd),
+      after: after.slice(windowStart, afterWindowEnd),
+    };
+  }
+  const headLength = Math.floor(REVISION_PREVIEW_LENGTH / 3);
+  const tailLength = REVISION_PREVIEW_LENGTH - headLength - REVISION_PREVIEW_ELLIPSIS.length;
+  const tailStart = Math.max(windowStart + headLength, Math.max(beforeEnd, afterEnd) - tailLength);
+  return {
+    before: `${before.slice(windowStart, windowStart + headLength)}${REVISION_PREVIEW_ELLIPSIS}${before.slice(tailStart, tailStart + tailLength)}`,
+    after: `${after.slice(windowStart, windowStart + headLength)}${REVISION_PREVIEW_ELLIPSIS}${after.slice(tailStart, tailStart + tailLength)}`,
+  };
+}
+
 // History previews used to be stored without an atom's attribute content, so
 // an older revision can still carry identical before/after text even though its
 // snapshots show an inserted citation or equation. The snapshots are the source
