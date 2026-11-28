@@ -5435,8 +5435,9 @@
       "hint": "Repro: 1. Create a project and type 'Rate '.\n2. Open Insert > Inline equation.\n3. Enter 100% in the LaTeX source: the preview shows only '100', there is no error message and Insert is enabled.\n4. Click Insert, go to View > LaTeX and click Refresh from visual: the body reads 'Rate \\(100%\\)'.\n5. Compile that source with the bundled Tectonic.\nActual: The preview silently drops everything from % onward and Insert is allowed. The exported inline math is 'Rate \\(100%\\)'; the % starts a TeX comment that swallows the closing \\), so Tectonic stops with '! Missing $ inserted.' and writes no PDF.",
       "source": "explore:math:a bare percent sign in inline math is accepted, but the exported formula never closes because % comments out the delimit",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T00:53:40Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T00:53:40Z",
+      "lastAttemptAt": "2026-11-28T00:53:40Z"
     },
     {
       "id": "qa-343",

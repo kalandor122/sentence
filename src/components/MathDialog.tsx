@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "./Modal";
-import { latexHasBlankLine, latexHasError, renderLatex } from "../editor/KatexMath";
+import { latexHasBlankLine, latexHasError, latexHasUnclosedComment, renderLatex } from "../editor/KatexMath";
 
 interface MathDialogProps {
   open: boolean;
@@ -54,10 +54,16 @@ export default function MathDialog({
   );
   const editing = initialLatex.trim().length > 0;
   const blankLine = useMemo(() => latexHasBlankLine(latex, environment), [environment, latex]);
+  const unclosedComment = useMemo(
+    () => !display && latexHasUnclosedComment(latex),
+    [display, latex],
+  );
   const error = invalid
-    ? blankLine
-      ? "Blank lines are not allowed in math. Remove the empty line and try again."
-      : "This LaTeX could not be rendered. Check the syntax and try again."
+    ? unclosedComment
+      ? "A percent sign starts a LaTeX comment and would hide the closing delimiter. Write \\% for a literal percent sign."
+      : blankLine
+        ? "Blank lines are not allowed in math. Remove the empty line and try again."
+        : "This LaTeX could not be rendered. Check the syntax and try again."
     : null;
 
   const insertSnippet = (snippet: string) => {
