@@ -5451,8 +5451,9 @@
       "hint": "Repro: 1. Create a project and type 'Colour '.\n2. Open Insert > Inline equation and enter \\textcolor{red}{x}: the preview renders a red x with no error and Insert is enabled.\n3. Click Insert, then View > LaTeX: the body contains \\(\\textcolor{red}{x}\\) and the preamble lists fontspec, amsmath/amssymb, graphicx, booktabs, ulem, microtype, hyperref, fancyhdr and geometry, but no xcolor.\n4. Compile the exported source with the bundled Tectonic.\nActual: Tectonic stops with '! Undefined control sequence.' at \\(\\textcolor{red}{x}\\) and writes no pages, even though the dialog preview showed the formula as valid.",
       "source": "explore:math:the math preview accepts \\textcolor, but the exported preamble omits xcolor so the pdf compile fails",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T00:56:35Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T00:56:35Z",
+      "lastAttemptAt": "2026-11-28T00:56:35Z"
     },
     {
       "id": "qa-344",

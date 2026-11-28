@@ -2502,6 +2502,41 @@ describe("LaTeX generation", () => {
     expect(plainLatex).not.toContain("xcolor");
   });
 
+  it("loads xcolor when a formula uses a colour command", () => {
+    const latex = documentToLatex(
+      {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              { type: "text", text: "Colour " },
+              { type: "mathInline", attrs: { latex: "\\textcolor{red}{x}" } },
+            ],
+          },
+          { type: "mathBlock", attrs: { latex: "\\color{blue} y = 1" } },
+        ],
+      },
+      DEFAULT_SETTINGS,
+    );
+    expect(latex).toContain("\\usepackage{xcolor}");
+    expect(latex).toContain("\\(\\textcolor{red}{x}\\)");
+
+    const plainLatex = documentToLatex(
+      {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [{ type: "mathInline", attrs: { latex: "\\textcolorful{y}" } }],
+          },
+        ],
+      },
+      DEFAULT_SETTINGS,
+    );
+    expect(plainLatex).not.toContain("xcolor");
+  });
+
   it("generates and parses arXiv paper metadata", () => {
     const paperSettings: ProjectSettings = {
       ...DEFAULT_SETTINGS,
