@@ -1,6 +1,7 @@
 import { Extension, type Editor } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import type { Node as PMNode } from "@tiptap/pm/model";
 import type { ProjectSettings } from "../lib/types";
 
 type LineSpacing = ProjectSettings["lineSpacing"];
@@ -11,37 +12,62 @@ export const LINE_HEIGHTS: Record<LineSpacing, string> = {
   double: "2.6",
 };
 
-const lineSpacingKey = new PluginKey<LineSpacing>("sentenceLineSpacing");
+interface LineSpacingState {
+  spacing: LineSpacing;
+  decorations: DecorationSet;
+}
 
-// Line spacing is a document-wide setting, but rendering it on the paragraphs
-// keeps the editor markup in step with the spacing the reader actually sees.
+const lineSpacingKey = new PluginKey<LineSpacingState>("sentenceLineSpacing");
+
+// One node decoration per paragraph, rendered so the markup shows the spacing
+// the reader sees. The set is built once per spacing change and mapped through
+// later edits: rebuilding it on every transaction re-walked the whole document
+// and rebuilt a decoration for every paragraph, which made typing in a long
+// manuscript progressively slower.
+function paragraphSpacingDecorations(doc: PMNode, spacing: LineSpacing): DecorationSet {
+  const decorations: Decoration[] = [];
+  doc.descendants((node, position) => {
+    if (node.type.name === "paragraph") {
+      decorations.push(
+        Decoration.node(position, position + node.nodeSize, {
+          "data-line-spacing": spacing,
+        }),
+      );
+    }
+  });
+  return DecorationSet.create(doc, decorations);
+}
+
 export const LineSpacing = Extension.create({
   name: "sentenceLineSpacing",
 
   addProseMirrorPlugins() {
     return [
-      new Plugin<LineSpacing>({
+      new Plugin<LineSpacingState>({
         key: lineSpacingKey,
         state: {
-          init: () => "single",
-          apply(tr, value) {
-            return (tr.getMeta(lineSpacingKey) as LineSpacing | undefined) ?? value;
+          init: (_config, state) => ({
+            spacing: "single",
+            decorations: paragraphSpacingDecorations(state.doc, "single"),
+          }),
+          apply(transaction, value, _oldState, newState) {
+            const next = transaction.getMeta(lineSpacingKey) as LineSpacing | undefined;
+            if (next !== undefined) {
+              return {
+                spacing: next,
+                decorations: paragraphSpacingDecorations(newState.doc, next),
+              };
+            }
+            if (!transaction.docChanged) return value;
+            return {
+              spacing: value.spacing,
+              decorations: value.decorations.map(transaction.mapping, transaction.doc),
+            };
           },
         },
         props: {
           decorations(state) {
-            const spacing = lineSpacingKey.getState(state) ?? "single";
-            const decorations: Decoration[] = [];
-            state.doc.descendants((node, pos) => {
-              if (node.type.name === "paragraph") {
-                decorations.push(
-                  Decoration.node(pos, pos + node.nodeSize, {
-                    "data-line-spacing": spacing,
-                  }),
-                );
-              }
-            });
-            return DecorationSet.create(state.doc, decorations);
+            return lineSpacingKey.getState(state)?.decorations ?? DecorationSet.empty;
           },
         },
       }),

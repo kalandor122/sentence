@@ -2623,7 +2623,11 @@ export function documentPlainText(document: SentenceDocument): string {
 }
 
 export function countWords(document: SentenceDocument): number {
-  const text = documentPlainText(document).trim();
-  if (!text) return 0;
-  return text.split(/\s+/).filter(Boolean).length;
+  const text = documentPlainText(document);
+  // Counting word starts avoids building an array of every word, which for a
+  // long manuscript is most of the cost of the status bar counter.
+  let words = 0;
+  const matcher = /\S+/g;
+  while (matcher.exec(text)) words += 1;
+  return words;
 }

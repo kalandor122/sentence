@@ -1367,7 +1367,7 @@ export default function App() {
 
   const handleDocumentUpdate = (document: SentenceDocument, undoneComments: string[] = []) => {
     const before = workspaceRef.current?.document;
-    if (!isDesktop && before && JSON.stringify(before) === JSON.stringify(document)) return;
+    if (!isDesktop && before === document) return;
     const currentSettings = workspaceRef.current?.settings;
     // Undo removes a comment's mark along with its thread. A redo puts the mark
     // back, so its stashed thread returns with it rather than leaving a
@@ -2422,7 +2422,10 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  const words = workspace ? countWords(workspace.document) : 0;
+  const words = useMemo(
+    () => (workspace ? countWords(workspace.document) : 0),
+    [workspace?.document],
+  );
   const [visualPages, setVisualPages] = useState<number | null>(null);
   const pages = visualPages ?? 1;
   const branch = workspace?.git.status.branch ?? "main";
