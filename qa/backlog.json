@@ -5607,8 +5607,9 @@
       "hint": "Repro: Create a project and leave the first paragraph empty; press Enter and type \"QuickNote \", then insert a footnote with text \"Note\". Double-click the new footnote marker, then press Escape as soon as the Edit footnote dialog appears (the probe presses it immediately, without waiting for the dialog's focus hand-off; the failure window is roughly the first 250 ms). Wait for the dialog to close and type \"Z\". The probe's atomEditQuickEscape scenario repeats this for a footnote, a citation and a cross-reference.\nActual: The atom's selection is lost. The probe's paragraphs after typing become [\"Z\", \"QuickNote 1\"], [\"Z\", \"QuickCite [sentence2026]\"] and [\"Z\", \"QuickRef ref: fig:quick\"]: the character is inserted at the very start of the document instead of beside the marker. Pressing Escape after the dialog has been open for about 300 ms preserves the caret, so the failure is the fast-cancel path.",
       "source": "explore:links-cites-footnotes:cancelling a citation, footnote or cross-reference edit immediately after it opens drops the caret to the start of the d",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T02:55:08Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T02:55:08Z",
+      "lastAttemptAt": "2026-11-28T02:55:08Z"
     },
     {
       "id": "qa-354",
