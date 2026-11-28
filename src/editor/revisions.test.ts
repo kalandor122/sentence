@@ -279,6 +279,33 @@ describe("tracked change decorations", () => {
     editor.destroy();
   });
 
+  it("marks a citation inserted into an empty paragraph stored without content", () => {
+    const before: SentenceDocument = { type: "doc", content: [{ type: "paragraph" }] };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "citation", attrs: { key: "sentence2026" } }] }],
+    };
+    const editor = new Editor({ extensions: [StarterKit, Citation, RevisionMarks], content: after });
+    setRevisionMarks(editor, [revision(before, after)]);
+
+    const citation = editor.view.dom.querySelector(".citation");
+    expect(citation?.classList.contains("sentence-revision-insertion")).toBe(true);
+    editor.destroy();
+  });
+
+  it("marks an equation inserted into an empty paragraph stored without content", () => {
+    const before: SentenceDocument = { type: "doc", content: [{ type: "paragraph" }] };
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "mathInline", attrs: { latex: "x^2" } }] }],
+    };
+    const editor = new Editor({ extensions: [StarterKit, MathInline, RevisionMarks], content: after });
+    setRevisionMarks(editor, [revision(before, after)]);
+
+    expect(editor.view.dom.querySelectorAll(".sentence-revision-insertion")).toHaveLength(1);
+    editor.destroy();
+  });
+
   it("marks an equation inserted as a new block as an insertion", () => {
     const before: SentenceDocument = {
       type: "doc",

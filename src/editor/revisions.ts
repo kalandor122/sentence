@@ -206,6 +206,14 @@ function markAtomInsertion(
   colorClass: string,
   path: Path | null,
 ): void {
+  // An empty block stores no `content` key at all, so adding its first atom is
+  // diffed as a whole new content array rather than as one inserted node.
+  if (Array.isArray(node)) {
+    node.forEach((child, index) => {
+      markAtomInsertion(decorations, doc, child, revision, colorClass, path ? [...path, index] : null);
+    });
+    return;
+  }
   if (!isRecord(node)) return;
   const range = findAtomRange(doc, node, path);
   if (range) {
