@@ -5958,10 +5958,11 @@
       ],
       "hint": "Repro: Run `node qa/probes/long-document.mjs` and read `stages.zoom`, or reproduce by hand at 1280x800 with the 50-heading/3,600-word document: click in the page and press Ctrl+End (the editor scrolls to scrollTop 13,558 of a 14,082 maximum). Click the status-bar 'Zoom out' button three times to reach 70%: scrollTop remains 13,558, but the sheet's bottom edge moves from +1,071px to -3,309px relative to the editor viewport, so the entire page and its last block (at -3,707px) are above the visible area. Wheel to the maximum (14,082): the sheet bottom is -3,833px and the editor is completely blank. At 150% the sheet spans -120px to 1,071px in the 950px-wide viewport while the horizontal scroll range is only 121px, so the left 120px of the page cannot be brought into view.\nActual: The CSS transform scales the sheet but leaves scroll geometry at the 100% layout: zooming out from the end leaves the viewport below the sheet (with 3,833px of blank scroll past it), and at 150% the left edge of the page is clipped with only 121px of horizontal scroll available to recover it.",
       "source": "explore:long-document:zooming out while at the end leaves the whole document above the viewport, and the scroll range extends past the end of ",
-      "status": "in_progress",
+      "status": "done",
       "attempts": 1,
       "startedAt": "2026-11-28T07:33:30Z",
-      "lastAttemptAt": "2026-11-28T07:33:30Z"
+      "lastAttemptAt": "2026-11-28T07:33:30Z",
+      "doneAt": "2026-11-28T07:54:05Z"
     },
     {
       "id": "qa-376",
@@ -6769,6 +6770,44 @@
     },
     {
       "id": "qa-442",
+      "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
+      "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
+      "severity": "medium",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: 1. Open a new document and put the caret at the end of the last paragraph. 2. Review tab > Track changes. 3. References tab > Insert citation > Enter a key manually > sentence2026 > Insert; wait about 2.5 s and open History. 4. Back in the document, Insert tab > Inline equation > x^2 > Insert; wait about 2.5 s and open History again.\nActual: Both cards show exactly the same text on both sides (e.g. 'mpactly: meaning = structure + language.' for before and after), and the document contains no .sentence-revision-insertion mark for either atom. The citation and equation are only discoverable by reading the body, so a reviewer cannot see what was inserted or where, even though Reject does remove them.",
+      "source": "explore:review:tracked insertions of a citation or an equation show a history card with identical before/after text and no mark in the ",
+      "status": "open"
+    },
+    {
+      "id": "qa-443",
+      "title": "Source round trip drops empty rows from one-column tables; a 1x1 empty table disappears and its LaTeX becomes body text",
+      "why": "Exploratory pass on tables (functional): expected The one-column table keeps all three rows (Head plus two empty body rows), and the single empty cell stays an editable 1x1 table. Empty rows are table structure and must survive the parse.",
+      "severity": "high",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: New document. Insert tab > Insert table (3x3, header row). Click the first body cell, then Table toolbar > Delete column twice, leaving one column. Click the header cell and type Head. Open the source pane (status-bar Source), append a space to the source so Apply source enables, click Apply source, then Visual. For the 1x1 case: New document > Insert table, click the first body cell, Delete column twice and Delete row twice, leaving a single empty header cell; make the same trivial source edit, Apply source, then Visual.\nActual: The 3x1 table returns as 1x1: only the row containing Head survives, and both empty body rows are dropped. The 1x1 table disappears entirely (0 tables in the editor) and its LaTeX is inserted as paragraph text, rendered as 'egin{table}[htbp] entering egin{tabular}{l} \\hline \\hline \\end{tabular} \\end{table}' (the \\b and \\c sequences are decoded as accent macros); the status bar reports 7 words and the toast says 'Visual document synchronized from LaTeX.' The source pane still shows the original 3-row tabular, so source and visual disagree. Both cases reproduce from the trivial 'append a space + Apply source' edit, not only from a hand-written tabular. Evidence: qa/shots/probe-tables-narrow.png, probe scenarios narrowTableRoundTrip and trivialSourceEdit.",
+      "source": "explore:tables:source round trip drops empty rows from one-column tables; a 1x1 empty table disappears and its latex becomes body text",
+      "status": "in_progress",
+      "attempts": 0,
+      "startedAt": "2026-11-28T08:15:07Z"
+    },
+    {
+      "id": "qa-444",
+      "title": "Shift+Tab in the first table cell jumps to the sidebar History button and discards the next keystrokes",
+      "why": "Exploratory pass on tables (functional): expected Shift+Tab at the start of the table keeps the caret in the text flow (for example, in the paragraph before the table), mirroring what Tab does after the last cell, so continued typing lands in the document.",
+      "severity": "low",
+      "files": [
+        "src"
+      ],
+      "hint": "Repro: New document. Insert tab > Insert table (3x3). Click the first (header) cell, type first. Click the second body row's middle cell and type mid. Click the first header cell again, press Shift+Tab, then type X without clicking anywhere.\nActual: document.activeElement becomes the sidebar BUTTON labelled History (activeElement.closest('.tiptap, .ProseMirror') is false). The caret is still painted in the first cell, but typing X adds no text anywhere; the editor text remains 'first mid', so the keystroke is silently discarded. Probe scenario tableBoundaries, check 'Shift+Tab in the first cell keeps typing inside the document'.",
+      "source": "explore:tables:shift+tab in the first table cell jumps to the sidebar history button and discards the next keystrokes",
+      "status": "open"
+    },
+    {
+      "id": "qa-445",
       "title": "Tracked insertions of a citation or an equation show a History card with identical before/after text and no mark in the ",
       "why": "Exploratory pass on review (ux): expected Each History card identifies the inserted atom (for example the citation key or the equation source) in its before/after previews, and the new citation/equation is marked as an insertion in the document.",
       "severity": "medium",
