@@ -5591,8 +5591,9 @@
       "hint": "Repro: Create a project and type \"SelectNote alpha beta\". Select \"beta\" (Ctrl+Shift+ArrowLeft), open Insert > Footnote, enter \"Selected note\" and click Insert. Repeat with \"SelectCite alpha beta\", References > Insert citation > Enter a key manually, key sentence2026; and with \"SelectRef alpha beta\", References > Cross-reference, label fig:sel.\nActual: The selected word is deleted. The probe's atomInsertOverSelection scenario records the paragraphs as \"SelectNote alpha 1\", \"SelectCite alpha [sentence2026]\" and \"SelectRef alpha ref: fig:sel\"; \"beta\" is gone from the document and from the exported LaTeX, with no warning.",
       "source": "explore:links-cites-footnotes:inserting a footnote, citation or cross-reference over a text selection deletes the selected text",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T02:42:04Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T02:42:04Z",
+      "lastAttemptAt": "2026-11-28T02:42:04Z"
     },
     {
       "id": "qa-353",

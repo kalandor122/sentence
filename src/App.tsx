@@ -1502,9 +1502,21 @@ export default function App() {
     }
   };
 
-  const insertCitation = (key: string) => {
+  // insertContent replaces the selection. A citation, footnote or
+  // cross-reference is a marker added after the highlighted text, not a
+  // replacement for it (a link, by contrast, marks the selected text itself).
+  const insertInlineAtom = (
+    type: "citation" | "footnote" | "crossReference",
+    attrs: Record<string, string>,
+  ) => {
     if (!editor) return;
-    editor.chain().focus().insertContent({ type: "citation", attrs: { key } }).run();
+    const { selection } = editor.state;
+    const position = selection.empty ? selection.from : selection.to;
+    editor.chain().focus().insertContentAt(position, { type, attrs }).setTextSelection(position + 1).run();
+  };
+
+  const insertCitation = (key: string) => {
+    insertInlineAtom("citation", { key });
     warnMissingCitations(key);
   };
 
@@ -1953,7 +1965,7 @@ export default function App() {
       case "footnote": {
         const position = dialog.position;
         if (position === undefined) {
-          editor?.chain().focus().insertContent({ type: "footnote", attrs: { text: value } }).run();
+          insertInlineAtom("footnote", { text: value });
           break;
         }
         updateInlineAtom("footnote", position, { text: value });
@@ -1961,7 +1973,7 @@ export default function App() {
       }
       case "cross-reference":
         if (dialog.position === undefined) {
-          editor?.chain().focus().insertContent({ type: "crossReference", attrs: { label: value } }).run();
+          insertInlineAtom("crossReference", { label: value });
           break;
         }
         updateInlineAtom("crossReference", dialog.position, { label: value });
