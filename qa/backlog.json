@@ -6039,8 +6039,9 @@
       "hint": "Repro: In Source mode add '% Hand-written draft to keep' plus 'Second draft line.' to the body so Apply source is enabled. Click 'Refresh from visual' within the autosave window, then click into the textarea and press Ctrl+Z.\nActual: The draft is replaced with generated LaTeX immediately; no toast or confirmation appears and Ctrl+Z after refocusing the textarea does nothing (the undo history was reset).",
       "source": "explore:source-editor:'refresh from visual' destroys the unsaved draft instantly and it cannot be undone",
       "status": "in_progress",
-      "attempts": 0,
-      "startedAt": "2026-11-28T08:49:42Z"
+      "attempts": 1,
+      "startedAt": "2026-11-28T08:49:42Z",
+      "lastAttemptAt": "2026-11-28T08:49:42Z"
     },
     {
       "id": "qa-381",

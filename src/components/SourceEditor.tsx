@@ -12,6 +12,9 @@ interface SourceEditorProps {
   historyRef?: RefObject<Record<string, SourceHistory | null>>;
   historyKey?: string;
   undoBoundary?: number;
+  // Bumped when the app replaces the text with something the user can undo
+  // (Refresh from visual), as opposed to a rewrite that starts a new baseline.
+  undoableReplace?: number;
 }
 
 interface HistoryEntry {
@@ -44,6 +47,7 @@ export default function SourceEditor({
   historyRef,
   historyKey = "document.tex",
   undoBoundary,
+  undoableReplace,
 }: SourceEditorProps) {
   const localTextarea = useRef<HTMLTextAreaElement>(null);
   const textarea = textareaRef ?? localTextarea;
@@ -82,6 +86,7 @@ export default function SourceEditor({
   // just committed and one undo would remove both. Blurring the textarea (the
   // Apply button, another view) or moving through the history ends the run.
   const boundary = useRef(true);
+  const undoableReplaceRef = useRef(undoableReplace);
   const onChangeRef = useRef(onChange);
   const actions = useRef({ undo: () => {}, redo: () => {} });
 
@@ -213,6 +218,8 @@ export default function SourceEditor({
   useEffect(() => {
     const node = textarea.current;
     if (!node) return;
+    const replaced = undoableReplace !== undefined && undoableReplace !== undoableReplaceRef.current;
+    undoableReplaceRef.current = undoableReplace;
     if (historyKeyRef.current !== historyKey) {
       // Switching file tabs swaps the text without an edit, so keep the stack
       // of the file being left and bring back the other file's own stack.
@@ -245,7 +252,20 @@ export default function SourceEditor({
       node.setSelectionRange(start, end);
       caret.current = { start, end };
       restoredSelection.current = null;
-      resetHistory(value, start, end);
+      if (replaced) {
+        // The text that was just replaced stays on the stack as one step, so a
+        // mistaken Refresh from visual can be taken back with Ctrl+Z (and put
+        // back with Ctrl+Shift+Z) instead of deleting the draft for good.
+        const current = history.current;
+        if (current.index < current.entries.length - 1) {
+          current.entries = current.entries.slice(0, current.index + 1);
+        }
+        current.entries.push({ value, selectionStart: start, selectionEnd: end, inputType: "external" });
+        current.index = current.entries.length - 1;
+        boundary.current = true;
+      } else {
+        resetHistory(value, start, end);
+      }
     } else if (restoredSelection.current) {
       // Coming back from another view: put the caret where it was left so the
       // next keystroke (or undo) continues in place instead of at the start.
@@ -262,7 +282,7 @@ export default function SourceEditor({
     caret.current = { start: offset, end: offset + length };
     const lineHeight = 22;
     node.scrollTop = Math.max(0, (activeLine - 3) * lineHeight);
-  }, [activeLine, historyKey, value]);
+  }, [activeLine, historyKey, value, undoableReplace]);
 
   return (
     <div className="source-editor">
