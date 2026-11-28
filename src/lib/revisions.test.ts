@@ -260,6 +260,27 @@ describe("tracked text comparison", () => {
     expect(equation.after).toContain("x^2");
   });
 
+  it("names an inserted node that revisionText cannot describe beside another change", () => {
+    const before = doc("Body");
+    const after: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "Body" },
+            { type: "horizontalRule" },
+            { type: "text", text: " More" },
+          ],
+        },
+      ],
+    };
+    const preview = revisionPreviewText(revision("mixed", before, after));
+    expect(preview.before).toBe("Body");
+    expect(preview.after).toContain("More");
+    expect(preview.after).toContain("[horizontalRule]");
+  });
+
   it("labels a whitespace-only insertion so the previews still differ", () => {
     const preview = revisionPreviewText(revision("space", doc("Body"), doc("Body ")));
     expect(preview.before).toBe("Body");
