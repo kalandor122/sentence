@@ -405,7 +405,14 @@ function changePreviewText(changes: Change[]): { before: string; after: string }
       if (change.after !== undefined) after.push(changeValueText(change.after));
     }
   }
-  const join = (parts: string[]) => parts.map((part) => part.trim()).filter(Boolean).join(" ");
+  // Trim the surrounding context, but keep a run that is only whitespace: a
+  // tracked space adds no visible characters, and dropping it would leave the
+  // card with two identical previews.
+  const join = (parts: string[]) =>
+    parts
+      .map((part) => part.trim() || (part ? "[space]" : ""))
+      .filter(Boolean)
+      .join(" ");
   return { before: join(before), after: join(after) };
 }
 

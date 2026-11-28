@@ -260,6 +260,13 @@ describe("tracked text comparison", () => {
     expect(equation.after).toContain("x^2");
   });
 
+  it("labels a whitespace-only insertion so the previews still differ", () => {
+    const preview = revisionPreviewText(revision("space", doc("Body"), doc("Body ")));
+    expect(preview.before).toBe("Body");
+    expect(preview.after).toContain("[space]");
+    expect(preview.before).not.toBe(preview.after);
+  });
+
   it("identifies other inserted atoms in the review preview", () => {
     const before = doc("Body");
     const after: SentenceDocument = {

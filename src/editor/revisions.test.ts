@@ -365,6 +365,61 @@ describe("tracked change decorations", () => {
     editor.destroy();
   });
 
+  it("marks a citation and an equation appended after a formatted run", () => {
+    const before: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "The central model: " },
+            { type: "text", text: "meaning = structure + language", marks: [{ type: "code" }] },
+          ],
+        },
+      ],
+    };
+    const withCitation: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            ...(before.content?.[0]?.content ?? []),
+            { type: "citation", attrs: { key: "sentence2026" } },
+          ],
+        },
+      ],
+    };
+    const withEquation: SentenceDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            ...(withCitation.content?.[0]?.content ?? []),
+            { type: "mathInline", attrs: { latex: "x^2" } },
+          ],
+        },
+      ],
+    };
+    const editor = new Editor({
+      extensions: [StarterKit, Citation, MathInline, RevisionMarks],
+      content: withEquation,
+    });
+    setRevisionMarks(editor, [
+      { ...revision(before, withCitation), id: "r1" },
+      { ...revision(withCitation, withEquation), id: "r2" },
+    ]);
+
+    const marks = Array.from(editor.view.dom.querySelectorAll(".sentence-revision-insertion"));
+    expect(marks.map((mark) => mark.getAttribute("data-revision-id"))).toEqual(["r1", "r2"]);
+    expect(marks.map((mark) => mark.getAttribute("title"))).toEqual([
+      "Inserted by Ada: [sentence2026]",
+      "Inserted by Ada: x^2",
+    ]);
+    editor.destroy();
+  });
+
   it("marks an inserted empty paragraph with a paragraph symbol", () => {
     const before: SentenceDocument = {
       type: "doc",
